@@ -1,0 +1,132 @@
+# Cmake build folder
+build
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.core
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# python precompiled files
+*.pyc
+
+# python dirs
+venv
+dist
+htmlcov
+instance
+.pytest_cache
+.coverage
+*.egg-info
+__pycache__
+
+# OS generated files
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+*.lock
+package-lock.json
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# gtags
+GPATH
+GRTAGS
+GTAGS
+
+# Org-mode
+#*.org
+.org-id-locations
+*_archive
+
+# flymake-mode
+*_flymake.*
+
+# reftex files
+*.rel
+
+# projectile
+.projectile
+
+# dir-locals
+.dir-locals.el
+
+# editorconfig
+.editorconfig
+
+# -- Mesk --
+# Emacs history
+history
+
+# Mesk dirs
+.demo
+.backup
+.org
+cache
+autosave
+
+# Cask dir
+.cask
+
+# Cask file
+Cask
+
+# Emacs Packages Dirs
+tutorial
+irony
+eshell
+elpa
+transient
+url
+eshell
+elpa
+rtags
+anaconda-mode
+
+# Mesk .el
+init.el
+custom.el
+private.el
+my-code.el
+mesk.org
+eos.el
+
+# Mesk docs
+README.txt

@@ -126,7 +126,6 @@ custom.el
 private.el
 my-code.el
 mesk.org
-eos.el
 
 # Mesk docs
 README.txt

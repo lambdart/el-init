@@ -30,11 +30,8 @@ banner() {
     # print help message
     cat <<-'EOF'
 
-  |\  /|
-  | \/ | |'   _   |
-  |    | |-  |__  |/
-  |    | |__ ___| |\
-                 ... installation script
+    [ EMACS OS ]
+      ... installation script
 
 EOF
 }

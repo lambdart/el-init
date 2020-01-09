@@ -11,6 +11,3 @@
 
 ;; finally byte-compile it
 (byte-compile-file "eos.el")
-
-;; load it
-;; (load-file (concat user-emacs-directory "init.el"))

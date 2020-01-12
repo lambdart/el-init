@@ -1,9 +1,6 @@
 # Cmake build folder
 build
 
-# Prerequisites
-*.d
-
 # Compiled Object files
 *.slo
 *.lo
@@ -91,7 +88,6 @@ GTAGS
 # editorconfig
 .editorconfig
 
-# -- Mesk --
 # Emacs history
 history
 
@@ -120,12 +116,10 @@ elpa
 rtags
 anaconda-mode
 
-# Mesk .el
+# .el
 init.el
 custom.el
 private.el
-my-code.el
-mesk.org
 
-# Mesk docs
+# docs
 README.txt

@@ -1,6 +1,0 @@
-#contributor: k-bps <k-bps@tutanota.com>
-#name: require
-#key:  require
-#key:  req
-# --
-(require '$1)

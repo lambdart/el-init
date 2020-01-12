@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name:case
+# key: case
+# --
+case \$$1 in
+     h)  ;;
+     *) ; exit 1 ;;
+esac

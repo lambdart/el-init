@@ -1,0 +1,7 @@
+#contributor: k-bps
+#name: provide
+#key:  provide
+#key:  pro
+# --
+(provide '$1)
+;;; $1.el ends here

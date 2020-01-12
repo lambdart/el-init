@@ -115,6 +115,7 @@ eshell
 elpa
 rtags
 anaconda-mode
+snippets
 
 # .el
 custom.el

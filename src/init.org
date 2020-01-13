@@ -1,4 +1,4 @@
-l#+TITLE: Emacs Configuration File
+#+TITLE: Emacs Configuration File
 #+AUTHOR: esac-io
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
@@ -887,104 +887,104 @@ l#+TITLE: Emacs Configuration File
 
      #+BEGIN_SRC emacs-lisp
 
-          (when (require 'exwm nil t)
-            (progn
-              (require 'exwm-config nil t)
+     (when (require 'exwm nil t)
+       (progn
+         (require 'exwm-config nil t)
 
-              ;; set exwm workspaces
-              (customize-set-variable 'exwm-workspace-number 0)
+         ;; set exwm workspaces
+         (customize-set-variable 'exwm-workspace-number 2)
 
-              ;; show workspaces in all buffers
-              (customize-set-variable 'exwm-workspace-show-all-buffers t)
+         ;; show workspaces in all buffers
+         (customize-set-variable 'exwm-workspace-show-all-buffers t)
 
-              ;; Non-nil to allow switching to buffers on other workspaces
-              (customize-set-variable 'exwm-layout-show-all-buffers t)
+         ;; Non-nil to allow switching to buffers on other workspaces
+         (customize-set-variable 'exwm-layout-show-all-buffers t)
 
-              ;; exwn global keybindings
-              (customize-set-variable 'exwm-input-global-keys
-                                      `(([?\s-r] . exwm-reset)
-                                        ([?\s-w] . exwm-workspace-switch)
-                                        ([?\s-q] . exwm-input-toggle-keyboard)
+         ;; exwn global keybindings
+         (customize-set-variable 'exwm-input-global-keys
+                                 `(([?\s-r] . exwm-reset)
+                                   ([?\s-w] . exwm-workspace-switch)
+                                   ([?\s-q] . exwm-input-toggle-keyboard)
 
-                                        ;; ([?\s-k] . exwm-workspace-delete)
-                                        ;; ([?\s-a] . exwm-workspace-swap)
+                                   ;; ([?\s-k] . exwm-workspace-delete)
+                                   ;; ([?\s-a] . exwm-workspace-swap)
 
-                                        ;; create and switch to workspaces
-                                        ,@(mapcar (lambda (i)
-                                                    `(,(kbd (format "s-%d" i)) .
-                                                      (lambda ()
-                                                        (interactive)
-                                                        (exwm-workspace-switch-create ,i))))
-                                                  (number-sequence 0))))
+                                   ;; create and switch to workspaces
+                                   ,@(mapcar (lambda (i)
+                                               `(,(kbd (format "s-%d" i)) .
+                                                 (lambda ()
+                                                   (interactive)
+                                                   (exwm-workspace-switch-create ,i))))
+                                             (number-sequence 0))))
 
-              ;; The following example demonstrates how to use simulation keys to mimic
-              ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
-              ;; list of cons cells (SRC . DEST), where SRC is the key sequence you press
-              ;; and DEST is what EXWM actually sends to application.  Note that both SRC
-              ;; and DEST should be key sequences (vector or string).
-              (customize-set-variable 'exwm-input-simulation-keys
-                                      '(
-                                        ;; movement
-                                        ([?\C-b] . [left])
-                                        ([?\M-b] . [C-left])
-                                        ([?\C-f] . [right])
-                                        ([?\M-f] . [C-right])
-                                        ([?\C-p] . [up])
-                                        ([?\C-n] . [down])
-                                        ([?\C-a] . [home])
-                                        ([?\C-e] . [end])
-                                        ([?\M-v] . [prior])
-                                        ([?\C-v] . [next])
-                                        ([?\C-d] . [delete])
-                                        ([?\C-k] . [S-end delete])
+         ;; The following example demonstrates how to use simulation keys to mimic
+         ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
+         ;; list of cons cells (SRC . DEST), where SRC is the key sequence you press
+         ;; and DEST is what EXWM actually sends to application.  Note that both SRC
+         ;; and DEST should be key sequences (vector or string).
+         (customize-set-variable 'exwm-input-simulation-keys
+                                 '(
+                                   ;; movement
+                                   ([?\C-b] . [left])
+                                   ([?\M-b] . [C-left])
+                                   ([?\C-f] . [right])
+                                   ([?\M-f] . [C-right])
+                                   ([?\C-p] . [up])
+                                   ([?\C-n] . [down])
+                                   ([?\C-a] . [home])
+                                   ([?\C-e] . [end])
+                                   ([?\M-v] . [prior])
+                                   ([?\C-v] . [next])
+                                   ([?\C-d] . [delete])
+                                   ([?\C-k] . [S-end delete])
 
-                                        ;; cut/paste.
-                                        ([?\C-w] . [?\C-x])
-                                        ([?\M-w] . [?\C-c])
-                                        ([?\C-y] . [?\C-v])
+                                   ;; cut/paste.
+                                   ([?\C-w] . [?\C-x])
+                                   ([?\M-w] . [?\C-c])
+                                   ([?\C-y] . [?\C-v])
 
-                                        ;; search
-                                        ([?\C-s] . [?\C-f]))))
+                                   ;; search
+                                   ([?\C-s] . [?\C-f])))))
 
-          ;; this little bit will make sure that XF86 keys work in exwm buffers as well
-          (if (boundp 'exwm-input-prefix-keys)
-              (progn
-                (dolist (key '(XF86AudioLowerVolume
-                               XF86AudioRaiseVolume
-                               XF86PowerOff
-                               XF86AudioMute
-                               XF86AudioPlay
-                               XF86AudioStop
-                               XF86AudioPrev
-                               XF86AudioNext
-                               XF86ScreenSaver
-                               XF68Back
-                               XF86Forward
-                               Scroll_Lock
-                               print))
-                  (cl-pushnew key exwm-input-prefix-keys))))
+     ;; this little bit will make sure that XF86 keys work in exwm buffers as well
+     (if (boundp 'exwm-input-prefix-keys)
+         (progn
+           (dolist (key '(XF86AudioLowerVolume
+                          XF86AudioRaiseVolume
+                          XF86PowerOff
+                          XF86AudioMute
+                          XF86AudioPlay
+                          XF86AudioStop
+                          XF86AudioPrev
+                          XF86AudioNext
+                          XF86ScreenSaver
+                          XF68Back
+                          XF86Forward
+                          Scroll_Lock
+                          print))
+             (cl-pushnew key exwm-input-prefix-keys))))
 
-          ;; enable exwm
-          (if (fboundp 'exwm-enable)
-              (funcall 'exwm-enable))
+     ;; enable exwm
+     (if (fboundp 'exwm-enable)
+         (funcall 'exwm-enable))
 
-          ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
-          ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
-          ;; are run when a new X window class name or title is available.  Here's
-          ;; some advice on this topic:
-          ;; + Always use `exwm-workspace-rename-buffer` to avoid naming conflict.
-          ;; + For applications with multiple windows (e.g. GIMP), the class names of
-          ;; all windows are probably the same.  Using window titles for them makes
-          ;; more sense.
-          (require 'exwm-core nil t)
-          (require 'exwm-workspace nil t)
+     ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
+     ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
+     ;; are run when a new X window class name or title is available.  Here's
+     ;; some advice on this topic:
+     ;; + Always use `exwm-workspace-rename-buffer` to avoid naming conflict.
+     ;; + For applications with multiple windows (e.g. GIMP), the class names of
+     ;; all windows are probably the same.  Using window titles for them makes
+     ;; more sense.
+     (require 'exwm-core nil t)
+     (require 'exwm-workspace nil t)
 
-          ;; update the buffer name by X11 window title
-          (when (and (fboundp 'exwm-workspace-rename-buffer)
-                     (boundp 'exwm-title))
-            (add-hook 'exwm-update-title-hook
-                      (lambda ()
-                        (exwm-workspace-rename-buffer exwm-title))))
+     ;; update the buffer name by X11 window title
+     (when (and (fboundp 'exwm-workspace-rename-buffer)
+                (boundp 'exwm-title))
+       (add-hook 'exwm-update-title-hook
+                 (lambda ()
+                   (exwm-workspace-rename-buffer exwm-title))))
 
      #+END_SRC
 
@@ -1273,6 +1273,7 @@ l#+TITLE: Emacs Configuration File
      #+END_SRC
 
 **** Eww
+*** Web
 *** Feed
 **** RFeed
 *** Chat
@@ -1411,14 +1412,10 @@ l#+TITLE: Emacs Configuration File
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'eshell nil t)
-       (progn
-         ;; customize
-         (customize-set-variable 'display-buffer-alist
-                                 '(("\\`\\*e?shell" display-buffer-below-selected))))
+     (require 'eshell nil t)
 
-       ;; bind
-       (global-set-key (kbd "C-x [") 'eshell))
+     ;; bind
+     (global-set-key (kbd "C-x [") 'eshell)
 
      #+END_SRC
 
@@ -1759,7 +1756,16 @@ l#+TITLE: Emacs Configuration File
 
      #+END_SRC
 
-*** Completion
+*** Complete
+**** Completition
+
+     #+BEGIN_SRC emacs-lisp
+
+     (add-to-list 'display-buffer-alist
+                  '("\\*Completions\\*" display-buffer-below-selected))
+
+     #+END_SRC
+
 **** Company
 
      #+BEGIN_SRC emacs-lisp
@@ -2146,14 +2152,14 @@ l#+TITLE: Emacs Configuration File
 
      #+BEGIN_SRC emacs-lisp
 
-     (add-to-list 'load-path "/home/k-bps/.emacs.d/.cask/26.3/elpa/markdown-mode-20191230.1055")
-
      (when (require 'markdown-mode nil t)
        (progn
          ;; customize
-         (customize-set-variable 'markdown-command "multimarkdown")
+         (customize-set-variable 'markdown-command "multimarkdown")))
 
-         ;; bind
+     ;; bind
+     (when (boundp 'markdown-mode-map)
+       (progn
          (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
 
      #+END_SRC
@@ -2334,11 +2340,11 @@ l#+TITLE: Emacs Configuration File
 *** Elisp
 **** Company-elisp
 
-#+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
      (require 'company-elisp nil t)
 
-#+END_SRC
+     #+END_SRC
 
 **** Elisp-mode
 
@@ -2365,13 +2371,14 @@ l#+TITLE: Emacs Configuration File
                (lambda ()
                  ;; set company backends
                  (eos/company/set-backends
-                  '(company-elisp
-                    company-capf
-                    company-yasnippet
-                    company-keywords
-                    company-dabbrev
-                    company-dabbrev-code)
-                  (company-files))))
+                  '((company-elisp
+                     company-capf
+                     company-yasnippet
+                     company-keywords
+                     company-dabbrev
+                     company-dabbrev-code)
+                    (company-files)))
+                 ))
 
      #+END_SRC
 
@@ -2493,12 +2500,19 @@ l#+TITLE: Emacs Configuration File
 
      #+END_SRC
 
-*** ESS
-**** R
-**** Julia
+*** R
+
+    #+BEGIN_SRC emacs-lisp
+
+    (require 'ess-r-mode nil t)
+
+    #+END_SRC
+
+*** Julia
 *** Forms
 *** Clojure
 *** Vhdl
+*** Verilog
 *** Mql
 *** Cmake
 ** Unbind

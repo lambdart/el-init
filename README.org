@@ -11,11 +11,11 @@
   Using emacs (lisp interpreter) as the only IO bridge
   between human and machine. In another words, a emacs configuration
   well design and integrated, that provides a generic
-  computer environment for the daily use.
+  computer environment for everyday use.
 
-  We rely on org-mode to organize the role configuration in a logic
-  an manageable way, so the source code and its documentation are
-  contained in only one single file: ~init.org~.
+  We rely on org-mode to organize the whole configuration in a logic and
+  manageable way, so the source code and its documentation are contained
+  in only one file: ~init.org~.
 
   # ** TODO List resumed features
 

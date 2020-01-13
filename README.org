@@ -84,8 +84,8 @@
 
     - Table 1.2 (Global Prefix Keymaps)
 
-    [Note: The (minor) complete =M-`= uses a prefix
-    which does not follow the specified pattern.
+    - Note: The (minor) complete =M-`= uses a prefix
+      which does not follow the specified pattern.
 
 *** Major Prefix
 
@@ -107,7 +107,7 @@
     You can always use the functions (describe-key) =C-h k= and
     (describe-bindings) =C-h b= to require this information.
 
-**** TODO: Table!
+# **** TODO: Table!
 
      | Keymap | Keybind | function |
      |        |         |          |
@@ -130,11 +130,11 @@
     prefixs (parent or childs). So, as you can see, it's like
     a visual map.
 
-    [ TIP: If you want to visit a parent prefix, just hit =C-h u <up>=
-    inside the which-key popup ]
+    - TIP: If you want to visit a parent prefix, just hit =C-h u= (up)
+      inside the which-key popup.
 
-    [ TIP: Within which-key popup press =C-h= (help) and explore its
-    options ]
+    - TIP: Within which-key popup press =C-h= (help) and explore its
+      options.
 
 * Package Manager
 ** Add

@@ -29,9 +29,9 @@
 * Usage
 
   Using this emacs configuration is like using emacs vanilla itself
-  with a "few" reforms. For me the official interactive emacs
-  tutorial is a great way to start and understand a little bit of
-  the emacs universe.
+  with a “few” reforms.  As such, the official interactive emacs
+  tutorial is a great way to start to understanding a little
+  bit of the emacs universe.
 
   So, open emacs and press =C-h= and wait =0.2 ms=, the which-key
   popup will bring to you the help options available,

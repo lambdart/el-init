@@ -116,8 +116,8 @@
     have changed from the standard and some additional ones that we
     think are important.
 
-    You can always use the functions (describe-key) =C-h k= and
-    (describe-bindings) =C-h b= to require this information.
+    You can always use the functions =C-h k= (describe-key) and
+    =C-h b= (describe-bindings) to require this information.
 
 # **** TODO: Table!
 
@@ -125,25 +125,24 @@
      |        |         |          |
      - Table 1.3 (Global-map)
 
-**
 * Applications
   # ** TODO List and summarize apps
   # ** TODO Short by app classification
-** Misc
+** Miscellaneous
 *** Which-key
 
-    I like to think of this package as a guiding map among
+    I like to think of this package (or app) as a guiding map among
     the available keybindds. It's usability is quite simple,
     just press any keybinds sequence, e.g, =C-x=,
     and wait a litle bit, if the sequence is a prefix
     it will open a menu with the list of possible keys from
     the prefix entered.
 
-    Inside a which-key prefix (popup) you can enter in other
+    Inside a which-key popup you can enter in other
     prefixs (parent or childs). So, as you can see, it's like
     a visual map.
 
-    - TIP: If you want to visit a parent prefix, just hit =C-h u= (up)
+    - TIP: If you want to visit a parent prefix, just press =C-h u=,
       inside the which-key popup.
 
     - TIP: Within which-key popup press =C-h= (help) and explore its

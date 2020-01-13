@@ -1,6 +1,6 @@
 * EOS
 
-  Emacs OS, just another org-based emacs configuration,
+  Just another org-mode based emacs configuration,
   or a elisp interpreter desktop distribution.
 
 * Demo

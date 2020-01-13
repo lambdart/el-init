@@ -1,14 +1,14 @@
 * EOS
 
-  Just another emacs configuration, or a elisp interpreter
-  desktop distribution.
+  Emacs OS, just another org-based emacs configuration,
+  or a elisp interpreter desktop distribution.
 
 * Demo
   # ** TODO Add demo link
   # ** TODO Add screen-shot
 * Introduction
 
-  Using emacs (lisp interpreter) as the only IO bridge
+  Using emacs (elisp interpreter) as the only IO bridge
   between human and machine. In another words, a emacs configuration
   well design and integrated, that provides a generic
   computer environment for everyday use.

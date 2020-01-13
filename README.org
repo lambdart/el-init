@@ -60,20 +60,24 @@
 
     - TIP: =C-h r= (info-emacs-manual)
 
+*** Standard
+
     | Key        | Prefix | Description    |
+    |            |        |                |
     | Meta (Alt) | M-     | Global Meta    |
     | Crtl       | C-     | Global Command |
-
     - Table 1.0 (Emacs Basic Prefix)
 
-    | Keymap    | Prefix    |
-    | Ctl-x-map | C-x       |
-    | minor-map | C-x <key> |
-    | major-map | C-c       |
-
+    | Keymap    | Prefix    | Available       |
+    |           |           |                 |
+    | Ctl-x-map | C-x       | Always (Global) |
+    | minor-map | C-x <key> | Always (Global) |
+    | major-map | C-c       | Maybe* (Major)  |
     - Table 1.1 (Emacs Basic Action Prefix)
 
-*** Global Prefix
+    - TIP: Maybe*, means, depends on the current major mode
+
+*** C-x
 
     We define some new keymaps prefix, where the most
     common and used functions will be placed.
@@ -95,7 +99,7 @@
     - Note: The complete-prefix-map =M-`= are the only
       prefix that does not follow the specified pattern.
 
-*** Major Prefix
+*** C-c
 
     Some maps will be used only in specific modes,
     like cc-mode for example:
@@ -106,7 +110,7 @@
 
     - Table 1.2
 
-*** Global Keybinds
+*** Global
 
     We are not going to list all the keybinds, just the keybinds we
     have changed from the standard and some additional ones that we

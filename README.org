@@ -13,8 +13,8 @@
   well design and integrated, that provides a generic
   computer environment for the daily use.
 
-  We rely on org-mode to organize the how configuration in a logic
-  an manageable way, so the source code and it's documentation are
+  We rely on org-mode to organize the role configuration in a logic
+  an manageable way, so the source code and its documentation are
   contained in only one single file: ~init.org~.
 
   # ** TODO List resumed features

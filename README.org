@@ -40,30 +40,38 @@
   And, just enjoy your late nights :)
 
   - Note: Some keybinds will be not the same, in the next session
-    will be available a overview and how we map your functions.
+    will be available a overview on how we map elisp functions (keybind).
 
 ** Keybinds
 
-   Basically we create new maps (prefixs) to the minor
-   modes that we use, and we put them in Ctl-x-map.
-   Thus, the command access sequences become standardized.
+   Basically, new prefix maps are created for the most commonly
+   used minor modes and their functions are mapped within
+   their respective maps.
+
+   After that, the prefix maps will be placed in the Ctl-x-map prefix
+   map, resulting in the standardization of command
+   (function) access sequences.
 
 *** Basic
 
     If you do not understand the terminology of the tables below,
-    it is advisable to read the emacs manual on keys =C-h r=
-    (info-emacs-manual) and keymaps[8].
+    it is advisable to read the emacs manual in the sections on
+    keys and keymaps.
+
+    - TIP: =C-h r= (info-emacs-manual)
 
     | Key        | Prefix | Description    |
     | Meta (Alt) | M-     | Global Meta    |
     | Crtl       | C-     | Global Command |
-    - Table 1.0
+
+    - Table 1.0 (Emacs Basic Prefix)
 
     | Keymap    | Prefix    |
     | Ctl-x-map | C-x       |
     | minor-map | C-x <key> |
     | major-map | C-c       |
-    - Table 1.1
+
+    - Table 1.1 (Emacs Basic Action Prefix)
 
 *** Global Prefix
 
@@ -84,8 +92,8 @@
 
     - Table 1.2 (Global Prefix Keymaps)
 
-    - Note: The (minor) complete =M-`= uses a prefix
-      which does not follow the specified pattern.
+    - Note: The complete-prefix-map =M-`= are the only
+      prefix that does not follow the specified pattern.
 
 *** Major Prefix
 
@@ -113,6 +121,7 @@
      |        |         |          |
      - Table 1.3 (Global-map)
 
+**
 * Applications
   # ** TODO List and summarize apps
   # ** TODO Short by app classification

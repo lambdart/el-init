@@ -42,6 +42,13 @@
 
 *** Literate
 
+    Literate programming is a programming paradigm
+    introduced by Donald Knuth in which a computer program is
+    given an explanation of its logic in a natural language,
+    such as English, interspersed with snippets of macros and
+    traditional source code, from which compilable source code
+    can be generated.
+
     Literate programming it's only possible thanks to org-mode.
 
     #+BEGIN_SRC emacs-lisp
@@ -464,6 +471,25 @@
 
      #+END_SRC
 
+**** Get
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;;; Get symbol at point, maybe
+     (defun eos/get-selected-text-or-symbol-at-point ()
+       "Get the text in region or symbol at point.
+
+     If region is active, return the text in that region.  Else if the
+     point is on a symbol, return that symbol name.  Else return nil."
+       (cond ((use-region-p)
+              (buffer-substring-no-properties (region-beginning) (region-end)))
+             ((symbol-at-point)
+              (substring-no-properties (thing-at-point 'symbol)))
+             (t
+              nil)))
+
+     #+END_SRC
+
 *** Help
 
     #+BEGIN_SRC emacs-lisp
@@ -741,6 +767,17 @@
 
     #+END_SRC
 
+*** Timeclock
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'timeclock nil t)
+      (progn
+        ;; enable timeclock-mode-line
+        (timeclock-mode-line-display)))
+
+    #+END_SRC
+
 *** Mode-line
 
     #+BEGIN_SRC emacs-lisp
@@ -748,12 +785,10 @@
     (defun eos/mode-line()
       "Set eos `mode-line-format`."
       (customize-set-variable 'mode-line-format
-                              '(" %*%&  %l:%c | %I  %b  (%m) "
-                                " "
+                              '(" %*%&  %l:%c | %I  %b  (%m)  "
                                 (:eval
                                  (when (string-match " Projectile\\[\\(.+\\):" projectile--mode-line)
-                                   (concat "[" (match-string 1 projectile--mode-line) "]")))
-                                " "
+                                   (upcase (concat "- [" (match-string 1 projectile--mode-line) "] - "))))
                                 (vc-mode vc-mode)
                                 mode-line-end-space)))
 
@@ -874,11 +909,17 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; load cask
+     ;; eval when compile (avoid byte-compile warnings)
+     (eval-when-compile
+       (when (require 'cask "~/.cask/cask.el" t)
+         (progn
+           (cask-initialize))))
+
+     ;; load cask (maybe)
      (require 'cask "~/.cask/cask.el" t)
 
      ;; initialize cask
-     (cask-initialize)
+     (eos/funcall 'cask-initialize)
 
      #+END_SRC
 
@@ -892,7 +933,7 @@
          (require 'exwm-config nil t)
 
          ;; set exwm workspaces
-         (customize-set-variable 'exwm-workspace-number 2)
+         (customize-set-variable 'exwm-workspace-number 0)
 
          ;; show workspaces in all buffers
          (customize-set-variable 'exwm-workspace-show-all-buffers t)
@@ -937,11 +978,15 @@
                                    ([?\C-v] . [next])
                                    ([?\C-d] . [delete])
                                    ([?\C-k] . [S-end delete])
+                                   ([?\C-k] . [C-w]) ;; firefox close tab, temporary!
 
                                    ;; cut/paste.
                                    ([?\C-w] . [?\C-x])
                                    ([?\M-w] . [?\C-c])
                                    ([?\C-y] . [?\C-v])
+
+                                   ;; Escape (cancel)
+                                   ([?\C-g] . [escape])
 
                                    ;; search
                                    ([?\C-s] . [?\C-f])))))
@@ -965,8 +1010,7 @@
              (cl-pushnew key exwm-input-prefix-keys))))
 
      ;; enable exwm
-     (if (fboundp 'exwm-enable)
-         (funcall 'exwm-enable))
+     (eos/funcall 'exwm-enable)
 
      ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
      ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
@@ -980,11 +1024,10 @@
      (require 'exwm-workspace nil t)
 
      ;; update the buffer name by X11 window title
-     (when (and (fboundp 'exwm-workspace-rename-buffer)
-                (boundp 'exwm-title))
-       (add-hook 'exwm-update-title-hook
-                 (lambda ()
-                   (exwm-workspace-rename-buffer exwm-title))))
+     (add-hook 'exwm-update-title-hook
+               (lambda ()
+                 (exwm-workspace-rename-buffer
+                  (concat "[" exwm-class-name "] " exwm-title))))
 
      #+END_SRC
 
@@ -994,6 +1037,9 @@
 
      (when (require 'exwm-randr nil t)
        (progn
+         ;; set exwm workspaces
+         (customize-set-variable 'exwm-workspace-number 2)
+
          ;; customize monitors
          (customize-set-variable
           'exwm-randr-workspace-monitor-plist '(0 "HDMI-1"))
@@ -1246,14 +1292,6 @@
      #+END_SRC
 
 *** Browser
-**** Browser-url
-
-     #+BEGIN_SRC emacs-lisp
-
-     (customize-set-variable 'browse-url-generic-program "firefox")
-
-     #+END_SRC
-
 **** Shr
 
      Html parse options.
@@ -1273,19 +1311,73 @@
      #+END_SRC
 
 **** Eww
+
+     Elisp www browser configuration.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'eww nil t)
+       (progn
+         ;; define google search url
+         (defvar eos/eww-google-search-url "https://www.google.com/search?q="
+           "URL for Google searches.")
+
+         ;; customize search prefix
+         (customize-set-variable 'eww-search-prefix 'eos/eww-google-search-url)
+         ;; (customize-set-variable eww-search-prefix "https://duckduckgo.com/html/?q=")
+
+         ;; customize download directory
+         (customize-set-variable 'eww-download-directory "~/down")
+
+         ;; customize checkbox symbols
+         (customize-set-variable 'eww-form-checkbox-symbol "[ ]")
+         (customize-set-variable 'eww-form-checkbox-selected-symbol "[X]")
+         ;; (customize-set-variable eww-form-checkbox-symbol "☐") ; Unicode hex 2610
+         ;; (customize-set-variable eww-form-checkbox-selected-symbol "☑") ; Unicode hex 2611
+
+         ;; Re-write of the `eww-search-words' definition.
+         (defun eos/eww-search-words ()
+           "Search the web for the text between BEG and END.
+     If region is active (and not whitespace), search the web for
+     the text in that region.
+     Else if the region is not active, and the point is on a symbol,
+     search the web for that symbol.
+     Else prompt the user for a search string.
+     See the `eww-search-prefix' variable for the search engine used."
+           (interactive)
+           (let ((search-string (eos/get-selected-text-or-symbol-at-point)))
+             (when (and (stringp search-string)
+                        (string-match-p "\\`[[:blank:]]*\\'" search-string))
+               (customize-set-variable search-string nil))
+             (if (stringp search-string)
+                 (eww search-string)
+               (call-interactively #'eww))))
+         ))
+
+     #+END_SRC
+
+**** Surf
+**** Exwm-surf
+**** Browse-url
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'browse-url nil t)
+       (progn
+         ;; customize browse-url options
+         (customize-set-variable 'browse-url-generic-program "eww")
+         (customize-set-variable 'browse-url-function 'eww-browse-url)))
+
+     #+END_SRC
+
 *** Web
 *** Feed
 **** RFeed
 *** Chat
 **** Irc
+**** Jabber
+**** Slack
 **** Telega.el
-
-     #+BEGIN_SRC emacs-lisp
-
-
-
-     #+END_SRC
-
 *** Files
 **** Dired
 
@@ -2166,6 +2258,8 @@
 
 **** DocView
 **** Spell-check
+*** Analise
+**** Verb
 ** Development
 *** C/C++
 **** CC-mode

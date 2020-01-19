@@ -1939,10 +1939,6 @@
 
      (when (require 'yasnippet nil t)
        (progn
-         ;; snippet-dirs
-         (customize-set-variable 'yas-snippet-dirs
-                                 (concat user-emacs-directory "snippets"))
-
          ;; bind
          (define-key eos-complete-map (kbd "q") 'yas-expand)
          (define-key eos-complete-map (kbd "i") 'yas-insert-snippet)

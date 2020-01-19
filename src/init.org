@@ -2264,30 +2264,18 @@
 *** Analyse
 **** Verb
 *** Apparence
-**** Theme
+**** Mesk-term
 
      Add theme directory to load-path and load the
-     default theme.
+     default theme (mesk-term).
 
      #+BEGIN_SRC emacs-lisp
 
      ;; add eos-theme-dir to theme load path
-     (add-to-list 'custom-theme-load-path
-                  (concat user-emacs-directory "themes"))
+     (add-to-list 'custom-theme-load-path (concat user-emacs-directory "themes"))
 
      ;; load theme
      (load-theme 'mesk-term t)
-
-     #+END_SRC
-
-**** Moebius-theme
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; ;; load moebius theme
-     ;; (when (require 'moebius-theme nil t)
-     ;;   (progn
-     ;;     (load-theme 'moebius t)))
 
      #+END_SRC
 

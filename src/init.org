@@ -113,6 +113,21 @@
 
     #+END_SRC
 
+*** Private
+
+    Some settings are private, so edit ~private.el~ as you wish.
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; Add hook to load private.el after emacs initialize.
+    (add-hook 'after-init-hook
+      (lambda ()
+        (let ((private-file (concat user-emacs-directory "private.el")))
+          (when (file-exists-p private-file)
+            (load-file private-file)))))
+
+    #+END_SRC
+
 *** Server
 
     Allow this Emacs process to be a server for client processes.
@@ -528,22 +543,6 @@
 
     #+END_SRC
 
-*** Theme
-
-    Add theme directory to load-path and load the
-    default theme (eos-term).
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; add eos-theme-dir to theme load path
-    (add-to-list 'custom-theme-load-path
-                 (concat user-emacs-directory "themes"))
-
-    ;; load theme
-    (load-theme 'mesk-term t)
-
-    #+END_SRC
-
 *** Fringe
 
     Disable fringe, we do not need this ugly icons.
@@ -556,6 +555,7 @@
 
     #+END_SRC
 
+*** Theme
 *** Backup
 
     #+BEGIN_SRC emacs-lisp
@@ -584,6 +584,9 @@
 *** Cache
 
     #+BEGIN_SRC emacs-lisp
+
+    ;; create cache directory
+    (mkdir (concat user-emacs-directory "cache") t)
 
     ;; recentf location
     (customize-set-variable
@@ -771,10 +774,7 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    (when (require 'timeclock nil t)
-      (progn
-        ;; enable timeclock-mode-line
-        (timeclock-mode-line-display)))
+    (require 'timeclock nil t)
 
     #+END_SRC
 
@@ -920,6 +920,7 @@
 
      ;; initialize cask
      (eos/funcall 'cask-initialize)
+
 
      #+END_SRC
 
@@ -1323,7 +1324,7 @@
            "URL for Google searches.")
 
          ;; customize search prefix
-         (customize-set-variable 'eww-search-prefix 'eos/eww-google-search-url)
+         (customize-set-variable 'eww-search-prefix eos/eww-google-search-url)
          ;; (customize-set-variable eww-search-prefix "https://duckduckgo.com/html/?q=")
 
          ;; customize download directory
@@ -1370,7 +1371,8 @@
 
      #+END_SRC
 
-*** Web
+*** Blog
+**** Org-web-cms
 *** Feed
 **** RFeed
 *** Chat
@@ -1647,6 +1649,7 @@
 
      #+END_SRC
 
+**** Rfc-mode
 **** Bind
 
      #+BEGIN_SRC emacs-lisp
@@ -1936,6 +1939,10 @@
 
      (when (require 'yasnippet nil t)
        (progn
+         ;; snippet-dirs
+         (customize-set-variable 'yas-snippet-dirs
+                                 (concat user-emacs-directory "snippets"))
+
          ;; bind
          (define-key eos-complete-map (kbd "q") 'yas-expand)
          (define-key eos-complete-map (kbd "i") 'yas-insert-snippet)
@@ -2258,8 +2265,36 @@
 
 **** DocView
 **** Spell-check
-*** Analise
+*** Analyse
 **** Verb
+*** Apparence
+**** Theme
+
+     Add theme directory to load-path and load the
+     default theme.
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; add eos-theme-dir to theme load path
+     (add-to-list 'custom-theme-load-path
+                  (concat user-emacs-directory "themes"))
+
+     ;; load theme
+     (load-theme 'mesk-term t)
+
+     #+END_SRC
+
+**** Moebius-theme
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; ;; load moebius theme
+     ;; (when (require 'moebius-theme nil t)
+     ;;   (progn
+     ;;     (load-theme 'moebius t)))
+
+     #+END_SRC
+
 ** Development
 *** C/C++
 **** CC-mode
@@ -2447,8 +2482,8 @@
      (require 'elisp-mode nil t)
 
      ;; bind
-     (define-key emacs-lisp-mode-map (kbd "C-c f") 'eval-defun)
-     (define-key emacs-lisp-mode-map (kbd "C-c r") 'eval-regian)
+     (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
+     (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
      (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
      (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'eval-last-sexp)
      (define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)

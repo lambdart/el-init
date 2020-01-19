@@ -25,7 +25,35 @@
   2. Emacs >= 26.3
 
 * Installation
-* Build (Compile)
+
+  Download and execute the installation script, e.g:
+
+   - via fetch:
+
+     #+BEGIN_SRC sh
+     fetch https://github.com/esac-io/eos/scripts/install.sh && sh install.sh
+     #+END_SRC
+
+   - via curl:
+
+     #+BEGIN_SRC sh
+     sh -c "$(curl -fsSL https://github.com/esac-io/eos/scripts/install.sh)"
+     #+END_SRC
+
+   - via wget:
+
+     #+BEGIN_SRC sh
+     sh -c "$(wget -O- https://github.com/esac-io/eos/scripts/install.sh)"
+     #+END_SRC
+
+   Script steps:
+
+   1) Check dependencies
+   2) Clone Cask and EOS repositories
+   3) Backup ~.emacs.d~ directory
+   4) Install third-party packages: ~Cask~
+   5) Build and compile: ~init.org~
+
 * Usage
 
   Using this emacs configuration is like using emacs vanilla itself
@@ -218,11 +246,11 @@
   1. https://www.gnu.org/software/emacs/manual
   2. http://www.gigamonkeys.com/book
   3. https://github.com/bbatsov/prelude
-  4. https://github.com/seagle0128/.emacs.d
-  5. https://github.com/larstvei/dot-emacs/blob/master/init.org
-  6. https://zzamboni.org/post/my-emacs-configuration-with-commentary
-  7. https://cask.readthedocs.io/en/latest
-  8. https://www.gnu.org/software/emacs/manual/html_node/emacs/Keymaps.html
+  4. https://cask.readthedocs.io/en/latest
+  5. https://www.gnu.org/software/emacs/manual/html_node/emacs/Keymaps.html
+  6. https://github.com/seagle0128/.emacs.d
+  7. https://github.com/larstvei/dot-emacs/blob/master/init.org
+  8. https://zzamboni.org/post/my-emacs-configuration-with-commentary
 
 * LICENSE
   MIT

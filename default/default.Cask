@@ -26,6 +26,16 @@
 (depends-on "helm-descbinds")
 (depends-on "helm-flycheck")
 (depends-on "helm-projectile")
+
+;; (depends-on "helm-compile"
+;;               :git "https://github.com/esac-io/helm-compile")
+
+;; (depends-on "moebius-theme"
+;;              :git "https://github.com/esac-io/moebius-theme")
+
+(depends-on "rfc-mode"
+  :git "https://github.com/galdor/rfc-mode")
+
 (depends-on "iedit")
 (depends-on "dmenu")
 
@@ -41,6 +51,7 @@
 (depends-on "undo-tree"
    :git "http://www.dr-qubit.org/git/undo-tree.git")
 
+(depends-on "htmlize")
 (depends-on "which-key")
 (depends-on "dashboard")
 (depends-on "buffer-move")

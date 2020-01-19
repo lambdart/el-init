@@ -2641,6 +2641,39 @@
 *** Verilog
 *** Mql
 *** Cmake
+*** Highlight-doxygen
+
+    Mode for highlight doxygen sections and its keywords.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'highlight-doxygen nil t)
+       (progn
+         (highlight-doxygen-global-mode)))
+
+     #+END_SRC
+
+*** Web-mode
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'web-mode nil t)
+       (progn
+         (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+
+         (add-to-list 'web-mode-engines-alist '( ("php"    . "\\.phtml\\'") )
+         )
+       )
+     )
+
+     #+END_SRC
+
 ** Unbind
 *** Prefix
 **** Esc

@@ -57,3 +57,5 @@
 (depends-on "buffer-move")
 (depends-on "exec-path-from-shell")
 (depends-on "dired-sidebar")
+(depends-on "highlight-doxygen")
+(depends-on "web-mode")

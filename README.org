@@ -26,24 +26,30 @@
 
 * Installation
 
-  Download and execute the installation script, e.g:
+  Download and execute the installation script:
 
    - via fetch:
 
      #+BEGIN_SRC sh
+
      fetch https://github.com/esac-io/eos/scripts/install.sh && sh install.sh
+
      #+END_SRC
 
    - via curl:
 
      #+BEGIN_SRC sh
+
      sh -c "$(curl -fsSL https://github.com/esac-io/eos/scripts/install.sh)"
+
      #+END_SRC
 
    - via wget:
 
      #+BEGIN_SRC sh
+
      sh -c "$(wget -O- https://github.com/esac-io/eos/scripts/install.sh)"
+
      #+END_SRC
 
    Script steps:

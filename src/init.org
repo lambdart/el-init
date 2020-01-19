@@ -1396,6 +1396,19 @@
      #+END_SRC
 
 **** Dired-sidebar
+
+     Enables a sidebar (small buffer at left) browser using dired.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'dired-sidebar nil t)
+         (progn
+           ;; assign C-f2 to sidebar file browser
+           (global-set-key (kbd "C-<f2>") 'dired-sidebar-toggle-sidebar)
+      ))
+
+     #+END_SRC
+
 **** Tramp
 *** Misc
 **** Which-key

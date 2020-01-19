@@ -1663,6 +1663,22 @@
      #+END_SRC
 
 **** Rfc-mode
+
+     Mode so browser local RFC files. To make it work, just download
+     the RFC files and changhe the 'rfc-mode-directory' dir to match
+     the path where all the RFCs were extracted.
+
+     The RFC collection can be downloaded [[https://www.rfc-editor.org/retrieve/bulk][here]].
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'rfc-mode nil t)
+      (progn
+        (customize-set-variable 'rfc-mode-directory (expand-file-name "~/rfc/"))
+      ))
+
+    #+END_SRC
+
 **** Bind
 
      #+BEGIN_SRC emacs-lisp

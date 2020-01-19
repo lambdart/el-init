@@ -30,26 +30,20 @@
 
    - via fetch:
 
-     #+BEGIN_SRC sh
-
+     #+BEGIN_SRC
      fetch https://github.com/esac-io/eos/scripts/install.sh && sh install.sh
-
      #+END_SRC
 
    - via curl:
 
-     #+BEGIN_SRC sh
-
+     #+BEGIN_SRC
      sh -c "$(curl -fsSL https://github.com/esac-io/eos/scripts/install.sh)"
-
      #+END_SRC
 
    - via wget:
 
-     #+BEGIN_SRC sh
-
+     #+BEGIN_SRC
      sh -c "$(wget -O- https://github.com/esac-io/eos/scripts/install.sh)"
-
      #+END_SRC
 
    Script steps:

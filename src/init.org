@@ -3315,6 +3315,16 @@
     #+END_SRC
 
 *** Cmake
+**** cmake-mode
+
+     Enables cmake mode for editing cmake files.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'cmake-mode nil t)
+
+     #+END_SRC
+
 *** Mql
 *** Doxygen
 **** Highlight-doxygen

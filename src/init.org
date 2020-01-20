@@ -115,16 +115,17 @@
 
 *** Private
 
-    Some settings are private, so edit ~private.el~ as you wish.
+    Some settings are private, this file must contain these
+    variables/features.
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; Add hook to load private.el after emacs initialize.
+    ;; Load private.el after emacs initialize.
     (add-hook 'after-init-hook
-      (lambda ()
-        (let ((private-file (concat user-emacs-directory "private.el")))
-          (when (file-exists-p private-file)
-            (load-file private-file)))))
+              (lambda ()
+                (let ((private-file (concat user-emacs-directory "private.el")))
+                  (when (file-exists-p private-file)
+                    (load-file private-file)))))
 
     #+END_SRC
 
@@ -300,10 +301,25 @@
          (when (= orig-point (point))
            (move-beginning-of-line 1))))
 
-     ;; global bind
-     (global-set-key (kbd "C-a") 'eos/move/beginning-of-line)
-
      #+END_SRC
+
+***** Bind
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; line movement
+      (global-set-key (kbd "C-a") 'eos/move/beginning-of-line)
+      (global-set-key (kbd "C-e") 'move-end-of-line)
+
+      ;; word movement
+      (global-set-key (kbd "C-<left>") 'backward-word)
+      (global-set-key (kbd "C-<right>") 'forward-whitespace)
+
+      ;; scroll movement
+      (global-set-key (kbd "C-M-v") 'scroll-other-window)
+      (global-set-key (kbd "C-M-y") 'scroll-other-window-down)
+
+      #+END_SRC
 
 **** Edit
 ***** Move
@@ -392,7 +408,7 @@
 
       #+END_SRC
 
-***** Ident
+***** Indent
 
       #+BEGIN_SRC emacs-lisp
 
@@ -443,16 +459,16 @@
 
       #+END_SRC
 
-***** Binds
+***** Bind
 
       #+BEGIN_SRC emacs-lisp
 
       ;; edit
-      (global-set-key (kbd "M-<up>") 'eos/edit/move-lines-up)
-      (global-set-key (kbd "M-<down>") 'eos/edit/move-lines-down)
       (global-set-key (kbd "M-i") 'eos/edit/indent-region-or-buffer)
       (global-set-key (kbd "M-j") 'eos/edit/duplicate-current-line-or-region)
 
+      (global-set-key (kbd "M-<up>") 'eos/edit/move-lines-up)
+      (global-set-key (kbd "M-<down>") 'eos/edit/move-lines-down)
       ;; edit (terminal quick fix)
       (global-set-key (kbd "ESC <up>") 'eos/edit/move-lines-up)
       (global-set-key (kbd "ESC <down>") 'eos/edit/move-lines-down)
@@ -555,7 +571,6 @@
 
     #+END_SRC
 
-*** Theme
 *** Backup
 
     #+BEGIN_SRC emacs-lisp
@@ -699,7 +714,7 @@
      (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
 
     ;; delete selection-mode
-    (eos/funcall delete-selection-mode)
+    (eos/funcall 'delete-selection-mode 1)
 
     ;; clean whitespace and newlines before buffer save
     (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -726,7 +741,6 @@
 
     #+END_SRC
 
-*** Complete
 *** Comment
 
     #+BEGIN_SRC emacs-lisp
@@ -782,18 +796,8 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    (defun eos/mode-line()
-      "Set eos `mode-line-format`."
-      (customize-set-variable 'mode-line-format
-                              '(" %*%&  %l:%c | %I  %b  (%m)  "
-                                (:eval
-                                 (when (string-match " Projectile\\[\\(.+\\):" projectile--mode-line)
-                                   (upcase (concat "- [" (match-string 1 projectile--mode-line) "] - "))))
-                                (vc-mode vc-mode)
-                                mode-line-end-space)))
-
-    ;; always refresh the modeline
-    (add-hook 'buffer-list-update-hook 'eos/mode-line)
+    ;; always refresh the modeline (reference)
+    ;; (add-hook 'buffer-list-update-hook 'eos/mode-line)
 
     #+END_SRC
 
@@ -807,7 +811,7 @@
 
     #+END_SRC
 
-*** Custom
+*** Custom-file
 
     #+BEGIN_SRC emacs-lisp
 
@@ -818,6 +822,8 @@
     (eos/load-file custom-file)
 
     #+END_SRC
+
+*** Complete
 
 *** Misc
 **** Clean
@@ -851,6 +857,7 @@
      Enable/Disable some default modes.
 
      #+BEGIN_SRC emacs-lisp
+
      ;; disabled modes list
      (dolist (mode
               '(tool-bar-mode
@@ -874,7 +881,7 @@
 
      #+END_SRC
 
-**** Binds
+**** Bind
 
      #+BEGIN_SRC emacs-lisp
 
@@ -926,6 +933,9 @@
 
 *** Window Manager
 **** Exwm
+
+     EXWM (Emacs X Window Manager) is a full-featured tiling X window manager
+     for Emacs built on top of [XELB].
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1034,6 +1044,10 @@
 
 **** Exwm-randr
 
+     To configure the use of two monitors Ewwm-randr is used.
+     This module adds RandR support for EXWM. Currently it requires external
+     tools such as xrandr(1) to properly configure RandR first.
+
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'exwm-randr nil t)
@@ -1056,17 +1070,6 @@
          ;; enable exwm randr
          ;; (exwm-randr-enable)
          ))
-
-     #+END_SRC
-
-**** Helm-exwm
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'helm-exwm nil t)
-       (progn
-         ;; bind
-         (global-set-key (kbd "C-x C-SPC") 'helm-exwm)))
 
      #+END_SRC
 
@@ -1145,7 +1148,7 @@
      (when (boundp 'helm-map)
        (progn
          (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
-         (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
+         (define-key helm-map (kbd "C-j") 'helm-maybe-exit-minibuffer)
          (define-key helm-map (kbd "C-z") 'helm-select-action)))
 
      #+END_SRC
@@ -1371,7 +1374,7 @@
 
      #+END_SRC
 
-*** Blog
+*** Publish
 **** Org-web-cms
 *** Feed
 **** RFeed
@@ -1581,8 +1584,28 @@
 
      #+END_SRC
 
+*** Bar
+**** Moody
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'moody nil t)
+       (progn
+         ;; remove underline
+         (customize-set-variable 'x-underline-at-descent-line t)
+
+         ;; Mode-line format
+         (customize-set-variable 'mode-line-format
+                                 '(" %*%&  %l:%c | %I "
+                                   moody-mode-line-buffer-identification
+                                   " %m "
+                                   (vc-mode moody-vc-mode)))))
+
+     #+END_SRC
+
 *** Networking
 **** Tramp-mode
+**** Tcpdump
 *** Documentation
 **** Man
 
@@ -2830,7 +2853,7 @@
 
    #+BEGIN_SRC emacs-lisp
 
-   ;; (provide 'eos)
+   (provide 'eos)
    ;; eos.el ends here
 
    #+END_SRC

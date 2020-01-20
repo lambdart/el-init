@@ -5,6 +5,7 @@
 (depends-on "yasnippet")
 (depends-on "projectile")
 (depends-on "editorconfig")
+(depends-on "moody")
 (depends-on "ess")
 (depends-on "irony")
 (depends-on "go-mode")
@@ -39,8 +40,8 @@
 (depends-on "iedit")
 (depends-on "dmenu")
 
-(depends-on "helm-exwm"
-    :git "https://github.com/emacs-helm/helm-exwm")
+;; (depends-on "helm-exwm"
+;;    :git "https://github.com/emacs-helm/helm-exwm")
 
 (depends-on "exwm"
     :git "https://github.com/ch11ng/exwm")

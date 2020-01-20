@@ -1044,7 +1044,6 @@
 
 **** Exwm-randr
 
-     To configure the use of two monitors Ewwm-randr is used.
      This module adds RandR support for EXWM. Currently it requires external
      tools such as xrandr(1) to properly configure RandR first.
 
@@ -1374,8 +1373,6 @@
 
      #+END_SRC
 
-*** Publish
-**** Org-web-cms
 *** Feed
 **** RFeed
 *** Chat
@@ -1400,6 +1397,28 @@
 
 **** Dired-sidebar
 **** Tramp
+*** Bar
+**** Moody
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'moody nil t)
+       (progn
+         ;; remove underline
+         (customize-set-variable 'x-underline-at-descent-line t)
+
+         ;; change line height
+         (customize-set-variable 'moody-mode-line-height 32)
+
+         ;; mode-line format
+         (customize-set-variable 'mode-line-format
+                                 '(" %*%&  %l:%c | %I "
+                                   moody-mode-line-buffer-identification
+                                   " %m "
+                                   (vc-mode moody-vc-mode)))))
+
+     #+END_SRC
+
 *** Misc
 **** Which-key
 
@@ -1409,7 +1428,7 @@
        (progn
          ;; customize
          ;; (customize-set-variable 'which-key-paging-key nil)
-         (customize-set-variable 'which-key-idle-delay 0.5)
+         (customize-set-variable 'which-key-idle-delay 0.2)
          (customize-set-variable 'which-key-separator " - ")
          (customize-set-variable 'which-key-use-C-h-commands t)
          (customize-set-variable 'which-key-add-column-padding 2)
@@ -1581,25 +1600,6 @@
      (add-hook 'after-init-hook
                (lambda ()
                  (eos/run/async-proc "compton")))
-
-     #+END_SRC
-
-*** Bar
-**** Moody
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'moody nil t)
-       (progn
-         ;; remove underline
-         (customize-set-variable 'x-underline-at-descent-line t)
-
-         ;; Mode-line format
-         (customize-set-variable 'mode-line-format
-                                 '(" %*%&  %l:%c | %I "
-                                   moody-mode-line-buffer-identification
-                                   " %m "
-                                   (vc-mode moody-vc-mode)))))
 
      #+END_SRC
 

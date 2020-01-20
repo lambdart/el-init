@@ -469,21 +469,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'timeclock nil t)
 
-;; (customize-set-variable 'mode-line-format
-;;                         '((" %*%&  %l:%c | %I  %b  (%m)")
-;;                           (vc-mode vc-mode)))
-
-;; (defun eos/mode-line()
-;;   "Set eos `mode-line-format`."
-;;   (customize-set-variable 'mode-line-format
-;;                           '((" %*%&  %l:%c | %I  %b  (%m) "
-;;                              (:eval
-;;                               (when (string-match " Projectile\\[\\(.+\\):" projectile--mode-line)
-;;                                 (upcase (concat " [" (match-string 1 projectile--mode-line) "] "))))
-;;                              (vc-mode vc-mode)
-;;                              mode-line-end-space))))
-
-;; always refresh the modeline
+;; always refresh the modeline (reference)
 ;; (add-hook 'buffer-list-update-hook 'eos/mode-line)
 
 (customize-set-variable 'eval-expression-print-level nil)
@@ -886,11 +872,26 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; enable dired-aysnc-mode
 (eos/funcall 'dired-async-mode 1)
 
+(when (require 'moody nil t)
+  (progn
+    ;; remove underline
+    (customize-set-variable 'x-underline-at-descent-line t)
+
+    ;; change line height
+    (customize-set-variable 'moody-mode-line-height 32)
+
+    ;; mode-line format
+    (customize-set-variable 'mode-line-format
+                            '(" %*%&  %l:%c | %I "
+                              moody-mode-line-buffer-identification
+                              " %m "
+                              (vc-mode moody-vc-mode)))))
+
 (when (require 'which-key nil t)
   (progn
     ;; customize
     ;; (customize-set-variable 'which-key-paging-key nil)
-    (customize-set-variable 'which-key-idle-delay 0.5)
+    (customize-set-variable 'which-key-idle-delay 0.2)
     (customize-set-variable 'which-key-separator " - ")
     (customize-set-variable 'which-key-use-C-h-commands t)
     (customize-set-variable 'which-key-add-column-padding 2)
@@ -1011,18 +1012,6 @@ See the `eww-search-prefix' variable for the search engine used."
 (add-hook 'after-init-hook
           (lambda ()
             (eos/run/async-proc "compton")))
-
-(when (require 'moody nil t)
-  (progn
-    ;; remove underline
-    (customize-set-variable 'x-underline-at-descent-line t)
-
-    ;; Mode-line format
-    (customize-set-variable 'mode-line-format
-                            '(" %*%&  %l:%c | %I "
-                              moody-mode-line-buffer-identification
-                              " %m "
-                              (vc-mode moody-vc-mode)))))
 
 (require 'man nil t)
 

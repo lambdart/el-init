@@ -42,6 +42,13 @@
 ;; reset threshold to inital value
 (add-hook 'minibuffer-exit-hook 'eos/minibuffer/exit-hook)
 
+;; Load private.el after emacs initialize.
+(add-hook 'after-init-hook
+          (lambda ()
+            (let ((private-file (concat user-emacs-directory "private.el")))
+              (when (file-exists-p private-file)
+                (load-file private-file)))))
+
 ;; start emacs server
 (server-start)
 
@@ -131,8 +138,17 @@ Just a `compile` function wrapper."
     (when (= orig-point (point))
       (move-beginning-of-line 1))))
 
-;; global bind
+;; line movement
 (global-set-key (kbd "C-a") 'eos/move/beginning-of-line)
+(global-set-key (kbd "C-e") 'move-end-of-line)
+
+;; word movement
+(global-set-key (kbd "C-<left>") 'backward-word)
+(global-set-key (kbd "C-<right>") 'forward-whitespace)
+
+;; scroll movement
+(global-set-key (kbd "C-M-v") 'scroll-other-window)
+(global-set-key (kbd "C-M-y") 'scroll-other-window-down)
 
 (defun eos/edit/move-lines (n)
   "Move N lines, up if N is positive, else down."
@@ -252,11 +268,11 @@ However, if there's a region, all lines that region covers will be duplicated."
       (goto-char (+ origin (* (length region) arg) arg)))))
 
 ;; edit
-(global-set-key (kbd "M-<up>") 'eos/edit/move-lines-up)
-(global-set-key (kbd "M-<down>") 'eos/edit/move-lines-down)
 (global-set-key (kbd "M-i") 'eos/edit/indent-region-or-buffer)
 (global-set-key (kbd "M-j") 'eos/edit/duplicate-current-line-or-region)
 
+(global-set-key (kbd "M-<up>") 'eos/edit/move-lines-up)
+(global-set-key (kbd "M-<down>") 'eos/edit/move-lines-down)
 ;; edit (terminal quick fix)
 (global-set-key (kbd "ESC <up>") 'eos/edit/move-lines-up)
 (global-set-key (kbd "ESC <down>") 'eos/edit/move-lines-down)
@@ -276,6 +292,19 @@ However, if there's a region, all lines that region covers will be duplicated."
   (interactive)
   (start-process name nil name))
 
+;;; Get symbol at point, maybe
+(defun eos/get-selected-text-or-symbol-at-point ()
+  "Get the text in region or symbol at point.
+
+If region is active, return the text in that region.  Else if the
+point is on a symbol, return that symbol name.  Else return nil."
+  (cond ((use-region-p)
+         (buffer-substring-no-properties (region-beginning) (region-end)))
+        ((symbol-at-point)
+         (substring-no-properties (thing-at-point 'symbol)))
+        (t
+         nil)))
+
 ;; always select the help window
 (customize-set-variable 'help-window-select t)
 
@@ -293,13 +322,6 @@ However, if there's a region, all lines that region covers will be duplicated."
 
 ;; set font by face attribute (reference)
 ;; (set-face-attribute 'default nil :height)
-
-;; add eos-theme-dir to theme load path
-(add-to-list 'custom-theme-load-path
-             (concat user-emacs-directory "themes"))
-
-;; load theme
-(load-theme 'mesk-term t)
 
 ;; disable fringe
 (add-hook 'after-init-hook
@@ -323,6 +345,9 @@ However, if there's a region, all lines that region covers will be duplicated."
 (customize-set-variable
  'auto-save-list-file-prefix
  (concat user-emacs-directory "backup/.saves-"))
+
+;; create cache directory
+(mkdir (concat user-emacs-directory "cache") t)
 
 ;; recentf location
 (customize-set-variable
@@ -415,7 +440,7 @@ However, if there's a region, all lines that region covers will be duplicated."
  (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
 
 ;; delete selection-mode
-(eos/funcall delete-selection-mode)
+(eos/funcall 'delete-selection-mode 1)
 
 ;; clean whitespace and newlines before buffer save
 (add-hook 'before-save-hook 'whitespace-cleanup)
@@ -442,20 +467,24 @@ However, if there's a region, all lines that region covers will be duplicated."
 
 (customize-set-variable 'visible-cursor nil)
 
-(defun eos/mode-line()
-  "Set eos `mode-line-format`."
-  (customize-set-variable 'mode-line-format
-                          '(" %*%&  %l:%c | %I  %b  (%m) "
-                            " "
-                            (:eval
-                             (when (string-match " Projectile\\[\\(.+\\):" projectile--mode-line)
-                               (concat "[" (match-string 1 projectile--mode-line) "]")))
-                            " "
-                            (vc-mode vc-mode)
-                            mode-line-end-space)))
+(require 'timeclock nil t)
+
+;; (customize-set-variable 'mode-line-format
+;;                         '((" %*%&  %l:%c | %I  %b  (%m)")
+;;                           (vc-mode vc-mode)))
+
+;; (defun eos/mode-line()
+;;   "Set eos `mode-line-format`."
+;;   (customize-set-variable 'mode-line-format
+;;                           '((" %*%&  %l:%c | %I  %b  (%m) "
+;;                              (:eval
+;;                               (when (string-match " Projectile\\[\\(.+\\):" projectile--mode-line)
+;;                                 (upcase (concat " [" (match-string 1 projectile--mode-line) "] "))))
+;;                              (vc-mode vc-mode)
+;;                              mode-line-end-space))))
 
 ;; always refresh the modeline
-(add-hook 'buffer-list-update-hook 'eos/mode-line)
+;; (add-hook 'buffer-list-update-hook 'eos/mode-line)
 
 (customize-set-variable 'eval-expression-print-level nil)
 
@@ -510,11 +539,17 @@ However, if there's a region, all lines that region covers will be duplicated."
 ;; kill buffer and window
 (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
 
-;; load cask
+;; eval when compile (avoid byte-compile warnings)
+(eval-when-compile
+  (when (require 'cask "~/.cask/cask.el" t)
+    (progn
+      (cask-initialize))))
+
+;; load cask (maybe)
 (require 'cask "~/.cask/cask.el" t)
 
 ;; initialize cask
-(cask-initialize)
+(eos/funcall 'cask-initialize)
 
 (when (require 'exwm nil t)
   (progn
@@ -531,12 +566,12 @@ However, if there's a region, all lines that region covers will be duplicated."
 
     ;; exwn global keybindings
     (customize-set-variable 'exwm-input-global-keys
-                            `(([?\s-r]   . exwm-reset)
-                              ([?\s-w]   . exwm-workspace-switch)
-                              ([?\s-`]   . exwm-input-toggle-keyboard)
+                            `(([?\s-r] . exwm-reset)
+                              ([?\s-w] . exwm-workspace-switch)
+                              ([?\s-q] . exwm-input-toggle-keyboard)
 
-                              ;; ([?\s-q]   . exwm-workspace-delete)
-                              ;; ([?\s-a]   . exwm-workspace-swap)
+                              ;; ([?\s-k] . exwm-workspace-delete)
+                              ;; ([?\s-a] . exwm-workspace-swap)
 
                               ;; create and switch to workspaces
                               ,@(mapcar (lambda (i)
@@ -566,11 +601,15 @@ However, if there's a region, all lines that region covers will be duplicated."
                               ([?\C-v] . [next])
                               ([?\C-d] . [delete])
                               ([?\C-k] . [S-end delete])
+                              ([?\C-k] . [C-w]) ;; firefox close tab, temporary!
 
                               ;; cut/paste.
                               ([?\C-w] . [?\C-x])
                               ([?\M-w] . [?\C-c])
                               ([?\C-y] . [?\C-v])
+
+                              ;; Escape (cancel)
+                              ([?\C-g] . [escape])
 
                               ;; search
                               ([?\C-s] . [?\C-f])))))
@@ -594,8 +633,7 @@ However, if there's a region, all lines that region covers will be duplicated."
         (cl-pushnew key exwm-input-prefix-keys))))
 
 ;; enable exwm
-(if (fboundp 'exwm-enable)
-    (funcall 'exwm-enable))
+(eos/funcall 'exwm-enable)
 
 ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
 ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
@@ -609,14 +647,16 @@ However, if there's a region, all lines that region covers will be duplicated."
 (require 'exwm-workspace nil t)
 
 ;; update the buffer name by X11 window title
-(when (and (fboundp 'exwm-workspace-rename-buffer)
-           (boundp 'exwm-title))
-  (add-hook 'exwm-update-title-hook
-            (lambda ()
-              (exwm-workspace-rename-buffer exwm-title))))
+(add-hook 'exwm-update-title-hook
+          (lambda ()
+            (exwm-workspace-rename-buffer
+             (concat "[" exwm-class-name "] " exwm-title))))
 
 (when (require 'exwm-randr nil t)
   (progn
+    ;; set exwm workspaces
+    (customize-set-variable 'exwm-workspace-number 2)
+
     ;; customize monitors
     (customize-set-variable
      'exwm-randr-workspace-monitor-plist '(0 "HDMI-1"))
@@ -632,11 +672,6 @@ However, if there's a region, all lines that region covers will be duplicated."
     ;; enable exwm randr
     ;; (exwm-randr-enable)
     ))
-
-(when (require 'helm-exwm nil t)
-  (progn
-    ;; bind
-    (global-set-key (kbd "C-x C-SPC") 'helm-exwm)))
 
 (when (require 'helm nil t)
   (progn
@@ -702,7 +737,7 @@ However, if there's a region, all lines that region covers will be duplicated."
 (when (boundp 'helm-map)
   (progn
     (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
-    (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
+    (define-key helm-map (kbd "C-j") 'helm-maybe-exit-minibuffer)
     (define-key helm-map (kbd "C-z") 'helm-select-action)))
 
 (when (require 'helm-descbinds nil t)
@@ -789,8 +824,6 @@ However, if there's a region, all lines that region covers will be duplicated."
 
 (require 'helm-ag nil t)
 
-(customize-set-variable 'browse-url-generic-program "firefox")
-
 (when (require 'shr nil t)
   (progn
     (customize-set-variable 'shr-width 80)
@@ -801,7 +834,49 @@ However, if there's a region, all lines that region covers will be duplicated."
     (customize-set-variable 'shr-color-visible-distance-min 10)
     (customize-set-variable 'shr-color-visible-luminance-min 80)))
 
+(when (require 'eww nil t)
+  (progn
+    ;; define google search url
+    (defvar eos/eww-google-search-url "https://www.google.com/search?q="
+      "URL for Google searches.")
 
+    ;; customize search prefix
+    (customize-set-variable 'eww-search-prefix eos/eww-google-search-url)
+    ;; (customize-set-variable eww-search-prefix "https://duckduckgo.com/html/?q=")
+
+    ;; customize download directory
+    (customize-set-variable 'eww-download-directory "~/down")
+
+    ;; customize checkbox symbols
+    (customize-set-variable 'eww-form-checkbox-symbol "[ ]")
+    (customize-set-variable 'eww-form-checkbox-selected-symbol "[X]")
+    ;; (customize-set-variable eww-form-checkbox-symbol "☐") ; Unicode hex 2610
+    ;; (customize-set-variable eww-form-checkbox-selected-symbol "☑") ; Unicode hex 2611
+
+    ;; Re-write of the `eww-search-words' definition.
+    (defun eos/eww-search-words ()
+      "Search the web for the text between BEG and END.
+If region is active (and not whitespace), search the web for
+the text in that region.
+Else if the region is not active, and the point is on a symbol,
+search the web for that symbol.
+Else prompt the user for a search string.
+See the `eww-search-prefix' variable for the search engine used."
+      (interactive)
+      (let ((search-string (eos/get-selected-text-or-symbol-at-point)))
+        (when (and (stringp search-string)
+                   (string-match-p "\\`[[:blank:]]*\\'" search-string))
+          (customize-set-variable search-string nil))
+        (if (stringp search-string)
+            (eww search-string)
+          (call-interactively #'eww))))
+    ))
+
+(when (require 'browse-url nil t)
+  (progn
+    ;; customize browse-url options
+    (customize-set-variable 'browse-url-generic-program "eww")
+    (customize-set-variable 'browse-url-function 'eww-browse-url)))
 
 (require 'dired-async nil t)
 
@@ -901,14 +976,10 @@ However, if there's a region, all lines that region covers will be duplicated."
     (global-set-key (kbd "C-x <C-left>") 'buf-move-left)
     (global-set-key (kbd "C-x <C-right>") 'buf-move-right)))
 
-(when (require 'eshell nil t)
-  (progn
-    ;; customize
-    (customize-set-variable 'display-buffer-alist
-                            '(("\\`\\*e?shell" display-buffer-below-selected))))
+(require 'eshell nil t)
 
-  ;; bind
-  (global-set-key (kbd "C-x [") 'eshell))
+;; bind
+(global-set-key (kbd "C-x [") 'eshell)
 
 (customize-set-variable 'explicit-shell-file-name "/bin/sh")
 
@@ -940,6 +1011,18 @@ However, if there's a region, all lines that region covers will be duplicated."
 (add-hook 'after-init-hook
           (lambda ()
             (eos/run/async-proc "compton")))
+
+(when (require 'moody nil t)
+  (progn
+    ;; remove underline
+    (customize-set-variable 'x-underline-at-descent-line t)
+
+    ;; Mode-line format
+    (customize-set-variable 'mode-line-format
+                            '(" %*%&  %l:%c | %I "
+                              moody-mode-line-buffer-identification
+                              " %m "
+                              (vc-mode moody-vc-mode)))))
 
 (require 'man nil t)
 
@@ -1129,6 +1212,9 @@ However, if there's a region, all lines that region covers will be duplicated."
 
 ;; ctl-x-map bind (C-x t)
 (define-key ctl-x-map (kbd "t") 'eos-tags-map)
+
+(add-to-list 'display-buffer-alist
+             '("\\*Completions\\*" display-buffer-below-selected))
 
 (when (require 'company nil t)
   (progn
@@ -1372,7 +1458,21 @@ However, if there's a region, all lines that region covers will be duplicated."
                    (company-files)))))
     ))
 
+(when (require 'markdown-mode nil t)
+  (progn
+    ;; customize
+    (customize-set-variable 'markdown-command "multimarkdown")))
 
+;; bind
+(when (boundp 'markdown-mode-map)
+  (progn
+    (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+
+;; add eos-theme-dir to theme load path
+(add-to-list 'custom-theme-load-path (concat user-emacs-directory "themes"))
+
+;; load theme
+(load-theme 'mesk-term t)
 
 (require 'cc-mode)
 
@@ -1480,11 +1580,13 @@ However, if there's a region, all lines that region covers will be duplicated."
 
 (customize-set-variable 'lisp-body-indent 2)
 
+(require 'company-elisp nil t)
+
 (require 'elisp-mode nil t)
 
 ;; bind
-(define-key emacs-lisp-mode-map (kbd "C-c f") 'eval-defun)
-(define-key emacs-lisp-mode-map (kbd "C-c r") 'eval-regian)
+(define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
+(define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
 (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
 (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'eval-last-sexp)
 (define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)
@@ -1495,6 +1597,20 @@ However, if there's a region, all lines that region covers will be duplicated."
 (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
 (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
 (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)
+
+;; add-hook
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            ;; set company backends
+            (eos/company/set-backends
+             '((company-elisp
+                company-capf
+                company-yasnippet
+                company-keywords
+                company-dabbrev
+                company-dabbrev-code)
+               (company-files)))
+            ))
 
 (require 'sh-script)
 
@@ -1555,6 +1671,8 @@ However, if there's a region, all lines that region covers will be duplicated."
 
             ;; set dash docsets
             (eos/dash/activate-docset '"Go")))
+
+(require 'ess-r-mode nil t)
 
 ;; clean esc map
 (define-key esc-map (kbd "ESC") nil)
@@ -1726,5 +1844,5 @@ However, if there's a region, all lines that region covers will be duplicated."
 (global-unset-key (kbd "<M-drag-mouse-1>"))
 (global-unset-key (kbd "<S-down-mouse-1>"))
 
-;; (provide 'eos)
+(provide 'eos)
 ;; eos.el ends here

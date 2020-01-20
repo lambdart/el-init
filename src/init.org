@@ -1402,14 +1402,13 @@
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'dired-sidebar nil t)
-         (progn
-           ;; assign C-f2 to sidebar file browser
-           (global-set-key (kbd "C-<f2>") 'dired-sidebar-toggle-sidebar)
-      ))
+       (progn
+         ;; bind
+         ;; assign C-f2 to sidebar file browser
+         (global-set-key (kbd "C-<f2>") 'dired-sidebar-toggle-sidebar)))
 
      #+END_SRC
 
-**** Tramp
 *** Bar
 **** Moody
 
@@ -1693,14 +1692,15 @@
 
      The RFC collection can be downloaded [[https://www.rfc-editor.org/retrieve/bulk][here]].
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-    (when (require 'rfc-mode nil t)
-      (progn
-        (customize-set-variable 'rfc-mode-directory (expand-file-name "~/rfc/"))
-      ))
+     (when (require 'rfc-mode nil t)
+       (progn
+         ;; customize rfc location
+         (customize-set-variable
+          'rfc-mode-directory (expand-file-name "~/rfc/"))))
 
-    #+END_SRC
+     #+END_SRC
 
 **** Bind
 
@@ -2324,7 +2324,8 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; add eos-theme-dir to theme load path
-     (add-to-list 'custom-theme-load-path (concat user-emacs-directory "themes"))
+     (add-to-list 'custom-theme-load-path
+                  (concat user-emacs-directory "themes"))
 
      ;; load theme
      (load-theme 'mesk-term t)
@@ -2680,38 +2681,43 @@
 *** Verilog
 *** Mql
 *** Cmake
-*** Highlight-doxygen
+*** Doxygen
+**** Highlight-doxygen
 
-    Mode for highlight doxygen sections and its keywords.
+     Mode for highlight doxygen sections and its keywords.
 
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'highlight-doxygen nil t)
        (progn
-         (highlight-doxygen-global-mode)))
+         ;; add doxygen
+         (add-hook 'prog-mode-hook 'highlight-doxygen-global-mode)))
 
      #+END_SRC
 
-*** Web-mode
+*** Web
+**** Web-mode
 
-     #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
 
-     (when (require 'web-mode nil t)
-       (progn
-         (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-         (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-         (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-         (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-         (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-         (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-         (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+    (when (require 'web-mode nil t)
+      (progn
+        (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+        (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))))
 
-         (add-to-list 'web-mode-engines-alist '( ("php"    . "\\.phtml\\'") )
-         )
-       )
-     )
+    (when (boundp 'web-mode-engines-alist)
+      (progn
+        (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'")))))
 
-     #+END_SRC
+    #+END_SRC
+
+*** PHP
+*** HTML
 
 ** Unbind
 *** Prefix

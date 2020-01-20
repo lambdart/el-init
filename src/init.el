@@ -872,6 +872,12 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; enable dired-aysnc-mode
 (eos/funcall 'dired-async-mode 1)
 
+(when (require 'dired-sidebar nil t)
+  (progn
+    ;; assign C-f2 to sidebar file browser
+    (global-set-key (kbd "C-<f2>") 'dired-sidebar-toggle-sidebar)
+    ))
+
 (when (require 'moody nil t)
   (progn
     ;; remove underline
@@ -1053,6 +1059,12 @@ See the `eww-search-prefix' variable for the search engine used."
   "Activate a DOCSET, if available."
   (when (fboundp 'helm-dash-activate-docset)
     (funcall 'helm-dash-activate-docset docset)))
+
+(when (require 'rfc-mode nil t)
+  (progn
+    ;; customize rfc location
+    (customize-set-variable
+     'rfc-mode-directory (expand-file-name "~/.rfc/"))))
 
 ;; bind documentation related functions on eos-docs-map
 (define-key eos-docs-map (kbd "C-g") 'keyboard-quit)
@@ -1458,7 +1470,8 @@ See the `eww-search-prefix' variable for the search engine used."
     (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
 
 ;; add eos-theme-dir to theme load path
-(add-to-list 'custom-theme-load-path (concat user-emacs-directory "themes"))
+(add-to-list 'custom-theme-load-path
+             (concat user-emacs-directory "themes"))
 
 ;; load theme
 (load-theme 'mesk-term t)
@@ -1662,6 +1675,25 @@ See the `eww-search-prefix' variable for the search engine used."
             (eos/dash/activate-docset '"Go")))
 
 (require 'ess-r-mode nil t)
+
+(when (require 'highlight-doxygen nil t)
+  (progn
+    ;; add doxygen
+    (add-hook 'prog-mode-hook 'highlight-doxygen-global-mode)))
+
+(when (require 'web-mode nil t)
+  (progn
+    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))))
+
+(when (boundp 'web-mode-engines-alist)
+  (progn
+    (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'")))))
 
 ;; clean esc map
 (define-key esc-map (kbd "ESC") nil)

@@ -40,6 +40,13 @@
 
     Verify emacs version.
 
+    #+BEGIN_SRC emacs-lisp
+
+    (when (version< emacs-version "26.3")
+      (error "This requires Emacs 26.3 and above!"))
+
+    #+END_SRC
+
 *** Literate
 
     Literate programming is a programming paradigm
@@ -76,11 +83,15 @@
     #+BEGIN_SRC emacs-lisp
 
     (defun eos/build ()
-      "Tangle Emacs Lisp source code blocks in eos.el file, and compile it."
+      "If the current buffer is '~/emacs.d/init.org' the code-blocks are
+    tangled, and the tangled file is compiled."
       (interactive)
-      (let ((prog-mode-hook nil))
-        (org-babel-tangle)
-        (byte-compile-file (concat user-emacs-directory "init.el"))))
+      (when (equal (buffer-name) "init.org")
+        (progn
+          ;; Avoid running hooks when tangling.
+          (let ((prog-mode-hook nil))
+            (org-babel-tangle)
+            (byte-compile-file (concat user-emacs-directory "init.el"))))))
 
     #+END_SRC
 
@@ -113,22 +124,6 @@
 
     #+END_SRC
 
-*** Private
-
-    Some settings are private, this file must contain these
-    variables/features.
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; Load private.el after emacs initialize.
-    (add-hook 'after-init-hook
-              (lambda ()
-                (let ((private-file (concat user-emacs-directory "private.el")))
-                  (when (file-exists-p private-file)
-                    (load-file private-file)))))
-
-    #+END_SRC
-
 *** Server
 
     Allow this Emacs process to be a server for client processes.
@@ -141,6 +136,22 @@
 
     ;; start emacs server
     (server-start)
+
+    #+END_SRC
+
+*** Private
+
+    Some settings are private, this file must
+    contain these variables values.
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; Load private.el after emacs initialize.
+    (add-hook 'after-init-hook
+              (lambda ()
+                (let ((private-file (expand-file-name "~/.private/private.el")))
+                       (if (file-exists-p private-file)
+                           (progn (load-file private-file))))))
 
     #+END_SRC
 
@@ -303,7 +314,7 @@
 
      #+END_SRC
 
-***** Bind
+***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
@@ -459,7 +470,7 @@
 
       #+END_SRC
 
-***** Bind
+***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
@@ -784,11 +795,17 @@
 
     #+END_SRC
 
-*** Timeclock
+*** Time
 
     #+BEGIN_SRC emacs-lisp
 
-    (require 'timeclock nil t)
+    (when (require 'time nil t)
+      (progn
+        ;; format time string
+        (customize-set-variable 'display-time-format "%H:%M")
+
+        ;; enable display time mode
+        (display-time-mode 1)))
 
     #+END_SRC
 
@@ -797,7 +814,7 @@
     #+BEGIN_SRC emacs-lisp
 
     ;; always refresh the modeline (reference)
-    ;; (add-hook 'buffer-list-update-hook 'eos/mode-line)
+    ;; (add-hook 'buffer-list-update-hook 'func)
 
     #+END_SRC
 
@@ -822,8 +839,6 @@
     (eos/load-file custom-file)
 
     #+END_SRC
-
-*** Complete
 
 *** Misc
 **** Clean
@@ -881,7 +896,7 @@
 
      #+END_SRC
 
-**** Bind
+**** Binds
 
      #+BEGIN_SRC emacs-lisp
 
@@ -916,18 +931,28 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; eval when compile (avoid byte-compile warnings)
-     (eval-when-compile
-       (when (require 'cask "~/.cask/cask.el" t)
-         (progn
-           (cask-initialize))))
+     ;; cask load and initialize
+     (when (require 'cask "~/.cask/cask.el" t)
+       (progn
+         ;; initialize cask
+         (cask-initialize)))
 
-     ;; load cask (maybe)
-     (require 'cask "~/.cask/cask.el" t)
+     (defun eos/pm/add-subdirs-to-load-path (&rest _)
+       "Add subdirectories to `load-path'."
+       (let ((default-directory
+               (expand-file-name ".cask/26.3/elpa" user-emacs-directory)))
+         (normal-top-level-add-subdirs-to-load-path)))
 
-     ;; initialize cask
-     (eos/funcall 'cask-initialize)
+     (defun eos/pm/update-load-path ()
+       "Add subdirs to load-path variable and remove duplicates."
+       (interactive)
+       ;; add cask subdirs to load-path variable and
+       ;; remove duplicates
+       (eos/pm/add-subdirs-to-load-path)
+       (delete-dups load-path))
 
+     ;; calls update-load-path
+     (eos/pm/update-load-path)
 
      #+END_SRC
 
@@ -1044,8 +1069,9 @@
 
 **** Exwm-randr
 
-     This module adds RandR support for EXWM. Currently it requires external
-     tools such as xrandr(1) to properly configure RandR first.
+     This module adds Randr support for EXWM.
+     Currently it requires external tools such as xrandr(1)
+     to properly configure Randr first.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1164,7 +1190,7 @@
 
      #+END_SRC
 
-**** Bind
+**** Binds
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1285,15 +1311,36 @@
 
      #+END_SRC
 
-*** Filter
-**** Helm-ag
+*** Files
+**** Dired
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'helm-ag nil t)
+     (require 'dired-async nil t)
+
+     ;; enable find-alternate-file
+     (put 'dired-find-alternate-file 'disabled nil)
+
+     ;; enable dired-aysnc-mode
+     (eos/funcall 'dired-async-mode 1)
 
      #+END_SRC
 
+**** Dired-sidebar
+
+     Enables a sidebar (small buffer at left) browser using dired.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'dired-sidebar nil t)
+       (progn
+         ;; bind
+         ;; assign C-f2 to sidebar file browser
+         (global-set-key (kbd "C-<f2>") 'dired-sidebar-toggle-sidebar)))
+
+     #+END_SRC
+
+*** Email
 *** Browser
 **** Shr
 
@@ -1359,8 +1406,6 @@
 
      #+END_SRC
 
-**** Surf
-**** Exwm-surf
 **** Browse-url
 
      #+BEGIN_SRC emacs-lisp
@@ -1375,42 +1420,12 @@
 
 *** Feed
 **** RFeed
-*** Chat
-**** Irc
-**** Jabber
-**** Slack
-**** Telega.el
-*** Files
-**** Dired
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'dired-async nil t)
-
-     ;; enable find-alternate-file
-     (put 'dired-find-alternate-file 'disabled nil)
-
-     ;; enable dired-aysnc-mode
-     (eos/funcall 'dired-async-mode 1)
-
-     #+END_SRC
-
-**** Dired-sidebar
-
-     Enables a sidebar (small buffer at left) browser using dired.
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'dired-sidebar nil t)
-       (progn
-         ;; bind
-         ;; assign C-f2 to sidebar file browser
-         (global-set-key (kbd "C-<f2>") 'dired-sidebar-toggle-sidebar)))
-
-     #+END_SRC
 
 *** Bar
 **** Moody
+
+     Emacs has to be compiled with xpm support, for this package
+     to work properly.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1424,13 +1439,48 @@
 
          ;; mode-line format
          (customize-set-variable 'mode-line-format
-                                 '(" %*%&  %l:%c | %I "
+                                 '(" " display-time-string
+                                   "  %*%&  %l:%c | %I "
                                    moody-mode-line-buffer-identification
                                    " %m "
                                    (vc-mode moody-vc-mode)))))
 
      #+END_SRC
 
+*** Chat
+**** Erc
+
+     ERC is a powerful, modular, and extensible
+     IRC client for Emacs.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'erc nil t)
+       (progn
+         ;; nickname to use if one is not provided
+         (customize-set-variable 'erc-nick "esac-io")
+
+         ;; the string to append to the nick if it is already in use.
+         (customize-set-variable 'erc-nick-uniquifier "_")
+
+         ;; non-nil means rename buffers with network name, if available.
+         (customize-set-variable 'erc-rename-buffers t)
+
+         ;; prompt for channel key when using erc-join-channel interactively.
+         (customize-set-variable 'erc-prompt-for-channel-key t)
+
+         ;; asks before using the default password,
+         ;; or whether to enter a new one.
+         (customize-set-variable 'erc-prompt-for-password t)
+
+         ;; if nil, ERC will call system-name to get this information.
+         (customize-set-variable 'erc-system-name "eos")))
+
+     #+END_SRC
+
+**** Telega.el
+**** Jabber
+**** Slack
 *** Misc
 **** Which-key
 
@@ -1440,7 +1490,7 @@
        (progn
          ;; customize
          ;; (customize-set-variable 'which-key-paging-key nil)
-         (customize-set-variable 'which-key-idle-delay 0.2)
+         (customize-set-variable 'which-key-idle-delay 0.9)
          (customize-set-variable 'which-key-separator " - ")
          (customize-set-variable 'which-key-use-C-h-commands t)
          (customize-set-variable 'which-key-add-column-padding 2)
@@ -1550,8 +1600,13 @@
 *** Terminal
 **** Term
 
+     It seems that sh shell works better with term.
+
      #+BEGIN_SRC emacs-lisp
 
+     (require 'term)
+
+     ;; customuze term shell
      (customize-set-variable 'explicit-shell-file-name "/bin/sh")
 
      #+END_SRC
@@ -1570,17 +1625,85 @@
 
      #+END_SRC
 
-*** Interpreter
-**** Comint
+*** Filter
+**** Helm-ag
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'comint nil t)
-       (progn
-         ;; disable line number mode
-         (add-hook 'comint-mode-hook
-                   (lambda ()
-                     (display-line-numbers-mode 0)))))
+     (require 'helm-ag nil t)
+
+     #+END_SRC
+
+*** Checker
+**** Spell
+***** Flyspell
+**** Syntax
+***** Flycheck
+
+      Flycheck is a modern on-the-fly syntax checking extension.
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'flycheck nil t)
+        (progn
+          ;; bind
+          (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
+          (define-key eos-sc-map (kbd "m") 'flycheck-mode)
+          (define-key eos-sc-map (kbd "M") 'flycheck-manual)
+          (define-key eos-sc-map (kbd "o") 'flycheck-list-errors)
+          (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
+
+          (define-key eos-sc-map
+            (kbd "v") 'flycheck-verify-setup)
+
+          (define-key eos-sc-map
+            (kbd "c") 'flycheck-select-checker)
+
+          (define-key eos-sc-map
+            (kbd "d") 'flycheck-disable-checker)
+
+          (define-key eos-sc-map
+            (kbd "?") 'flycheck-describe-checker)
+
+          ;; init flycheck mode after some programming mode
+          ;; is activated (c-mode, elisp-mode, etc).
+          (add-hook 'prog-mode-hook 'flycheck-mode)))
+
+      #+END_SRC
+
+***** Helm-flycheck
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'helm-flycheck nil t)
+        (progn
+          ;; binds
+          (define-key eos-sc-map (kbd "e") 'helm-flycheck)
+          (define-key ctl-x-map (kbd ";") 'helm-flycheck)))
+
+      #+END_SRC
+
+***** Utils
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; auxiliary function
+      (defun eos/flycheck/set-checker (checker)
+        "Set flycheck CHECKER variable."
+        (make-local-variable 'flycheck-checker)
+        (customize-set-variable 'flycheck-checker checker))
+
+      #+END_SRC
+
+**** Binds
+
+     Set syntax check related keybinds on eos-sc-map
+     (C-x e).
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; bind eos-sc-map prefix to C-x e
+     (define-key ctl-x-map (kbd "e") 'eos-sc-map)
 
      #+END_SRC
 
@@ -1615,9 +1738,231 @@
 
      #+END_SRC
 
+**** Transset
+*** Interpreter
+**** Comint
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'comint nil t)
+       (progn
+         ;; disable line number mode
+         (add-hook 'comint-mode-hook
+                   (lambda ()
+                     (display-line-numbers-mode 0)))))
+
+     #+END_SRC
+
 *** Networking
 **** Tramp-mode
 **** Tcpdump
+*** Torrent
+**** Aria2c
+*** Screen
+**** Locker
+***** Slock
+
+      #+BEGIN_SRC emacs-lisp
+
+      (global-set-key (kbd "C-x <end>")
+                      (lambda ()
+                        (interactive)
+                        (eos/run/async-proc "slock")))
+
+      #+END_SRC
+
+**** Shot
+***** Scrot
+
+      #+BEGIN_SRC emacs-lisp
+
+      (global-set-key (kbd "<print>")
+                      (lambda ()
+                        (interactive)
+                        (eos/run/async-proc "scrot")))
+
+      #+END_SRC
+
+*** Control
+**** Volume
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; volume functions (utils)
+     (defun eos/toggle-audio ()
+       "Toggle audio (mute or unmute)."
+       (interactive)
+       (async-shell-command "amixer -D default set Master mute"))
+
+     (defun eos/raise-volume ()
+       "Raise the volume (factor +5)."
+       (interactive)
+       (async-shell-command "amixer -D default set Master 5+ unmute"))
+
+     (defun eos/lower-volume ()
+       "Lower the volume (factor -5)."
+       (interactive)
+       (async-shell-command "amixer -D default set Master 5- unmute"))
+
+     ;; bind
+     (global-set-key (kbd "<s-f6>") 'eos/toggle-audio)
+     (global-set-key (kbd "<s-f7>") 'eos/lower-volume)
+     (global-set-key (kbd "<s-f8>") 'eos/raise-volume)
+
+     #+END_SRC
+
+*** Calculator
+**** Calc
+*** Calendar
+*** Multimedia
+**** Emms
+*** Office
+**** Org
+
+     #+BEGIN_SRC emacs-lisp
+
+     (add-hook 'org-mode-hook
+               (lambda ()
+                 ;; do not truncate lines
+                 (setq truncate-lines nil)
+
+                 ;; set company backends
+                 (eos/company/set-backends
+                  '((company-capf
+                     company-keywords
+                     company-yasnippet
+                     company-ispell
+                     company-dabbrev
+                     company-dabbrev-code)
+                    (company-files)))))
+
+     #+END_SRC
+
+**** Tex
+**** Text
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'text-mode nil t)
+       (progn
+         ;; bind
+         (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
+         (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
+         (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
+         (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
+
+         ;; text mode hook
+         (add-hook 'text-mode-hook
+                   (lambda ()
+                     ;; turn on auto fill mode
+                     (turn-on-auto-fill)
+
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-ispell
+                         company-keywords
+                         company-capf
+                         company-dabbrev-code
+                         company-dabbrev)
+                        (company-files)))))
+         ))
+
+     #+END_SRC
+
+**** Markdown
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'markdown-mode nil t)
+       (progn
+         ;; customize
+         (customize-set-variable 'markdown-command "multimarkdown")))
+
+     ;; bind
+     (when (boundp 'markdown-mode-map)
+       (progn
+         (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+
+     #+END_SRC
+
+**** DocView
+**** Spell-check
+*** Analyse
+**** Verb
+*** Apparence
+**** Mesk-term
+
+     Add theme directory to load-path and load the
+     default theme (mesk-term).
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; add eos-theme-dir to theme load path
+     (add-to-list 'custom-theme-load-path
+                  (concat user-emacs-directory "themes"))
+
+     ;; load theme
+     (load-theme 'mesk-term t)
+
+     #+END_SRC
+
+*** Dashboard
+**** Dashboard
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'dashboard nil t)
+       (progn
+         ;; items
+         (customize-set-variable 'dashboard-items
+                                 '((recents . 5)
+                                   (projects . 5)
+                                   (agenda . 5)
+                                   (bookmarks . 5)))
+
+         ;; banners directory
+         (customize-set-variable 'dashboard-banners-directory
+                                 (concat user-emacs-directory "banner/"))
+
+         ;; banner
+         (customize-set-variable 'dashboard-startup-banner 1)
+
+         ;; page separator
+         (customize-set-variable 'dashboard-page-separator "
+
+      ")
+
+         ;; footer icon
+         (customize-set-variable 'dashboard-footer-icon
+                                 #(" " 0 1 (face dashboard-footer)))
+
+         ;; footer
+         (customize-set-variable 'dashboard-footer
+                                 "Litany Against Fear
+
+        I must not fear.
+        Fear is the mind-killer.
+        Fear is the little-death that brings total obliteration.
+        I will face my fear.
+        I will permit it to pass over me and through me.
+        And when it has gone past I will turn the inner eye to see its path.
+        Where the fear has gone there will be nothing.
+        Only I will remain.
+        ")
+
+         ;; set initial buffer choice (emacsclient fix)
+         (customize-set-variable 'initial-buffer-choice
+                                 (lambda ()
+                                   (let ((initial-buffer (get-buffer "*dashboard*")))
+                                     (unless initial-buffer
+                                       (setq initial-buffer (get-buffer "*scratch*")))
+                                     initial-buffer)))
+
+         ;; init dashboard after emacs initialize
+         (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
+
+     #+END_SRC
+
 *** Documentation
 **** Man
 
@@ -1702,7 +2047,7 @@
 
      #+END_SRC
 
-**** Bind
+**** Binds
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1711,195 +2056,6 @@
 
      ;; bind eos-docs-map under ctl-x-map
      (define-key ctl-x-map (kbd "l") 'eos-docs-map)
-
-     #+END_SRC
-
-*** Dashboard
-**** Dashboard
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'dashboard nil t)
-       (progn
-         ;; items
-         (customize-set-variable 'dashboard-items
-                                 '((recents . 5)
-                                   (projects . 5)
-                                   (agenda . 5)
-                                   (bookmarks . 5)))
-
-         ;; banners directory
-         (customize-set-variable 'dashboard-banners-directory
-                                 (concat user-emacs-directory "banner/"))
-
-         ;; banner
-         (customize-set-variable 'dashboard-startup-banner 1)
-
-         ;; page separator
-         (customize-set-variable 'dashboard-page-separator "
-
-      ")
-
-         ;; footer icon
-         (customize-set-variable 'dashboard-footer-icon
-                                 #(" " 0 1 (face dashboard-footer)))
-
-         ;; footer
-         (customize-set-variable 'dashboard-footer
-                                 "Litany Against Fear
-
-        I must not fear.
-        Fear is the mind-killer.
-        Fear is the little-death that brings total obliteration.
-        I will face my fear.
-        I will permit it to pass over me and through me.
-        And when it has gone past I will turn the inner eye to see its path.
-        Where the fear has gone there will be nothing.
-        Only I will remain.
-        ")
-
-         ;; set initial buffer choice (emacsclient fix)
-         (customize-set-variable 'initial-buffer-choice
-                                 (lambda ()
-                                   (let ((initial-buffer (get-buffer "*dashboard*")))
-                                     (unless initial-buffer
-                                       (setq initial-buffer (get-buffer "*scratch*")))
-                                     initial-buffer)))
-
-         ;; init dashboard after emacs initialize
-         (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
-
-     #+END_SRC
-
-*** Project Manager
-**** Projectile
-
-     Projectile is used as the project management and navigation.
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'projectile nil t)
-       (progn
-         ;; customize
-         ;; enable cache and choose indexing method
-         (customize-set-variable 'projectile-enable-caching t)
-         (customize-set-variable 'projectile-indexing-method 'hybrid)
-         (customize-set-variable 'projectile-completion-system 'helm)
-
-         ;; set bookmarks file localtion (cache)
-         (customize-set-variable 'projectile-known-projects-file
-                                 (concat user-emacs-directory "cache/projectile-bookmarks.eld"))
-
-         (customize-set-variable 'projectile-cache-file
-                                 (concat user-emacs-directory "cache/projectile.cache"))
-
-         ;; bind
-         (define-key eos-pm-map (kbd "g") 'projectile-grep)
-         (define-key eos-pm-map (kbd "t") 'projectile-find-tag)
-         (define-key eos-pm-map (kbd "x") 'projectile-compile-project)
-         (define-key eos-pm-map (kbd "!") 'projectile-run-eshell)
-         (define-key eos-pm-map (kbd "o") 'projectile-switch-project)
-         (define-key eos-pm-map (kbd "r") 'projectile-replace-regexp)
-         (define-key eos-pm-map (kbd "R") 'projectile-replace)
-         (define-key eos-pm-map (kbd "s") 'projectile-save-project-buffers)
-         (define-key eos-pm-map (kbd "d") 'projectile-discover-projects-in-directory)
-         (define-key eos-pm-map (kbd "c") 'projectile-cleanup-known-projects)
-         (define-key eos-pm-map (kbd "C") 'projectile-invalidate-cache)
-         (define-key eos-pm-map (kbd "U") 'projectile-purge-dir-from-cache)
-         (define-key eos-pm-map (kbd "u") 'projectile-purge-file-from-cache)
-         (define-key eos-pm-map (kbd ".") 'projectile-edit-dir-locals)
-         (define-key eos-pm-map (kbd "k") 'projectile-kill-buffers)
-         (define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)
-
-         ;; add hook (init projectile)
-         (add-hook 'after-init-hook 'projectile-mode)))
-
-     #+END_SRC
-
-**** Helm-projectile
-
-     Helm-projectile is used as projectile frontend/interface.
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'helm-projectile nil t)
-       (progn
-         ;; bind
-         (define-key eos-pm-map (kbd "p") 'helm-projectile-ag)
-         (define-key eos-pm-map (kbd "n") 'helm-projectile-recentf)
-         (define-key eos-pm-map (kbd "/") 'helm-projectile-find-dir)
-         (define-key eos-pm-map (kbd "f") 'helm-projectile-find-file)
-         (define-key eos-pm-map (kbd "b") 'helm-projectile-browse-dirty-projects)
-         (define-key eos-pm-map (kbd "a")
-           'helm-projectile-find-file-in-known-projects)
-
-         ;; dwin
-         (define-key eos-pm-map (kbd "w") 'helm-projectile-find-file-dwim)
-
-         ;; helm-swoop
-         ;; (define-key eos-pm-map (kbd "S") 'helm-multi-swoop-projectile)
-
-         ;; enable helm-projectile after emacs start
-         (add-hook 'after-init-hook 'helm-projectile-on)))
-
-     #+END_SRC
-
-**** Bind
-
-     Set project manager keybinds on eos-pm-map (C-x p).
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; exit, keyboard quit
-     (define-key eos-pm-map (kbd "C-g") 'keyboard-quit)
-
-     ;; set ctl-x-map prefix (C-x p)
-     (define-key ctl-x-map (kbd "p") 'eos-pm-map)
-
-     #+END_SRC
-
-*** Navigation
-**** Helm-gtags
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'helm-gtags)
-       (progn
-         ;; customize
-         (customize-set-variable 'helm-gtags-ignore-case t)
-         (customize-set-variable 'helm-gtags-auto-update t)
-         (customize-set-variable 'helm-gtags-pulse-at-cursor t)
-         (customize-set-variable 'helm-gtags-use-input-at-cursor t)
-         (customize-set-variable 'helm-gtags-suggested-key-mapping t)
-
-         ;; bind
-         (define-key eos-tags-map (kbd "t") 'helm-gtags-dwim)
-         (define-key eos-tags-map (kbd "s") 'helm-gtags-select)
-         (define-key eos-tags-map (kbd "f") 'helm-gtags-find-tag)
-         (define-key eos-tags-map (kbd "+") 'helm-gtags-show-stack)
-         (define-key eos-tags-map (kbd "a") 'helm-gtags-parse-file)
-         (define-key eos-tags-map (kbd "c") 'helm-gtags-create-tags)
-         (define-key eos-tags-map (kbd "u") 'helm-gtags-update-tags)
-         (define-key eos-tags-map (kbd "p") 'helm-gtags-find-pattern)
-         (define-key eos-tags-map (kbd "r") 'helm-gtags-find-rtag)
-         (define-key eos-tags-map (kbd "o") 'helm-gtags-find-tag-other-window)
-
-         ;; enable helm-gtags mode after some programming mode startup
-         (add-hook 'porg-mode-hook 'helm-gtags-mode)))
-
-     #+END_SRC
-
-**** Bind
-
-     Set tags (navigation) keybinds on eos-tags-map (C-x t).
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; exit, keyboard quit
-     (define-key eos-tags-map (kbd "C-g") 'keyboard-quit)
-
-     ;; ctl-x-map bind (C-x t)
-     (define-key ctl-x-map (kbd "t") 'eos-tags-map)
 
      #+END_SRC
 
@@ -2014,7 +2170,7 @@
 
      #+END_SRC
 
-**** Util
+**** Utils
 
      #+BEGIN_SRC emacs-lisp
      ;; set company backends
@@ -2035,7 +2191,7 @@
 
      #+END_SRC
 
-**** Bind
+**** Binds
 
      #+BEGIN_SRC emacs-lisp
 
@@ -2048,7 +2204,52 @@
 
      #+END_SRC
 
-*** Debugging
+*** Navigator
+**** Helm-gtags
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'helm-gtags)
+       (progn
+         ;; customize
+         (customize-set-variable 'helm-gtags-ignore-case t)
+         (customize-set-variable 'helm-gtags-auto-update t)
+         (customize-set-variable 'helm-gtags-pulse-at-cursor t)
+         (customize-set-variable 'helm-gtags-use-input-at-cursor t)
+         (customize-set-variable 'helm-gtags-suggested-key-mapping t)
+
+         ;; bind
+         (define-key eos-tags-map (kbd "t") 'helm-gtags-dwim)
+         (define-key eos-tags-map (kbd "s") 'helm-gtags-select)
+         (define-key eos-tags-map (kbd "f") 'helm-gtags-find-tag)
+         (define-key eos-tags-map (kbd "+") 'helm-gtags-show-stack)
+         (define-key eos-tags-map (kbd "a") 'helm-gtags-parse-file)
+         (define-key eos-tags-map (kbd "c") 'helm-gtags-create-tags)
+         (define-key eos-tags-map (kbd "u") 'helm-gtags-update-tags)
+         (define-key eos-tags-map (kbd "p") 'helm-gtags-find-pattern)
+         (define-key eos-tags-map (kbd "r") 'helm-gtags-find-rtag)
+         (define-key eos-tags-map (kbd "o") 'helm-gtags-find-tag-other-window)
+
+         ;; enable helm-gtags mode after some programming mode startup
+         (add-hook 'porg-mode-hook 'helm-gtags-mode)))
+
+     #+END_SRC
+
+**** Binds
+
+     Set tags (navigation) keybinds on eos-tags-map (C-x t).
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; exit, keyboard quit
+     (define-key eos-tags-map (kbd "C-g") 'keyboard-quit)
+
+     ;; ctl-x-map bind (C-x t)
+     (define-key ctl-x-map (kbd "t") 'eos-tags-map)
+
+     #+END_SRC
+
+*** Debugger
 **** Gud
 
      #+BEGIN_SRC emacs-lisp
@@ -2057,7 +2258,7 @@
 
      #+END_SRC
 
-*** Build System
+*** Builder
 **** Cmake-ide
 
      #+BEGIN_SRC emacs-lisp
@@ -2102,77 +2303,7 @@
 
      #+END_SRC
 
-*** Syntax-check
-**** Flycheck
-
-     Flycheck is a modern on-the-fly syntax checking extension.
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'flycheck nil t)
-       (progn
-         ;; bind
-         (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
-         (define-key eos-sc-map (kbd "m") 'flycheck-mode)
-         (define-key eos-sc-map (kbd "M") 'flycheck-manual)
-         (define-key eos-sc-map (kbd "o") 'flycheck-list-errors)
-         (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
-
-         (define-key eos-sc-map
-           (kbd "v") 'flycheck-verify-setup)
-
-         (define-key eos-sc-map
-           (kbd "c") 'flycheck-select-checker)
-
-         (define-key eos-sc-map
-           (kbd "d") 'flycheck-disable-checker)
-
-         (define-key eos-sc-map
-           (kbd "?") 'flycheck-describe-checker)
-
-         ;; init flycheck mode after some programming mode
-         ;; is activated (c-mode, elisp-mode, etc).
-         (add-hook 'prog-mode-hook 'flycheck-mode)))
-
-     #+END_SRC
-
-**** Helm-flycheck
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'helm-flycheck nil t)
-       (progn
-         ;; binds
-         (define-key eos-sc-map (kbd "e") 'helm-flycheck)
-         (define-key ctl-x-map (kbd ";") 'helm-flycheck)))
-
-     #+END_SRC
-
-**** Util
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; auxiliary function
-     (defun eos/flycheck/set-checker (checker)
-       "Set flycheck CHECKER variable."
-       (make-local-variable 'flycheck-checker)
-       (customize-set-variable 'flycheck-checker checker))
-
-     #+END_SRC
-
-**** Bind
-
-     Set syntax check related keybinds on eos-sc-map
-     (C-x e).
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; bind eos-sc-map prefix to C-x e
-     (define-key ctl-x-map (kbd "e") 'eos-sc-map)
-
-     #+END_SRC
-
-*** Version-control
+*** Version Control
 **** Vc
 **** Magit
 
@@ -2185,150 +2316,91 @@
 
      #+END_SRC
 
-*** Screen
-**** Lock
-***** Slock
 
-      #+BEGIN_SRC emacs-lisp
+*** Project Management
+**** Projectile
 
-      (global-set-key (kbd "C-x <end>")
-                      (lambda ()
-                        (interactive)
-                        (eos/run/async-proc "slock")))
-
-      #+END_SRC
-
-**** Shot
-***** Scrot
-
-      #+BEGIN_SRC emacs-lisp
-
-      (global-set-key (kbd "<print>")
-                      (lambda ()
-                        (interactive)
-                        (eos/run/async-proc "scrot")))
-
-      #+END_SRC
-
-*** Controls
-**** Volume
+     Projectile is used as the project management and navigation.
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; volume functions (utils)
-     (defun eos/toggle-audio ()
-       "Toggle audio (mute or unmute)."
-       (interactive)
-       (async-shell-command "amixer -D default set Master mute"))
-
-     (defun eos/raise-volume ()
-       "Raise the volume (factor +5)."
-       (interactive)
-       (async-shell-command "amixer -D default set Master 5+ unmute"))
-
-     (defun eos/lower-volume ()
-       "Lower the volume (factor -5)."
-       (interactive)
-       (async-shell-command "amixer -D default set Master 5- unmute"))
-
-     ;; bind
-     (global-set-key (kbd "<s-f6>") 'eos/toggle-audio)
-     (global-set-key (kbd "<s-f7>") 'eos/lower-volume)
-     (global-set-key (kbd "<s-f8>") 'eos/raise-volume)
-
-     #+END_SRC
-
-**** Transparency
-*** Calculator
-**** Calc
-*** Calendar
-*** Office
-**** Org
-
-     #+BEGIN_SRC emacs-lisp
-
-     (add-hook 'org-mode-hook
-               (lambda ()
-                 ;; do not truncate lines
-                 (setq truncate-lines nil)
-
-                 ;; set company backends
-                 (eos/company/set-backends
-                  '((company-capf
-                     company-keywords
-                     company-yasnippet
-                     company-ispell
-                     company-dabbrev
-                     company-dabbrev-code)
-                    (company-files)))))
-
-     #+END_SRC
-
-**** Tex
-**** Text
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'text-mode nil t)
-       (progn
-         ;; bind
-         (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-         (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
-         (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
-         (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
-
-         ;; text mode hook
-         (add-hook 'text-mode-hook
-                   (lambda ()
-                     ;; turn on auto fill mode
-                     (turn-on-auto-fill)
-
-                     ;; set company backends
-                     (eos/company/set-backends
-                      '((company-ispell
-                         company-keywords
-                         company-capf
-                         company-dabbrev-code
-                         company-dabbrev)
-                        (company-files)))))
-         ))
-
-     #+END_SRC
-
-**** Markdown
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'markdown-mode nil t)
+     (when (require 'projectile nil t)
        (progn
          ;; customize
-         (customize-set-variable 'markdown-command "multimarkdown")))
+         ;; enable cache and choose indexing method
+         (customize-set-variable 'projectile-enable-caching t)
+         (customize-set-variable 'projectile-indexing-method 'hybrid)
+         (customize-set-variable 'projectile-completion-system 'helm)
 
-     ;; bind
-     (when (boundp 'markdown-mode-map)
-       (progn
-         (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+         ;; set bookmarks file localtion (cache)
+         (customize-set-variable 'projectile-known-projects-file
+                                 (concat user-emacs-directory "cache/projectile-bookmarks.eld"))
+
+         (customize-set-variable 'projectile-cache-file
+                                 (concat user-emacs-directory "cache/projectile.cache"))
+
+         ;; bind
+         (define-key eos-pm-map (kbd "g") 'projectile-grep)
+         (define-key eos-pm-map (kbd "t") 'projectile-find-tag)
+         (define-key eos-pm-map (kbd "x") 'projectile-compile-project)
+         (define-key eos-pm-map (kbd "!") 'projectile-run-eshell)
+         (define-key eos-pm-map (kbd "o") 'projectile-switch-project)
+         (define-key eos-pm-map (kbd "r") 'projectile-replace-regexp)
+         (define-key eos-pm-map (kbd "R") 'projectile-replace)
+         (define-key eos-pm-map (kbd "s") 'projectile-save-project-buffers)
+         (define-key eos-pm-map (kbd "d") 'projectile-discover-projects-in-directory)
+         (define-key eos-pm-map (kbd "c") 'projectile-cleanup-known-projects)
+         (define-key eos-pm-map (kbd "C") 'projectile-invalidate-cache)
+         (define-key eos-pm-map (kbd "U") 'projectile-purge-dir-from-cache)
+         (define-key eos-pm-map (kbd "u") 'projectile-purge-file-from-cache)
+         (define-key eos-pm-map (kbd ".") 'projectile-edit-dir-locals)
+         (define-key eos-pm-map (kbd "k") 'projectile-kill-buffers)
+         (define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)
+
+         ;; add hook (init projectile)
+         (add-hook 'after-init-hook 'projectile-mode)))
 
      #+END_SRC
 
-**** DocView
-**** Spell-check
-*** Analyse
-**** Verb
-*** Apparence
-**** Mesk-term
+**** Helm-projectile
 
-     Add theme directory to load-path and load the
-     default theme (mesk-term).
+     Helm-projectile is used as projectile frontend/interface.
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; add eos-theme-dir to theme load path
-     (add-to-list 'custom-theme-load-path
-                  (concat user-emacs-directory "themes"))
+     (when (require 'helm-projectile nil t)
+       (progn
+         ;; bind
+         (define-key eos-pm-map (kbd "p") 'helm-projectile-ag)
+         (define-key eos-pm-map (kbd "n") 'helm-projectile-recentf)
+         (define-key eos-pm-map (kbd "/") 'helm-projectile-find-dir)
+         (define-key eos-pm-map (kbd "f") 'helm-projectile-find-file)
+         (define-key eos-pm-map (kbd "b") 'helm-projectile-browse-dirty-projects)
+         (define-key eos-pm-map (kbd "a")
+           'helm-projectile-find-file-in-known-projects)
 
-     ;; load theme
-     (load-theme 'mesk-term t)
+         ;; dwin
+         (define-key eos-pm-map (kbd "w") 'helm-projectile-find-file-dwim)
+
+         ;; helm-swoop
+         ;; (define-key eos-pm-map (kbd "S") 'helm-multi-swoop-projectile)
+
+         ;; enable helm-projectile after emacs start
+         (add-hook 'after-init-hook 'helm-projectile-on)))
+
+     #+END_SRC
+
+**** Binds
+
+     Set project manager keybinds on eos-pm-map (C-x p).
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; exit, keyboard quit
+     (define-key eos-pm-map (kbd "C-g") 'keyboard-quit)
+
+     ;; set ctl-x-map prefix (C-x p)
+     (define-key ctl-x-map (kbd "p") 'eos-pm-map)
 
      #+END_SRC
 
@@ -2410,7 +2482,7 @@
 
      #+END_SRC
 
-**** Bind
+**** Binds
 
      #+BEGIN_SRC emacs-lisp
 
@@ -2443,7 +2515,7 @@
 
      #+END_SRC
 
-**** Util
+**** Utils
 
      #+BEGIN_SRC emacs-lisp
 
@@ -2679,6 +2751,13 @@
 *** Clojure
 *** Vhdl
 *** Verilog
+
+    #+BEGIN_SRC emacs-lisp
+
+    (require 'verilog nil t)
+
+    #+END_SRC
+
 *** Mql
 *** Cmake
 *** Doxygen
@@ -2698,27 +2777,26 @@
 *** Web
 **** Web-mode
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-    (when (require 'web-mode nil t)
-      (progn
-        (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-        (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-        (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-        (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-        (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-        (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-        (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))))
+     (when (require 'web-mode nil t)
+       (progn
+         (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+         (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))))
 
-    (when (boundp 'web-mode-engines-alist)
-      (progn
-        (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'")))))
+     (when (boundp 'web-mode-engines-alist)
+       (progn
+         (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'")))))
 
-    #+END_SRC
+     #+END_SRC
 
 *** PHP
-*** HTML
-
+*** Html
 ** Unbind
 *** Prefix
 **** Esc
@@ -2916,6 +2994,14 @@
     (global-unset-key (kbd "<S-down-mouse-1>"))
 
     #+END_SRC
+
+** Adapt
+
+   #+BEGIN_SRC emacs-lisp
+
+   (require 'eos-adapt (expand-file-name "eos-adapt.el" user-emacs-directory) t)
+
+   #+END_SRC
 
 ** Provide
 

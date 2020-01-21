@@ -24,7 +24,7 @@ _FLAG_SYMLINK=1
 
 # defaults
 _DEFAULT_DIR=
-_DEFAULT_FILES="private.el adapt.el Cask"
+_DEFAULT_FILES="eos-adapt.el Cask"
 _DEFAULT_PREFIX="default."
 
 # banner

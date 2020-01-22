@@ -476,11 +476,12 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'time nil t)
   (progn
-    ;; format time string
-    (customize-set-variable 'display-time-format "%H:%M")
+    ;; customize
+    (customize-set-variable
+     'eos-time-string (format-time-string "%H:%M"))
 
-    ;; enable display time mode
-    (display-time-mode 1)))
+    ;; initialize display time mode
+    (display-time)))
 
 ;; always refresh the modeline (reference)
 ;; (add-hook 'buffer-list-update-hook 'func)
@@ -750,6 +751,24 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key helm-map (kbd "C-j") 'helm-maybe-exit-minibuffer)
     (define-key helm-map (kbd "C-z") 'helm-select-action)))
 
+(when (require 'auth-source nil t)
+  (progn
+    (require 'auth-source-pass nil t)
+
+    ;; function
+    (defun eos/auth/lookup-password (host user port)
+      "Lookup password related to HOST USER PORT params."
+      (let ((auth (auth-source-search :host host :user user :port port)))
+        (if auth
+            (let ((secretf (plist-get (car auth) :secret)))
+              (if secretf
+                  (funcall secretf)
+                (error "Auth entry for %s@%s:%s has no secret!"
+                       user host port)))
+          (error "No auth entry found for %s@%s:%s" user host port))))))
+
+(require 'notifications nil t)
+
 (when (require 'helm-descbinds nil t)
   (progn
     ;; helm-descbinds, window splitting style (2: vertical)
@@ -910,8 +929,8 @@ See the `eww-search-prefix' variable for the search engine used."
 
     ;; mode-line format
     (customize-set-variable 'mode-line-format
-                            '(" " display-time-string
-                              "  %*%&  %l:%c | %I "
+                            '(" " eos-time-string
+                              " %*%& %l:%c | %I "
                               moody-mode-line-buffer-identification
                               " %m "
                               (vc-mode moody-vc-mode)))))
@@ -935,10 +954,13 @@ See the `eww-search-prefix' variable for the search engine used."
     (customize-set-variable 'erc-prompt-for-password t)
 
     ;; if nil, ERC will call system-name to get this information.
-    (customize-set-variable 'erc-system-name "eos")
+    (customize-set-variable 'erc-system-name "eos")))
 
-    ;; binds
-    (define-key erc-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+  ;; binds
+  (when (boundp 'erc-mode-map)
+    (progn
+      ;; use eos/complete
+      (define-key erc-mode-map (kbd "TAB") 'eos/complete)))
 
 (when (require 'which-key nil t)
   (progn
@@ -1073,6 +1095,7 @@ See the `eww-search-prefix' variable for the search engine used."
     (customize-set-variable 'flyspell-default-dictionary "english")
 
     ;; add hooks
+    (add-hook 'text-mode-hook 'flyspell-mode)
     (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
 
 (when (require 'flycheck nil t)
@@ -1376,6 +1399,7 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; bind
 (when (boundp 'company-active-map)
   (progn
+    (define-key company-active-map (kbd "C-j") 'company-complete-selection)
     (define-key company-active-map (kbd "C-n") 'company-select-next)
     (define-key company-active-map (kbd "C-p") 'company-select-previous)))
 
@@ -1412,6 +1436,13 @@ See the `eww-search-prefix' variable for the search engine used."
   "Set company BACKENDS."
   (make-local-variable 'company-backends)
   (customize-set-variable 'company-backends backends))
+
+;; calls helm-company if its bounded
+(defun eos/complete ()
+  "Helm company complete wrapper."
+  (interactive)
+  (when (fboundp 'helm-company)
+    (helm-company)))
 
 ;; complete or indent
 (defun eos/complete-or-indent ()

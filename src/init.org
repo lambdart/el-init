@@ -532,7 +532,6 @@
 
      #+END_SRC
 
-**** Auth
 *** Help
 
     #+BEGIN_SRC emacs-lisp
@@ -802,11 +801,12 @@
 
     (when (require 'time nil t)
       (progn
-        ;; format time string
-        (customize-set-variable 'display-time-format "%H:%M")
+        ;; customize
+        (customize-set-variable
+         'eos-time-string (format-time-string "%H:%M"))
 
-        ;; enable display time mode
-        (display-time-mode 1)))
+        ;; initialize display time mode
+        (display-time)))
 
     #+END_SRC
 
@@ -1179,6 +1179,41 @@
 
      #+END_SRC
 
+*** Authentication
+**** Auth-source
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'auth-source nil t)
+       (progn
+         (require 'auth-source-pass nil t)
+
+         ;; function
+         (defun eos/auth/lookup-password (host user port)
+           "Lookup password related to HOST USER PORT params."
+           (let ((auth (auth-source-search :host host :user user :port port)))
+             (if auth
+                 (let ((secretf (plist-get (car auth) :secret)))
+                   (if secretf
+                       (funcall secretf)
+                     (error "Auth entry for %s@%s:%s has no secret!"
+                            user host port)))
+               (error "No auth entry found for %s@%s:%s" user host port))))))
+
+     #+END_SRC
+
+*** Notification
+**** Notifications
+
+     For proper usage, Emacs must be started in an environment with an
+     active D-Bus session bus.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'notifications nil t)
+
+     #+END_SRC
+
 *** Help
 **** Helm-descbinds
 
@@ -1440,8 +1475,8 @@
 
          ;; mode-line format
          (customize-set-variable 'mode-line-format
-                                 '(" " display-time-string
-                                   "  %*%&  %l:%c | %I "
+                                 '(" " eos-time-string
+                                   " %*%& %l:%c | %I "
                                    moody-mode-line-buffer-identification
                                    " %m "
                                    (vc-mode moody-vc-mode)))))
@@ -1475,14 +1510,16 @@
          (customize-set-variable 'erc-prompt-for-password t)
 
          ;; if nil, ERC will call system-name to get this information.
-         (customize-set-variable 'erc-system-name "eos")
+         (customize-set-variable 'erc-system-name "eos")))
 
-         ;; binds
-         (define-key erc-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+       ;; binds
+       (when (boundp 'erc-mode-map)
+         (progn
+           ;; use eos/complete
+           (define-key erc-mode-map (kbd "TAB") 'eos/complete)))
 
      #+END_SRC
 
-**** Telega.el
 **** Jabber
 **** Slack
 *** Misc
@@ -1685,6 +1722,7 @@
           (customize-set-variable 'flyspell-default-dictionary "english")
 
           ;; add hooks
+          (add-hook 'text-mode-hook 'flyspell-mode)
           (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
 
       #+END_SRC
@@ -2171,6 +2209,7 @@
      ;; bind
      (when (boundp 'company-active-map)
        (progn
+         (define-key company-active-map (kbd "C-j") 'company-complete-selection)
          (define-key company-active-map (kbd "C-n") 'company-select-next)
          (define-key company-active-map (kbd "C-p") 'company-select-previous)))
 
@@ -2225,11 +2264,19 @@
 **** Utils
 
      #+BEGIN_SRC emacs-lisp
+
      ;; set company backends
      (defun eos/company/set-backends (backends)
        "Set company BACKENDS."
        (make-local-variable 'company-backends)
        (customize-set-variable 'company-backends backends))
+
+     ;; calls helm-company if its bounded
+     (defun eos/complete ()
+       "Helm company complete wrapper."
+       (interactive)
+       (when (fboundp 'helm-company)
+         (helm-company)))
 
      ;; complete or indent
      (defun eos/complete-or-indent ()
@@ -2367,7 +2414,6 @@
          (define-key ctl-x-map (kbd "j") 'magit-status)))
 
      #+END_SRC
-
 
 *** Project Management
 **** Projectile
@@ -2849,6 +2895,7 @@
 
 *** PHP
 *** Html
+*** Mql
 ** Unbind
 *** Prefix
 **** Esc

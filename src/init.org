@@ -139,21 +139,21 @@
 
     #+END_SRC
 
-*** Private
+** Private
 
-    Some settings are private, this file must
-    contain these variables values.
+   Some settings are private, this file must
+   contain these variables values.
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
 
-    ;; Load private.el after emacs initialize.
-    (add-hook 'after-init-hook
-              (lambda ()
-                (let ((private-file (expand-file-name "~/.private/private.el")))
-                       (if (file-exists-p private-file)
-                           (progn (load-file private-file))))))
+   ;; Load private.el after emacs initialize.
+   (add-hook 'after-init-hook
+             (lambda ()
+               (let ((private-file (expand-file-name "~/.private/private.el")))
+                 (if (file-exists-p private-file)
+                     (progn (load-file private-file))))))
 
-    #+END_SRC
+   #+END_SRC
 
 ** Vanilla
 *** Aliases
@@ -532,6 +532,7 @@
 
      #+END_SRC
 
+**** Auth
 *** Help
 
     #+BEGIN_SRC emacs-lisp
@@ -1474,7 +1475,10 @@
          (customize-set-variable 'erc-prompt-for-password t)
 
          ;; if nil, ERC will call system-name to get this information.
-         (customize-set-variable 'erc-system-name "eos")))
+         (customize-set-variable 'erc-system-name "eos")
+
+         ;; binds
+         (define-key erc-mode-map (kbd "TAB") 'eos/complete-or-indent)))
 
      #+END_SRC
 
@@ -1636,7 +1640,55 @@
 
 *** Checker
 **** Spell
+***** Ispell
+
+      Aspell is a utility program that connects to the Aspell library so that
+      it can function as an ispell -a replacement, as an independent spell
+      checker, as a test utility to test out Aspell library features, and as
+      a utility for managing dictionaries used by the library.
+
+      Note : Ispell minor mode configuration requires aspell program.
+      TIP  : On FreeBSD: pkg info aspell
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'ispell nil t)
+        (progn
+          ;; customize
+          ;; aspell setup
+          (customize-set-variable 'ispell-program-name "aspell")
+          (customize-set-variable 'ispell-list-command "-a")
+
+          ;; functions (reference)
+          ;; (defun eos/ispell/switch-dictionary ()
+          ;;   "Switch dictionaries."
+          ;;   (interactive)
+          ;;   (let* ((dic ispell-current-dictionary)
+          ;;          (change (if (string= dic "english") "" "english")))
+          ;;     (ispell-change-dictionary change)
+          ;;     (message "Dictionary switched from %s to %s" dic change)))
+
+          ))
+
+      #+END_SRC
+
 ***** Flyspell
+
+      Flyspell is a minor Emacs mode performing on-the-fly spelling
+      checking.
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'flyspell nil t)
+        (progn
+          ;; string that is the name of the default dictionary
+          (customize-set-variable 'flyspell-default-dictionary "english")
+
+          ;; add hooks
+          (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
+
+      #+END_SRC
+
 **** Syntax
 ***** Flycheck
 

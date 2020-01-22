@@ -56,8 +56,8 @@ tangled, and the tangled file is compiled."
 (add-hook 'after-init-hook
           (lambda ()
             (let ((private-file (expand-file-name "~/.private/private.el")))
-                   (if (file-exists-p private-file)
-                       (progn (load-file private-file))))))
+              (if (file-exists-p private-file)
+                  (progn (load-file private-file))))))
 
 ;; y or n
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -935,7 +935,10 @@ See the `eww-search-prefix' variable for the search engine used."
     (customize-set-variable 'erc-prompt-for-password t)
 
     ;; if nil, ERC will call system-name to get this information.
-    (customize-set-variable 'erc-system-name "eos")))
+    (customize-set-variable 'erc-system-name "eos")
+
+    ;; binds
+    (define-key erc-mode-map (kbd "TAB") 'eos/complete-or-indent)))
 
 (when (require 'which-key nil t)
   (progn
@@ -1045,6 +1048,32 @@ See the `eww-search-prefix' variable for the search engine used."
 (global-set-key (kbd "C-x ]") 'eos/launch/st)
 
 (require 'helm-ag nil t)
+
+(when (require 'ispell nil t)
+  (progn
+    ;; customize
+    ;; aspell setup
+    (customize-set-variable 'ispell-program-name "aspell")
+    (customize-set-variable 'ispell-list-command "-a")
+
+    ;; functions (reference)
+    ;; (defun eos/ispell/switch-dictionary ()
+    ;;   "Switch dictionaries."
+    ;;   (interactive)
+    ;;   (let* ((dic ispell-current-dictionary)
+    ;;          (change (if (string= dic "english") "" "english")))
+    ;;     (ispell-change-dictionary change)
+    ;;     (message "Dictionary switched from %s to %s" dic change)))
+
+    ))
+
+(when (require 'flyspell nil t)
+  (progn
+    ;; string that is the name of the default dictionary
+    (customize-set-variable 'flyspell-default-dictionary "english")
+
+    ;; add hooks
+    (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
 
 (when (require 'flycheck nil t)
   (progn

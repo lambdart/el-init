@@ -369,6 +369,10 @@
     ;;; Iedit
     `(iedit-occurrence ((t (:background ,yellow :foreground ,black))))
 
+    ;;; Man
+    `(Man-overstrike ((t (:foreground ,blue :weight bold))))
+    `(Man-underline ((t (:foreground ,red))))
+
     ;;; Message
     `(message-header-cc ((t (:foreground ,fgdim))))
     `(message-header-name ((t (:inherit gnus-header-name))))
@@ -605,7 +609,7 @@
     ;; vertical-border
     ;; `(vertical-border ((((type x tty)) (:foreground "#262626"))))
     `(vertical-border ((t nil)))
-  ))
+    ))
 
 ;;;###autoload
 (and load-file-name

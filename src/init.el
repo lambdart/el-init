@@ -871,9 +871,9 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; refresh sidebar to match current file.
     (customize-set-variable 'dired-sidebar-should-follow-file t)
 
-    ;; global bind
+    ;; bind
     ;; assign C-x C-d to sidebar file browser
-    (global-set-key (kbd "C-x C-d") 'dired-sidebar-toggle-sidebar)))
+    (define-key ctl-x-map (kbd "C-d") 'dired-sidebar-toggle-sidebar)))
 
 (when (require 'shr nil t)
   (progn
@@ -1179,7 +1179,7 @@ See the `eww-search-prefix' variable for the search engine used."
      (concat user-emacs-directory "cache/dmenu-itens"))
 
     ;; bind
-    (global-set-key (kbd "C-x C-x") 'dmenu)))
+    (define-key ctl-x-map (kbd "C-x") 'dmenu)))
 
 ;; start compton after emacs initialize
 (add-hook 'after-init-hook
@@ -1206,23 +1206,24 @@ See the `eww-search-prefix' variable for the search engine used."
     (customize-set-variable 'tramp-connection-timeout 30)
 
     ;; tramp filename syntax to be used
-    (customize-set-variable 'tramp-syntax "default")))
+    ;; (customize-set-variable 'tramp-syntax "")
+    ))
 
-(global-set-key (kbd "C-x <end>")
-                (lambda ()
-                  (interactive)
-                  (eos/run/async-proc "slock")))
+(define-key ctl-x-map (kbd "<end>")
+  (lambda ()
+    (interactive)
+    (eos/run/async-proc "slock")))
 
 (global-set-key (kbd "<print>")
                 (lambda ()
                   (interactive)
                   (eos/run/async-proc "scrot")))
 
-;; volume functions (utils)
-(defun eos/toggle-audio ()
-  "Toggle audio (mute or unmute)."
-  (interactive)
-  (async-shell-command "amixer -D default set Master mute"))
+;; control functions: volume
+;; (defun eos/toggle-audio ()
+;;   "Toggle audio (mute or unmute)."
+;;   (interactive)
+;;   (async-shell-command "amixer -D default set Master"))
 
 (defun eos/raise-volume ()
   "Raise the volume (factor +5)."
@@ -1235,9 +1236,9 @@ See the `eww-search-prefix' variable for the search engine used."
   (async-shell-command "amixer -D default set Master 5- unmute"))
 
 ;; bind
-(global-set-key (kbd "<s-f6>") 'eos/toggle-audio)
-(global-set-key (kbd "<s-f7>") 'eos/lower-volume)
-(global-set-key (kbd "<s-f8>") 'eos/raise-volume)
+;; (define-key ctl-x-map (kbd "C-0") 'eos/toggle-audio)
+(define-key ctl-x-map (kbd "C--") 'eos/lower-volume)
+(define-key ctl-x-map (kbd "C-=") 'eos/raise-volume)
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -1355,7 +1356,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (when (require 'helm-man nil t)
   (progn
     ;; bind
-    (global-set-key (kbd "<f1>") 'helm-man-woman)))
+    (define-key help-map (kbd "y") 'helm-man-woman)))
 
 (when (require 'dash-docs nil t)
   (progn
@@ -1863,14 +1864,14 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; (define-key ctl-x-map (kbd "C-SPC") nil)
 ;; (define-key ctl-x-map (kbd "C-<left>") nil)
 ;; (define-key ctl-x-map (kbd "C-<right>") nil)
-(define-key ctl-x-map (kbd "C-=") nil)
-(define-key ctl-x-map (kbd "C-0") nil)
+;; (define-key ctl-x-map (kbd "C-=") nil)
+;; (define-key ctl-x-map (kbd "C-0") nil)
 (define-key ctl-x-map (kbd "C-z") nil)
 (define-key ctl-x-map (kbd "C-+") nil)
-(define-key ctl-x-map (kbd "C--") nil)
+;; (define-key ctl-x-map (kbd "C--") nil)
 (define-key ctl-x-map (kbd "C-a") nil)
 (define-key ctl-x-map (kbd "C-l") nil)
-(define-key ctl-x-map (kbd "C-d") nil)
+;; (define-key ctl-x-map (kbd "C-d") nil)
 (define-key ctl-x-map (kbd "C-r") nil)
 (define-key ctl-x-map (kbd "C-n") nil)
 (define-key ctl-x-map (kbd "C-p") nil)

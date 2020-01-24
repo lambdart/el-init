@@ -1398,9 +1398,9 @@
          ;; refresh sidebar to match current file.
          (customize-set-variable 'dired-sidebar-should-follow-file t)
 
-         ;; global bind
+         ;; bind
          ;; assign C-x C-d to sidebar file browser
-         (global-set-key (kbd "C-x C-d") 'dired-sidebar-toggle-sidebar)))
+         (define-key ctl-x-map (kbd "C-d") 'dired-sidebar-toggle-sidebar)))
 
      #+END_SRC
 
@@ -1910,7 +1910,7 @@
           (concat user-emacs-directory "cache/dmenu-itens"))
 
          ;; bind
-         (global-set-key (kbd "C-x C-x") 'dmenu)))
+         (define-key ctl-x-map (kbd "C-x") 'dmenu)))
 
      #+END_SRC
 
@@ -1963,7 +1963,8 @@
          (customize-set-variable 'tramp-connection-timeout 30)
 
          ;; tramp filename syntax to be used
-         (customize-set-variable 'tramp-syntax "default")))
+         ;; (customize-set-variable 'tramp-syntax "")
+         ))
 
      #+END_SRC
 
@@ -1975,10 +1976,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (global-set-key (kbd "C-x <end>")
-                      (lambda ()
-                        (interactive)
-                        (eos/run/async-proc "slock")))
+      (define-key ctl-x-map (kbd "<end>")
+        (lambda ()
+          (interactive)
+          (eos/run/async-proc "slock")))
 
       #+END_SRC
 
@@ -1999,11 +2000,11 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; volume functions (utils)
-     (defun eos/toggle-audio ()
-       "Toggle audio (mute or unmute)."
-       (interactive)
-       (async-shell-command "amixer -D default set Master mute"))
+     ;; control functions: volume
+     ;; (defun eos/toggle-audio ()
+     ;;   "Toggle audio (mute or unmute)."
+     ;;   (interactive)
+     ;;   (async-shell-command "amixer -D default set Master"))
 
      (defun eos/raise-volume ()
        "Raise the volume (factor +5)."
@@ -2016,9 +2017,9 @@
        (async-shell-command "amixer -D default set Master 5- unmute"))
 
      ;; bind
-     (global-set-key (kbd "<s-f6>") 'eos/toggle-audio)
-     (global-set-key (kbd "<s-f7>") 'eos/lower-volume)
-     (global-set-key (kbd "<s-f8>") 'eos/raise-volume)
+     ;; (define-key ctl-x-map (kbd "C-0") 'eos/toggle-audio)
+     (define-key ctl-x-map (kbd "C--") 'eos/lower-volume)
+     (define-key ctl-x-map (kbd "C-=") 'eos/raise-volume)
 
      #+END_SRC
 
@@ -2195,7 +2196,7 @@
      (when (require 'helm-man nil t)
        (progn
          ;; bind
-         (global-set-key (kbd "<f1>") 'helm-man-woman)))
+         (define-key help-map (kbd "y") 'helm-man-woman)))
 
      #+END_SRC
 
@@ -3040,14 +3041,14 @@
      ;; (define-key ctl-x-map (kbd "C-SPC") nil)
      ;; (define-key ctl-x-map (kbd "C-<left>") nil)
      ;; (define-key ctl-x-map (kbd "C-<right>") nil)
-     (define-key ctl-x-map (kbd "C-=") nil)
-     (define-key ctl-x-map (kbd "C-0") nil)
+     ;; (define-key ctl-x-map (kbd "C-=") nil)
+     ;; (define-key ctl-x-map (kbd "C-0") nil)
      (define-key ctl-x-map (kbd "C-z") nil)
      (define-key ctl-x-map (kbd "C-+") nil)
-     (define-key ctl-x-map (kbd "C--") nil)
+     ;; (define-key ctl-x-map (kbd "C--") nil)
      (define-key ctl-x-map (kbd "C-a") nil)
      (define-key ctl-x-map (kbd "C-l") nil)
-     (define-key ctl-x-map (kbd "C-d") nil)
+     ;; (define-key ctl-x-map (kbd "C-d") nil)
      (define-key ctl-x-map (kbd "C-r") nil)
      (define-key ctl-x-map (kbd "C-n") nil)
      (define-key ctl-x-map (kbd "C-p") nil)

@@ -932,28 +932,16 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; cask load and initialize
-     (when (require 'cask "~/.cask/cask.el" t)
-       (progn
-         ;; initialize cask
-         (cask-initialize)))
+     ;; avoid warnings when byte-compile
+     (eval-when-compile
+       (require 'cask "~/.cask/cask.el")
+       (cask-initialize))
 
-     (defun eos/pm/add-subdirs-to-load-path (&rest _)
-       "Add subdirectories to `load-path'."
-       (let ((default-directory
-               (expand-file-name ".cask/26.3/elpa" user-emacs-directory)))
-         (normal-top-level-add-subdirs-to-load-path)))
+     ;; load cask
+     (require 'cask "~/.cask/cask.el")
 
-     (defun eos/pm/update-load-path ()
-       "Add subdirs to load-path variable and remove duplicates."
-       (interactive)
-       ;; add cask subdirs to load-path variable and
-       ;; remove duplicates
-       (eos/pm/add-subdirs-to-load-path)
-       (delete-dups load-path))
-
-     ;; calls update-load-path
-     (eos/pm/update-load-path)
+     ;; initialize cask
+     (cask-initialize)
 
      #+END_SRC
 
@@ -1060,6 +1048,7 @@
      (require 'exwm-core nil t)
      (require 'exwm-workspace nil t)
 
+     ;; hooks
      ;; update the buffer name by X11 window title
      (add-hook 'exwm-update-title-hook
                (lambda ()
@@ -1182,23 +1171,19 @@
 *** Authentication
 **** Auth-source
 
+     It lets users tell Gnus how to authenticate in a single place.
+     Simplicity is the goal. Instead of providing 5000 options,
+     we'll stick to simple, easy to understand options.
+
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'auth-source nil t)
        (progn
-         (require 'auth-source-pass nil t)
-
-         ;; function
-         (defun eos/auth/lookup-password (host user port)
-           "Lookup password related to HOST USER PORT params."
-           (let ((auth (auth-source-search :host host :user user :port port)))
-             (if auth
-                 (let ((secretf (plist-get (car auth) :secret)))
-                   (if secretf
-                       (funcall secretf)
-                     (error "Auth entry for %s@%s:%s has no secret!"
-                            user host port)))
-               (error "No auth entry found for %s@%s:%s" user host port))))))
+         ;; list of authentication sources
+         (customize-set-variable 'auth-sources
+                                 '("~/.auth/auth.gpg"
+                                   "~/.auth/auth"
+                                   "~/.auth/netrc"))))
 
      #+END_SRC
 
@@ -1265,7 +1250,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'undo-tree)
+     (when (require 'undo-tree nil t)
        (progn
          ;; define alias for redo
          (defalias 'redo 'undo-tree-redo)
@@ -1350,29 +1335,72 @@
 *** Files
 **** Dired
 
+     This is a major mode for directory browsing and editing.
+
      #+BEGIN_SRC emacs-lisp
 
-     (require 'dired-async nil t)
+     (require 'dired nil t)
 
-     ;; enable find-alternate-file
-     (put 'dired-find-alternate-file 'disabled nil)
+     #+END_SRC
 
-     ;; enable dired-aysnc-mode
-     (eos/funcall 'dired-async-mode 1)
+**** Dired-async
+
+     This package provides a redefinition of `dired-create-file' function,
+     performs copies, moves and all what is handled by `dired-create-file'
+     in the background using a slave Emacs process, by means of the async.el module.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'dired-async nil t)
+       (progn
+         ;; enable find-alternate-file
+         ;; (put 'dired-find-alternate-file 'disabled nil)
+
+         ;; enable dired-aysnc-mode
+         (eos/funcall 'dired-async-mode 1)))
+
+     ;; binds
+     (if (boundp 'dired-mode-map)
+         (progn
+           ;;     (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+           (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)))
 
      #+END_SRC
 
 **** Dired-sidebar
 
+     This package provides a tree browser similar to `neotree' or `treemacs'
+     but leverages `dired' to do the job of display.
      Enables a sidebar (small buffer at left) browser using dired.
 
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'dired-sidebar nil t)
        (progn
-         ;; bind
-         ;; assign C-f2 to sidebar file browser
-         (global-set-key (kbd "C-<f2>") 'dired-sidebar-toggle-sidebar)))
+         ;; customize
+         ;; close sidebar when dired-sidebar-find-file it's called
+         (customize-set-variable
+          'dired-sidebar-close-sidebar-on-file-open t)
+
+         ;; when finding file to point at for
+         ;; dired-sidebar-follow-file-at-point-on-toggle-open, use file at point
+         ;; in magit buffer.
+         (customize-set-variable
+          'dired-sidebar-use-magit-integration t)
+
+         ;; refresh on projectile switch
+         (customize-set-variable
+          'dired-sidebar-refresh-on-projectile-switch t)
+
+         ;; only show one buffer instance for dired-sidebar for each frame
+         (customize-set-variable 'dired-sidebar-one-instance-p t)
+
+         ;; refresh sidebar to match current file.
+         (customize-set-variable 'dired-sidebar-should-follow-file t)
+
+         ;; global bind
+         ;; assign C-x C-d to sidebar file browser
+         (global-set-key (kbd "C-x C-d") 'dired-sidebar-toggle-sidebar)))
 
      #+END_SRC
 
@@ -1512,11 +1540,11 @@
          ;; if nil, ERC will call system-name to get this information.
          (customize-set-variable 'erc-system-name "eos")))
 
-       ;; binds
-       (when (boundp 'erc-mode-map)
-         (progn
-           ;; use eos/complete
-           (define-key erc-mode-map (kbd "TAB") 'eos/complete)))
+     ;; binds
+     (when (boundp 'erc-mode-map)
+       (progn
+         ;; use eos/complete
+         (define-key erc-mode-map (kbd "TAB") 'eos/complete)))
 
      #+END_SRC
 
@@ -1525,13 +1553,20 @@
 *** Misc
 **** Which-key
 
+     The mode displays the key bindings following your currently entered incomplete command (a
+     prefix) in a popup. For example, after enabling the minor mode if you enter
+     C-x and wait for the default of 1 second the minibuffer will expand with all
+     of the available key bindings that follow C-x (or as many as space allows
+     given your settings).
+
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'which-key nil t)
        (progn
          ;; customize
          ;; (customize-set-variable 'which-key-paging-key nil)
-         (customize-set-variable 'which-key-idle-delay 0.9)
+         (customize-set-variable 'which-key-idle-delay 1)
+         (customize-set-variable 'which-key-idle-secondary-delay 0.5)
          (customize-set-variable 'which-key-separator " - ")
          (customize-set-variable 'which-key-use-C-h-commands t)
          (customize-set-variable 'which-key-add-column-padding 2)
@@ -1625,34 +1660,98 @@
 
      #+END_SRC
 
+**** Ibuffer
+
+     Ibuffer.el is an advanced replacement for the `buffer-menu' which
+     is normally distributed with Emacs.  Its interface is intended to
+     be analogous to that of Dired.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'ibuffer nil t)
+       (progn
+         ;; customize
+         ;; (customize-set-variable
+         ;;  'ibuffer-default-sorting-mode "filename/process")
+
+         ;; hook
+         (add-hook 'ibuffer-mode-hook
+                   (lambda ()
+                     ;; sort by filename/process
+                     (when (fboundp 'ibuffer-do-sort-by-filename/process)
+                       (ibuffer-do-sort-by-filename/process))))
+         ;; bind
+         (define-key ctl-x-map (kbd "b") 'ibuffer)))
+
+     #+END_SRC
+
 *** Shell
 **** Shell
+
+     This package defines a shell-in-a-buffer (shell mode) built on
+     top of comint mode.  This is actually cmushell with things renamed
+     to replace its counterpart in Emacs 18.  cmushell is more
+     featureful, robust, and uniform than the Emacs 18 version.
+
+     Since this mode is built on top of the general command-interpreter-in-
+     a-buffer mode (comint mode), it shares a common base functionality,
+     and a common set of bindings, with all modes derived from comint mode.
+     This makes these modes easier to use.
+
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'shell nil t)
+
+     ;; define M-# to run some strange command:
+     (eval-after-load "shell"
+       '(define-key shell-mode-map "\M-#" 'shells-dynamic-spell))
+
+     #+END_SRC
+
 **** Eshell
+
+     Despite the sheer fact that running an Emacs shell can be fun, here
+     are a few of the unique features offered by Eshell:
+
+     - Integration with the Emacs Lisp programming environment
+     - A high degree of configurability.
+     - The ability to have the same shell on every system Emacs has been
+       ported to. Since Eshell imposes no external requirements, and
+       relies upon only the Lisp functions exposed by Emacs, it is quite
+       operating system independent. Several of the common UNIX
+       commands, such as ls, mv, rm, ln, etc., have been implemented in
+       Lisp in order to provide a more consistent work environment.
+
 
      #+BEGIN_SRC emacs-lisp
 
      (require 'eshell nil t)
 
      ;; bind
-     (global-set-key (kbd "C-x [") 'eshell)
+     (define-key ctl-x-map (kbd "&") 'eshell)
 
      #+END_SRC
 
 *** Terminal
 **** Term
 
+     Command-interpreter-in-a-buffer package (term mode).
+     The idea is that you can build specific process-in-a-buffer
+     modes on top of term mode -- e.g., lisp, shell, scheme, T, soar,
+     ....
+
      It seems that sh shell works better with term.
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'term)
-
-     ;; customuze term shell
-     (customize-set-variable 'explicit-shell-file-name "/bin/sh")
+     (when (require 'term nil t)
+       (progn
+         ;; customuze term shell
+         (customize-set-variable 'explicit-shell-file-name "/bin/sh")))
 
      #+END_SRC
 
-**** Ansi-term
 **** St
 
      #+BEGIN_SRC emacs-lisp
@@ -1662,7 +1761,8 @@
        (interactive)
        (eos/run/async-proc "st"))
 
-     (global-set-key (kbd "C-x ]") 'eos/launch/st)
+     ;; bind
+     (define-key ctl-x-map (kbd "<C-return>") 'eos/launch/st)
 
      #+END_SRC
 
@@ -1845,7 +1945,28 @@
 
 *** Networking
 **** Tramp-mode
-**** Tcpdump
+
+     Transparent Remote Access, Multiple Protocol
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'tramp nil t)
+       (progn
+         ;; customize
+         ;; gives the same backup policy for tramp
+         (customize-set-variable 'tramp-backup-directory-alist backup-directory-alist)
+
+         ;; read directory timeout 8 seconds
+         (customize-set-variable 'tramp-completion-reread-directory-timeout 8)
+
+         ;; connection timeout 30 seconds
+         (customize-set-variable 'tramp-connection-timeout 30)
+
+         ;; tramp filename syntax to be used
+         (customize-set-variable 'tramp-syntax "default")))
+
+     #+END_SRC
+
 *** Torrent
 **** Aria2c
 *** Screen
@@ -1976,7 +2097,7 @@
      #+END_SRC
 
 **** DocView
-**** Spell-check
+**** Dictionary
 *** Analyse
 **** Verb
 *** Apparence
@@ -2131,9 +2252,10 @@
 
      (when (require 'rfc-mode nil t)
        (progn
-         ;; customize rfc location
+         ;; customize
+         ;; the directory where RFC documents are stored
          (customize-set-variable
-          'rfc-mode-directory (expand-file-name "~/rfc/"))))
+          'rfc-mode-directory (expand-file-name "~/.rfc/"))))
 
      #+END_SRC
 
@@ -2308,7 +2430,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'helm-gtags)
+     (when (require 'helm-gtags nil t)
        (progn
          ;; customize
          (customize-set-variable 'helm-gtags-ignore-case t)
@@ -2356,6 +2478,9 @@
      (require 'gud nil t)
 
      #+END_SRC
+
+**** Gud-gdb
+**** Radare2
 
 *** Builder
 **** Cmake-ide
@@ -2508,7 +2633,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'cc-mode)
+     (require 'cc-mode nil t)
 
      #+END_SRC
 
@@ -2723,7 +2848,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'sh-script)
+     (require 'sh-script nil t)
 
      #+END_SRC
 
@@ -2856,8 +2981,8 @@
 
     #+END_SRC
 
-*** Mql
 *** Cmake
+*** Mql
 *** Doxygen
 **** Highlight-doxygen
 
@@ -2895,7 +3020,6 @@
 
 *** PHP
 *** Html
-*** Mql
 ** Unbind
 *** Prefix
 **** Esc

@@ -539,28 +539,16 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; kill buffer and window
 (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
 
-;; cask load and initialize
-(when (require 'cask "~/.cask/cask.el" t)
-  (progn
-    ;; initialize cask
-    (cask-initialize)))
+;; avoid warnings when byte-compile
+(eval-when-compile
+  (require 'cask "~/.cask/cask.el")
+  (cask-initialize))
 
-(defun eos/pm/add-subdirs-to-load-path (&rest _)
-  "Add subdirectories to `load-path'."
-  (let ((default-directory
-          (expand-file-name ".cask/26.3/elpa" user-emacs-directory)))
-    (normal-top-level-add-subdirs-to-load-path)))
+;; load cask
+(require 'cask "~/.cask/cask.el")
 
-(defun eos/pm/update-load-path ()
-  "Add subdirs to load-path variable and remove duplicates."
-  (interactive)
-  ;; add cask subdirs to load-path variable and
-  ;; remove duplicates
-  (eos/pm/add-subdirs-to-load-path)
-  (delete-dups load-path))
-
-;; calls update-load-path
-(eos/pm/update-load-path)
+;; initialize cask
+(cask-initialize)
 
 (when (require 'exwm nil t)
   (progn
@@ -657,6 +645,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (require 'exwm-core nil t)
 (require 'exwm-workspace nil t)
 
+;; hooks
 ;; update the buffer name by X11 window title
 (add-hook 'exwm-update-title-hook
           (lambda ()
@@ -753,19 +742,11 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'auth-source nil t)
   (progn
-    (require 'auth-source-pass nil t)
-
-    ;; function
-    (defun eos/auth/lookup-password (host user port)
-      "Lookup password related to HOST USER PORT params."
-      (let ((auth (auth-source-search :host host :user user :port port)))
-        (if auth
-            (let ((secretf (plist-get (car auth) :secret)))
-              (if secretf
-                  (funcall secretf)
-                (error "Auth entry for %s@%s:%s has no secret!"
-                       user host port)))
-          (error "No auth entry found for %s@%s:%s" user host port))))))
+    ;; list of authentication sources
+    (customize-set-variable 'auth-sources
+                            '("~/.auth/auth.gpg"
+                              "~/.auth/auth"
+                              "~/.auth/netrc"))))
 
 (require 'notifications nil t)
 
@@ -796,7 +777,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (boundp 'iedit-mode-keymap)
   (define-key iedit-mode-keymap (kbd "TAB") 'eos/complete-or-indent))
 
-(when (require 'undo-tree)
+(when (require 'undo-tree nil t)
   (progn
     ;; define alias for redo
     (defalias 'redo 'undo-tree-redo)
@@ -851,19 +832,48 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
 
-(require 'dired-async nil t)
+(require 'dired nil t)
 
-;; enable find-alternate-file
-(put 'dired-find-alternate-file 'disabled nil)
+(when (require 'dired-async nil t)
+  (progn
+    ;; enable find-alternate-file
+    ;; (put 'dired-find-alternate-file 'disabled nil)
 
-;; enable dired-aysnc-mode
-(eos/funcall 'dired-async-mode 1)
+    ;; enable dired-aysnc-mode
+    (eos/funcall 'dired-async-mode 1)))
+
+;; binds
+(if (boundp 'dired-mode-map)
+    (progn
+      ;;     (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+      (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)))
 
 (when (require 'dired-sidebar nil t)
   (progn
-    ;; bind
-    ;; assign C-f2 to sidebar file browser
-    (global-set-key (kbd "C-<f2>") 'dired-sidebar-toggle-sidebar)))
+    ;; customize
+    ;; close sidebar when dired-sidebar-find-file it's called
+    (customize-set-variable
+     'dired-sidebar-close-sidebar-on-file-open t)
+
+    ;; when finding file to point at for
+    ;; dired-sidebar-follow-file-at-point-on-toggle-open, use file at point
+    ;; in magit buffer.
+    (customize-set-variable
+     'dired-sidebar-use-magit-integration t)
+
+    ;; refresh on projectile switch
+    (customize-set-variable
+     'dired-sidebar-refresh-on-projectile-switch t)
+
+    ;; only show one buffer instance for dired-sidebar for each frame
+    (customize-set-variable 'dired-sidebar-one-instance-p t)
+
+    ;; refresh sidebar to match current file.
+    (customize-set-variable 'dired-sidebar-should-follow-file t)
+
+    ;; global bind
+    ;; assign C-x C-d to sidebar file browser
+    (global-set-key (kbd "C-x C-d") 'dired-sidebar-toggle-sidebar)))
 
 (when (require 'shr nil t)
   (progn
@@ -956,17 +966,18 @@ See the `eww-search-prefix' variable for the search engine used."
     ;; if nil, ERC will call system-name to get this information.
     (customize-set-variable 'erc-system-name "eos")))
 
-  ;; binds
-  (when (boundp 'erc-mode-map)
-    (progn
-      ;; use eos/complete
-      (define-key erc-mode-map (kbd "TAB") 'eos/complete)))
+;; binds
+(when (boundp 'erc-mode-map)
+  (progn
+    ;; use eos/complete
+    (define-key erc-mode-map (kbd "TAB") 'eos/complete)))
 
 (when (require 'which-key nil t)
   (progn
     ;; customize
     ;; (customize-set-variable 'which-key-paging-key nil)
-    (customize-set-variable 'which-key-idle-delay 0.9)
+    (customize-set-variable 'which-key-idle-delay 1)
+    (customize-set-variable 'which-key-idle-secondary-delay 0.5)
     (customize-set-variable 'which-key-separator " - ")
     (customize-set-variable 'which-key-use-C-h-commands t)
     (customize-set-variable 'which-key-add-column-padding 2)
@@ -1052,22 +1063,44 @@ See the `eww-search-prefix' variable for the search engine used."
     (global-set-key (kbd "C-x <C-left>") 'buf-move-left)
     (global-set-key (kbd "C-x <C-right>") 'buf-move-right)))
 
+(when (require 'ibuffer nil t)
+  (progn
+    ;; customize
+    ;; (customize-set-variable
+    ;;  'ibuffer-default-sorting-mode "filename/process")
+
+    ;; hook
+    (add-hook 'ibuffer-mode-hook
+              (lambda ()
+                ;; sort by filename/process
+                (when (fboundp 'ibuffer-do-sort-by-filename/process)
+                  (ibuffer-do-sort-by-filename/process))))
+    ;; bind
+    (define-key ctl-x-map (kbd "b") 'ibuffer)))
+
+(require 'shell nil t)
+
+;; define M-# to run some strange command:
+(eval-after-load "shell"
+  '(define-key shell-mode-map "\M-#" 'shells-dynamic-spell))
+
 (require 'eshell nil t)
 
 ;; bind
-(global-set-key (kbd "C-x [") 'eshell)
+(define-key ctl-x-map (kbd "&") 'eshell)
 
-(require 'term)
-
-;; customuze term shell
-(customize-set-variable 'explicit-shell-file-name "/bin/sh")
+(when (require 'term nil t)
+  (progn
+    ;; customuze term shell
+    (customize-set-variable 'explicit-shell-file-name "/bin/sh")))
 
 (defun eos/launch/st ()
   "Launch urxvt"
   (interactive)
   (eos/run/async-proc "st"))
 
-(global-set-key (kbd "C-x ]") 'eos/launch/st)
+;; bind
+(define-key ctl-x-map (kbd "<C-return>") 'eos/launch/st)
 
 (require 'helm-ag nil t)
 
@@ -1159,6 +1192,21 @@ See the `eww-search-prefix' variable for the search engine used."
     (add-hook 'comint-mode-hook
               (lambda ()
                 (display-line-numbers-mode 0)))))
+
+(when (require 'tramp nil t)
+  (progn
+    ;; customize
+    ;; gives the same backup policy for tramp
+    (customize-set-variable 'tramp-backup-directory-alist backup-directory-alist)
+
+    ;; read directory timeout 8 seconds
+    (customize-set-variable 'tramp-completion-reread-directory-timeout 8)
+
+    ;; connection timeout 30 seconds
+    (customize-set-variable 'tramp-connection-timeout 30)
+
+    ;; tramp filename syntax to be used
+    (customize-set-variable 'tramp-syntax "default")))
 
 (global-set-key (kbd "C-x <end>")
                 (lambda ()
@@ -1340,9 +1388,10 @@ See the `eww-search-prefix' variable for the search engine used."
 
 (when (require 'rfc-mode nil t)
   (progn
-    ;; customize rfc location
+    ;; customize
+    ;; the directory where RFC documents are stored
     (customize-set-variable
-     'rfc-mode-directory (expand-file-name "~/rfc/"))))
+     'rfc-mode-directory (expand-file-name "~/.rfc/"))))
 
 ;; bind documentation related functions on eos-docs-map
 (define-key eos-docs-map (kbd "C-g") 'keyboard-quit)
@@ -1461,7 +1510,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (global-set-key (kbd "TAB") 'eos/complete-or-indent)
 (global-set-key (kbd "ESC `") 'eos-complete-map)
 
-(when (require 'helm-gtags)
+(when (require 'helm-gtags nil t)
   (progn
     ;; customize
     (customize-set-variable 'helm-gtags-ignore-case t)
@@ -1585,7 +1634,7 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; set ctl-x-map prefix (C-x p)
 (define-key ctl-x-map (kbd "p") 'eos-pm-map)
 
-(require 'cc-mode)
+(require 'cc-mode nil t)
 
 (when (require 'irony nil t)
   (progn
@@ -1723,7 +1772,7 @@ See the `eww-search-prefix' variable for the search engine used."
                (company-files)))
             ))
 
-(require 'sh-script)
+(require 'sh-script nil t)
 
 (require 'company-shell nil t)
 

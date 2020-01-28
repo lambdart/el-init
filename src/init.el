@@ -16,6 +16,7 @@
     (customize-set-variable 'org-export-with-smart-quotes t)
     (customize-set-variable 'org-confirm-babel-evaluate nil)
     (customize-set-variable 'org-src-window-setup 'current-window)
+    (customize-set-variable 'org-special-ctrl-a/e t)
 
     ;; load languages
     (org-babel-do-load-languages 'org-babel-load-languages
@@ -457,6 +458,10 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; prefer newer
 (customize-set-variable 'load-prefer-newer t)
 
+;; binds
+(define-key ctl-x-map (kbd "C-,") 'previous-buffer)
+(define-key ctl-x-map (kbd "C-.") 'next-buffer)
+
 (customize-set-variable 'enable-recursive-minibuffers t)
 
 ;; bind kmacro-keymap to C-x m
@@ -536,7 +541,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key ctl-x-map (kbd "=") 'text-scale-adjust)
 
 ;; whitespace-mode
-(global-set-key (kbd "M-.") 'whitespace-mode)
+(define-key ctl-x-map (kbd ".") 'whitespace-mode)
 
 ;; kill buffer and window
 (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
@@ -605,7 +610,10 @@ point is on a symbol, return that symbol name.  Else return nil."
                               ([?\C-v] . [next])
                               ([?\C-d] . [delete])
                               ([?\C-k] . [S-end delete])
-                              ([?\C-k] . [C-w]) ;; firefox close tab, temporary!
+
+                              ;; firefox temporary
+                              ([?\C-o] . [C-prior]) ; change tab mapping
+                              ([?\C-k] . [C-w]) ; close tab mapping
 
                               ;; cut/paste.
                               ([?\C-w] . [?\C-x])
@@ -737,6 +745,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; bind global map
     (global-set-key (kbd "M-x") 'helm-M-x)
     (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+    (global-set-key (kbd "M-m") 'helm-mark-ring)
 
     ;; init helm mode
     (add-hook 'after-init-hook 'helm-mode)))
@@ -796,6 +805,11 @@ point is on a symbol, return that symbol name.  Else return nil."
 (require 'password-store nil t)
 
 (require 'notifications nil t)
+
+(when (require 'helm-info nil t)
+  (progn
+    ;; bind
+    (define-key help-map (kbd "C-i") 'helm-info)))
 
 (when (require 'helm-descbinds nil t)
   (progn
@@ -1266,6 +1280,7 @@ See the `eww-search-prefix' variable for the search engine used."
   (let ((opacity (or opacity 1.0)))
     (async-shell-command (format "transset -a %.1f" opacity))))
 
+;; init after exwm
 (add-hook 'exwm-init-hook
           (lambda ()
             (interactive)
@@ -1972,6 +1987,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (define-key ctl-x-map (kbd ">") nil)
 (define-key ctl-x-map (kbd "\@") nil)
 (define-key ctl-x-map (kbd "-") nil)
+(define-key ctl-x-map (kbd ".") nil)
 (define-key ctl-x-map (kbd ";") nil)
 (define-key ctl-x-map (kbd "#") nil)
 (define-key ctl-x-map (kbd "*") nil)
@@ -2002,7 +2018,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (global-unset-key (kbd "M-$"))
 (global-unset-key (kbd "M-("))
 (global-unset-key (kbd "M-)"))
-(global-unset-key (kbd "M-m"))
+;; (global-unset-key (kbd "M-m"))
 (global-unset-key (kbd "M-r"))
 (global-unset-key (kbd "M-{"))
 (global-unset-key (kbd "M-}"))

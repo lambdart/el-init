@@ -287,8 +287,8 @@ However, if there's a region, all lines that region covers will be duplicated."
 
 (defun eos/kill-buffer (buffer-name)
   "Kill BUFFER-NAME if exists."
-  (if (get-buffer (buffer-name))
-      (kill-buffer buffer-name) nil))
+  (when (get-buffer buffer-name)
+    (kill-buffer buffer-name)))
 
 (defun eos/kill/current-buffer ()
   "Kill the current buffer without prompting."
@@ -680,22 +680,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'helm-exwm nil t)
 
-(defun eos/transset-set (opacity)
-  "Set transparency on frame window specify by OPACITY."
-  (interactive "nOpacity: ")
-  (let ((opacity (or opacity 1.0)))
-    (async-shell-command (format "transset -a %.1f" opacity))))
-
-(add-hook 'exwm-init-hook
-          (lambda ()
-            (interactive)
-            (eos/transset-set 0.9)))
-
-;; start compton after emacs initialize
-(add-hook 'after-init-hook
-          (lambda ()
-            (eos/run/async-proc "compton")))
-
 (when (require 'helm nil t)
   (progn
     ;; default input idle delay
@@ -746,7 +730,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'helm-display-header-line nil)
 
     ;; bind (C-x)
-    ;; (define-key ctl-x-map (kbd "b")   'helm-buffers-list)
+    ;; (define-key ctl-x-map (kbd "b") 'helm-buffers-list)
     (define-key ctl-x-map (kbd "C-b") 'helm-mini)
     (define-key ctl-x-map (kbd "C-f") 'helm-find-files)
 
@@ -764,41 +748,42 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key helm-map (kbd "C-j") 'helm-maybe-exit-minibuffer)
     (define-key helm-map (kbd "C-z") 'helm-select-action)))
 
-(require 'helm-source)
+(when (require 'helm-source nil t)
+  (progn
+    ;; files buffers list
+    (customize-set-variable 'eos/helm-source-file-buffers
+                            (helm-build-in-buffer-source "File Buffers"
+                              :data 'helm-buffer-list
+                              :candidate-transformer (lambda (buffers)
+                                                       (cl-loop for buf in buffers
+                                                                when (with-current-buffer
+                                                                         buf buffer-file-name)
+                                                                collect buf))
+                              :action 'helm-type-buffer-actions))
 
-;; files buffers list
-(customize-set-variable 'eos/helm-source-file-buffers
-                        (helm-build-in-buffer-source "File Buffers"
-                          :data 'helm-buffer-list
-                          :candidate-transformer (lambda (buffers)
-                                                   (cl-loop for buf in buffers
-                                                            when (with-current-buffer
-                                                                     buf buffer-file-name)
-                                                            collect buf))
-                          :action 'helm-type-buffer-actions))
+    ;; non files buffers list
+    (customize-set-variable 'eos/helm-source-nonfile-buffers
+                            (helm-build-in-buffer-source "Non-file Buffers"
+                              :data 'helm-buffer-list
+                              :candidate-transformer (lambda (buffers)
+                                                       (cl-loop for buf in buffers
+                                                                unless (with-current-buffer
+                                                                           buf buffer-file-name)
+                                                                collect buf))
+                              :filtered-candidate-transformer 'helm-skip-boring-buffers
+                              :action 'helm-type-buffer-actions))
 
-;; non files buffers list
-(customize-set-variable 'eos/helm-source-nonfile-buffers
-                        (helm-build-in-buffer-source "Non-file Buffers"
-                          :data 'helm-buffer-list
-                          :candidate-transformer (lambda (buffers)
-                                                   (cl-loop for buf in buffers
-                                                            unless (with-current-buffer
-                                                                       buf buffer-file-name)
-                                                            collect buf))
-                          :filtered-candidate-transformer 'helm-skip-boring-buffers
-                          :action 'helm-type-buffer-actions))
+    ;; exwm buffers list
+    (customize-set-variable 'eos/helm-source-exwm-buffers (helm-exwm-build-source))
 
-;; exwm buffers list
-(customize-set-variable 'eos/helm-source-exwm-buffers (helm-exwm-build-source))
-
-;; customize helm-mini default sources
-(customize-set-variable 'helm-mini-default-sources
-                        '(eos/helm-source-file-buffers
-                          eos/helm-source-exwm-buffers
-                          eos/helm-source-nonfile-buffers
-                          helm-source-recentf
-                          helm-source-buffer-not-found))
+    ;; customize helm-mini default sources
+    (customize-set-variable 'helm-mini-default-sources
+                            '(eos/helm-source-file-buffers
+                              eos/helm-source-exwm-buffers
+                              eos/helm-source-nonfile-buffers
+                              helm-source-recentf
+                              helm-source-buffers-list
+                              helm-source-buffer-not-found))))
 
 (when (require 'auth-source nil t)
   (progn
@@ -1274,6 +1259,24 @@ See the `eww-search-prefix' variable for the search engine used."
               (lambda ()
                 (interactive)
                 (display-line-numbers-mode nil)))))
+
+(defun eos/transset-set (opacity)
+  "Set transparency on frame window specify by OPACITY."
+  (interactive "nOpacity: ")
+  (let ((opacity (or opacity 1.0)))
+    (async-shell-command (format "transset -a %.1f" opacity))))
+
+(add-hook 'exwm-init-hook
+          (lambda ()
+            (interactive)
+            (eos/transset-set 0.9)
+            ;; (eos/kill-buffer "*Async Shell Command*")
+            (delete-other-windows)))
+
+;; start compton after emacs initialize
+(add-hook 'after-init-hook
+          (lambda ()
+            (eos/run/async-proc "compton")))
 
 (when (require 'tramp nil t)
   (progn

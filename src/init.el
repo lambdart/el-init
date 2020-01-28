@@ -55,6 +55,7 @@ tangled, and the tangled file is compiled."
 ;; Load private.el after emacs initialize.
 (add-hook 'after-init-hook
           (lambda ()
+            (interactive)
             (let ((private-file (expand-file-name "~/.private/private.el")))
               (if (file-exists-p private-file)
                   (progn (load-file private-file))))))
@@ -118,7 +119,7 @@ tangled, and the tangled file is compiled."
 
 (defun eos/mkdir (dir)
   "Create DIR in the file system."
-  ;; (interactive "P")
+  ;; (interactive)
   (when (and (not (file-exists-p dir))
              (make-directory dir :parents))))
 
@@ -332,7 +333,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; disable fringe
 (add-hook 'after-init-hook
-          (lambda () (fringe-mode '(0 . 0))))
+          (lambda ()
+            (fringe-mode '(0 . 0))))
 
 ;; autosave/backups options
 (customize-set-variable 'version-control t)
@@ -481,7 +483,7 @@ point is on a symbol, return that symbol name.  Else return nil."
      'eos-time-string (format-time-string "%H:%M"))
 
     ;; initialize display time mode
-    (display-time)))
+    (display-time-mode 1)))
 
 ;; always refresh the modeline (reference)
 ;; (add-hook 'buffer-list-update-hook 'func)
@@ -549,6 +551,9 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; initialize cask
 (cask-initialize)
+
+(require 'async nil t)
+(require 'async-bytecomp nil t)
 
 (when (require 'exwm nil t)
   (progn
@@ -673,6 +678,24 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; (exwm-randr-enable)
     ))
 
+(require 'helm-exwm nil t)
+
+(defun eos/transset-set (opacity)
+  "Set transparency on frame window specify by OPACITY."
+  (interactive "nOpacity: ")
+  (let ((opacity (or opacity 1.0)))
+    (async-shell-command (format "transset -a %.1f" opacity))))
+
+(add-hook 'exwm-init-hook
+          (lambda ()
+            (interactive)
+            (eos/transset-set 0.9)))
+
+;; start compton after emacs initialize
+(add-hook 'after-init-hook
+          (lambda ()
+            (eos/run/async-proc "compton")))
+
 (when (require 'helm nil t)
   (progn
     ;; default input idle delay
@@ -696,7 +719,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'helm-M-x-always-save-history t)
 
     ;; clean details flag
-    (customize-set-variable 'helm-buffer-details-flag nil)
+    (customize-set-variable 'helm-buffer-details-flag t)
 
     ;; split window in side
     (customize-set-variable 'helm-split-window-in-side-p t)
@@ -723,6 +746,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'helm-display-header-line nil)
 
     ;; bind (C-x)
+    ;; (define-key ctl-x-map (kbd "b")   'helm-buffers-list)
     (define-key ctl-x-map (kbd "C-b") 'helm-mini)
     (define-key ctl-x-map (kbd "C-f") 'helm-find-files)
 
@@ -740,6 +764,42 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key helm-map (kbd "C-j") 'helm-maybe-exit-minibuffer)
     (define-key helm-map (kbd "C-z") 'helm-select-action)))
 
+(require 'helm-source)
+
+;; files buffers list
+(customize-set-variable 'eos/helm-source-file-buffers
+                        (helm-build-in-buffer-source "File Buffers"
+                          :data 'helm-buffer-list
+                          :candidate-transformer (lambda (buffers)
+                                                   (cl-loop for buf in buffers
+                                                            when (with-current-buffer
+                                                                     buf buffer-file-name)
+                                                            collect buf))
+                          :action 'helm-type-buffer-actions))
+
+;; non files buffers list
+(customize-set-variable 'eos/helm-source-nonfile-buffers
+                        (helm-build-in-buffer-source "Non-file Buffers"
+                          :data 'helm-buffer-list
+                          :candidate-transformer (lambda (buffers)
+                                                   (cl-loop for buf in buffers
+                                                            unless (with-current-buffer
+                                                                       buf buffer-file-name)
+                                                            collect buf))
+                          :filtered-candidate-transformer 'helm-skip-boring-buffers
+                          :action 'helm-type-buffer-actions))
+
+;; exwm buffers list
+(customize-set-variable 'eos/helm-source-exwm-buffers (helm-exwm-build-source))
+
+;; customize helm-mini default sources
+(customize-set-variable 'helm-mini-default-sources
+                        '(eos/helm-source-file-buffers
+                          eos/helm-source-exwm-buffers
+                          eos/helm-source-nonfile-buffers
+                          helm-source-recentf
+                          helm-source-buffer-not-found))
+
 (when (require 'auth-source nil t)
   (progn
     ;; list of authentication sources
@@ -747,6 +807,8 @@ point is on a symbol, return that symbol name.  Else return nil."
                             '("~/.auth/auth.gpg"
                               "~/.auth/auth"
                               "~/.auth/netrc"))))
+
+(require 'password-store nil t)
 
 (require 'notifications nil t)
 
@@ -875,59 +937,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; assign C-x C-d to sidebar file browser
     (define-key ctl-x-map (kbd "C-d") 'dired-sidebar-toggle-sidebar)))
 
-(when (require 'shr nil t)
-  (progn
-    (customize-set-variable 'shr-width 80)
-    (customize-set-variable 'shr-use-fonts nil)
-    (customize-set-variable 'shr-use-colors nil)
-    (customize-set-variable 'shr-inhibit-images t)
-    (customize-set-variable 'shr-blocked-images t)
-    (customize-set-variable 'shr-color-visible-distance-min 10)
-    (customize-set-variable 'shr-color-visible-luminance-min 80)))
-
-(when (require 'eww nil t)
-  (progn
-    ;; define google search url
-    (defvar eos/eww-google-search-url "https://www.google.com/search?q="
-      "URL for Google searches.")
-
-    ;; customize search prefix
-    (customize-set-variable 'eww-search-prefix eos/eww-google-search-url)
-    ;; (customize-set-variable eww-search-prefix "https://duckduckgo.com/html/?q=")
-
-    ;; customize download directory
-    (customize-set-variable 'eww-download-directory "~/down")
-
-    ;; customize checkbox symbols
-    (customize-set-variable 'eww-form-checkbox-symbol "[ ]")
-    (customize-set-variable 'eww-form-checkbox-selected-symbol "[X]")
-    ;; (customize-set-variable eww-form-checkbox-symbol "☐") ; Unicode hex 2610
-    ;; (customize-set-variable eww-form-checkbox-selected-symbol "☑") ; Unicode hex 2611
-
-    ;; Re-write of the `eww-search-words' definition.
-    (defun eos/eww-search-words ()
-      "Search the web for the text between BEG and END.
-If region is active (and not whitespace), search the web for
-the text in that region.
-Else if the region is not active, and the point is on a symbol,
-search the web for that symbol.
-Else prompt the user for a search string.
-See the `eww-search-prefix' variable for the search engine used."
-      (interactive)
-      (let ((search-string (eos/get-selected-text-or-symbol-at-point)))
-        (when (and (stringp search-string)
-                   (string-match-p "\\`[[:blank:]]*\\'" search-string))
-          (customize-set-variable search-string nil))
-        (if (stringp search-string)
-            (eww search-string)
-          (call-interactively #'eww))))
-    ))
-
-(when (require 'browse-url nil t)
-  (progn
-    ;; customize browse-url options
-    (customize-set-variable 'browse-url-generic-program "eww")
-    (customize-set-variable 'browse-url-function 'eww-browse-url)))
+(require 'elfeed nil t)
 
 (when (require 'moody nil t)
   (progn
@@ -964,7 +974,22 @@ See the `eww-search-prefix' variable for the search engine used."
     (customize-set-variable 'erc-prompt-for-password t)
 
     ;; if nil, ERC will call system-name to get this information.
-    (customize-set-variable 'erc-system-name "eos")))
+    (customize-set-variable 'erc-system-name "eos")
+
+    ;;   if non-nil, then all incoming CTCP requests will be shown.
+    (customize-set-variable 'erc-paranoid t)
+
+    ;; disable replies to CTCP requests that require a reply.
+    (customize-set-variable 'erc-disable-ctcp-replies t)
+
+    ;; be paranoid, don’t give away your machine name.
+    (customize-set-variable 'erc-anonymous-login t)
+
+    ;; show the channel key in the header line.
+    (customize-set-variable 'erc-show-channel-key-p t)
+
+    ;; kill all query (also channel) buffers of this server on QUIT
+    (customize-set-variable 'erc-kill-queries-on-quit t)))
 
 ;; binds
 (when (boundp 'erc-mode-map)
@@ -1066,17 +1091,18 @@ See the `eww-search-prefix' variable for the search engine used."
 (when (require 'ibuffer nil t)
   (progn
     ;; customize
-    ;; (customize-set-variable
-    ;;  'ibuffer-default-sorting-mode "filename/process")
 
     ;; hook
     (add-hook 'ibuffer-mode-hook
               (lambda ()
+                (interactive)
                 ;; sort by filename/process
                 (when (fboundp 'ibuffer-do-sort-by-filename/process)
                   (ibuffer-do-sort-by-filename/process))))
-    ;; bind
-    (define-key ctl-x-map (kbd "b") 'ibuffer)))
+    ))
+
+;; bind
+;; (define-key ctl-x-map (kbd "b") 'ibuffer)))
 
 (require 'shell nil t)
 
@@ -1101,6 +1127,65 @@ See the `eww-search-prefix' variable for the search engine used."
 
 ;; bind
 (define-key ctl-x-map (kbd "<C-return>") 'eos/launch/st)
+
+(when (require 'shr nil t)
+  (progn
+    (customize-set-variable 'shr-width 80)
+    (customize-set-variable 'shr-use-fonts nil)
+    (customize-set-variable 'shr-use-colors nil)
+    (customize-set-variable 'shr-inhibit-images t)
+    (customize-set-variable 'shr-blocked-images t)
+    (customize-set-variable 'shr-color-visible-distance-min 10)
+    (customize-set-variable 'shr-color-visible-luminance-min 80)))
+
+(when (require 'eww nil t)
+  (progn
+    ;; define google search url
+    (defvar eos/eww-google-search-url "https://www.google.com/search?q="
+      "URL for Google searches.")
+
+    ;; customize search prefix
+    (customize-set-variable 'eww-search-prefix eos/eww-google-search-url)
+    ;; (customize-set-variable eww-search-prefix "https://duckduckgo.com/html/?q=")
+
+    ;; customize download directory
+    (customize-set-variable 'eww-download-directory "~/down")
+
+    ;; customize checkbox symbols
+    (customize-set-variable 'eww-form-checkbox-symbol "[ ]")
+    (customize-set-variable 'eww-form-checkbox-selected-symbol "[X]")
+    ;; (customize-set-variable eww-form-checkbox-symbol "☐") ; Unicode hex 2610
+    ;; (customize-set-variable eww-form-checkbox-selected-symbol "☑") ; Unicode hex 2611
+
+    ;; Re-write of the `eww-search-words' definition.
+    (defun eos/eww-search-words ()
+      "Search the web for the text between BEG and END.
+If region is active (and not whitespace), search the web for
+the text in that region.
+Else if the region is not active, and the point is on a symbol,
+search the web for that symbol.
+Else prompt the user for a search string.
+See the `eww-search-prefix' variable for the search engine used."
+      (interactive)
+      (let ((search-string (eos/get-selected-text-or-symbol-at-point)))
+        (when (and (stringp search-string)
+                   (string-match-p "\\`[[:blank:]]*\\'" search-string))
+          (customize-set-variable search-string nil))
+        (if (stringp search-string)
+            (eww search-string)
+          (call-interactively #'eww))))
+
+    ))
+
+(when (require 'browse-url nil t)
+  (progn
+    ;; customize:
+
+    ;; the name of the browser program used by ‘browse-url-generic’.
+    (customize-set-variable 'browse-url-generic-program "eww")
+
+    ;; function to display the current buffer in a WWW browser: eww
+    (customize-set-variable 'browse-url-browser-function 'eww-browse-url)))
 
 (require 'helm-ag nil t)
 
@@ -1181,17 +1266,14 @@ See the `eww-search-prefix' variable for the search engine used."
     ;; bind
     (define-key ctl-x-map (kbd "C-x") 'dmenu)))
 
-;; start compton after emacs initialize
-(add-hook 'after-init-hook
-          (lambda ()
-            (eos/run/async-proc "compton")))
-
 (when (require 'comint nil t)
   (progn
+    ;; hooks
     ;; disable line number mode
     (add-hook 'comint-mode-hook
               (lambda ()
-                (display-line-numbers-mode 0)))))
+                (interactive)
+                (display-line-numbers-mode nil)))))
 
 (when (require 'tramp nil t)
   (progn
@@ -1203,11 +1285,7 @@ See the `eww-search-prefix' variable for the search engine used."
     (customize-set-variable 'tramp-completion-reread-directory-timeout 8)
 
     ;; connection timeout 30 seconds
-    (customize-set-variable 'tramp-connection-timeout 30)
-
-    ;; tramp filename syntax to be used
-    ;; (customize-set-variable 'tramp-syntax "")
-    ))
+    (customize-set-variable 'tramp-connection-timeout 30)))
 
 (define-key ctl-x-map (kbd "<end>")
   (lambda ()
@@ -1510,6 +1588,7 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; set eos-complete-map M-` keybind
 (global-set-key (kbd "TAB") 'eos/complete-or-indent)
 (global-set-key (kbd "ESC `") 'eos-complete-map)
+(global-set-key (kbd "M-`") 'eos-complete-map)
 
 (when (require 'helm-gtags nil t)
   (progn

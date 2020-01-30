@@ -653,6 +653,9 @@
     ;; internal border
     (add-to-list 'default-frame-alist '(internal-border-width . 2))
 
+    ;; bind
+    ;; (global-set-key (kbd "M-z") 'other-frame)
+
     #+END_SRC
 
 *** Window
@@ -809,8 +812,11 @@
     (when (require 'time nil t)
       (progn
         ;; customize
+
+        ;; format time string
         (customize-set-variable
-         'eos-time-string (format-time-string "%H:%M"))
+         'display-time-format
+         (format-time-string "%H:%M" nil nil))
 
         ;; initialize display time mode
         (display-time-mode 1)))
@@ -1130,12 +1136,12 @@
      (when (require 'helm nil t)
        (progn
          ;; default input idle delay
-         (customize-set-variable 'helm-idle-delay 0.1)
-         (customize-set-variable 'helm-input-idle-delay 0.1)
+         (customize-set-variable 'helm-idle-delay 0.01)
+         (customize-set-variable 'helm-input-idle-delay 0.01)
 
          ;; set autoresize max and mim height
-         (customize-set-variable 'helm-autoresize-max-height 50)
-         (customize-set-variable 'helm-autoresize-min-height 20)
+         (customize-set-variable 'helm-autoresize-max-height 35)
+         (customize-set-variable 'helm-autoresize-min-height 25)
 
          ;; enable fuzzing matching
          (customize-set-variable 'helm-M-x-fuzzy-match t)
@@ -1187,7 +1193,8 @@
          (global-set-key (kbd "M-m") 'helm-mark-ring)
 
          ;; init helm mode
-         (add-hook 'after-init-hook 'helm-mode)))
+         (add-hook 'after-init-hook 'helm-mode)
+         (add-hook 'after-init-hook 'helm-autoresize-mode)))
 
      ;; bind
      (when (boundp 'helm-map)
@@ -1433,7 +1440,10 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'dired nil t)
+     (when (require 'dired nil t)
+       (progn
+         ;; enable find-alternate-file
+         (put 'dired-find-alternate-file 'disabled nil)))
 
      #+END_SRC
 
@@ -1447,9 +1457,6 @@
 
      (when (require 'dired-async nil t)
        (progn
-         ;; enable find-alternate-file
-         ;; (put 'dired-find-alternate-file 'disabled nil)
-
          ;; enable dired-aysnc-mode
          (eos/funcall 'dired-async-mode 1)))
 
@@ -1526,11 +1533,13 @@
 
          ;; mode-line format
          (customize-set-variable 'mode-line-format
-                                 '(" " eos-time-string
-                                   " %*%& %l:%c | %I "
+                                 '(" " display-time-string " "
+                                   mode-line-mule-info
+                                   "%*%& %l:%c | %I "
                                    moody-mode-line-buffer-identification
                                    " %m "
-                                   (vc-mode moody-vc-mode)))))
+                                   moody-vc-mode
+                                   mode-line-frame-identification))))
 
      #+END_SRC
 
@@ -1603,14 +1612,18 @@
        (progn
          ;; customize
          ;; (customize-set-variable 'which-key-paging-key nil)
-         (customize-set-variable 'which-key-idle-delay 1)
-         (customize-set-variable 'which-key-idle-secondary-delay 0.5)
+         (customize-set-variable 'which-key-idle-delay 0.8)
+         (customize-set-variable 'which-key-idle-secondary-delay 0.4)
          (customize-set-variable 'which-key-separator " - ")
          (customize-set-variable 'which-key-use-C-h-commands t)
          (customize-set-variable 'which-key-add-column-padding 2)
          (customize-set-variable 'which-key-side-window-location 'bottom)
          (customize-set-variable 'which-key-sort-order
                                  'which-key-key-order-alpha)
+
+         ;; if non-nil allow which-key to use a less intensive method of Hide
+         ;; fitting the popup window to the buffer.
+         (customize-set-variable 'which-key-allow-imprecise-window-fit t)
 
          ;; bind
          (define-key ctl-x-map (kbd "x") 'which-key-show-major-mode)
@@ -1620,6 +1633,7 @@
 
      (when (boundp 'which-key-replacement-alist)
        (progn
+
          ;; customize key replacements
          (add-to-list 'which-key-replacement-alist
                       '(("\\(.+\\)" .
@@ -1663,9 +1677,7 @@
                       '((nil . "eos-sc-map") . (nil . "flycheck")))
 
          (add-to-list 'which-key-replacement-alist
-                      '((nil . "eos-complete-map") . (nil . "complete")))
-
-         ))
+                      '((nil . "eos-complete-map") . (nil . "complete")))))
 
      (when (fboundp 'which-key-add-key-based-replacements)
        (which-key-add-key-based-replacements
@@ -1676,7 +1688,7 @@
          "C-x 4"   "other"
          "C-x 5"   "frame"
          "C-x 6"   "2c"
-         "C-x <end>" "lock-screen"
+         "C-x <end>" "eos/lock-screen"
          "C-x ESC"   "rept"
          "C-x 8"   "iso"
          "C-x m"   "kmacro"
@@ -3061,6 +3073,7 @@
 
      #+END_SRC
 
+*** Tcl
 *** Perl
 **** Cperl-mode
 
@@ -3257,7 +3270,7 @@
     (global-unset-key (kbd "M-l"))
     (global-unset-key (kbd "M-h"))
     (global-unset-key (kbd "M-\\"))
-    (global-unset-key (kbd "M-z"))
+    ;; (global-unset-key (kbd "M-z"))
     (global-unset-key (kbd "M-SPC"))
     (global-unset-key (kbd "M-$"))
     (global-unset-key (kbd "M-("))

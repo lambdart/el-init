@@ -102,7 +102,7 @@ tangled, and the tangled file is compiled."
   (define-prefix-command prefix-map))
 
 (defun eos/funcall (func &optional args)
-  "Call function (FUNC ARGS), if that function symbol it's not void."
+  "Call FUNC if it's bounded."
   (when (fboundp func)
     (funcall func args)))
 
@@ -566,6 +566,10 @@ point is on a symbol, return that symbol name.  Else return nil."
 (require 'async nil t)
 (require 'async-bytecomp nil t)
 
+;; to run command without displaying the output in a window
+(add-to-list 'display-buffer-alist
+             '("\\*Async Shell Command\\*" display-buffer-no-window))
+
 (when (require 'exwm nil t)
   (progn
     (require 'exwm-config nil t)
@@ -576,8 +580,11 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; show workspaces in all buffers
     (customize-set-variable 'exwm-workspace-show-all-buffers t)
 
-    ;; Non-nil to allow switching to buffers on other workspaces
+    ;; non-nil to allow switching to buffers on other workspaces
     (customize-set-variable 'exwm-layout-show-all-buffers t)
+
+    ;; non-nil to force managing all X windows in tiling layout.
+    (customize-set-variable 'exwm-manage-force-tiling t)
 
     ;; exwn global keybindings
     (customize-set-variable 'exwm-input-global-keys
@@ -1129,16 +1136,35 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'term nil t)
   (progn
-    ;; customuze term shell
-    (customize-set-variable 'explicit-shell-file-name "/bin/sh")))
+    ;; customize
+
+    ;; if non-nil, is file name to use for explicitly requested inferior shell.
+    (customize-set-variable 'explicit-shell-file-name "/usr/local/bin/fish")
+
+    ;; if non-nil, add a ‘/’ to completed directories
+    (customize-set-variable 'term-completion-addsuffix t)
+
+    ;; regexp to recognize prompts in the inferior process
+    (customize-set-variable 'term-prompt-regexp "^\\(>\\|\\(->\\)+\\) *")
+
+    ;; if non-nil, automatically list possibilities on partial completion.
+    (customize-set-variable 'term-completion-autolist t)
+
+    ;; bind
+    (define-key ctl-x-map (kbd "<C-return>") 'ansi-term)
+
+    ;; advices
+    ;; fish shell, default
+    (defadvice ansi-term (before force-fish)
+      (interactive (list explicit-shell-file-name)))
+
+    ;; active advice
+    (ad-activate 'ansi-term)))
 
 (defun eos/launch/st ()
   "Launch urxvt"
   (interactive)
   (eos/run/async-proc "st"))
-
-;; bind
-(define-key ctl-x-map (kbd "<C-return>") 'eos/launch/st)
 
 (when (require 'shr nil t)
   (progn
@@ -1297,9 +1323,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (add-hook 'exwm-init-hook
           (lambda ()
             (interactive)
-            (eos/transset-set 0.9)
-            ;; (eos/kill-buffer "*Async Shell Command*")
-            (delete-other-windows)))
+            (eos/transset-set 0.9)))
 
 ;; start compton after emacs initialize
 (add-hook 'after-init-hook
@@ -1465,7 +1489,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (when (require 'helm-man nil t)
   (progn
     ;; bind
-    (define-key help-map (kbd "y") 'helm-man-woman)))
+    (define-key help-map (kbd "C-y") 'helm-man-woman)))
 
 (when (require 'dash-docs nil t)
   (progn

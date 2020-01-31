@@ -1107,28 +1107,23 @@
      to properly configure Randr first.
 
      #+BEGIN_SRC emacs-lisp
-
      (when (require 'exwm-randr nil t)
        (progn
-         ;; set exwm workspaces
-         (customize-set-variable 'exwm-workspace-number 2)
-
-         ;; customize monitors
+         ;; customize my monitors: check the xrandr(1) output and use the same name/order
+         ;; TODO: create a func that retrieves these values from xrandr.
          (customize-set-variable
-          'exwm-randr-workspace-monitor-plist '(0 "HDMI-1"))
+           'exwm-randr-workspace-monitor-plist '(0 "HDMI-1"
+                                                 1 "DP-1"))
 
-         (customize-set-variable
-          'exwm-randr-workspace-monitor-plist '(1 "DP-1"))
+         (customize-set-variable 'exwm-workspace-number
+                                 (/ (safe-length exwm-randr-workspace-monitor-plist) 2))
 
-         (add-hook 'exwm-randr-screen-change-hook
-                   (lambda ()
-                     (start-process-shell-command
-                      "xrandr" nil "xrandr --output HDMI-1 --left-of DP-1 --auto")))
+         ;; enable exwm randr after init
+         (add-hook 'after-init-hook 'exwm-randr-enable)
 
-         ;; enable exwm randr
-         ;; (exwm-randr-enable)
+         ;; bind: switch to other frame
+         (global-set-key (kbd "s-o") 'other-frame)
          ))
-
      #+END_SRC
 
 **** Helm-exwm

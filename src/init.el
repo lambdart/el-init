@@ -335,7 +335,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; disable fringe
 (add-hook 'after-init-hook
           (lambda ()
-            (fringe-mode '(0 . 0))))
+            (set-fringe-style 1)))
 
 ;; autosave/backups options
 (customize-set-variable 'version-control t)
@@ -487,12 +487,19 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'time nil t)
   (progn
     ;; customize
+    ;; seconds between updates of time in the mode line.
+    (customize-set-variable 'display-time-interval 15)
 
-    ;; format time string
-    (customize-set-variable
-     'display-time-format
-     (format-time-string "%H:%M" nil nil))
+    ;; non-nil indicates time should be displayed as hh:mm, 0 <= hh <= 23
+    (customize-set-variable 'display-time-24hr-format t)
 
+    ;; set format time string
+    (customize-set-variable 'display-time-format "%H:%M")
+
+    ;; load-average values below this value won’t be shown in the mode line.
+    (customize-set-variable 'display-time-load-average-threshold 1.0)
+
+    ;; enable
     ;; initialize display time mode
     (display-time-mode 1)))
 
@@ -963,13 +970,13 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; mode-line format
     (customize-set-variable 'mode-line-format
-                            '(" " display-time-string " "
+                            '(" "
+                              mode-line-misc-info
                               mode-line-mule-info
                               "%*%& %l:%c | %I "
                               moody-mode-line-buffer-identification
                               " %m "
-                              moody-vc-mode
-                              mode-line-frame-identification))))
+                              (moody-vc-mode vc-mode)))))
 
 (when (require 'erc nil t)
   (progn
@@ -1123,11 +1130,14 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; bind
 ;; (define-key ctl-x-map (kbd "b") 'ibuffer)))
 
-(require 'shell nil t)
-
-;; define M-# to run some strange command:
-(eval-after-load "shell"
-  '(define-key shell-mode-map "\M-#" 'shells-dynamic-spell))
+(when (require 'shell nil t)
+      (progn
+        ;; hook
+        (add-hook 'shell-mode-hook
+                  (lambda()
+                    ;; do not display continuation lines.
+                    (toggle-truncate-lines)
+                    (display-line-numbers-mode 0)))))
 
 (require 'eshell nil t)
 
@@ -1137,7 +1147,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'term nil t)
   (progn
     ;; customize
-
     ;; if non-nil, is file name to use for explicitly requested inferior shell.
     (customize-set-variable 'explicit-shell-file-name "/usr/local/bin/fish")
 
@@ -1145,21 +1154,32 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'term-completion-addsuffix t)
 
     ;; regexp to recognize prompts in the inferior process
-    (customize-set-variable 'term-prompt-regexp "^\\(>\\|\\(->\\)+\\) *")
+    ;; (customize-set-variable 'term-prompt-regexp "^\\(>\\|\\(->\\)+\\) *")
+    ;; (customize-set-variable 'term-prompt-regexp ".*:.*>.*? ")
 
     ;; if non-nil, automatically list possibilities on partial completion.
     (customize-set-variable 'term-completion-autolist t)
 
+    ;; if true, buffer name equals process name
+    (customize-set-variable 'term-ansi-buffer-base-name nil)
+
+    ;; hook
+    (add-hook 'term-mode-hook
+              (lambda()
+                ;; do not display continuation lines.
+                (toggle-truncate-lines)
+                (display-line-numbers-mode 0)))))
+
+(when (require 'multi-term nil t)
+  (progn
+    ;; customize
+    (customize-set-variable 'multi-term-program "/usr/local/bin/fish")
+
+    ;; the buffer name of term buffer.
+    (customize-set-variable 'multi-term-buffer-name "term")
+
     ;; bind
-    (define-key ctl-x-map (kbd "<C-return>") 'ansi-term)
-
-    ;; advices
-    ;; fish shell, default
-    (defadvice ansi-term (before force-fish)
-      (interactive (list explicit-shell-file-name)))
-
-    ;; active advice
-    (ad-activate 'ansi-term)))
+    (define-key ctl-x-map (kbd "<C-return>") 'multi-term)))
 
 (defun eos/launch/st ()
   "Launch urxvt"
@@ -1306,12 +1326,18 @@ See the `eww-search-prefix' variable for the search engine used."
 
 (when (require 'comint nil t)
   (progn
-    ;; hooks
-    ;; disable line number mode
-    (add-hook 'comint-mode-hook
-              (lambda ()
-                (interactive)
-                (display-line-numbers-mode nil)))))
+    ;; customize
+    ;; if non-nil, assume that the subprocess echoes any input.
+    (customize-set-variable 'comint-process-echoes t)
+
+    ;; if non-nil, use comint-prompt-regexp to recognize prompts.
+    (customize-set-variable 'comint-use-prompt-regexp t)
+
+    ;; regexp to recognize prompts in the inferior process.
+    (customize-set-variable 'comint-prompt-regexp ".*:.*>.*? ")
+
+    ;; value to use for TERM when the system uses terminfo.
+    (customize-set-variable 'comint-terminfo-terminal (getenv "TERM"))))
 
 (defun eos/transset-set (opacity)
   "Set transparency on frame window specify by OPACITY."

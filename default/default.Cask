@@ -5,6 +5,7 @@
 (depends-on "yasnippet")
 (depends-on "projectile")
 (depends-on "editorconfig")
+(depends-on "multi-term")
 (depends-on "moody")
 (depends-on "ess")
 (depends-on "irony")

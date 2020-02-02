@@ -1131,13 +1131,15 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; (define-key ctl-x-map (kbd "b") 'ibuffer)))
 
 (when (require 'shell nil t)
-      (progn
-        ;; hook
-        (add-hook 'shell-mode-hook
-                  (lambda()
-                    ;; do not display continuation lines.
-                    (toggle-truncate-lines)
-                    (display-line-numbers-mode 0)))))
+  (progn
+    ;; hook
+    (add-hook 'shell-mode-hook
+              (lambda()
+                ;; do not display continuation lines.
+                (toggle-truncate-lines)
+
+                ;; disable line numbers
+                (display-line-numbers-mode 0)))))
 
 (require 'eshell nil t)
 
@@ -1163,6 +1165,20 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; if true, buffer name equals process name
     (customize-set-variable 'term-ansi-buffer-base-name nil)
 
+    ;; functions
+    (defun eos/term-mode-toggle ()
+      "Toggles term between line mode and char mode. Nice to have a
+   single key so I don't have to remember separate char and line
+   mode bindings"
+      (interactive)
+      (if (and (fboundp 'term-in-line-mode)
+               (fboundp 'term-char-mode)
+               (fboundp 'term-line-mode))
+          (progn
+            (if (term-in-line-mode)
+                (term-char-mode)
+              (term-line-mode)))))
+
     ;; hook
     (add-hook 'term-mode-hook
               (lambda()
@@ -1170,16 +1186,31 @@ point is on a symbol, return that symbol name.  Else return nil."
                 (toggle-truncate-lines)
                 (display-line-numbers-mode 0)))))
 
+;; binds
+(when (boundp 'term-raw-map)
+  (progn
+    (define-key term-raw-map (kbd "C-c q") 'eos/term-mode-toggle)))
+
+(when (boundp 'term-mode-map)
+  (progn
+    (define-key term-mode-map (kbd "C-c C-q") 'eos/term-mode-toggle)))
+
 (when (require 'multi-term nil t)
   (progn
     ;; customize
     (customize-set-variable 'multi-term-program "/usr/local/bin/fish")
 
+    ;; focus terminal window after you open dedicated window
+    (customize-set-variable 'multi-term-dedicated-select-after-open-p t)
+
     ;; the buffer name of term buffer.
     (customize-set-variable 'multi-term-buffer-name "term")
 
-    ;; bind
-    (define-key ctl-x-map (kbd "<C-return>") 'multi-term)))
+    ;; bind (C-x) prefix
+    (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
+
+    ;; bind global
+    (global-set-key (kbd "C-z") 'multi-term-dedicated-toggle)))
 
 (defun eos/launch/st ()
   "Launch urxvt"
@@ -1909,7 +1940,6 @@ See the `eww-search-prefix' variable for the search engine used."
 (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
 (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
 (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
-(define-key emacs-lisp-mode-map (kbd "C-c C-e") 'eval-last-sexp)
 (define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)
 
 ;; unbind
@@ -2070,7 +2100,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (setq minor-mode-map-alist nil)
 
 ;; unset
-(global-unset-key (kbd "C-z"))
+;; (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-@"))
 (global-unset-key (kbd "C-\\"))
 (global-unset-key (kbd "M-l"))

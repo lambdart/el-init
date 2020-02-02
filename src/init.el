@@ -598,6 +598,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                             `(([?\s-r] . exwm-reset)
                               ([?\s-w] . exwm-workspace-switch)
                               ([?\s-q] . exwm-input-toggle-keyboard)
+                              ([?\s-z] . multi-term-dedicated-toggle)
 
                               ;; ([?\s-k] . exwm-workspace-delete)
                               ;; ([?\s-a] . exwm-workspace-swap)
@@ -1163,21 +1164,35 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'term-completion-autolist t)
 
     ;; if true, buffer name equals process name
-    (customize-set-variable 'term-ansi-buffer-base-name nil)
+    (customize-set-variable 'term-ansi-buffer-base-name t)
 
     ;; functions
     (defun eos/term-mode-toggle ()
       "Toggles term between line mode and char mode. Nice to have a
-   single key so I don't have to remember separate char and line
-   mode bindings"
+        single key so I don't have to remember separate char and line
+        mode bindings"
       (interactive)
-      (if (and (fboundp 'term-in-line-mode)
-               (fboundp 'term-char-mode)
-               (fboundp 'term-line-mode))
-          (progn
-            (if (term-in-line-mode)
-                (term-char-mode)
-              (term-line-mode)))))
+      (when (and (fboundp 'term-in-line-mode)
+                 (fboundp 'term-char-mode)
+                 (fboundp 'term-line-mode))
+        (progn
+          (if (term-in-line-mode)
+              (term-char-mode)
+            (term-line-mode)))))
+
+    (defun eos/term-send-kill-line ()
+      "Kill line in multi-term mode with the possibility to paste it like in a normal shell."
+      (interactive)
+      (when (fboundp 'term-send-raw-string)
+        (progn
+          (kill-line)
+          (term-send-raw-string "\C-k"))))
+
+    ;; bind (with hook)
+    (add-hook 'term-mode-hook
+              (lambda ()
+                (define-key term-raw-map (kbd "M-SPC") 'eos/term-mode-toggle)
+                (define-key term-mode-map (kbd "M-SPC") 'eos/term-mode-toggle)))
 
     ;; hook
     (add-hook 'term-mode-hook
@@ -1187,13 +1202,11 @@ point is on a symbol, return that symbol name.  Else return nil."
                 (display-line-numbers-mode 0)))))
 
 ;; binds
-(when (boundp 'term-raw-map)
-  (progn
-    (define-key term-raw-map (kbd "C-c q") 'eos/term-mode-toggle)))
+;; (when (boundp 'term-raw-map)
+;;   (progn
 
-(when (boundp 'term-mode-map)
-  (progn
-    (define-key term-mode-map (kbd "C-c C-q") 'eos/term-mode-toggle)))
+;;     (when (boundp 'term-mode-map)
+;;       (progn
 
 (when (require 'multi-term nil t)
   (progn
@@ -1204,12 +1217,15 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'multi-term-dedicated-select-after-open-p t)
 
     ;; the buffer name of term buffer.
-    (customize-set-variable 'multi-term-buffer-name "term")
+    (customize-set-variable 'multi-term-buffer-name "Term")
 
     ;; bind (C-x) prefix
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
 
+    ;; hook
+
     ;; bind global
+    (global-set-key (kbd "C-M-i") 'eos/complete)
     (global-set-key (kbd "C-z") 'multi-term-dedicated-toggle)))
 
 (defun eos/launch/st ()
@@ -2056,7 +2072,7 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; (define-key ctl-x-map (kbd "C-<right>") nil)
 ;; (define-key ctl-x-map (kbd "C-=") nil)
 ;; (define-key ctl-x-map (kbd "C-0") nil)
-(define-key ctl-x-map (kbd "C-z") nil)
+;; (define-key ctl-x-map (kbd "C-z") nil)
 (define-key ctl-x-map (kbd "C-+") nil)
 ;; (define-key ctl-x-map (kbd "C--") nil)
 (define-key ctl-x-map (kbd "C-a") nil)
@@ -2107,7 +2123,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (global-unset-key (kbd "M-h"))
 (global-unset-key (kbd "M-\\"))
 ;; (global-unset-key (kbd "M-z"))
-(global-unset-key (kbd "M-SPC"))
+;; (global-unset-key (kbd "M-SPC"))
 (global-unset-key (kbd "M-$"))
 (global-unset-key (kbd "M-("))
 (global-unset-key (kbd "M-)"))

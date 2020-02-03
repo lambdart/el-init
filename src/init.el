@@ -841,10 +841,17 @@ point is on a symbol, return that symbol name.  Else return nil."
      'epa-file-cache-passphrase-for-symmetric-encryption t)
 
     ;; if t, always asks user to select recipients.
-    (customize-set-variable 'epa-file-select-keys t)
+    (customize-set-variable 'epa-file-select-keys nil)
 
-    ;; enable
-    (epa-file-enable)))
+    ;; the gpg executable.
+    (customize-set-variable 'epg-gpg-program "gpg")
+
+    ;; the pinentry mode.
+    ;; In epa commands, a particularly useful mode is ‘loopback’, which
+    ;; redirects all Pinentry queries to the caller, so Emacs can query
+    ;; passphrase through the minibuffer, instead of external Pinentry
+    ;; program.
+    (customize-set-variable 'epa-pinentry-mode 'loopback)))
 
 (when (require 'auth-source nil t)
   (progn
@@ -855,7 +862,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; list of authentication sources
     (customize-set-variable
-     'auth-sources '("~/.auth/auth" "~/.auth/auth.gpg" "~/.auth/netrc"))))
+     'auth-sources '("~/.auth/auth.gpg" "~/.auth/netrc"))))
 
 (require 'password-store nil t)
 
@@ -929,10 +936,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key helm-swoop-map (kbd "C-c s c")
       'helm-multi-swoop-current-mode-from-helm-swoop)))
 
-(when (require 'helm-locate nil t)
-  (progn
-    ;; customize locate command
-    (customize-set-variable 'helm-locate-command "locate %s %s")))
+(require 'helm-locate nil t)
 
 ;; load helm-imenu
 (when (require 'helm-imenu nil t)
@@ -1591,7 +1595,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (when (require 'helm-man nil t)
   (progn
     ;; bind
-    (define-key help-map (kbd "C-y") 'helm-man-woman)))
+    (define-key help-map (kbd "y") 'helm-man-woman)))
 
 (when (require 'dash-docs nil t)
   (progn
@@ -2100,11 +2104,14 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; (define-key ctl-x-map (kbd "C-=") nil)
 ;; (define-key ctl-x-map (kbd "C-0") nil)
 ;; (define-key ctl-x-map (kbd "C-z") nil)
-(define-key ctl-x-map (kbd "C-+") nil)
 ;; (define-key ctl-x-map (kbd "C--") nil)
+;; (define-key ctl-x-map (kbd "C-d") nil)
+;; (define-key ctl-x-map (kbd "ESC") nil)
+(define-key ctl-x-map (kbd "]") nil)
+(define-key ctl-x-map (kbd "[") nil)
+(define-key ctl-x-map (kbd "C-+") nil)
 (define-key ctl-x-map (kbd "C-a") nil)
 (define-key ctl-x-map (kbd "C-l") nil)
-;; (define-key ctl-x-map (kbd "C-d") nil)
 (define-key ctl-x-map (kbd "C-r") nil)
 (define-key ctl-x-map (kbd "C-n") nil)
 (define-key ctl-x-map (kbd "C-p") nil)
@@ -2112,13 +2119,10 @@ See the `eww-search-prefix' variable for the search engine used."
 (define-key ctl-x-map (kbd "C-h") nil)
 (define-key ctl-x-map (kbd "C-u") nil)
 (define-key ctl-x-map (kbd "C-\@") nil)
-;;  (define-key ctl-x-map (kbd "ESC") nil)
 (define-key ctl-x-map (kbd "M-:") nil)
 (define-key ctl-x-map (kbd "`") nil)
 (define-key ctl-x-map (kbd ")") nil)
 (define-key ctl-x-map (kbd "(") nil)
-;; (define-key ctl-x-map (kbd "]") nil)
-;; (define-key ctl-x-map (kbd "[") nil)
 (define-key ctl-x-map (kbd "<") nil)
 (define-key ctl-x-map (kbd ">") nil)
 (define-key ctl-x-map (kbd "\@") nil)

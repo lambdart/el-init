@@ -799,8 +799,8 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     ;; files buffers list
     (defvar eos/helm-source-file-buffers
-      (if (fboundp 'helm-build-in-buffer-source)
-          (helm-build-in-buffer-source "File Buffers"
+      (if (fboundp 'helm-make-source)
+          (helm-make-source "File Buffers" 'helm-source-in-buffer
             :data 'helm-buffer-list
             :candidate-transformer (lambda (buffers)
                                      (cl-loop for buf in buffers
@@ -812,8 +812,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; non files buffers list
     (defvar eos/helm-source-nonfile-buffers
-      (if (fboundp 'helm-build-in-buffer-source)
-          (helm-build-in-buffer-source "Non-file Buffers"
+      (if (fboundp 'helm-make-source)
+          (helm-make-source "Non-file Buffers" 'helm-source-in-buffer
             :data 'helm-buffer-list
             :candidate-transformer (lambda (buffers)
                                      (cl-loop for buf in buffers
@@ -833,11 +833,29 @@ point is on a symbol, return that symbol name.  Else return nil."
             helm-source-buffers-list
             helm-source-buffer-not-found))))
 
+(when (require 'epa nil t)
+  (progn
+    ;; customize
+    ;; if non-nil, cache passphrase for symmetric encryption.
+    (customize-set-variable
+     'epa-file-cache-passphrase-for-symmetric-encryption t)
+
+    ;; if t, always asks user to select recipients.
+    (customize-set-variable 'epa-file-select-keys t)
+
+    ;; enable
+    (epa-file-enable)))
+
 (when (require 'auth-source nil t)
   (progn
+
+    ;; Note: If the auth-sources variable contains ~/.auth.gpg before
+    ;; ~/.auth, the auth-source library will try to read the GnuPG
+    ;; encrypted .gpg file first, before the unencrypted file.
+
     ;; list of authentication sources
     (customize-set-variable
-     'auth-sources '("~/.auth/auth.gpg" "~/.auth/auth" "~/.auth/netrc"))))
+     'auth-sources '("~/.auth/auth" "~/.auth/auth.gpg" "~/.auth/netrc"))))
 
 (require 'password-store nil t)
 
@@ -1374,7 +1392,7 @@ See the `eww-search-prefix' variable for the search engine used."
     ;; set dmenu-itens cache location
     (customize-set-variable
      'dmenu-save-file
-     (concat user-emacs-directory "cache/dmenu-itens"))
+     (concat user-emacs-directory "cache/dmenu-items"))
 
     ;; bind
     (define-key ctl-x-map (kbd "C-x") 'dmenu)))
@@ -1695,8 +1713,7 @@ See the `eww-search-prefix' variable for the search engine used."
 
 (when (boundp 'helm-company-map)
   (define-key helm-company-map (kbd "SPC") 'helm-keyboard-quit)
-  (define-key helm-company-map (kbd "C-j") 'helm-maybe-exit-minibuffer)
-  (define-key helm-company-map (kbd "TAB") 'helm-next-line))
+  (define-key helm-company-map (kbd "C-j") 'helm-maybe-exit-minibuffer))
 
 ;; set company backends
 (defun eos/company/set-backends (backends)

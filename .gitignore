@@ -91,12 +91,10 @@ GTAGS
 # Emacs history
 history
 
-# Mesk dirs
+# EOS dirs
 .demo
 .backup
 .org
-cache
-autosave
 
 # Cask dir
 .cask
@@ -104,22 +102,28 @@ autosave
 # Cask file
 Cask
 
-# Emacs Packages Dirs
+# Emacs Dirs (Packages)
 tutorial
 irony
 eshell
+cache
+autosave
 elpa
 transient
 url
 eshell
 elpa
 rtags
-anaconda-mode
 snippets
+info
+scrot
+rfc
 
 # .el
 custom.el
 private.el
+eos-adapt.el
+yoshi-theme.el
 
 # docs
 README.txt

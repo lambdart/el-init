@@ -3358,6 +3358,21 @@
 
 *** PHP
 *** HTML
+*** Hide-show (blocks)
+
+    Minor mode to hide and show code and comment blocks.
+
+    #+BEGIN_SRC elisp
+
+    (when (require 'hs-minor-mode nil t)
+      (progn
+        ;; add doxygen
+        (add-hook 'prog-mode-hook 'hs-minor-mode)
+
+        (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
+
+    #+END_SRC
+
 ** Unbind
 *** Prefix
 **** Esc

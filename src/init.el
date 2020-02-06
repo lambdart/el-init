@@ -1519,7 +1519,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'emms-setup nil t)
   (progn
     ;; enable emms
-    (eos/funcall 'emms-all)))
+    (add-hook 'after-emacs-init 'emms-all)))
 
 (when (require 'emms nil t)
   (progn
@@ -1703,7 +1703,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'company nil t)
   (progn
     ;; set echo delay
-    (customize-set-variable 'company-echo-delay 0.2)
+    (customize-set-variable 'company-echo-delay 0.0)
 
     ;; disable idle delay
     (customize-set-variable 'company-idle-delay nil)
@@ -1722,7 +1722,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                             '(company-sort-by-occurrence))
 
     ;; enable dabbrev downcase (most common)
-    (customize-set-variable 'company-dabbrev-downcase t)
+    (customize-set-variable 'company-dabbrev-downcase nil)
 
     ;; align annotations true
     (customize-set-variable 'company-tooltip-align-annotations nil)
@@ -1731,7 +1731,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; to select completions use: M-1, M-2, etc..
     (customize-set-variable 'company-show-numbers t)
 
-    ;; bind
+    ;; binds
     (define-key eos-complete-map (kbd "M-`") 'company-ispell)
     (define-key eos-complete-map (kbd "2") 'company-dabbrev)
     (define-key eos-complete-map (kbd "3") 'company-dabbrev-code)
@@ -1741,25 +1741,29 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key eos-complete-map (kbd "1") 'company-yasnippet)
 
     ;; init after emacs initialize
-    (add-hook 'after-init-hook 'global-company-mode)))
+    (add-hook 'after-init-hook
+              (lambda ()
+                (eos/funcall 'global-company-mode 1)))))
 
 ;; bind
 (when (boundp 'company-active-map)
   (progn
-    (define-key company-active-map (kbd "C-j") 'company-complete-selection)
+    (define-key company-active-map (kbd "C-j") 'nil)
     (define-key company-active-map (kbd "C-n") 'company-select-next)
     (define-key company-active-map (kbd "C-p") 'company-select-previous)))
 
 (when (require 'company-statistics nil t)
   (progn
-
+    ;; customize
     ;; set company-statistics cache location
     (customize-set-variable
      'company-statistics-file
      (concat user-emacs-directory "cache/company-statistics-cache.el"))
 
     ;; init after company mode
-    (add-hook 'company-mode-hook 'company-statistics-mode)))
+    (add-hook 'company-mode-hook
+              (lambda()
+                (eos/funcall 'company-statistics-mode 1)))))
 
 (when (require 'yasnippet nil t)
   (progn
@@ -1771,7 +1775,11 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; initialize after emacs starts
     (add-hook 'after-init-hook 'yas-global-mode)))
 
-(require 'helm-company nil t)
+(when (require 'helm-company nil t)
+  (progn
+    ;; customize:
+    ;; enable fuzzy matching for helm company
+    (customize-set-variable 'helm-company-fuzzy-match t)))
 
 (when (boundp 'helm-company-map)
   (define-key helm-company-map (kbd "SPC") 'helm-keyboard-quit)
@@ -2216,6 +2224,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; (define-key ctl-x-map (kbd "C-d") nil)
 ;; (define-key ctl-x-map (kbd "ESC") nil)
 (define-key ctl-x-map (kbd "]") nil)
+(define-key ctl-x-map (kbd "C-z") nil)
 (define-key ctl-x-map (kbd "C-<left>") nil)
 (define-key ctl-x-map (kbd "C-<right>") nil)
 (define-key ctl-x-map (kbd "C-<up>") nil)

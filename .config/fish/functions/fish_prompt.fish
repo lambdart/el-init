@@ -1,5 +1,5 @@
 # count the numer of files in current the directory
-# function _count_files
+# funxction _count_files
 #     ls -1 | wc -l | sed 's/\ //g'
 # end
 
@@ -16,7 +16,7 @@ function fish_prompt
     set -l last_status $status
 
     # setup colors
-    set -l white (set_color bfbfbf)
+    set -l white (set_color cccccc)
     set -l cyan (set_color cyan)
     set -l yellow (set_color yellow)
     set -l red (set_color red)
@@ -53,6 +53,22 @@ function fish_prompt
         set prompt_color $normal
     end
 
+    # set prompt default symbol
+    set -l prompt_symbol ' » '
+
+    # clean prompt format if TERM it's equals to dump
+    if test $TERM = "dumb"
+        set promt_symbol "\$ "
+    end
+
+    if test $USER = "root"
+        set prompt_symbol ' # '
+    end
+
+    # finaly set the promt format
+    set -l prompt_format $prompt_color $cwd $red $prompt_symbol $normal
+
     # display prompt
-    echo -e -n -s $prompt_color $cwd $white ' > ' $normal
+    echo -e -n -s $prompt_format
+
 end

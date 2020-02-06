@@ -8,6 +8,7 @@
 (depends-on "multi-term")
 (depends-on "moody")
 (depends-on "ess")
+(depends-on "emms")
 (depends-on "irony")
 (depends-on "password-store")
 (depends-on "go-mode")

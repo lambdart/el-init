@@ -140,23 +140,6 @@
 
     #+END_SRC
 
-** Private
-
-   Some settings are private, this file must
-   contain these variables values.
-
-   #+BEGIN_SRC emacs-lisp
-
-   ;; Load private.el after emacs initialize.
-   (add-hook 'after-init-hook
-             (lambda ()
-               (interactive)
-               (let ((private-file (expand-file-name "~/.private/private.el")))
-                 (if (file-exists-p private-file)
-                     (progn (load-file private-file))))))
-
-   #+END_SRC
-
 ** Vanilla
 *** Aliases
 
@@ -480,11 +463,8 @@
       (global-set-key (kbd "M-i") 'eos/edit/indent-region-or-buffer)
       (global-set-key (kbd "M-j") 'eos/edit/duplicate-current-line-or-region)
 
-      (global-set-key (kbd "M-<up>") 'eos/edit/move-lines-up)
-      (global-set-key (kbd "M-<down>") 'eos/edit/move-lines-down)
-      ;; edit (terminal quick fix)
-      (global-set-key (kbd "ESC <up>") 'eos/edit/move-lines-up)
-      (global-set-key (kbd "ESC <down>") 'eos/edit/move-lines-down)
+      (global-set-key (kbd "M-p") 'eos/edit/move-lines-up)
+      (global-set-key (kbd "M-n") 'eos/edit/move-lines-down)
 
       #+END_SRC
 
@@ -536,10 +516,28 @@
 
 *** Help
 
+    GNU Emacs's built-in help system, the one invoked by
+    `M-x help-for-help'.
+
     #+BEGIN_SRC emacs-lisp
 
-    ;; always select the help window
-    (customize-set-variable 'help-window-select t)
+    (when (require 'help nil t)
+      (progn
+        ;; customize
+        ;; always select the help window
+        (customize-set-variable 'help-window-select t)))
+
+    ;; binds
+    (when (boundp help-map)
+      (progn
+        ;; clean, quality of life
+        (define-key help-map (kbd "<help>") nil)
+        (define-key help-map (kbd "<f1>") nil)
+        (define-key help-map (kbd "C-n") nil)
+        (define-key help-map (kbd "C-h") nil)
+        (define-key help-map (kbd "C-;") nil)
+        (define-key help-map (kbd "K") nil)
+        (define-key help-map (kbd "RET") nil)))
 
     #+END_SRC
 
@@ -681,10 +679,10 @@
     (add-hook 'after-init-hook 'window-divider-mode)
 
     ;; global bind
-    (global-set-key (kbd "<s-left>") 'shrink-window-horizontally)
-    (global-set-key (kbd "<s-right>") 'enlarge-window-horizontally)
-    (global-set-key (kbd "<s-down>") 'shrink-window)
-    (global-set-key (kbd "<s-up>") 'enlarge-window)
+    (global-set-key (kbd "s-l") 'shrink-window-horizontally)
+    (global-set-key (kbd "s-h") 'enlarge-window-horizontally)
+    (global-set-key (kbd "s-j") 'shrink-window)
+    (global-set-key (kbd "s-k") 'enlarge-window)
 
     ;; eos-window-map bind
     ;; (define-key eos-window-map (kbd "j") 'windmove-up)
@@ -1337,7 +1335,7 @@
 
       #+END_SRC
 
-**** Passowrd
+**** Password
 ***** Password-store
 
       #+BEGIN_SRC emacs-lisp
@@ -1345,6 +1343,23 @@
       (require 'password-store nil t)
 
       #+END_SRC
+
+**** Utils
+
+     #+BEGIN_SRC emacs-lisp
+
+     (defun eos/lookup-password (host user port)
+       "Lookup password on auth-source default file."
+       (let ((auth (auth-source-search :host host :user user :port port)))
+         (if auth
+             (let ((secretf (plist-get (car auth) :secret)))
+               (if secretf
+                   (funcall secretf)
+                 (error "Auth entry for %s@%s:%s has no secret!"
+                        user host port)))
+           (error "No auth entry found for %s@%s:%s" user host port))))
+
+     #+END_SRC
 
 *** Notification
 **** Notifications
@@ -1359,6 +1374,22 @@
      #+END_SRC
 
 *** Help
+**** Help-mode
+
+     Help-mode, which is the mode used by *Help* buffers, and
+     associated support machinery, such as adding hyperlinks, etc...
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'help-mode nil t)
+
+     ;; binds
+     (when (boundp 'help-mode-map)
+       (progn
+         (define-key help-mode-map (kbd "C-j") 'push-button)))
+
+     #+END_SRC
+
 **** Helm-info
 
      #+BEGIN_SRC emacs-lisp
@@ -1379,23 +1410,8 @@
          ;; helm-descbinds, window splitting style (2: vertical)
          (customize-set-variable 'helm-descbinds-window-style 2)))
 
-     #+END_SRC
-
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
      ;; bind
      (define-key help-map (kbd "b") 'helm-descbinds)
-
-     ;; unbind (clean, quality of life)
-     (define-key help-map (kbd "<help>") nil)
-     (define-key help-map (kbd "<f1>") nil)
-     (define-key help-map (kbd "C-n") nil)
-     (define-key help-map (kbd "C-h") nil)
-     (define-key help-map (kbd "C-;") nil)
-     (define-key help-map (kbd "K") nil)
-     (define-key help-map (kbd "RET") nil)
 
      #+END_SRC
 
@@ -1619,9 +1635,6 @@
 
      (when (require 'erc nil t)
        (progn
-         ;; nickname to use if one is not provided
-         (customize-set-variable 'erc-nick "esac-io")
-
          ;; the string to append to the nick if it is already in use.
          (customize-set-variable 'erc-nick-uniquifier "_")
 
@@ -1650,8 +1663,17 @@
          ;; show the channel key in the header line.
          (customize-set-variable 'erc-show-channel-key-p t)
 
-         ;; kill all query (also channel) buffers of this server on QUIT
-         (customize-set-variable 'erc-kill-queries-on-quit t)))
+         ;; kill all query (also channel) buffers of this server on QUIT.
+         (customize-set-variable 'erc-kill-queries-on-quit t)
+
+         ;; functions
+         (defun eos/irc-tls ()
+           "A `erc-tls function interface."
+           (interactive)
+           (let ((server "irc.freenode.net")
+                 (nick "esac-io"))
+             (erc-tls :server server :port 6697 :nick nick
+                      :password (eos/lookup-password server nick 6697))))))
 
      ;; binds
      (when (boundp 'erc-mode-map)
@@ -1678,8 +1700,8 @@
        (progn
          ;; customize
          ;; (customize-set-variable 'which-key-paging-key nil)
-         (customize-set-variable 'which-key-idle-delay 0.8)
-         (customize-set-variable 'which-key-idle-secondary-delay 0.4)
+         (customize-set-variable 'which-key-idle-delay 0.5)
+         (customize-set-variable 'which-key-idle-secondary-delay 0.1)
          (customize-set-variable 'which-key-separator " - ")
          (customize-set-variable 'which-key-use-C-h-commands t)
          (customize-set-variable 'which-key-add-column-padding 2)
@@ -1769,10 +1791,10 @@
      (when (require 'buffer-move nil t)
        (progn
          ;; bind
-         (global-set-key (kbd "C-x <C-up>") 'buf-move-up)
-         (global-set-key (kbd "C-x <C-down>") 'buf-move-down)
-         (global-set-key (kbd "C-x <C-left>") 'buf-move-left)
-         (global-set-key (kbd "C-x <C-right>") 'buf-move-right)))
+         (global-set-key (kbd "C-s-j") 'buf-move-up)
+         (global-set-key (kbd "C-s-k") 'buf-move-down)
+         (global-set-key (kbd "C-s-h") 'buf-move-left)
+         (global-set-key (kbd "C-s-l") 'buf-move-right)))
 
      #+END_SRC
 
@@ -2026,12 +2048,12 @@
          ;; Re-write of the `eww-search-words' definition.
          (defun eos/eww-search-words ()
            "Search the web for the text between BEG and END.
-     If region is active (and not whitespace), search the web for
-     the text in that region.
-     Else if the region is not active, and the point is on a symbol,
-     search the web for that symbol.
-     Else prompt the user for a search string.
-     See the `eww-search-prefix' variable for the search engine used."
+               If region is active (and not whitespace), search the web for
+               the text in that region.
+               Else if the region is not active, and the point is on a symbol,
+               search the web for that symbol.
+               Else prompt the user for a search string.
+               See the `eww-search-prefix' variable for the search engine used."
            (interactive)
            (let ((search-string (eos/get-selected-text-or-symbol-at-point)))
              (when (and (stringp search-string)
@@ -2040,8 +2062,12 @@
              (if (stringp search-string)
                  (eww search-string)
                (call-interactively #'eww))))
-
          ))
+
+     ;; binds
+     (when (boundp 'eww-mode-map)
+       (progn
+         (define-key eww-mode-map (kbd "C-j") 'eww-follow-link)))
 
      #+END_SRC
 
@@ -2207,6 +2233,9 @@
      #+END_SRC
 
 *** Interpreter
+
+    Inferior interpreters interface.
+
 **** Comint
 
      This package defines a general command-interpreter-in-a-buffer
@@ -2229,6 +2258,16 @@
 
          ;; value to use for TERM when the system uses terminfo.
          (customize-set-variable 'comint-terminfo-terminal "eterm-color")))
+
+     #+END_SRC
+
+**** Sql
+
+     Specialized ~comint.el~ for SQL interpreters.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'sql nil t)
 
      #+END_SRC
 
@@ -2294,8 +2333,17 @@
          ;; if non-nil, chunksize for sending input to local process.
          ;; (customize-set-variable 'tramp-chunksize 512)
 
+         ;; a value of t would require an immediate reread during filename completion,
+         ;; nil means to use always cached values for the directory contents.
+         (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
+
          ;; set tramp verbose level
          (customize-set-variable 'tramp-verbose 2)
+
+         ;; file which keeps connection history for tramp connections.
+         (customize-set-variable
+          'tramp-persistency-file-name
+          (concat (expand-file-name user-emacs-directory) "cache/tramp"))
 
          ;; connection timeout 30 seconds
          (customize-set-variable 'tramp-connection-timeout 30)))
@@ -2436,21 +2484,22 @@
 *** Analyse
 **** Verb
 *** Apparence
-**** Mesk-term
+**** Theme
+***** Mesk-term
 
-     Add theme directory to load-path and load the
-     default theme (mesk-term).
+      Add theme directory to load-path and load the
+      default theme (mesk-term).
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     ;; add eos-theme-dir to theme load path
-     (add-to-list 'custom-theme-load-path
-                  (concat user-emacs-directory "themes"))
+      ;; add eos-theme-dir to theme load path
+      (add-to-list 'custom-theme-load-path
+                   (concat user-emacs-directory "themes"))
 
-     ;; load theme
-     (load-theme 'mesk-term t)
+      ;; load theme
+      (load-theme 'mesk-term t)
 
-     #+END_SRC
+      #+END_SRC
 
 *** Dashboard
 **** Dashboard
@@ -2530,7 +2579,7 @@
      (when (require 'helm-man nil t)
        (progn
          ;; bind
-         (define-key help-map (kbd "y") 'helm-man-woman)))
+         (define-key eos-docs-map (kbd "m") 'helm-man-woman)))
 
      #+END_SRC
 
@@ -2962,11 +3011,100 @@
 
 ** Development
 *** C/C++
-**** CC-mode
+**** Utils
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'cc-mode nil t)
+     ;; c/c++ garage
+     (defun eos/cc/set-company-backends ()
+       "Set C/C++ common company backends."
+       (eos/company/set-backends
+        '((company-c-headers)
+          (company-irony
+           company-yasnippet
+           company-capf
+           company-keywords
+           company-dabbrev
+           company-dabbrev-code)
+          (company-files))))
+
+     #+END_SRC
+
+**** CC-mode
+
+     This package provides GNU Emacs major modes for editing C, C++,
+     Objective-C, Java, CORBA's IDL, Pike and AWK code.  As of the
+     latest Emacs and XEmacs releases, it is the default package for
+     editing these languages.  This package is called "CC Mode", and
+     should be spelled exactly this way.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'cc-mode nil t)
+       (progn
+         ;; hooks
+         (add-hook 'c-mode-hook
+                   (lambda ()
+                     ;; set cc common company backends
+                     (eos/cc/set-company-backends)
+
+                     ;; set dash docset
+                     (eos/dash/activate-docset '"C")
+
+                     ;; set flycheck checker
+                     (eos/flycheck/set-checker 'c/c++-clang)
+
+                     ;; load rtags
+                     (eos/cc/load-rtags)))
+
+         (add-hook 'c++-mode-hook
+                   (lambda ()
+                     ;; set cc common backends (company and flycheck)
+                     (eos/cc/set-company-backends)
+
+                     ;; set flycheck checker
+                     (eos/flycheck/set-checker 'c++-cppcheck)
+
+                     ;; set dash docset
+                     (eos/dash/activate-docset '"C++")
+
+                     ;; load rtags
+                     (eos/cc/load-rtags)))))
+
+     ;; binds: c-mode-
+     (when (boundp 'c-mode-map)
+       (progn
+         ;; set rtags prefix map in c-mode map (C-c r)
+         (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
+
+         ;; complete or indent
+         (define-key c-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+
+     #+END_SRC
+
+**** Rtags
+
+     RTags is a client/server application that indexes C/C++ code and keeps a
+     persistent file-based database of references, declarations, definitions,
+     symbolnames etc. There’s also limited support for ObjC/ObjC++.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (defun eos/cc/load-rtags ()
+       "Load rtags manually."
+       (eos/load-file (concat user-emacs-directory "rtags/src/rtags.el"))
+
+       ;; load helm-rtags
+       (eos/load-file (concat user-emacs-directory "rtags/src/helm-rtags.el"))
+
+       ;; set rtags binary path
+       (customize-set-variable
+        'rtags-path
+        (concat user-emacs-directory "rtags/build/bin/"))
+
+       ;; set helm as the frontend
+       (customize-set-variable 'rtags-display-result-backend 'helm)
+       (customize-set-variable 'rtags-completing-read-behavior 'helm))
 
      #+END_SRC
 
@@ -2999,6 +3137,10 @@
 
 **** Company-irony
 
+     This package provides a company-mode asynchronous
+     completion backend for the C, C++ and Objective-C languages.
+
+
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'company-irony nil t)
@@ -3013,28 +3155,6 @@
      #+BEGIN_SRC emacs-lisp
 
      (require 'company-c-headers nil t)
-
-     #+END_SRC
-
-**** Rtags
-
-     #+BEGIN_SRC emacs-lisp
-
-     (defun eos/cc/load-rtags ()
-       "Load rtags manually."
-       (eos/load-file (concat user-emacs-directory "rtags/src/rtags.el"))
-
-       ;; load helm-rtags
-       (eos/load-file (concat user-emacs-directory "rtags/src/helm-rtags.el"))
-
-       ;; set rtags binary path
-       (customize-set-variable
-        'rtags-path
-        (concat user-emacs-directory "rtags/build/bin/"))
-
-       ;; set helm as the frontend
-       (customize-set-variable 'rtags-display-result-backend 'helm)
-       (customize-set-variable 'rtags-completing-read-behavior 'helm))
 
      #+END_SRC
 
@@ -3063,61 +3183,6 @@
      (define-key eos-rtags-map (kbd ".")
        'rtags-find-functions-called-by-this-function)
 
-     ;; ser rtags prefix map in c-mode map (C-c r)
-     (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
-
-     ;; complete or indent
-     (define-key c-mode-map (kbd "TAB") 'eos/complete-or-indent)
-
-     #+END_SRC
-
-**** Utils
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; c/c++ garage
-     (defun eos/cc/set-company-backends ()
-       "Set C/C++ company backends."
-       (eos/company/set-backends
-        '((company-c-headers)
-          (company-irony
-           company-yasnippet
-           company-capf
-           company-keywords
-           company-dabbrev
-           company-dabbrev-code)
-          (company-files))))
-
-     #+END_SRC
-
-**** Add-hook
-
-     This functions will to be called after c/cpp mode starts.
-
-     #+BEGIN_SRC emacs-lisp
-
-     (add-hook 'c-mode-hook
-               (lambda ()
-                 ;; set cc common company backends
-                 (eos/cc/set-company-backends)
-
-                 ;; set dash docset
-                 (eos/dash/activate-docset '"C")
-
-                 ;; load rtags
-                 (eos/cc/load-rtags)))
-
-     (add-hook 'c++-mode-hook
-               (lambda ()
-                 ;; set cc common backends (company and flycheck)
-                 (eos/cc/set-company-backends)
-
-                 ;; set dash docset
-                 (eos/dash/activate-docset '"C++")
-
-                 ;; load rtags
-                 (eos/cc/load-rtags)))
-
      #+END_SRC
 
 *** Lisp
@@ -3125,53 +3190,62 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'lisp-mode nil t)
-
-     (customize-set-variable 'lisp-body-indent 2)
+     (when (require 'lisp-mode nil t)
+       (progn
+         ;; customize:
+         ;; number of columns to indent the second line of a (def...) form
+         (customize-set-variable 'lisp-body-indent 2)))
 
      #+END_SRC
 
 *** Elisp
+**** Elisp-mode
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'elisp-mode nil t)
+       (progn
+         ;; hooks:
+         (add-hook 'emacs-lisp-mode-hook
+                   (lambda ()
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-elisp
+                         company-capf
+                         company-yasnippet
+                         company-keywords
+                         company-dabbrev
+                         company-dabbrev-code)
+                        (company-files)))
+
+                     ;; set flycheck checker
+                     (eos/flycheck/set-checker 'emacs-lisp)
+
+                     ;; activate dash docset (emacs)
+                     (eos/dash/activate-docset "Emacs Lisp")))))
+
+     ;; binds
+     (when (boundp 'emacs-lisp-mode-map)
+       (progn
+         (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
+         (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
+         (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
+         (define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)
+
+         ;; ubind, qualaty of life
+         (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
+         (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
+         (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
+         (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
+         (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)))
+
+     #+END_SRC
+
 **** Company-elisp
 
      #+BEGIN_SRC emacs-lisp
 
      (require 'company-elisp nil t)
-
-     #+END_SRC
-
-**** Elisp-mode
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'elisp-mode nil t)
-
-     ;; bind
-     (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
-     (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
-     (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
-     (define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)
-
-     ;; unbind
-     (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
-     (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
-     (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
-     (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
-     (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)
-
-     ;; add-hook
-     (add-hook 'emacs-lisp-mode-hook
-               (lambda ()
-                 ;; set company backends
-                 (eos/company/set-backends
-                  '((company-elisp
-                     company-capf
-                     company-yasnippet
-                     company-keywords
-                     company-dabbrev
-                     company-dabbrev-code)
-                    (company-files)))
-                 ))
 
      #+END_SRC
 
@@ -3316,6 +3390,35 @@
 
 *** Cmake
 *** Mql
+
+    #+BEGIN_SRC emacs-lisp
+
+    (add-to-list 'load-path
+                 (concat user-emacs-directory "elpa/mql-mode"))
+
+    (when (require 'mql-mode nil t)
+      (progn
+        ;; hooks
+        (add-hook 'mql-mode-hook
+                  (lambda ()
+                    ;; set company backends
+                    (eos/company/set-backends
+                     '((company-gtags
+                        company-yasnippet
+                        company-keywords
+                        company-capf
+                        company-dabbrev-code
+                        company-dabbrev)
+                       (company-files)))
+
+                    ;; select flycheck checker (use gcc)
+                    (eos/flycheck/set-checker 'c/c++-gcc)
+
+                    ;; activate mql5 docset
+                    (eos/dash/activate-docset '"mql5")))))
+
+    #+END_SRC
+
 *** Doxygen
 **** Highlight-doxygen
 
@@ -3371,8 +3474,6 @@
 
      ;; unbind
      ;; (define-key ctl-x-map (kbd "C-SPC") nil)
-     ;; (define-key ctl-x-map (kbd "C-<left>") nil)
-     ;; (define-key ctl-x-map (kbd "C-<right>") nil)
      ;; (define-key ctl-x-map (kbd "C-=") nil)
      ;; (define-key ctl-x-map (kbd "C-0") nil)
      ;; (define-key ctl-x-map (kbd "C-z") nil)
@@ -3380,6 +3481,12 @@
      ;; (define-key ctl-x-map (kbd "C-d") nil)
      ;; (define-key ctl-x-map (kbd "ESC") nil)
      (define-key ctl-x-map (kbd "]") nil)
+     (define-key ctl-x-map (kbd "C-<left>") nil)
+     (define-key ctl-x-map (kbd "C-<right>") nil)
+     (define-key ctl-x-map (kbd "C-<up>") nil)
+     (define-key ctl-x-map (kbd "C-<down>") nil)
+     (define-key ctl-x-map (kbd "<right>") nil)
+     (define-key ctl-x-map (kbd "<left>") nil)
      (define-key ctl-x-map (kbd "[") nil)
      (define-key ctl-x-map (kbd "C-+") nil)
      (define-key ctl-x-map (kbd "C-a") nil)
@@ -3433,18 +3540,15 @@
     #+BEGIN_SRC emacs-lisp
 
     ;; unset
-    ;; (global-unset-key (kbd "C-z"))
+    (global-unset-key (kbd "C-z"))
     (global-unset-key (kbd "C-@"))
     (global-unset-key (kbd "C-\\"))
     (global-unset-key (kbd "M-l"))
     (global-unset-key (kbd "M-h"))
     (global-unset-key (kbd "M-\\"))
-    ;; (global-unset-key (kbd "M-z"))
-    ;; (global-unset-key (kbd "M-SPC"))
     (global-unset-key (kbd "M-$"))
     (global-unset-key (kbd "M-("))
     (global-unset-key (kbd "M-)"))
-    ;; (global-unset-key (kbd "M-m"))
     (global-unset-key (kbd "M-r"))
     (global-unset-key (kbd "M-{"))
     (global-unset-key (kbd "M-}"))
@@ -3454,6 +3558,9 @@
     (global-unset-key (kbd "M-@"))
     (global-unset-key (kbd "M-~"))
 
+    ;; (global-unset-key (kbd "M-z"))
+    ;; (global-unset-key (kbd "M-SPC"))
+    ;; (global-unset-key (kbd "M-m"))
     ;; (global-unset-key (kbd "M-k"))
     ;; (global-unset-key (kbd "M-t"))
     ;; (global-unset-key (kbd "M-q"))

@@ -53,14 +53,6 @@ tangled, and the tangled file is compiled."
 ;; start emacs server
 (server-start)
 
-;; Load private.el after emacs initialize.
-(add-hook 'after-init-hook
-          (lambda ()
-            (interactive)
-            (let ((private-file (expand-file-name "~/.private/private.el")))
-              (if (file-exists-p private-file)
-                  (progn (load-file private-file))))))
-
 ;; y or n
 (defalias 'yes-or-no-p 'y-or-n-p)
 
@@ -280,11 +272,8 @@ However, if there's a region, all lines that region covers will be duplicated."
 (global-set-key (kbd "M-i") 'eos/edit/indent-region-or-buffer)
 (global-set-key (kbd "M-j") 'eos/edit/duplicate-current-line-or-region)
 
-(global-set-key (kbd "M-<up>") 'eos/edit/move-lines-up)
-(global-set-key (kbd "M-<down>") 'eos/edit/move-lines-down)
-;; edit (terminal quick fix)
-(global-set-key (kbd "ESC <up>") 'eos/edit/move-lines-up)
-(global-set-key (kbd "ESC <down>") 'eos/edit/move-lines-down)
+(global-set-key (kbd "M-p") 'eos/edit/move-lines-up)
+(global-set-key (kbd "M-n") 'eos/edit/move-lines-down)
 
 (defun eos/kill-buffer (buffer-name)
   "Kill BUFFER-NAME if exists."
@@ -314,8 +303,23 @@ point is on a symbol, return that symbol name.  Else return nil."
         (t
          nil)))
 
-;; always select the help window
-(customize-set-variable 'help-window-select t)
+(when (require 'help nil t)
+  (progn
+    ;; customize
+    ;; always select the help window
+    (customize-set-variable 'help-window-select t)))
+
+;; binds
+(when (boundp help-map)
+  (progn
+    ;; clean, quality of life
+    (define-key help-map (kbd "<help>") nil)
+    (define-key help-map (kbd "<f1>") nil)
+    (define-key help-map (kbd "C-n") nil)
+    (define-key help-map (kbd "C-h") nil)
+    (define-key help-map (kbd "C-;") nil)
+    (define-key help-map (kbd "K") nil)
+    (define-key help-map (kbd "RET") nil)))
 
 (defun eos/set-frame-font (font)
   "Set the default font to FONT."
@@ -411,10 +415,10 @@ point is on a symbol, return that symbol name.  Else return nil."
 (add-hook 'after-init-hook 'window-divider-mode)
 
 ;; global bind
-(global-set-key (kbd "<s-left>") 'shrink-window-horizontally)
-(global-set-key (kbd "<s-right>") 'enlarge-window-horizontally)
-(global-set-key (kbd "<s-down>") 'shrink-window)
-(global-set-key (kbd "<s-up>") 'enlarge-window)
+(global-set-key (kbd "s-l") 'shrink-window-horizontally)
+(global-set-key (kbd "s-h") 'enlarge-window-horizontally)
+(global-set-key (kbd "s-j") 'shrink-window)
+(global-set-key (kbd "s-k") 'enlarge-window)
 
 ;; eos-window-map bind
 ;; (define-key eos-window-map (kbd "j") 'windmove-up)
@@ -866,7 +870,25 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'password-store nil t)
 
+(defun eos/lookup-password (host user port)
+  "Lookup password on auth-source default file."
+  (let ((auth (auth-source-search :host host :user user :port port)))
+    (if auth
+        (let ((secretf (plist-get (car auth) :secret)))
+          (if secretf
+              (funcall secretf)
+            (error "Auth entry for %s@%s:%s has no secret!"
+                   user host port)))
+      (error "No auth entry found for %s@%s:%s" user host port))))
+
 (require 'notifications nil t)
+
+(require 'help-mode nil t)
+
+;; binds
+(when (boundp 'help-mode-map)
+  (progn
+    (define-key help-mode-map (kbd "C-j") 'push-button)))
 
 (when (require 'helm-info nil t)
   (progn
@@ -880,15 +902,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; bind
 (define-key help-map (kbd "b") 'helm-descbinds)
-
-;; unbind (clean, quality of life)
-(define-key help-map (kbd "<help>") nil)
-(define-key help-map (kbd "<f1>") nil)
-(define-key help-map (kbd "C-n") nil)
-(define-key help-map (kbd "C-h") nil)
-(define-key help-map (kbd "C-;") nil)
-(define-key help-map (kbd "K") nil)
-(define-key help-map (kbd "RET") nil)
 
 (when (require 'iedit nil t)
   (progn
@@ -1017,9 +1030,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'erc nil t)
   (progn
-    ;; nickname to use if one is not provided
-    (customize-set-variable 'erc-nick "esac-io")
-
     ;; the string to append to the nick if it is already in use.
     (customize-set-variable 'erc-nick-uniquifier "_")
 
@@ -1048,8 +1058,17 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; show the channel key in the header line.
     (customize-set-variable 'erc-show-channel-key-p t)
 
-    ;; kill all query (also channel) buffers of this server on QUIT
-    (customize-set-variable 'erc-kill-queries-on-quit t)))
+    ;; kill all query (also channel) buffers of this server on QUIT.
+    (customize-set-variable 'erc-kill-queries-on-quit t)
+
+    ;; functions
+    (defun eos/irc-tls ()
+      "A `erc-tls function interface."
+      (interactive)
+      (let ((server "irc.freenode.net")
+            (nick "esac-io"))
+        (erc-tls :server server :port 6697 :nick nick
+                 :password (eos/lookup-password server nick 6697))))))
 
 ;; binds
 (when (boundp 'erc-mode-map)
@@ -1061,8 +1080,8 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     ;; customize
     ;; (customize-set-variable 'which-key-paging-key nil)
-    (customize-set-variable 'which-key-idle-delay 0.8)
-    (customize-set-variable 'which-key-idle-secondary-delay 0.4)
+    (customize-set-variable 'which-key-idle-delay 0.5)
+    (customize-set-variable 'which-key-idle-secondary-delay 0.1)
     (customize-set-variable 'which-key-separator " - ")
     (customize-set-variable 'which-key-use-C-h-commands t)
     (customize-set-variable 'which-key-add-column-padding 2)
@@ -1146,10 +1165,10 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'buffer-move nil t)
   (progn
     ;; bind
-    (global-set-key (kbd "C-x <C-up>") 'buf-move-up)
-    (global-set-key (kbd "C-x <C-down>") 'buf-move-down)
-    (global-set-key (kbd "C-x <C-left>") 'buf-move-left)
-    (global-set-key (kbd "C-x <C-right>") 'buf-move-right)))
+    (global-set-key (kbd "C-s-j") 'buf-move-up)
+    (global-set-key (kbd "C-s-k") 'buf-move-down)
+    (global-set-key (kbd "C-s-h") 'buf-move-left)
+    (global-set-key (kbd "C-s-l") 'buf-move-right)))
 
 (when (require 'ibuffer nil t)
   (progn
@@ -1298,12 +1317,12 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; Re-write of the `eww-search-words' definition.
     (defun eos/eww-search-words ()
       "Search the web for the text between BEG and END.
-If region is active (and not whitespace), search the web for
-the text in that region.
-Else if the region is not active, and the point is on a symbol,
-search the web for that symbol.
-Else prompt the user for a search string.
-See the `eww-search-prefix' variable for the search engine used."
+          If region is active (and not whitespace), search the web for
+          the text in that region.
+          Else if the region is not active, and the point is on a symbol,
+          search the web for that symbol.
+          Else prompt the user for a search string.
+          See the `eww-search-prefix' variable for the search engine used."
       (interactive)
       (let ((search-string (eos/get-selected-text-or-symbol-at-point)))
         (when (and (stringp search-string)
@@ -1312,8 +1331,12 @@ See the `eww-search-prefix' variable for the search engine used."
         (if (stringp search-string)
             (eww search-string)
           (call-interactively #'eww))))
-
     ))
+
+;; binds
+(when (boundp 'eww-mode-map)
+  (progn
+    (define-key eww-mode-map (kbd "C-j") 'eww-follow-link)))
 
 (when (require 'browse-url nil t)
   (progn
@@ -1416,6 +1439,8 @@ See the `eww-search-prefix' variable for the search engine used."
     ;; value to use for TERM when the system uses terminfo.
     (customize-set-variable 'comint-terminfo-terminal "eterm-color")))
 
+(require 'sql nil t)
+
 (defun eos/transset-set (opacity)
   "Set transparency on frame window specify by OPACITY."
   (interactive "nOpacity: ")
@@ -1442,8 +1467,17 @@ See the `eww-search-prefix' variable for the search engine used."
     ;; if non-nil, chunksize for sending input to local process.
     ;; (customize-set-variable 'tramp-chunksize 512)
 
+    ;; a value of t would require an immediate reread during filename completion,
+    ;; nil means to use always cached values for the directory contents.
+    (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
+
     ;; set tramp verbose level
     (customize-set-variable 'tramp-verbose 2)
+
+    ;; file which keeps connection history for tramp connections.
+    (customize-set-variable
+     'tramp-persistency-file-name
+     (concat (expand-file-name user-emacs-directory) "cache/tramp"))
 
     ;; connection timeout 30 seconds
     (customize-set-variable 'tramp-connection-timeout 30)))
@@ -1595,7 +1629,7 @@ See the `eww-search-prefix' variable for the search engine used."
 (when (require 'helm-man nil t)
   (progn
     ;; bind
-    (define-key help-map (kbd "y") 'helm-man-woman)))
+    (define-key eos-docs-map (kbd "m") 'helm-man-woman)))
 
 (when (require 'dash-docs nil t)
   (progn
@@ -1873,7 +1907,74 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; set ctl-x-map prefix (C-x p)
 (define-key ctl-x-map (kbd "p") 'eos-pm-map)
 
-(require 'cc-mode nil t)
+;; c/c++ garage
+(defun eos/cc/set-company-backends ()
+  "Set C/C++ common company backends."
+  (eos/company/set-backends
+   '((company-c-headers)
+     (company-irony
+      company-yasnippet
+      company-capf
+      company-keywords
+      company-dabbrev
+      company-dabbrev-code)
+     (company-files))))
+
+(when (require 'cc-mode nil t)
+  (progn
+    ;; hooks
+    (add-hook 'c-mode-hook
+              (lambda ()
+                ;; set cc common company backends
+                (eos/cc/set-company-backends)
+
+                ;; set dash docset
+                (eos/dash/activate-docset '"C")
+
+                ;; set flycheck checker
+                (eos/flycheck/set-checker 'c/c++-clang)
+
+                ;; load rtags
+                (eos/cc/load-rtags)))
+
+    (add-hook 'c++-mode-hook
+              (lambda ()
+                ;; set cc common backends (company and flycheck)
+                (eos/cc/set-company-backends)
+
+                ;; set flycheck checker
+                (eos/flycheck/set-checker 'c++-cppcheck)
+
+                ;; set dash docset
+                (eos/dash/activate-docset '"C++")
+
+                ;; load rtags
+                (eos/cc/load-rtags)))))
+
+;; binds: c-mode-
+(when (boundp 'c-mode-map)
+  (progn
+    ;; set rtags prefix map in c-mode map (C-c r)
+    (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
+
+    ;; complete or indent
+    (define-key c-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+
+(defun eos/cc/load-rtags ()
+  "Load rtags manually."
+  (eos/load-file (concat user-emacs-directory "rtags/src/rtags.el"))
+
+  ;; load helm-rtags
+  (eos/load-file (concat user-emacs-directory "rtags/src/helm-rtags.el"))
+
+  ;; set rtags binary path
+  (customize-set-variable
+   'rtags-path
+   (concat user-emacs-directory "rtags/build/bin/"))
+
+  ;; set helm as the frontend
+  (customize-set-variable 'rtags-display-result-backend 'helm)
+  (customize-set-variable 'rtags-completing-read-behavior 'helm))
 
 (when (require 'irony nil t)
   (progn
@@ -1897,22 +1998,6 @@ See the `eww-search-prefix' variable for the search engine used."
 
 (require 'company-c-headers nil t)
 
-(defun eos/cc/load-rtags ()
-  "Load rtags manually."
-  (eos/load-file (concat user-emacs-directory "rtags/src/rtags.el"))
-
-  ;; load helm-rtags
-  (eos/load-file (concat user-emacs-directory "rtags/src/helm-rtags.el"))
-
-  ;; set rtags binary path
-  (customize-set-variable
-   'rtags-path
-   (concat user-emacs-directory "rtags/build/bin/"))
-
-  ;; set helm as the frontend
-  (customize-set-variable 'rtags-display-result-backend 'helm)
-  (customize-set-variable 'rtags-completing-read-behavior 'helm))
-
 ;; eos rtags prefix map
 (define-key eos-rtags-map (kbd "C-g") 'keyboard-quit)
 (define-key eos-rtags-map (kbd "l") 'rtags-taglist)
@@ -1934,81 +2019,49 @@ See the `eww-search-prefix' variable for the search engine used."
 (define-key eos-rtags-map (kbd ".")
   'rtags-find-functions-called-by-this-function)
 
-;; ser rtags prefix map in c-mode map (C-c r)
-(define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
+(when (require 'lisp-mode nil t)
+  (progn
+    ;; customize:
+    ;; number of columns to indent the second line of a (def...) form
+    (customize-set-variable 'lisp-body-indent 2)))
 
-;; complete or indent
-(define-key c-mode-map (kbd "TAB") 'eos/complete-or-indent)
+(when (require 'elisp-mode nil t)
+  (progn
+    ;; hooks:
+    (add-hook 'emacs-lisp-mode-hook
+              (lambda ()
+                ;; set company backends
+                (eos/company/set-backends
+                 '((company-elisp
+                    company-capf
+                    company-yasnippet
+                    company-keywords
+                    company-dabbrev
+                    company-dabbrev-code)
+                   (company-files)))
 
-;; c/c++ garage
-(defun eos/cc/set-company-backends ()
-  "Set C/C++ company backends."
-  (eos/company/set-backends
-   '((company-c-headers)
-     (company-irony
-      company-yasnippet
-      company-capf
-      company-keywords
-      company-dabbrev
-      company-dabbrev-code)
-     (company-files))))
+                ;; set flycheck checker
+                (eos/flycheck/set-checker 'emacs-lisp)
 
-(add-hook 'c-mode-hook
-          (lambda ()
-            ;; set cc common company backends
-            (eos/cc/set-company-backends)
+                ;; activate dash docset (emacs)
+                (eos/dash/activate-docset "Emacs Lisp")))))
 
-            ;; set dash docset
-            (eos/dash/activate-docset '"C")
+;; binds
+(when (boundp 'emacs-lisp-mode-map)
+  (progn
+    (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
+    (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
+    (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
+    (define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)
 
-            ;; load rtags
-            (eos/cc/load-rtags)))
-
-(add-hook 'c++-mode-hook
-          (lambda ()
-            ;; set cc common backends (company and flycheck)
-            (eos/cc/set-company-backends)
-
-            ;; set dash docset
-            (eos/dash/activate-docset '"C++")
-
-            ;; load rtags
-            (eos/cc/load-rtags)))
-
-(require 'lisp-mode nil t)
-
-(customize-set-variable 'lisp-body-indent 2)
+    ;; ubind, qualaty of life
+    (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
+    (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
+    (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
+    (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
+    (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)))
 
 (require 'company-elisp nil t)
-
-(require 'elisp-mode nil t)
-
-;; bind
-(define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
-(define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
-(define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
-(define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)
-
-;; unbind
-(define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
-(define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
-(define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
-(define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
-(define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)
-
-;; add-hook
-(add-hook 'emacs-lisp-mode-hook
-          (lambda ()
-            ;; set company backends
-            (eos/company/set-backends
-             '((company-elisp
-                company-capf
-                company-yasnippet
-                company-keywords
-                company-dabbrev
-                company-dabbrev-code)
-               (company-files)))
-            ))
 
 (require 'sh-script nil t)
 
@@ -2074,6 +2127,30 @@ See the `eww-search-prefix' variable for the search engine used."
 
 (require 'verilog nil t)
 
+(add-to-list 'load-path
+             (concat user-emacs-directory "elpa/mql-mode"))
+
+(when (require 'mql-mode nil t)
+  (progn
+    ;; hooks
+    (add-hook 'mql-mode-hook
+              (lambda ()
+                ;; set company backends
+                (eos/company/set-backends
+                 '((company-gtags
+                    company-yasnippet
+                    company-keywords
+                    company-capf
+                    company-dabbrev-code
+                    company-dabbrev)
+                   (company-files)))
+
+                ;; select flycheck checker (use gcc)
+                (eos/flycheck/set-checker 'c/c++-gcc)
+
+                ;; activate mql5 docset
+                (eos/dash/activate-docset '"mql5")))))
+
 (when (require 'highlight-doxygen nil t)
   (progn
     ;; add doxygen
@@ -2099,8 +2176,6 @@ See the `eww-search-prefix' variable for the search engine used."
 
 ;; unbind
 ;; (define-key ctl-x-map (kbd "C-SPC") nil)
-;; (define-key ctl-x-map (kbd "C-<left>") nil)
-;; (define-key ctl-x-map (kbd "C-<right>") nil)
 ;; (define-key ctl-x-map (kbd "C-=") nil)
 ;; (define-key ctl-x-map (kbd "C-0") nil)
 ;; (define-key ctl-x-map (kbd "C-z") nil)
@@ -2108,6 +2183,12 @@ See the `eww-search-prefix' variable for the search engine used."
 ;; (define-key ctl-x-map (kbd "C-d") nil)
 ;; (define-key ctl-x-map (kbd "ESC") nil)
 (define-key ctl-x-map (kbd "]") nil)
+(define-key ctl-x-map (kbd "C-<left>") nil)
+(define-key ctl-x-map (kbd "C-<right>") nil)
+(define-key ctl-x-map (kbd "C-<up>") nil)
+(define-key ctl-x-map (kbd "C-<down>") nil)
+(define-key ctl-x-map (kbd "<right>") nil)
+(define-key ctl-x-map (kbd "<left>") nil)
 (define-key ctl-x-map (kbd "[") nil)
 (define-key ctl-x-map (kbd "C-+") nil)
 (define-key ctl-x-map (kbd "C-a") nil)
@@ -2147,18 +2228,15 @@ See the `eww-search-prefix' variable for the search engine used."
 (setq minor-mode-map-alist nil)
 
 ;; unset
-;; (global-unset-key (kbd "C-z"))
+(global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-@"))
 (global-unset-key (kbd "C-\\"))
 (global-unset-key (kbd "M-l"))
 (global-unset-key (kbd "M-h"))
 (global-unset-key (kbd "M-\\"))
-;; (global-unset-key (kbd "M-z"))
-;; (global-unset-key (kbd "M-SPC"))
 (global-unset-key (kbd "M-$"))
 (global-unset-key (kbd "M-("))
 (global-unset-key (kbd "M-)"))
-;; (global-unset-key (kbd "M-m"))
 (global-unset-key (kbd "M-r"))
 (global-unset-key (kbd "M-{"))
 (global-unset-key (kbd "M-}"))
@@ -2168,6 +2246,9 @@ See the `eww-search-prefix' variable for the search engine used."
 (global-unset-key (kbd "M-@"))
 (global-unset-key (kbd "M-~"))
 
+;; (global-unset-key (kbd "M-z"))
+;; (global-unset-key (kbd "M-SPC"))
+;; (global-unset-key (kbd "M-m"))
 ;; (global-unset-key (kbd "M-k"))
 ;; (global-unset-key (kbd "M-t"))
 ;; (global-unset-key (kbd "M-q"))

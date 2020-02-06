@@ -528,7 +528,7 @@
         (customize-set-variable 'help-window-select t)))
 
     ;; binds
-    (when (boundp help-map)
+    (when (boundp 'help-map)
       (progn
         ;; clean, quality of life
         (define-key help-map (kbd "<help>") nil)
@@ -1142,8 +1142,7 @@
          ;; exwm buffers list
          (setq eos/helm-source-exwm-buffers
                (if (fboundp 'helm-exwm-build-source)
-                   (helm-exwm-build-source)
-                 nil))))
+                   (helm-exwm-build-source)))))
 
      #+END_SRC
 
@@ -1280,9 +1279,25 @@
 *** Session
 **** Desktop
 *** Security
+**** Utils
+
+     #+BEGIN_SRC emacs-lisp
+
+     (defun eos/lookup-password (host user port)
+       "Lookup password on auth-source default file."
+       (let ((auth (auth-source-search :host host :user user :port port)))
+         (if auth
+             (let ((secretf (plist-get (car auth) :secret)))
+               (if secretf
+                   (funcall secretf)
+                 (error "Auth entry for %s@%s:%s has no secret!"
+                        user host port)))
+           (error "No auth entry found for %s@%s:%s" user host port))))
+
+     #+END_SRC
+
 **** Encryption
 ***** Epa
-
 
       EasyPG is an all-in-one GnuPG interface for Emacs.
       It has two aspects: convenient tools which allow to use GnuPG
@@ -1344,23 +1359,6 @@
 
       #+END_SRC
 
-**** Utils
-
-     #+BEGIN_SRC emacs-lisp
-
-     (defun eos/lookup-password (host user port)
-       "Lookup password on auth-source default file."
-       (let ((auth (auth-source-search :host host :user user :port port)))
-         (if auth
-             (let ((secretf (plist-get (car auth) :secret)))
-               (if secretf
-                   (funcall secretf)
-                 (error "Auth entry for %s@%s:%s has no secret!"
-                        user host port)))
-           (error "No auth entry found for %s@%s:%s" user host port))))
-
-     #+END_SRC
-
 *** Notification
 **** Notifications
 
@@ -1396,8 +1394,10 @@
 
      (when (require 'helm-info nil t)
        (progn
-         ;; bind
-         (define-key help-map (kbd "C-i") 'helm-info)))
+         ;; binds
+         (if (boundp 'helm-map)
+             (progn
+               (define-key help-map (kbd "C-i") 'helm-info)))))
 
      #+END_SRC
 
@@ -1408,10 +1408,12 @@
      (when (require 'helm-descbinds nil t)
        (progn
          ;; helm-descbinds, window splitting style (2: vertical)
-         (customize-set-variable 'helm-descbinds-window-style 2)))
+         (customize-set-variable 'helm-descbinds-window-style 2)
 
-     ;; bind
-     (define-key help-map (kbd "b") 'helm-descbinds)
+         ;; binds
+         (if (boundp 'helm-map)
+             (progn
+               (define-key help-map (kbd "b") 'helm-descbinds)))))
 
      #+END_SRC
 
@@ -3193,6 +3195,7 @@
      (when (require 'lisp-mode nil t)
        (progn
          ;; customize:
+
          ;; number of columns to indent the second line of a (def...) form
          (customize-set-variable 'lisp-body-indent 2)))
 
@@ -3254,7 +3257,24 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'sh-script nil t)
+     (when (require 'sh-script nil t)
+       (progn
+         ;; hooks:
+         (add-hook 'sh-mode-hook
+                   (lambda ()
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-shell
+                         company-shell-env
+                         company-yasnippet
+                         company-keywords
+                         company-capf
+                         company-dabbrev-code
+                         company-dabbrev)
+                        (company-files)))
+
+                     ;; set flycheck backends
+                     (eos/flycheck/set-checker 'sh-shellcheck)))))
 
      #+END_SRC
 
@@ -3266,53 +3286,27 @@
 
      #+END_SRC
 
-**** Add-hook
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; add backends selection on sh-mode-hook space.
-     ;; this function will be called after sh-mode initialize
-     (add-hook 'sh-mode-hook
-               (lambda ()
-                 ;; set company backends
-                 (eos/company/set-backends
-                  '((company-shell
-                     company-shell-env
-                     company-yasnippet
-                     company-keywords
-                     company-capf
-                     company-dabbrev-code
-                     company-dabbrev)
-                    (company-files)))))
-
-     #+END_SRC
-
 *** Fish
 **** Fish-mode
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'fish-mode nil t)
-
-     #+END_SRC
-
-**** Add-hook
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; set the proper company backends
-     (add-hook 'fish-mode-hook
-               (lambda ()
-                 (eos/company/set-backends
-                  '((company-fish-shell
-                     company-shell
-                     company-shell-env
-                     company-yasnippet
-                     company-keywords
-                     company-capf
-                     company-dabbrev
-                     company-dabbrev-code)
-                    (company-files)))))
+     (when (require 'fish-mode nil t)
+       (progn
+         ;; hooks
+         (add-hook 'fish-mode-hook
+                   (lambda ()
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-fish-shell
+                         company-shell
+                         company-shell-env
+                         company-yasnippet
+                         company-keywords
+                         company-capf
+                         company-dabbrev
+                         company-dabbrev-code)
+                        (company-files)))))))
 
      #+END_SRC
 
@@ -3343,28 +3337,26 @@
        (progn
          ;; add (*.go . go-mode) to auto-mode-alist
          ;; init go-mode when a file with the extersion .go is opened
-         (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))))
+         (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
-     #+END_SRC
+         ;; hooks:
+         (add-hook 'go-mode-hook
+                   (lambda ()
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-yasnippet
+                         company-keywords
+                         company-capf
+                         company-dabbrev
+                         company-dabbrev-code)
+                        (company-files)))
 
-**** Add-hook
+                     ;; set flycheck checker (go lint)
+                     (eos/flycheck/set-checker 'go-golint)
 
-     #+BEGIN_SRC emacs-lisp
 
-     ;; select the proper backends and docset
-     (add-hook 'go-mode-hook
-               (lambda ()
-                 ;; set company backends
-                 (eos/company/set-backends
-                  '((company-yasnippet
-                     company-keywords
-                     company-capf
-                     company-dabbrev
-                     company-dabbrev-code)
-                    (company-files)))
-
-                 ;; set dash docsets
-                 (eos/dash/activate-docset '"Go")))
+                     ;; set dash docsets
+                     (eos/dash/activate-docset '"Go")))))
 
      #+END_SRC
 
@@ -3440,6 +3432,7 @@
 
      (when (require 'web-mode nil t)
        (progn
+         ;; add files extensions to web-mode
          (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
          (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
          (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))

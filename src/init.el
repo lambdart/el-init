@@ -310,7 +310,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'help-window-select t)))
 
 ;; binds
-(when (boundp help-map)
+(when (boundp 'help-map)
   (progn
     ;; clean, quality of life
     (define-key help-map (kbd "<help>") nil)
@@ -723,8 +723,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; exwm buffers list
     (setq eos/helm-source-exwm-buffers
           (if (fboundp 'helm-exwm-build-source)
-              (helm-exwm-build-source)
-            nil))))
+              (helm-exwm-build-source)))))
 
 (when (require 'helm nil t)
   (progn
@@ -837,6 +836,17 @@ point is on a symbol, return that symbol name.  Else return nil."
             helm-source-buffers-list
             helm-source-buffer-not-found))))
 
+(defun eos/lookup-password (host user port)
+  "Lookup password on auth-source default file."
+  (let ((auth (auth-source-search :host host :user user :port port)))
+    (if auth
+        (let ((secretf (plist-get (car auth) :secret)))
+          (if secretf
+              (funcall secretf)
+            (error "Auth entry for %s@%s:%s has no secret!"
+                   user host port)))
+      (error "No auth entry found for %s@%s:%s" user host port))))
+
 (when (require 'epa nil t)
   (progn
     ;; customize
@@ -870,17 +880,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'password-store nil t)
 
-(defun eos/lookup-password (host user port)
-  "Lookup password on auth-source default file."
-  (let ((auth (auth-source-search :host host :user user :port port)))
-    (if auth
-        (let ((secretf (plist-get (car auth) :secret)))
-          (if secretf
-              (funcall secretf)
-            (error "Auth entry for %s@%s:%s has no secret!"
-                   user host port)))
-      (error "No auth entry found for %s@%s:%s" user host port))))
-
 (require 'notifications nil t)
 
 (require 'help-mode nil t)
@@ -892,16 +891,20 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'helm-info nil t)
   (progn
-    ;; bind
-    (define-key help-map (kbd "C-i") 'helm-info)))
+    ;; binds
+    (if (boundp 'helm-map)
+        (progn
+          (define-key help-map (kbd "C-i") 'helm-info)))))
 
 (when (require 'helm-descbinds nil t)
   (progn
     ;; helm-descbinds, window splitting style (2: vertical)
-    (customize-set-variable 'helm-descbinds-window-style 2)))
+    (customize-set-variable 'helm-descbinds-window-style 2)
 
-;; bind
-(define-key help-map (kbd "b") 'helm-descbinds)
+    ;; binds
+    (if (boundp 'helm-map)
+        (progn
+          (define-key help-map (kbd "b") 'helm-descbinds)))))
 
 (when (require 'iedit nil t)
   (progn
@@ -2022,6 +2025,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'lisp-mode nil t)
   (progn
     ;; customize:
+
     ;; number of columns to indent the second line of a (def...) form
     (customize-set-variable 'lisp-body-indent 2)))
 
@@ -2063,40 +2067,43 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'company-elisp nil t)
 
-(require 'sh-script nil t)
+(when (require 'sh-script nil t)
+  (progn
+    ;; hooks:
+    (add-hook 'sh-mode-hook
+              (lambda ()
+                ;; set company backends
+                (eos/company/set-backends
+                 '((company-shell
+                    company-shell-env
+                    company-yasnippet
+                    company-keywords
+                    company-capf
+                    company-dabbrev-code
+                    company-dabbrev)
+                   (company-files)))
+
+                ;; set flycheck backends
+                (eos/flycheck/set-checker 'sh-shellcheck)))))
 
 (require 'company-shell nil t)
 
-;; add backends selection on sh-mode-hook space.
-;; this function will be called after sh-mode initialize
-(add-hook 'sh-mode-hook
-          (lambda ()
-            ;; set company backends
-            (eos/company/set-backends
-             '((company-shell
-                company-shell-env
-                company-yasnippet
-                company-keywords
-                company-capf
-                company-dabbrev-code
-                company-dabbrev)
-               (company-files)))))
-
-(require 'fish-mode nil t)
-
-;; set the proper company backends
-(add-hook 'fish-mode-hook
-          (lambda ()
-            (eos/company/set-backends
-             '((company-fish-shell
-                company-shell
-                company-shell-env
-                company-yasnippet
-                company-keywords
-                company-capf
-                company-dabbrev
-                company-dabbrev-code)
-               (company-files)))))
+(when (require 'fish-mode nil t)
+  (progn
+    ;; hooks
+    (add-hook 'fish-mode-hook
+              (lambda ()
+                ;; set company backends
+                (eos/company/set-backends
+                 '((company-fish-shell
+                    company-shell
+                    company-shell-env
+                    company-yasnippet
+                    company-keywords
+                    company-capf
+                    company-dabbrev
+                    company-dabbrev-code)
+                   (company-files)))))))
 
 (require 'cperl-mode nil t)
 
@@ -2106,22 +2113,26 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     ;; add (*.go . go-mode) to auto-mode-alist
     ;; init go-mode when a file with the extersion .go is opened
-    (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))))
+    (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
-;; select the proper backends and docset
-(add-hook 'go-mode-hook
-          (lambda ()
-            ;; set company backends
-            (eos/company/set-backends
-             '((company-yasnippet
-                company-keywords
-                company-capf
-                company-dabbrev
-                company-dabbrev-code)
-               (company-files)))
+    ;; hooks:
+    (add-hook 'go-mode-hook
+              (lambda ()
+                ;; set company backends
+                (eos/company/set-backends
+                 '((company-yasnippet
+                    company-keywords
+                    company-capf
+                    company-dabbrev
+                    company-dabbrev-code)
+                   (company-files)))
 
-            ;; set dash docsets
-            (eos/dash/activate-docset '"Go")))
+                ;; set flycheck checker (go lint)
+                (eos/flycheck/set-checker 'go-golint)
+
+
+                ;; set dash docsets
+                (eos/dash/activate-docset '"Go")))))
 
 (require 'ess-r-mode nil t)
 
@@ -2158,6 +2169,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'web-mode nil t)
   (progn
+    ;; add files extensions to web-mode
     (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))

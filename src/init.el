@@ -1622,12 +1622,18 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; init dashboard after emacs initialize
     (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
 
-(require 'man nil t)
+(when (require 'man nil t)
+  (progn
+    ;; hooks
+    (add-hook 'Man-mode-hook
+              (lambda ()
+                ;; don't truncate lines
+                (setq truncate-lines nil)))))
 
-(add-hook 'Man-mode-hook
-          (lambda ()
-            ;; don't truncate lines
-            (setq truncate-lines nil)))
+;; binds
+(when (boundp 'Man-mode-map)
+  (progn
+    (define-key Man-mode-map (kbd "C-j") 'push-button)))
 
 (when (require 'helm-man nil t)
   (progn

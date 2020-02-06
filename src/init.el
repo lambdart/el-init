@@ -1637,6 +1637,8 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; init dashboard after emacs initialize
     (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
 
+(require 'eldoc nil t)
+
 (when (require 'man nil t)
   (progn
     ;; hooks
@@ -1748,7 +1750,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; bind
 (when (boundp 'company-active-map)
   (progn
-    (define-key company-active-map (kbd "C-j") 'nil)
+    (define-key company-active-map (kbd "C-j") 'company-complete-selection)
     (define-key company-active-map (kbd "C-n") 'company-select-next)
     (define-key company-active-map (kbd "C-p") 'company-select-previous)))
 
@@ -2061,6 +2063,16 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'elisp-mode nil t)
   (progn
     ;; hooks:
+    ;; enable minor modes
+    (add-hook 'emacs-lisp-mode-hook
+              (lambda()
+                (eos/funcall 'eldoc-mode 1)))
+
+    (add-hook 'lisp-interaction-mode-hook
+              (lambda()
+                (eos/funcall 'eldoc-mode 1)))
+
+    ;; set backends
     (add-hook 'emacs-lisp-mode-hook
               (lambda ()
                 ;; set company backends
@@ -2136,7 +2148,39 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'cperl-mode nil t)
 
-(require 'python nil t)
+(when (require 'python nil t)
+  (progn
+    ;; customize:
+    ;; default Python interpreter for shell
+    (customize-set-variable 'python-shell-interpreter "python2.7")
+
+    ;; non-nil means template skeletons will be automagically inserted
+    (customize-set-variable 'python-skeleton-autoinsert t)
+
+    ;; hooks:
+    ;; enable modes
+    (add-hook 'python-mode-hook
+              (lambda()
+                ;; enable eldoc mode
+                (eos/funcall 'eldoc-mode 1)))
+
+    ;; set backends
+    (add-hook 'python-mode-hook
+              (lambda ()
+                ;; set company backends
+                (eos/company/set-backends
+                 '((company-yasnippet
+                    company-keywords
+                    company-capf
+                    company-dabbrev
+                    company-dabbrev-code)
+                   (company-files)))
+
+                ;; set flycheck checker
+                (eos/flycheck/set-checker 'python-pycompile)
+
+                ;; set dash docsets
+                (eos/dash/activate-docset '"Python 3")))))
 
 (when (require 'go-mode nil t)
   (progn
@@ -2158,7 +2202,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 
                 ;; set flycheck checker (go lint)
                 (eos/flycheck/set-checker 'go-golint)
-
 
                 ;; set dash docsets
                 (eos/dash/activate-docset '"Go")))))

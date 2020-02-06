@@ -2585,6 +2585,22 @@
      #+END_SRC
 
 *** Documentation
+**** Eldoc
+
+     As you type a function's symbol name as part of a sexp,
+     it will print the argument list for that function.
+     Behavior is not identical; for example, you need not actually
+     type the function name, you need only move point around in a sexp that
+     calls it.  Also, if point is over a documented variable, it will print
+     the one-line documentation for that variable instead, to remind you of
+     that variable's meaning.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'eldoc nil t)
+
+     #+END_SRC
+
 **** Man
 
      #+BEGIN_SRC emacs-lisp
@@ -2753,7 +2769,7 @@
      ;; bind
      (when (boundp 'company-active-map)
        (progn
-         (define-key company-active-map (kbd "C-j") 'nil)
+         (define-key company-active-map (kbd "C-j") 'company-complete-selection)
          (define-key company-active-map (kbd "C-n") 'company-select-next)
          (define-key company-active-map (kbd "C-p") 'company-select-previous)))
 
@@ -3250,6 +3266,16 @@
      (when (require 'elisp-mode nil t)
        (progn
          ;; hooks:
+         ;; enable minor modes
+         (add-hook 'emacs-lisp-mode-hook
+                   (lambda()
+                     (eos/funcall 'eldoc-mode 1)))
+
+         (add-hook 'lisp-interaction-mode-hook
+                   (lambda()
+                     (eos/funcall 'eldoc-mode 1)))
+
+         ;; set backends
          (add-hook 'emacs-lisp-mode-hook
                    (lambda ()
                      ;; set company backends
@@ -3363,9 +3389,46 @@
 
 *** Python
 
+    Syntax highlighting, Indentation, Movement, Shell
+    interaction, Shell completion, Shell virtualenv support, Shell
+    package support, Shell syntax highlighting, Pdb tracking, Symbol
+    completion, Skeletons, FFAP, Code Check, Eldoc, Imenu.
+
     #+BEGIN_SRC emacs-lisp
 
-    (require 'python nil t)
+    (when (require 'python nil t)
+      (progn
+        ;; customize:
+        ;; default Python interpreter for shell
+        (customize-set-variable 'python-shell-interpreter "python2.7")
+
+        ;; non-nil means template skeletons will be automagically inserted
+        (customize-set-variable 'python-skeleton-autoinsert t)
+
+        ;; hooks:
+        ;; enable modes
+        (add-hook 'python-mode-hook
+                  (lambda()
+                    ;; enable eldoc mode
+                    (eos/funcall 'eldoc-mode 1)))
+
+        ;; set backends
+        (add-hook 'python-mode-hook
+                  (lambda ()
+                    ;; set company backends
+                    (eos/company/set-backends
+                     '((company-yasnippet
+                        company-keywords
+                        company-capf
+                        company-dabbrev
+                        company-dabbrev-code)
+                       (company-files)))
+
+                    ;; set flycheck checker
+                    (eos/flycheck/set-checker 'python-pycompile)
+
+                    ;; set dash docsets
+                    (eos/dash/activate-docset '"Python 3")))))
 
     #+END_SRC
 
@@ -3394,7 +3457,6 @@
 
                      ;; set flycheck checker (go lint)
                      (eos/flycheck/set-checker 'go-golint)
-
 
                      ;; set dash docsets
                      (eos/dash/activate-docset '"Go")))))

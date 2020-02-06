@@ -1687,6 +1687,7 @@
 
 **** Jabber
 **** Slack
+*** View
 *** Misc
 **** Which-key
 
@@ -2412,6 +2413,29 @@
 *** Calendar
 *** Multimedia
 **** Emms
+
+     Emms is the Emacs Multi-Media System. It tries to be a clean and small
+     application to play multimedia files from Emacs using external players.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'emms-setup nil t)
+       (progn
+         ;; enable emms
+         (eos/funcall 'emms-all)))
+
+     (when (require 'emms nil t)
+       (progn
+         ;; customize
+         ;; list of players that emms can use (only mpv)
+         (customize-set-variable 'emms-player-list '(emms-player-mpv))
+
+         ;; the default directory to look for media files.
+         (customize-set-variable
+          'emms-source-file-default-directory (expand-file-name "~/media"))))
+
+     #+END_SRC
+
 *** Office
 **** Org
 

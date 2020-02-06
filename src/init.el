@@ -1516,6 +1516,21 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key ctl-x-map (kbd "C--") 'eos/lower-volume)
 (define-key ctl-x-map (kbd "C-=") 'eos/raise-volume)
 
+(when (require 'emms-setup nil t)
+  (progn
+    ;; enable emms
+    (eos/funcall 'emms-all)))
+
+(when (require 'emms nil t)
+  (progn
+    ;; customize
+    ;; list of players that emms can use (only mpv)
+    (customize-set-variable 'emms-player-list '(emms-player-mpv))
+
+    ;; the default directory to look for media files.
+    (customize-set-variable
+     'emms-source-file-default-directory (expand-file-name "~/media"))))
+
 (add-hook 'org-mode-hook
           (lambda ()
             ;; do not truncate lines

@@ -245,8 +245,8 @@ Just a `compile` function wrapper."
 
 (defun eos/edit/duplicate-current-line-or-region (arg)
   "Duplicates the current line or region ARG times.
-If there's no region, the current line will be duplicated.
-However, if there's a region, all lines that region covers will be duplicated."
+  If there's no region, the current line will be duplicated.
+  However, if there's a region, all lines that region covers will be duplicated."
   (interactive "p")
   (let (beg end (origin (point)))
     (if (and mark-active (> (point) (mark)))
@@ -305,11 +305,126 @@ point is on a symbol, return that symbol name.  Else return nil."
   (cond ((find-font (font-spec :name font))
          (set-frame-font font nil t))))
 
+;; non-nil means to make the cursor very visible
+(customize-set-variable 'visible-cursor nil)
+
+;; scroll options
+;; number of lines of margin at the top and bottom of a window
+(customize-set-variable 'scroll-margin 0)
+
+;; scroll up to this many lines, to bring point back on screen
+(customize-set-variable 'scroll-conservatively 100)
+
+;; t means point keeps its screen position
+(customize-set-variable 'scroll-preserve-screen-position t)
+
+;; non-nil means mouse commands use dialog boxes to ask questions
+(customize-set-variable 'use-dialog-box nil)
+
+;; set window margins
+;; width in columns of left marginal area for display of a buffer
+(customize-set-variable 'left-margin-width 1)
+
+;; width in columns of right marginal area for display of a buffer.
+(customize-set-variable 'right-margin-width 1)
+
+;; binds (global)
+(global-set-key (kbd "s-l") 'shrink-window-horizontally)
+(global-set-key (kbd "s-h") 'enlarge-window-horizontally)
+(global-set-key (kbd "s-j") 'shrink-window)
+(global-set-key (kbd "s-k") 'enlarge-window)
+
+;; next and previous buffer (on current window)
+(define-key ctl-x-map (kbd "C-,") 'previous-buffer)
+(define-key ctl-x-map (kbd "C-.") 'next-buffer)
+
+;; binds (eos-window prefix map)
+(define-key eos-window-map (kbd "1") 'maximize-window)
+(define-key eos-window-map (kbd "q") 'minimize-window)
+(define-key eos-window-map (kbd "w") 'balance-windows)
+
+;; bind ctl-x-map (C-x w)
+(define-key ctl-x-map (kbd "w") 'eos-window-map)
+
+;; kill buffer and window
+(define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
+
+;; customize:
+;; non-nil inhibits the startup screen.
+(customize-set-variable 'inhibit-startup-screen t)
+
+;; non-nil inhibits the startup screen.
+(customize-set-variable 'inhibit-startup-message nil)
+
+;; non-nil inhibits the initial startup echo area message
+(customize-set-variable 'inhibit-startup-echo-area-message nil)
+
+;; (customize-set-variable 'inhibit-buffer-choice nil)
+
+;; non-nil means do not display continuation lines.
+(customize-set-variable 'truncate-lines nil)
+
+;; sentences should be separated by a single space,
+;; so treat two sentences as two when filling
+(customize-set-variable 'sentence-end-double-space nil)
+
+;; default indent
+;; distance between tab stops (for display of tab characters), in columns.
+(customize-set-variable 'tab-width 4)
+
+;; indentation can insert tabs if this is non-nil.
+(customize-set-variable 'indent-tabs-mode nil)
+
+;; kill process not confirmation required
+;; list of functions called with no args to query before killing a buffer.
+;; The buffer being killed will be current while the functions are running.
+(customize-set-variable
+ 'kill-buffer-query-functions
+ (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
+
+;; non-nil means load prefers the newest version of a file.
+(customize-set-variable 'load-prefer-newer t)
+
+(customize-set-variable 'enable-recursive-minibuffers nil)
+
+;; coding system to use with system messages
+(customize-set-variable 'locale-coding-system 'utf-8)
+
+;; coding system to be used for encoding the buffer contents on saving
+(customize-set-variable 'buffer-file-coding-system 'utf-8)
+
+;; add coding-system at the front of the priority list for automatic detection
+(prefer-coding-system 'utf-8)
+
+;; set coding system (UFT8)
+(set-language-environment "UTF-8")
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+
+(when (require 'simple nil t)
+  (progn
+    ;; custom
+    ;; don't omit information when lists nest too deep.
+    (customize-set-variable 'eval-expression-print-level nil)
+
+    ;; binds
+    (define-key ctl-x-map (kbd "C-g") 'keyboard-quit)
+
+    ;; enable
+    ;; column number display in the mode line
+    (eos/funcall 'column-number-mode 1)
+
+    ;; buffer size display in the mode line
+    (eos/funcall 'size-indication-mode 1)))
+
 (when (require 'server nil t)
   (progn
     ;; hooks
+    ;; starts server after startup
     (add-hook 'emacs-startup-hook
               (lambda ()
+                ;; server start
                 (eos/funcall 'server-start)))))
 
 (when (require 'help nil t)
@@ -329,12 +444,6 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key help-map (kbd "C-;") nil)
     (define-key help-map (kbd "K") nil)
     (define-key help-map (kbd "RET") nil)))
-
-;; set frame font
-(eos/set-frame-font "Hermit Light:pixelsize=18")
-
-;; set font by face attribute (reference)
-;; (set-face-attribute 'default nil :height)
 
 (when (require 'fringe nil t)
   (progn
@@ -369,6 +478,10 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; non-nil says by default do auto-saving of every file-visiting buffer
     (customize-set-variable 'auto-save-default nil)
 
+    ;; Most *NIX tools work best when files are terminated
+    ;; with a newline
+    (customize-set-variable 'require-final-newline t)
+
     ;; set backup directory list
     ;; alist of filename patterns and backup directory names.
     (customize-set-variable
@@ -376,137 +489,109 @@ point is on a symbol, return that symbol name.  Else return nil."
      '(("" . (concat user-emacs-directory "backup"))))))
 
 ;; create cache directory
-(mkdir (concat user-emacs-directory "cache") t)
+(eos/mkdir (concat user-emacs-directory "cache"))
 
-;; custom:
-;; file to save the recent list into.
-(customize-set-variable
- 'recentf-save-file (concat user-emacs-directory "cache/recentf"))
+(when (require 'recentf nil t)
+  (progn
+    ;; custom:
+    ;; file to save the recent list into.
+    (customize-set-variable
+     'recentf-save-file (concat user-emacs-directory "cache/recentf"))))
 
-;; custom:
-;; file in which to save bookmarks by default.
-(customize-set-variable
- 'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))
+(when (require 'bookmark nil t)
+  (progn
+    ;; custom:
+    ;; file in which to save bookmarks by default.
+    (customize-set-variable
+     'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))))
 
-;; with some window managers you may have to set this to non-nil
-;; in order to set the size of a frame in pixels, to maximize
-;; frames or to make them fullscreen.
-(customize-set-variable 'frame-resize-pixelwise t)
+(when (require 'frame nil t)
+  (progn
+    ;; custom
+    ;; with some window managers you may have to set this to non-nil
+    ;; in order to set the size of a frame in pixels, to maximize
+    ;; frames or to make them fullscreen.
+    (customize-set-variable 'frame-resize-pixelwise t)
 
-;; normalize before maximize
-(customize-set-variable 'x-frame-normalize-before-maximize t)
+    ;; normalize before maximize
+    (customize-set-variable 'x-frame-normalize-before-maximize t)
 
-;; set frame title format
-(customize-set-variable 'frame-title-format
-                        '((:eval (if (buffer-file-name)
-                                     (abbreviate-file-name (buffer-file-name))
-                                   "%b"))))
+    ;; set frame title format
+    (customize-set-variable 'frame-title-format
+                            '((:eval (if (buffer-file-name)
+                                         (abbreviate-file-name (buffer-file-name))
+                                       "%b"))))
 
-;; fullscreen
-(add-to-list 'initial-frame-alist '(fullscreen . fullheight))
+    ;; alist of parameters for the initial X window frame
+    (add-to-list 'initial-frame-alist '(fullscreen . fullheight))
 
-;; internal border
-(add-to-list 'default-frame-alist '(internal-border-width . 2))
+    ;; (vertical-scroll-bars)
+    ;; (bottom-divider-width . 0)
+    ;; (right-divider-width . 6)))
 
-;; bind
-;; (global-set-key (kbd "M-z") 'other-frame)
+    ;; alist of default values for frame creation
+    (add-to-list 'default-frame-alist '(internal-border-width . 2))
 
-;; scroll options
-(customize-set-variable 'scroll-margin 0)
-(customize-set-variable 'scroll-conservatively 100)
-(customize-set-variable 'scroll-preserve-screen-position 1)
+    ;; set frame font
+    (eos/set-frame-font "Hermit Light:pixelsize=18")
 
-;; never show dialogs box
-(customize-set-variable 'use-dialog-box nil)
+    ;; hooks
+    ;; enable window divider
+    (add-hook 'after-init-hook
+              (lambda()
+                (eos/funcall 'window-divider-mode)))
 
-;; window move default keybinds (shift-up/down etc..)
-(add-hook 'after-init-hook 'windmove-default-keybindings)
+    ;; disable blink cursor
+    (add-hook 'emacs-startup-hook
+              (lambda()
+                (eos/funcall 'blink-cursor-mode 0)))))
 
-;; set window margins
-(customize-set-variable 'left-margin-width 1)
-(customize-set-variable 'right-margin-width 1)
+;; binds
+;; (global-set-key (kbd "M-z") 'other-frame)))
 
-;; set window divider
-(add-hook 'after-init-hook 'window-divider-mode)
+(when (require 'windmove nil t)
+  (progn
+    ;; hooks
+    ;; window move default keybinds (shift-up/down etc..)
+    (add-hook 'after-init-hook 'windmove-default-keybindings)))
 
-;; global bind
-(global-set-key (kbd "s-l") 'shrink-window-horizontally)
-(global-set-key (kbd "s-h") 'enlarge-window-horizontally)
-(global-set-key (kbd "s-j") 'shrink-window)
-(global-set-key (kbd "s-k") 'enlarge-window)
-
-;; eos-window-map bind
+;; binds (eos window prefix map)
 ;; (define-key eos-window-map (kbd "j") 'windmove-up)
 ;; (define-key eos-window-map (kbd "k") 'windmove-down)
 ;; (define-key eos-window-map (kbd "h") 'windmove-left)
 ;; (define-key eos-window-map (kbd "l") 'windmove-right)
 
-(define-key eos-window-map (kbd "1") 'maximize-window)
-(define-key eos-window-map (kbd "q") 'minimize-window)
-(define-key eos-window-map (kbd "w") 'balance-windows)
+(when (require 'kmacro nil t)
+  (progn
+    ;; binds
+    (define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
 
-;; ctl-x-map bind (C-x w)
-(define-key ctl-x-map (kbd "w") 'eos-window-map)
+(when (require 'paren nil t)
+  (progn
+    ;; hooks
+    ;; enable paren mode
+    ;; visualization of matching parens
+    (eos/funcall 'show-paren-mode 1)))
 
-;; linum format
-(customize-set-variable 'linum-format " %2d ")
+(when (require 'elec-pair nil t)
+  (progn
+    ;; custom:
+    ;; alist of pairs that should be used regardless of major mode.
+    (customize-set-variable 'electric-pair-pairs
+                            '((?\{ . ?\})
+                              (?\( . ?\))
+                              (?\[ . ?\])
+                              (?\" . ?\"))))
+  ;; hook:
+  ;; enable eletric pair mode
+  (add-hook 'emacs-startup-hook
+            (lambda()
+              (eos/funcall electric-pair-mode 1))))
 
-;; truncate lines
-(customize-set-variable 'truncate-lines nil)
-
-;; Most *NIX tools work best when files are terminated
-;; with a newline
-(customize-set-variable 'require-final-newline t)
-
-;; sentences should be separated by a single space,
-;; so treat two sentences as two when filling
-(customize-set-variable 'sentence-end-double-space nil)
-
-;; default indent
-(customize-set-variable 'tab-width 4)
-(customize-set-variable 'indent-tabs-mode nil)
-
-;; kill process not confirmation required
-(customize-set-variable
- 'kill-buffer-query-functions
- (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
-
-;; delete selection-mode
-(eos/funcall 'delete-selection-mode 1)
-
-;; clean whitespace and newlines before buffer save
-(add-hook 'before-save-hook 'whitespace-cleanup)
-
-;; prefer newer
-(customize-set-variable 'load-prefer-newer t)
-
-;; binds
-(define-key ctl-x-map (kbd "C-,") 'previous-buffer)
-(define-key ctl-x-map (kbd "C-.") 'next-buffer)
-
-(customize-set-variable 'enable-recursive-minibuffers nil)
-
-;; bind kmacro-keymap to C-x m
-(define-key ctl-x-map (kbd "m") 'kmacro-keymap)
-
-(global-set-key (kbd "M-c") 'comment-or-uncomment-region)
-
-;; coding system to use with system messages
-(customize-set-variable 'locale-coding-system 'utf-8)
-
-;; coding system to be used for encoding the buffer contents on saving
-(customize-set-variable 'buffer-file-coding-system 'utf-8)
-
-;; add coding-system at the front of the priority list for automatic detection
-(prefer-coding-system 'utf-8)
-
-;; set coding system (UFT8)
-(set-language-environment "UTF-8")
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-(set-selection-coding-system 'utf-8)
-
-(customize-set-variable 'visible-cursor nil)
+(when (require 'newcomment nil t)
+  (progn
+    ;; binds
+    (global-set-key (kbd "M-c") 'comment-or-uncomment-region)))
 
 (when (require 'time nil t)
   (progn
@@ -523,11 +608,66 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; load-average values below this value won’t be shown in the mode line.
     (customize-set-variable 'display-time-load-average-threshold 1.0)
 
-    ;; enable:
-    ;; initialize display time mode
-    (display-time-mode 1)))
+    ;; enable display time
+    (eos/funcall display-time-mode 1)))
 
-(customize-set-variable 'eval-expression-print-level nil)
+(when (require 'tool-bar nil t)
+  (progn
+    ;; disable tool bar
+    (eos/funcall 'tool-bar-mode 0)))
+
+(when (require 'tooltip nil t)
+  (progn
+    ;; disable tooltip
+    (eos/funcall 'tooltip-mode 0)))
+
+(when (require 'menu-bar nil t)
+  (progn
+    ;; disable menu-bar
+    (eos/funcall 'menu-bar-mode 0)))
+
+(when (require 'scroll-bar nil t)
+  (progn
+    ;; disable scroll bar
+    (eos/funcall 'scroll-bar-mode 0)))
+
+(when (require 'hl-line nil t)
+  (progn
+    ;; enable highlight line
+    (eos/funcall 'global-hl-line-mode 1)))
+
+(when (require 'linum nil t)
+  (progn
+    ;; custom:
+    ;; format used to display line numbers.
+    (customize-set-variable 'linum-format " %2d ")))
+
+(when (require 'display-line-numbers nil t)
+  (progn
+    ;; enable display line numbers mode
+    (eos/funcall 'global-display-line-numbers-mode 1)))
+
+(when (require 'delsel nil t)
+  (progn
+    ;; delete selection-mode
+    (eos/funcall 'delete-selection-mode 1)))
+
+(when (require 'whitespace nil t)
+  (progn
+    ;; hooks
+    ;; clean whitespace and newlines before buffer save
+    (add-hook 'before-save-hook 'whitespace-cleanup)
+
+    ;; binds
+    (define-key ctl-x-map (kbd ".") 'whitespace-mode)))
+
+;; global-subword-mode
+
+(when (require 'face-remap nil t)
+  (progn
+    ;; binds
+    ;; text scale adjust
+    (define-key ctl-x-map (kbd "=") 'text-scale-adjust)))
 
 (when (require 'custom nil t)
   (progn
@@ -540,54 +680,20 @@ point is on a symbol, return that symbol name.  Else return nil."
      'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
 
     ;; hooks:
-    ;; load custom file (enable)
+    ;; load custom file after emacs initialize
     (add-hook 'after-emacs-init
               (lambda()
                 (eos/load-file custom-file)))))
 
-;; clean startup message/area
-(customize-set-variable 'inhibit-startup-screen t)
-(customize-set-variable 'inhibit-startup-message nil)
-(customize-set-variable 'inhibit-startup-echo-area-message nil)
-(customize-set-variable 'inhibit-buffer-choice nil)
+;; add eos-theme-dir to theme load path
+(add-to-list 'custom-theme-load-path
+             (concat user-emacs-directory "themes"))
 
-(customize-set-variable 'electric-pair-pairs
-                        '((?\{ . ?\})
-                          (?\( . ?\))
-                          (?\[ . ?\])
-                          (?\" . ?\")))
+;; load theme
+(load-theme 'mesk-term t)
 
-;; disabled modes list
-(dolist (mode
-         '(tool-bar-mode
-           tooltip-mode
-           menu-bar-mode
-           scroll-bar-mode
-           blink-cursor-mode))
-  (eos/funcall mode 0))
-
-;; enabled modes list
-(dolist (mode
-         '(show-paren-mode
-           column-number-mode
-           size-indication-mode
-           electric-pair-mode
-           global-subword-mode
-           global-display-line-numbers-mode
-           global-hl-line-mode))
-  (eos/funcall mode 1))
-
-;; exit/quit
-(define-key ctl-x-map (kbd "C-g") 'keyboard-quit)
-
-;; text scale adjust
-(define-key ctl-x-map (kbd "=") 'text-scale-adjust)
-
-;; whitespace-mode
-(define-key ctl-x-map (kbd ".") 'whitespace-mode)
-
-;; kill buffer and window
-(define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
+;; set font by face attribute (reference)
+;; (set-face-attribute 'default nil :height)
 
 ;; avoid warnings when byte-compile
 (eval-when-compile
@@ -1344,12 +1450,12 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; Re-write of the `eww-search-words' definition.
     (defun eos/eww-search-words ()
       "Search the web for the text between BEG and END.
-          If region is active (and not whitespace), search the web for
-          the text in that region.
-          Else if the region is not active, and the point is on a symbol,
-          search the web for that symbol.
-          Else prompt the user for a search string.
-          See the `eww-search-prefix' variable for the search engine used."
+      If region is active (and not whitespace), search the web for
+      the text in that region.
+      Else if the region is not active, and the point is on a symbol,
+      search the web for that symbol.
+      Else prompt the user for a search string.
+      See the `eww-search-prefix' variable for the search engine used."
       (interactive)
       (let ((search-string (eos/get-selected-text-or-symbol-at-point)))
         (when (and (stringp search-string)
@@ -1603,13 +1709,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (boundp 'markdown-mode-map)
   (progn
     (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
-
-;; add eos-theme-dir to theme load path
-(add-to-list 'custom-theme-load-path
-             (concat user-emacs-directory "themes"))
-
-;; load theme
-(load-theme 'mesk-term t)
 
 (when (require 'dashboard nil t)
   (progn
@@ -2289,6 +2388,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; (define-key ctl-x-map (kbd "C-z") nil)
 ;; (define-key ctl-x-map (kbd "C--") nil)
 ;; (define-key ctl-x-map (kbd "ESC") nil)
+;; (define-key ctl-x-map (kbd ".") nil)
 (define-key ctl-x-map (kbd "C-d") nil)
 (define-key ctl-x-map (kbd "]") nil)
 (define-key ctl-x-map (kbd "C-z") nil)
@@ -2317,7 +2417,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key ctl-x-map (kbd ">") nil)
 (define-key ctl-x-map (kbd "\@") nil)
 (define-key ctl-x-map (kbd "-") nil)
-(define-key ctl-x-map (kbd ".") nil)
 (define-key ctl-x-map (kbd ";") nil)
 (define-key ctl-x-map (kbd "#") nil)
 (define-key ctl-x-map (kbd "*") nil)
@@ -2455,6 +2554,3 @@ point is on a symbol, return that symbol name.  Else return nil."
 (global-unset-key (kbd "<S-down-mouse-1>"))
 
 (require 'eos-adapt (expand-file-name "eos-adapt.el" user-emacs-directory) t)
-
-(provide 'eos)
-;; eos.el ends here

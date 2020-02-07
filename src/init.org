@@ -106,21 +106,19 @@
 
     #+END_SRC
 
-** Vanilla
-*** Aliases
+*** Defines
+**** Aliases
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-    ;; y or n
-    (defalias 'yes-or-no-p 'y-or-n-p)
+     ;; y or n
+     (defalias 'yes-or-no-p 'y-or-n-p)
 
-    #+END_SRC
+     #+END_SRC
 
-*** Keymaps
-**** Define
+**** Keymaps
 
-     Basically we creates new maps (prefix) to put major/minor
-     modes related keybinds.
+     Basically we creates new maps prefix maps.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -154,8 +152,6 @@
 
      #+END_SRC
 
-**** Define Command
-
      Define maps as prefix commands.
 
      #+BEGIN_SRC emacs-lisp
@@ -171,7 +167,7 @@
 
      #+END_SRC
 
-*** Utils
+*** Functions
 **** Funcall
 
      Funcall wrapper, if function is bounded, call it.
@@ -187,22 +183,22 @@
 
 **** Build
 
-    Tangle emacs-lisp source code blocks and byte-compile it.
+     Tangle emacs-lisp source code blocks and byte-compile it.
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-    (defun eos/build ()
-      "If the current buffer is '~/emacs.d/init.org' the code-blocks are
-    tangled, and the tangled file is compiled."
-      (interactive)
-      (when (equal (buffer-name) "init.org")
-        (progn
-          ;; Avoid running hooks when tangling.
-          (let ((prog-mode-hook nil))
-            (org-babel-tangle)
-            (byte-compile-file (concat user-emacs-directory "init.el"))))))
+     (defun eos/build ()
+       "If the current buffer is '~/emacs.d/init.org' the code-blocks are
+     tangled, and the tangled file is compiled."
+       (interactive)
+       (when (equal (buffer-name) "init.org")
+         (progn
+           ;; Avoid running hooks when tangling.
+           (let ((prog-mode-hook nil))
+             (org-babel-tangle)
+             (byte-compile-file (concat user-emacs-directory "init.el"))))))
 
-    #+END_SRC
+     #+END_SRC
 
 **** Load
 
@@ -418,8 +414,8 @@
 
       (defun eos/edit/duplicate-current-line-or-region (arg)
         "Duplicates the current line or region ARG times.
-      If there's no region, the current line will be duplicated.
-      However, if there's a region, all lines that region covers will be duplicated."
+        If there's no region, the current line will be duplicated.
+        However, if there's a region, all lines that region covers will be duplicated."
         (interactive "p")
         (let (beg end (origin (point)))
           (if (and mark-active (> (point) (mark)))
@@ -510,6 +506,173 @@
 
      #+END_SRC
 
+** Vanilla
+*** Cursor
+
+    On a text terminal, the cursor's appearance is controlled by the
+    terminal, largely out of the control of Emacs.
+    Some terminals offer two different cursors: a visible static
+    cursor, and a very visible blinking cursor.
+    By default, Emacs uses the very visible cursor, and switches
+    to it when you start or resume Emacs. If the variable
+    visible-cursor is nil when Emacs starts or resumes, it uses
+    the normal cursor.
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; non-nil means to make the cursor very visible
+    (customize-set-variable 'visible-cursor nil)
+
+    #+END_SRC
+
+*** Window
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; scroll options
+    ;; number of lines of margin at the top and bottom of a window
+    (customize-set-variable 'scroll-margin 0)
+
+    ;; scroll up to this many lines, to bring point back on screen
+    (customize-set-variable 'scroll-conservatively 100)
+
+    ;; t means point keeps its screen position
+    (customize-set-variable 'scroll-preserve-screen-position t)
+
+    ;; non-nil means mouse commands use dialog boxes to ask questions
+    (customize-set-variable 'use-dialog-box nil)
+
+    ;; set window margins
+    ;; width in columns of left marginal area for display of a buffer
+    (customize-set-variable 'left-margin-width 1)
+
+    ;; width in columns of right marginal area for display of a buffer.
+    (customize-set-variable 'right-margin-width 1)
+
+    ;; binds (global)
+    (global-set-key (kbd "s-l") 'shrink-window-horizontally)
+    (global-set-key (kbd "s-h") 'enlarge-window-horizontally)
+    (global-set-key (kbd "s-j") 'shrink-window)
+    (global-set-key (kbd "s-k") 'enlarge-window)
+
+    ;; next and previous buffer (on current window)
+    (define-key ctl-x-map (kbd "C-,") 'previous-buffer)
+    (define-key ctl-x-map (kbd "C-.") 'next-buffer)
+
+    ;; binds (eos-window prefix map)
+    (define-key eos-window-map (kbd "1") 'maximize-window)
+    (define-key eos-window-map (kbd "q") 'minimize-window)
+    (define-key eos-window-map (kbd "w") 'balance-windows)
+
+    ;; bind ctl-x-map (C-x w)
+    (define-key ctl-x-map (kbd "w") 'eos-window-map)
+
+    ;; kill buffer and window
+    (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
+
+    #+END_SRC
+
+*** Startup
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; customize:
+    ;; non-nil inhibits the startup screen.
+    (customize-set-variable 'inhibit-startup-screen t)
+
+    ;; non-nil inhibits the startup screen.
+    (customize-set-variable 'inhibit-startup-message nil)
+
+    ;; non-nil inhibits the initial startup echo area message
+    (customize-set-variable 'inhibit-startup-echo-area-message nil)
+
+    ;; (customize-set-variable 'inhibit-buffer-choice nil)
+
+    #+END_SRC
+
+*** Buffer
+
+    Customize some buffer options.
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; non-nil means do not display continuation lines.
+    (customize-set-variable 'truncate-lines nil)
+
+    ;; sentences should be separated by a single space,
+    ;; so treat two sentences as two when filling
+    (customize-set-variable 'sentence-end-double-space nil)
+
+    ;; default indent
+    ;; distance between tab stops (for display of tab characters), in columns.
+    (customize-set-variable 'tab-width 4)
+
+    ;; indentation can insert tabs if this is non-nil.
+    (customize-set-variable 'indent-tabs-mode nil)
+
+    ;; kill process not confirmation required
+    ;; list of functions called with no args to query before killing a buffer.
+    ;; The buffer being killed will be current while the functions are running.
+    (customize-set-variable
+     'kill-buffer-query-functions
+     (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
+
+    ;; non-nil means load prefers the newest version of a file.
+    (customize-set-variable 'load-prefer-newer t)
+
+    #+END_SRC
+
+*** Minibuffer
+
+    #+BEGIN_SRC emacs-lisp
+
+    (customize-set-variable 'enable-recursive-minibuffers nil)
+
+    #+END_SRC
+
+*** Coding-system
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; coding system to use with system messages
+    (customize-set-variable 'locale-coding-system 'utf-8)
+
+    ;; coding system to be used for encoding the buffer contents on saving
+    (customize-set-variable 'buffer-file-coding-system 'utf-8)
+
+    ;; add coding-system at the front of the priority list for automatic detection
+    (prefer-coding-system 'utf-8)
+
+    ;; set coding system (UFT8)
+    (set-language-environment "UTF-8")
+    (set-terminal-coding-system 'utf-8)
+    (set-keyboard-coding-system 'utf-8)
+    (set-selection-coding-system 'utf-8)
+
+    #+END_SRC
+
+*** Simple
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'simple nil t)
+      (progn
+        ;; custom
+        ;; don't omit information when lists nest too deep.
+        (customize-set-variable 'eval-expression-print-level nil)
+
+        ;; binds
+        (define-key ctl-x-map (kbd "C-g") 'keyboard-quit)
+
+        ;; enable
+        ;; column number display in the mode line
+        (eos/funcall 'column-number-mode 1)
+
+        ;; buffer size display in the mode line
+        (eos/funcall 'size-indication-mode 1)))
+
+    #+END_SRC
+
 *** Server
 
     Allow this Emacs process to be a server for client processes.
@@ -523,8 +686,10 @@
     (when (require 'server nil t)
       (progn
         ;; hooks
+        ;; starts server after startup
         (add-hook 'emacs-startup-hook
                   (lambda ()
+                    ;; server start
                     (eos/funcall 'server-start)))))
 
     #+END_SRC
@@ -557,21 +722,9 @@
     #+END_SRC
 
 *** Info
-*** Font
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; set frame font
-    (eos/set-frame-font "Hermit Light:pixelsize=18")
-
-    ;; set font by face attribute (reference)
-    ;; (set-face-attribute 'default nil :height)
-
-    #+END_SRC
-
 *** Fringe
 
-    Fringe bitmaps
+    Fringe bitmaps.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -618,6 +771,10 @@
         ;; non-nil says by default do auto-saving of every file-visiting buffer
         (customize-set-variable 'auto-save-default nil)
 
+        ;; Most *NIX tools work best when files are terminated
+        ;; with a newline
+        (customize-set-variable 'require-final-newline t)
+
         ;; set backup directory list
         ;; alist of filename patterns and backup directory names.
         (customize-set-variable
@@ -625,7 +782,7 @@
          '(("" . (concat user-emacs-directory "backup"))))))
 
     ;; create cache directory
-    (mkdir (concat user-emacs-directory "cache") t)
+    (eos/mkdir (concat user-emacs-directory "cache"))
 
     #+END_SRC
 
@@ -633,10 +790,12 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; custom:
-    ;; file to save the recent list into.
-    (customize-set-variable
-     'recentf-save-file (concat user-emacs-directory "cache/recentf"))
+    (when (require 'recentf nil t)
+      (progn
+        ;; custom:
+        ;; file to save the recent list into.
+        (customize-set-variable
+         'recentf-save-file (concat user-emacs-directory "cache/recentf"))))
 
     #+END_SRC
 
@@ -644,10 +803,12 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; custom:
-    ;; file in which to save bookmarks by default.
-    (customize-set-variable
-     'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))
+    (when (require 'bookmark nil t)
+      (progn
+        ;; custom:
+        ;; file in which to save bookmarks by default.
+        (customize-set-variable
+         'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))))
 
     #+END_SRC
 
@@ -655,132 +816,112 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; with some window managers you may have to set this to non-nil
-    ;; in order to set the size of a frame in pixels, to maximize
-    ;; frames or to make them fullscreen.
-    (customize-set-variable 'frame-resize-pixelwise t)
+    (when (require 'frame nil t)
+      (progn
+        ;; custom
+        ;; with some window managers you may have to set this to non-nil
+        ;; in order to set the size of a frame in pixels, to maximize
+        ;; frames or to make them fullscreen.
+        (customize-set-variable 'frame-resize-pixelwise t)
 
-    ;; normalize before maximize
-    (customize-set-variable 'x-frame-normalize-before-maximize t)
+        ;; normalize before maximize
+        (customize-set-variable 'x-frame-normalize-before-maximize t)
 
-    ;; set frame title format
-    (customize-set-variable 'frame-title-format
-                            '((:eval (if (buffer-file-name)
-                                         (abbreviate-file-name (buffer-file-name))
-                                       "%b"))))
+        ;; set frame title format
+        (customize-set-variable 'frame-title-format
+                                '((:eval (if (buffer-file-name)
+                                             (abbreviate-file-name (buffer-file-name))
+                                           "%b"))))
 
-    ;; fullscreen
-    (add-to-list 'initial-frame-alist '(fullscreen . fullheight))
+        ;; alist of parameters for the initial X window frame
+        (add-to-list 'initial-frame-alist '(fullscreen . fullheight))
 
-    ;; internal border
-    (add-to-list 'default-frame-alist '(internal-border-width . 2))
+        ;; (vertical-scroll-bars)
+        ;; (bottom-divider-width . 0)
+        ;; (right-divider-width . 6)))
 
-    ;; bind
-    ;; (global-set-key (kbd "M-z") 'other-frame)
+        ;; alist of default values for frame creation
+        (add-to-list 'default-frame-alist '(internal-border-width . 2))
+
+        ;; set frame font
+        (eos/set-frame-font "Hermit Light:pixelsize=18")
+
+        ;; hooks
+        ;; enable window divider
+        (add-hook 'after-init-hook
+                  (lambda()
+                    (eos/funcall 'window-divider-mode)))
+
+        ;; disable blink cursor
+        (add-hook 'emacs-startup-hook
+                  (lambda()
+                    (eos/funcall 'blink-cursor-mode 0)))))
+
+    ;; binds
+    ;; (global-set-key (kbd "M-z") 'other-frame)))
 
     #+END_SRC
 
-*** Window
+*** Windmove
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; scroll options
-    (customize-set-variable 'scroll-margin 0)
-    (customize-set-variable 'scroll-conservatively 100)
-    (customize-set-variable 'scroll-preserve-screen-position 1)
+    (when (require 'windmove nil t)
+      (progn
+        ;; hooks
+        ;; window move default keybinds (shift-up/down etc..)
+        (add-hook 'after-init-hook 'windmove-default-keybindings)))
 
-    ;; never show dialogs box
-    (customize-set-variable 'use-dialog-box nil)
-
-    ;; window move default keybinds (shift-up/down etc..)
-    (add-hook 'after-init-hook 'windmove-default-keybindings)
-
-    ;; set window margins
-    (customize-set-variable 'left-margin-width 1)
-    (customize-set-variable 'right-margin-width 1)
-
-    ;; set window divider
-    (add-hook 'after-init-hook 'window-divider-mode)
-
-    ;; global bind
-    (global-set-key (kbd "s-l") 'shrink-window-horizontally)
-    (global-set-key (kbd "s-h") 'enlarge-window-horizontally)
-    (global-set-key (kbd "s-j") 'shrink-window)
-    (global-set-key (kbd "s-k") 'enlarge-window)
-
-    ;; eos-window-map bind
+    ;; binds (eos window prefix map)
     ;; (define-key eos-window-map (kbd "j") 'windmove-up)
     ;; (define-key eos-window-map (kbd "k") 'windmove-down)
     ;; (define-key eos-window-map (kbd "h") 'windmove-left)
     ;; (define-key eos-window-map (kbd "l") 'windmove-right)
 
-    (define-key eos-window-map (kbd "1") 'maximize-window)
-    (define-key eos-window-map (kbd "q") 'minimize-window)
-    (define-key eos-window-map (kbd "w") 'balance-windows)
-
-    ;; ctl-x-map bind (C-x w)
-    (define-key ctl-x-map (kbd "w") 'eos-window-map)
-
     #+END_SRC
 
-*** Buffer
-
-    Common buffer options, apparence and behavior.
+*** Kmacro
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; linum format
-    (customize-set-variable 'linum-format " %2d ")
-
-    ;; truncate lines
-    (customize-set-variable 'truncate-lines nil)
-
-    ;; Most *NIX tools work best when files are terminated
-    ;; with a newline
-    (customize-set-variable 'require-final-newline t)
-
-    ;; sentences should be separated by a single space,
-    ;; so treat two sentences as two when filling
-    (customize-set-variable 'sentence-end-double-space nil)
-
-    ;; default indent
-    (customize-set-variable 'tab-width 4)
-    (customize-set-variable 'indent-tabs-mode nil)
-
-    ;; kill process not confirmation required
-    (customize-set-variable
-     'kill-buffer-query-functions
-     (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
-
-    ;; delete selection-mode
-    (eos/funcall 'delete-selection-mode 1)
-
-    ;; clean whitespace and newlines before buffer save
-    (add-hook 'before-save-hook 'whitespace-cleanup)
-
-    ;; prefer newer
-    (customize-set-variable 'load-prefer-newer t)
-
-    ;; binds
-    (define-key ctl-x-map (kbd "C-,") 'previous-buffer)
-    (define-key ctl-x-map (kbd "C-.") 'next-buffer)
+    (when (require 'kmacro nil t)
+      (progn
+        ;; binds
+        (define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
 
     #+END_SRC
 
-*** Minibuffer
+*** Paren
 
     #+BEGIN_SRC emacs-lisp
 
-    (customize-set-variable 'enable-recursive-minibuffers nil)
+    (when (require 'paren nil t)
+      (progn
+        ;; hooks
+        ;; enable paren mode
+        ;; visualization of matching parens
+        (eos/funcall 'show-paren-mode 1)))
 
     #+END_SRC
 
-*** Macros
+*** Elec-pair
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; bind kmacro-keymap to C-x m
-    (define-key ctl-x-map (kbd "m") 'kmacro-keymap)
+    (when (require 'elec-pair nil t)
+      (progn
+        ;; custom:
+        ;; alist of pairs that should be used regardless of major mode.
+        (customize-set-variable 'electric-pair-pairs
+                                '((?\{ . ?\})
+                                  (?\( . ?\))
+                                  (?\[ . ?\])
+                                  (?\" . ?\"))))
+      ;; hook:
+      ;; enable eletric pair mode
+      (add-hook 'emacs-startup-hook
+                (lambda()
+                  (eos/funcall electric-pair-mode 1))))
 
     #+END_SRC
 
@@ -788,45 +929,10 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    (global-set-key (kbd "M-c") 'comment-or-uncomment-region)
-
-    #+END_SRC
-
-*** Coding-system
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; coding system to use with system messages
-    (customize-set-variable 'locale-coding-system 'utf-8)
-
-    ;; coding system to be used for encoding the buffer contents on saving
-    (customize-set-variable 'buffer-file-coding-system 'utf-8)
-
-    ;; add coding-system at the front of the priority list for automatic detection
-    (prefer-coding-system 'utf-8)
-
-    ;; set coding system (UFT8)
-    (set-language-environment "UTF-8")
-    (set-terminal-coding-system 'utf-8)
-    (set-keyboard-coding-system 'utf-8)
-    (set-selection-coding-system 'utf-8)
-
-    #+END_SRC
-
-*** Cursor
-
-    On a text terminal, the cursor's appearance is controlled by the
-    terminal, largely out of the control of Emacs.
-    Some terminals offer two different cursors: a visible static
-    cursor, and a very visible blinking cursor.
-    By default, Emacs uses the very visible cursor, and switches
-    to it when you start or resume Emacs. If the variable
-    visible-cursor is nil when Emacs starts or resumes, it uses
-    the normal cursor.
-
-    #+BEGIN_SRC emacs-lisp
-
-    (customize-set-variable 'visible-cursor nil)
+    (when (require 'newcomment nil t)
+      (progn
+        ;; binds
+        (global-set-key (kbd "M-c") 'comment-or-uncomment-region)))
 
     #+END_SRC
 
@@ -849,19 +955,132 @@
         ;; load-average values below this value won’t be shown in the mode line.
         (customize-set-variable 'display-time-load-average-threshold 1.0)
 
-        ;; enable:
-        ;; initialize display time mode
-        (display-time-mode 1)))
+        ;; enable display time
+        (eos/funcall display-time-mode 1)))
 
     #+END_SRC
 
-*** Interpreter
-
-    Don't omit information when lists nest too deep.
+*** Tool-bar
 
     #+BEGIN_SRC emacs-lisp
 
-    (customize-set-variable 'eval-expression-print-level nil)
+    (when (require 'tool-bar nil t)
+      (progn
+        ;; disable tool bar
+        (eos/funcall 'tool-bar-mode 0)))
+
+    #+END_SRC
+
+*** Tooltip
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'tooltip nil t)
+      (progn
+        ;; disable tooltip
+        (eos/funcall 'tooltip-mode 0)))
+
+    #+END_SRC
+
+*** Menu-bar
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'menu-bar nil t)
+      (progn
+        ;; disable menu-bar
+        (eos/funcall 'menu-bar-mode 0)))
+
+    #+END_SRC
+
+*** Scroll-bar
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'scroll-bar nil t)
+      (progn
+        ;; disable scroll bar
+        (eos/funcall 'scroll-bar-mode 0)))
+
+    #+END_SRC
+
+*** Hl-line
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'hl-line nil t)
+      (progn
+        ;; enable highlight line
+        (eos/funcall 'global-hl-line-mode 1)))
+
+    #+END_SRC
+
+*** Linum
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'linum nil t)
+      (progn
+        ;; custom:
+        ;; format used to display line numbers.
+        (customize-set-variable 'linum-format " %2d ")))
+
+    #+END_SRC
+
+*** Display-line-numbers
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'display-line-numbers nil t)
+      (progn
+        ;; enable display line numbers mode
+        (eos/funcall 'global-display-line-numbers-mode 1)))
+
+    #+END_SRC
+
+*** Delsel
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'delsel nil t)
+      (progn
+        ;; delete selection-mode
+        (eos/funcall 'delete-selection-mode 1)))
+
+    #+END_SRC
+
+*** Whitespace
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'whitespace nil t)
+      (progn
+        ;; hooks
+        ;; clean whitespace and newlines before buffer save
+        (add-hook 'before-save-hook 'whitespace-cleanup)
+
+        ;; binds
+        (define-key ctl-x-map (kbd ".") 'whitespace-mode)))
+
+    #+END_SRC
+
+*** Subword
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; global-subword-mode
+
+    #+END_SRC
+
+*** Face-remap
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'face-remap nil t)
+      (progn
+        ;; binds
+        ;; text scale adjust
+        (define-key ctl-x-map (kbd "=") 'text-scale-adjust)))
 
     #+END_SRC
 
@@ -885,87 +1104,41 @@
          'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
 
         ;; hooks:
-        ;; load custom file (enable)
+        ;; load custom file after emacs initialize
         (add-hook 'after-emacs-init
                   (lambda()
                     (eos/load-file custom-file)))))
 
     #+END_SRC
 
-*** Misc
-**** Clean
-
-     Clean startup message/area.
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; clean startup message/area
-     (customize-set-variable 'inhibit-startup-screen t)
-     (customize-set-variable 'inhibit-startup-message nil)
-     (customize-set-variable 'inhibit-startup-echo-area-message nil)
-     (customize-set-variable 'inhibit-buffer-choice nil)
-
-     #+END_SRC
-
-**** Eletric
-
-     #+BEGIN_SRC emacs-lisp
-
-     (customize-set-variable 'electric-pair-pairs
-                             '((?\{ . ?\})
-                               (?\( . ?\))
-                               (?\[ . ?\])
-                               (?\" . ?\")))
-
-     #+END_SRC
-
-**** Modes
-
-     Enable/Disable some default modes.
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; disabled modes list
-     (dolist (mode
-              '(tool-bar-mode
-                tooltip-mode
-                menu-bar-mode
-                scroll-bar-mode
-                blink-cursor-mode))
-       (eos/funcall mode 0))
-
-     ;; enabled modes list
-     (dolist (mode
-              '(show-paren-mode
-                column-number-mode
-                size-indication-mode
-                electric-pair-mode
-                global-subword-mode
-                global-display-line-numbers-mode
-                global-hl-line-mode))
-       (eos/funcall mode 1))
-
-     #+END_SRC
-
-**** Bind
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; exit/quit
-     (define-key ctl-x-map (kbd "C-g") 'keyboard-quit)
-
-     ;; text scale adjust
-     (define-key ctl-x-map (kbd "=") 'text-scale-adjust)
-
-     ;; whitespace-mode
-     (define-key ctl-x-map (kbd ".") 'whitespace-mode)
-
-     ;; kill buffer and window
-     (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
-
-     #+END_SRC
-
 ** Applications
+*** Apparence
+**** Theme
+***** Mesk-term
+
+      Add theme directory to load-path and load the
+      default theme (mesk-term).
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; add eos-theme-dir to theme load path
+      (add-to-list 'custom-theme-load-path
+                   (concat user-emacs-directory "themes"))
+
+      ;; load theme
+      (load-theme 'mesk-term t)
+
+      #+END_SRC
+
+**** Font
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; set font by face attribute (reference)
+     ;; (set-face-attribute 'default nil :height)
+
+     #+END_SRC
+
 *** Package Manager
 **** Cask
 
@@ -2083,12 +2256,12 @@
          ;; Re-write of the `eww-search-words' definition.
          (defun eos/eww-search-words ()
            "Search the web for the text between BEG and END.
-               If region is active (and not whitespace), search the web for
-               the text in that region.
-               Else if the region is not active, and the point is on a symbol,
-               search the web for that symbol.
-               Else prompt the user for a search string.
-               See the `eww-search-prefix' variable for the search engine used."
+           If region is active (and not whitespace), search the web for
+           the text in that region.
+           Else if the region is not active, and the point is on a symbol,
+           search the web for that symbol.
+           Else prompt the user for a search string.
+           See the `eww-search-prefix' variable for the search engine used."
            (interactive)
            (let ((search-string (eos/get-selected-text-or-symbol-at-point)))
              (when (and (stringp search-string)
@@ -2545,24 +2718,6 @@
 **** Org-cms
 *** Analyse
 **** Verb
-*** Apparence
-**** Theme
-***** Mesk-term
-
-      Add theme directory to load-path and load the
-      default theme (mesk-term).
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; add eos-theme-dir to theme load path
-      (add-to-list 'custom-theme-load-path
-                   (concat user-emacs-directory "themes"))
-
-      ;; load theme
-      (load-theme 'mesk-term t)
-
-      #+END_SRC
-
 *** Dashboard
 **** Dashboard
 
@@ -3611,6 +3766,7 @@
      ;; (define-key ctl-x-map (kbd "C-z") nil)
      ;; (define-key ctl-x-map (kbd "C--") nil)
      ;; (define-key ctl-x-map (kbd "ESC") nil)
+     ;; (define-key ctl-x-map (kbd ".") nil)
      (define-key ctl-x-map (kbd "C-d") nil)
      (define-key ctl-x-map (kbd "]") nil)
      (define-key ctl-x-map (kbd "C-z") nil)
@@ -3639,7 +3795,6 @@
      (define-key ctl-x-map (kbd ">") nil)
      (define-key ctl-x-map (kbd "\@") nil)
      (define-key ctl-x-map (kbd "-") nil)
-     (define-key ctl-x-map (kbd ".") nil)
      (define-key ctl-x-map (kbd ";") nil)
      (define-key ctl-x-map (kbd "#") nil)
      (define-key ctl-x-map (kbd "*") nil)
@@ -3797,15 +3952,6 @@
    #+BEGIN_SRC emacs-lisp
 
    (require 'eos-adapt (expand-file-name "eos-adapt.el" user-emacs-directory) t)
-
-   #+END_SRC
-
-** Provide
-
-   #+BEGIN_SRC emacs-lisp
-
-   (provide 'eos)
-   ;; eos.el ends here
 
    #+END_SRC
 

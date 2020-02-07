@@ -9,7 +9,7 @@
 
 (when (require 'org nil t)
   (progn
-    ;; customize
+    ;; custom
     (customize-set-variable 'org-src-fontify-natively t)
     (customize-set-variable 'org-src-tab-acts-natively t)
     (customize-set-variable 'org-edit-src-content-indentation 0)
@@ -349,7 +349,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; kill buffer and window
 (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
 
-;; customize:
+;; custom:
 ;; non-nil inhibits the startup screen.
 (customize-set-variable 'inhibit-startup-screen t)
 
@@ -429,7 +429,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'help nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; always select the help window
     (customize-set-variable 'help-window-select t)))
 
@@ -504,6 +504,18 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; file in which to save bookmarks by default.
     (customize-set-variable
      'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))))
+
+(when (require 'savehist nil t)
+  (progn
+    ;; file name where minibuffer history is saved to and loaded from.
+    (customize-set-variable
+     'savehist-file (concat user-emacs-directory "cache/history"))
+
+    ;; if non-nil, save all recorded minibuffer histories.
+    (customize-set-variable 'savehist-save-minibuffer-history t)
+
+    ;; enable savehist mode
+    (eos/funcall 'savehist-mode 1)))
 
 (when (require 'frame nil t)
   (progn
@@ -595,7 +607,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'time nil t)
   (progn
-    ;; customize:
+    ;; custom:
     ;; seconds between updates of time in the mode line.
     (customize-set-variable 'display-time-interval 15)
 
@@ -671,7 +683,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'custom nil t)
   (progn
-    ;; customize:
+    ;; custom:
     ;; file used for storing customization information.
     ;; The default is nil, which means to use your init file
     ;; as specified by ‘user-init-file’.  If the value is not nil,
@@ -828,7 +840,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; set exwm workspaces
     (customize-set-variable 'exwm-workspace-number 2)
 
-    ;; customize monitors
+    ;; custom monitors
     (customize-set-variable
      'exwm-randr-workspace-monitor-plist '(0 "HDMI-1"))
 
@@ -979,7 +991,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'epa nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; if non-nil, cache passphrase for symmetric encryption.
     (customize-set-variable
      'epa-file-cache-passphrase-for-symmetric-encryption t)
@@ -1061,9 +1073,108 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     (add-hook 'after-init-hook 'editorconfig-mode)))
 
+(when (require 'buffer-move nil t)
+  (progn
+    ;; bind
+    (global-set-key (kbd "C-s-j") 'buf-move-up)
+    (global-set-key (kbd "C-s-k") 'buf-move-down)
+    (global-set-key (kbd "C-s-h") 'buf-move-left)
+    (global-set-key (kbd "C-s-l") 'buf-move-right)))
+
+(when (require 'ibuffer nil t)
+  (progn
+    ;; hooks
+    ;; sort by filename/process
+    (add-hook 'ibuffer-mode-hook
+              (lambda ()
+                (when (fboundp 'ibuffer-do-sort-by-filename/process)
+                  (ibuffer-do-sort-by-filename/process))))))
+
+;; binds
+;; (define-key ctl-x-map (kbd "b") 'ibuffer)))
+
+(when (require 'which-key nil t)
+  (progn
+    ;; custom
+    ;; (customize-set-variable 'which-key-paging-key nil)
+    (customize-set-variable 'which-key-idle-delay 0.5)
+    (customize-set-variable 'which-key-idle-secondary-delay 0.1)
+    (customize-set-variable 'which-key-separator " - ")
+    (customize-set-variable 'which-key-use-C-h-commands t)
+    (customize-set-variable 'which-key-add-column-padding 2)
+    (customize-set-variable 'which-key-side-window-location 'bottom)
+    (customize-set-variable 'which-key-sort-order
+                            'which-key-key-order-alpha)
+
+    ;; if non-nil allow which-key to use a less intensive method of Hide
+    ;; fitting the popup window to the buffer.
+    (customize-set-variable 'which-key-allow-imprecise-window-fit t)
+
+    ;; bind
+    (define-key ctl-x-map (kbd "x") 'which-key-show-major-mode)
+
+    ;; init which-key-mode after emacs initialize
+    (add-hook 'after-init-hook 'which-key-mode)))
+
+(when (boundp 'which-key-replacement-alist)
+  (progn
+    ;; custom key replacements
+    (add-to-list 'which-key-replacement-alist
+                 '(("\\(.+\\)" .
+                    "\\(\\(helm-\\)\\|.?\\(projectile\\|rtags\\|gtags\\|flycheck\\|company\\|dash\\|yas\\)[\-]\\)")
+                   . (nil . "")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "helm-dash") . (nil . "search")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "helm-dash-at-point") . (nil . "search-at-point")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "helm-flycheck") . (nil . "list-erros")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "flycheck-list-errors") . (nil . "list-erros-other-window")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "eos-rtags-map") . (nil . "rtags")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "eos-tags-map") . (nil . "gtags")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "eos-pm-map") . (nil . "projectile")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "eos-window-map") . (nil . "window")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "eos-docs-map") . (nil . "dash")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "eos-sc-map") . (nil . "flycheck")))
+
+    (add-to-list 'which-key-replacement-alist
+                 '((nil . "eos-complete-map") . (nil . "complete")))))
+
+(when (fboundp 'which-key-add-key-based-replacements)
+  (which-key-add-key-based-replacements
+    "C-x @"   "event"
+    "C-x RET" "set"
+    "C-x r"   "regs"
+    "C-x @"   "event"
+    "C-x 4"   "other"
+    "C-x 5"   "frame"
+    "C-x 6"   "2c"
+    "C-x <end>" "eos/lock-screen"
+    "C-x ESC"   "rept"
+    "C-x 8"   "iso"
+    "C-x m"   "kmacro"
+    "C-h 4"   "other"))
+
 (when (require 'helm-swoop nil t)
   (progn
-    ;; customize
+    ;; custom
     (customize-set-variable 'helm-swoop-speed-or-color nil)
     (customize-set-variable 'helm-swoop-split-with-multiple-windows t)
     (customize-set-variable 'helm-swoop-use-fuzzy-match t)
@@ -1116,7 +1227,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'dired-sidebar nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; close sidebar when dired-sidebar-find-file it's called
     (customize-set-variable
      'dired-sidebar-close-sidebar-on-file-open t)
@@ -1209,128 +1320,6 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; use eos/complete
     (define-key erc-mode-map (kbd "TAB") 'eos/complete)))
 
-(when (require 'which-key nil t)
-  (progn
-    ;; customize
-    ;; (customize-set-variable 'which-key-paging-key nil)
-    (customize-set-variable 'which-key-idle-delay 0.5)
-    (customize-set-variable 'which-key-idle-secondary-delay 0.1)
-    (customize-set-variable 'which-key-separator " - ")
-    (customize-set-variable 'which-key-use-C-h-commands t)
-    (customize-set-variable 'which-key-add-column-padding 2)
-    (customize-set-variable 'which-key-side-window-location 'bottom)
-    (customize-set-variable 'which-key-sort-order
-                            'which-key-key-order-alpha)
-
-    ;; if non-nil allow which-key to use a less intensive method of Hide
-    ;; fitting the popup window to the buffer.
-    (customize-set-variable 'which-key-allow-imprecise-window-fit t)
-
-    ;; bind
-    (define-key ctl-x-map (kbd "x") 'which-key-show-major-mode)
-
-    ;; init which-key-mode after emacs initialize
-    (add-hook 'after-init-hook 'which-key-mode)))
-
-(when (boundp 'which-key-replacement-alist)
-  (progn
-
-    ;; customize key replacements
-    (add-to-list 'which-key-replacement-alist
-                 '(("\\(.+\\)" .
-                    "\\(\\(helm-\\)\\|.?\\(projectile\\|rtags\\|gtags\\|flycheck\\|company\\|dash\\|yas\\)[\-]\\)")
-                   . (nil . "")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "helm-dash") . (nil . "search")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "helm-dash-at-point") . (nil . "search-at-point")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "helm-flycheck") . (nil . "list-erros")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "flycheck-list-errors") . (nil . "list-erros-other-window")))
-
-    ;; (add-to-list 'which-key-replacement-alist
-    ;;              '(("<left>" . nil) . ("left" . nil)))
-
-    ;; (add-to-list 'which-key-replacement-alist
-    ;;              '(("<right>" . nil) . ("right" . nil)))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-rtags-map") . (nil . "rtags")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-tags-map") . (nil . "gtags")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-pm-map") . (nil . "projectile")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-window-map") . (nil . "window")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-docs-map") . (nil . "dash")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-sc-map") . (nil . "flycheck")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-complete-map") . (nil . "complete")))))
-
-(when (fboundp 'which-key-add-key-based-replacements)
-  (which-key-add-key-based-replacements
-    "C-x @"   "event"
-    "C-x RET" "set"
-    "C-x r"   "regs"
-    "C-x @"   "event"
-    "C-x 4"   "other"
-    "C-x 5"   "frame"
-    "C-x 6"   "2c"
-    "C-x <end>" "eos/lock-screen"
-    "C-x ESC"   "rept"
-    "C-x 8"   "iso"
-    "C-x m"   "kmacro"
-    "C-h 4"   "other"))
-
-(when (require 'buffer-move nil t)
-  (progn
-    ;; bind
-    (global-set-key (kbd "C-s-j") 'buf-move-up)
-    (global-set-key (kbd "C-s-k") 'buf-move-down)
-    (global-set-key (kbd "C-s-h") 'buf-move-left)
-    (global-set-key (kbd "C-s-l") 'buf-move-right)))
-
-(when (require 'ibuffer nil t)
-  (progn
-    ;; customize
-
-    ;; hook
-    (add-hook 'ibuffer-mode-hook
-              (lambda ()
-                (interactive)
-                ;; sort by filename/process
-                (when (fboundp 'ibuffer-do-sort-by-filename/process)
-                  (ibuffer-do-sort-by-filename/process))))
-    ))
-
-;; bind
-;; (define-key ctl-x-map (kbd "b") 'ibuffer)))
-
-(when (require 'savehist nil t)
-  (progn
-    ;; file name where minibuffer history is saved to and loaded from.
-    (customize-set-variable
-     'savehist-file (concat user-emacs-directory "cache/history"))
-
-    ;; if non-nil, save all recorded minibuffer histories.
-    (customize-set-variable 'savehist-save-minibuffer-history t)
-
-    ;; enable savehist mode
-    (eos/funcall 'savehist-mode 1)))
-
 (when (require 'shell nil t)
   (progn
     ;; hook
@@ -1349,7 +1338,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'term nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; if non-nil, is file name to use for explicitly requested inferior shell.
     (customize-set-variable 'explicit-shell-file-name "/usr/local/bin/fish")
 
@@ -1398,7 +1387,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'multi-term nil t)
   (progn
-    ;; customize
+    ;; custom
     (customize-set-variable 'multi-term-program "/usr/local/bin/fish")
 
     ;; focus terminal window after you open dedicated window
@@ -1434,14 +1423,14 @@ point is on a symbol, return that symbol name.  Else return nil."
     (defvar eos/eww-google-search-url "https://www.google.com/search?q="
       "URL for Google searches.")
 
-    ;; customize search prefix
+    ;; custom search prefix
     (customize-set-variable 'eww-search-prefix eos/eww-google-search-url)
     ;; (customize-set-variable eww-search-prefix "https://duckduckgo.com/html/?q=")
 
-    ;; customize download directory
+    ;; custom download directory
     (customize-set-variable 'eww-download-directory "~/down")
 
-    ;; customize checkbox symbols
+    ;; custom checkbox symbols
     (customize-set-variable 'eww-form-checkbox-symbol "[ ]")
     (customize-set-variable 'eww-form-checkbox-selected-symbol "[X]")
     ;; (customize-set-variable eww-form-checkbox-symbol "☐") ; Unicode hex 2610
@@ -1473,7 +1462,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'browse-url nil t)
   (progn
-    ;; customize:
+    ;; custom:
 
     ;; the name of the browser program used by ‘browse-url-generic’.
     (customize-set-variable 'browse-url-generic-program "eww")
@@ -1485,7 +1474,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'ispell nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; program invoked by M-x ispell-word and M-x ispell-region commands.
     (customize-set-variable 'ispell-program-name "aspell")))
 
@@ -1559,7 +1548,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'comint nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; if non-nil, assume that the subprocess echoes any input.
     (customize-set-variable 'comint-process-echoes t)
 
@@ -1593,7 +1582,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'tramp nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; set tramp default method
     (customize-set-variable 'tramp-default-method "ssh")
 
@@ -1653,7 +1642,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'emms nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; list of players that emms can use (only mpv)
     (customize-set-variable 'emms-player-list '(emms-player-mpv))
 
@@ -1702,7 +1691,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'markdown-mode nil t)
   (progn
-    ;; customize
+    ;; custom
     (customize-set-variable 'markdown-command "multimarkdown")))
 
 ;; bind
@@ -1782,7 +1771,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'dash-docs nil t)
   (progn
-    ;; customize (fix async?)
+    ;; custom (fix async?)
     ;; (customize-set-variable
     ;;  'dash-docs-use-workaround-for-emacs-bug t)
 
@@ -1811,7 +1800,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'rfc-mode nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; the directory where RFC documents are stored
     (customize-set-variable
      'rfc-mode-directory (concat (expand-file-name user-emacs-directory) "rfc/"))))
@@ -1879,7 +1868,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'company-statistics nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; set company-statistics cache location
     (customize-set-variable
      'company-statistics-file
@@ -1902,7 +1891,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'helm-company nil t)
   (progn
-    ;; customize:
+    ;; custom:
     ;; enable fuzzy matching for helm company
     (customize-set-variable 'helm-company-fuzzy-match t)))
 
@@ -1942,7 +1931,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'helm-gtags nil t)
   (progn
-    ;; customize
+    ;; custom
     (customize-set-variable 'helm-gtags-ignore-case t)
     (customize-set-variable 'helm-gtags-auto-update t)
     (customize-set-variable 'helm-gtags-pulse-at-cursor t)
@@ -2004,7 +1993,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'projectile nil t)
   (progn
-    ;; customize
+    ;; custom
     ;; enable cache and choose indexing method
     (customize-set-variable 'projectile-enable-caching t)
     (customize-set-variable 'projectile-indexing-method 'hybrid)
@@ -2178,7 +2167,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'lisp-mode nil t)
   (progn
-    ;; customize:
+    ;; custom:
 
     ;; number of columns to indent the second line of a (def...) form
     (customize-set-variable 'lisp-body-indent 2)))
@@ -2273,7 +2262,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'python nil t)
   (progn
-    ;; customize:
+    ;; custom:
     ;; default Python interpreter for shell
     (customize-set-variable 'python-shell-interpreter "python2.7")
 

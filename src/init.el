@@ -22,17 +22,6 @@
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((emacs-lisp . t)))))
 
-(defun eos/build ()
-  "If the current buffer is '~/emacs.d/init.org' the code-blocks are
-tangled, and the tangled file is compiled."
-  (interactive)
-  (when (equal (buffer-name) "init.org")
-    (progn
-      ;; Avoid running hooks when tangling.
-      (let ((prog-mode-hook nil))
-        (org-babel-tangle)
-        (byte-compile-file (concat user-emacs-directory "init.el"))))))
-
 (defun eos/minibuffer/setup-hook ()
   "Set 'gc-cons-threshold most."
   (setq gc-cons-threshold most-positive-fixnum))
@@ -49,9 +38,6 @@ tangled, and the tangled file is compiled."
 
 ;; reset threshold to inital value
 (add-hook 'minibuffer-exit-hook 'eos/minibuffer/exit-hook)
-
-;; start emacs server
-(server-start)
 
 ;; y or n
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -97,6 +83,17 @@ tangled, and the tangled file is compiled."
   "Call FUNC if it's bounded."
   (when (fboundp func)
     (funcall func args)))
+
+(defun eos/build ()
+  "If the current buffer is '~/emacs.d/init.org' the code-blocks are
+tangled, and the tangled file is compiled."
+  (interactive)
+  (when (equal (buffer-name) "init.org")
+    (progn
+      ;; Avoid running hooks when tangling.
+      (let ((prog-mode-hook nil))
+        (org-babel-tangle)
+        (byte-compile-file (concat user-emacs-directory "init.el"))))))
 
 (defun eos/load-file (file)
   "Load FILE if exists."
@@ -303,6 +300,18 @@ point is on a symbol, return that symbol name.  Else return nil."
         (t
          nil)))
 
+(defun eos/set-frame-font (font)
+  "Set the default font to FONT."
+  (cond ((find-font (font-spec :name font))
+         (set-frame-font font nil t))))
+
+(when (require 'server nil t)
+  (progn
+    ;; hooks
+    (add-hook 'emacs-startup-hook
+              (lambda ()
+                (eos/funcall 'server-start)))))
+
 (when (require 'help nil t)
   (progn
     ;; customize
@@ -321,57 +330,63 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key help-map (kbd "K") nil)
     (define-key help-map (kbd "RET") nil)))
 
-(defun eos/set-frame-font (font)
-  "Set the default font to FONT."
-  (cond ((find-font (font-spec :name font))
-         (set-frame-font font nil t))))
-
-;; hermit light
-(defvar eos-font "Hermit Light:pixelsize=18"
-  "Default eos font.")
-
 ;; set frame font
-(eos/set-frame-font eos-font)
+(eos/set-frame-font "Hermit Light:pixelsize=18")
 
 ;; set font by face attribute (reference)
 ;; (set-face-attribute 'default nil :height)
 
-;; disable fringe
-(add-hook 'after-init-hook
-          (lambda ()
-            (set-fringe-style 1)))
+(when (require 'fringe nil t)
+  (progn
+    ;; disable
+    (add-hook 'after-init-hook
+              (lambda ()
+                ;; set the default appearance of fringes on the selected frame
+                ;; 1 ->  ("no-fringes" . 0)
+                (set-fringe-style 1)))))
 
-;; autosave/backups options
-(customize-set-variable 'version-control t)
-(customize-set-variable 'kept-new-versions 6)
-(customize-set-variable 'backup-by-copying t)
-(customize-set-variable 'kept-old-versions 2)
-(customize-set-variable 'delete-old-versions t)
-(customize-set-variable 'make-backup-files nil)
-(customize-set-variable 'auto-save-default nil)
+(when (require 'files nil t)
+  (progn
+    ;; custom:
+    ;; control use of version numbers for backup files.
+    (customize-set-variable 'version-control t)
 
-;; set backup directory list
-(customize-set-variable
- 'backup-directory-alist
- '(("" . (concat user-emacs-directory "backup"))))
+    ;; non-nil means always use copying to create backup files
+    (customize-set-variable 'backup-by-copying t)
 
-;; set autosave locations and format
-(customize-set-variable
- 'auto-save-list-file-prefix
- (concat user-emacs-directory "backup/.saves-"))
+    ;; number of newest versions to keep when a new numbered backup is made
+    (customize-set-variable 'kept-new-versions 6)
+
+    ;; number of oldest versions to keep when a new numbered backup is made
+    (customize-set-variable 'kept-old-versions 2)
+
+    ;; if t, delete excess backup versions silently
+    (customize-set-variable 'delete-old-versions t)
+
+    ;; non-nil means make a backup of a file the first time it is saved
+    (customize-set-variable 'make-backup-files nil)
+
+    ;; non-nil says by default do auto-saving of every file-visiting buffer
+    (customize-set-variable 'auto-save-default nil)
+
+    ;; set backup directory list
+    ;; alist of filename patterns and backup directory names.
+    (customize-set-variable
+     'backup-directory-alist
+     '(("" . (concat user-emacs-directory "backup"))))))
 
 ;; create cache directory
 (mkdir (concat user-emacs-directory "cache") t)
 
-;; recentf location
+;; custom:
+;; file to save the recent list into.
 (customize-set-variable
- 'recentf-save-file
- (concat user-emacs-directory "cache/recentf"))
+ 'recentf-save-file (concat user-emacs-directory "cache/recentf"))
 
-;; bookmark file location
+;; custom:
+;; file in which to save bookmarks by default.
 (customize-set-variable
- 'bookmark-default-file
- (concat user-emacs-directory "cache/bookmarks"))
+ 'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))
 
 ;; with some window managers you may have to set this to non-nil
 ;; in order to set the size of a frame in pixels, to maximize
@@ -440,11 +455,11 @@ point is on a symbol, return that symbol name.  Else return nil."
 (customize-set-variable 'truncate-lines nil)
 
 ;; Most *NIX tools work best when files are terminated
-;; with a newline.
+;; with a newline
 (customize-set-variable 'require-final-newline t)
 
 ;; sentences should be separated by a single space,
-;; so treat two sentences as two when filling.
+;; so treat two sentences as two when filling
 (customize-set-variable 'sentence-end-double-space nil)
 
 ;; default indent
@@ -469,18 +484,23 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key ctl-x-map (kbd "C-,") 'previous-buffer)
 (define-key ctl-x-map (kbd "C-.") 'next-buffer)
 
-(customize-set-variable 'enable-recursive-minibuffers t)
+(customize-set-variable 'enable-recursive-minibuffers nil)
 
 ;; bind kmacro-keymap to C-x m
 (define-key ctl-x-map (kbd "m") 'kmacro-keymap)
 
 (global-set-key (kbd "M-c") 'comment-or-uncomment-region)
 
-;; conding-system (utf8)
+;; coding system to use with system messages
 (customize-set-variable 'locale-coding-system 'utf-8)
+
+;; coding system to be used for encoding the buffer contents on saving
 (customize-set-variable 'buffer-file-coding-system 'utf-8)
 
+;; add coding-system at the front of the priority list for automatic detection
 (prefer-coding-system 'utf-8)
+
+;; set coding system (UFT8)
 (set-language-environment "UTF-8")
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
@@ -490,7 +510,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'time nil t)
   (progn
-    ;; customize
+    ;; customize:
     ;; seconds between updates of time in the mode line.
     (customize-set-variable 'display-time-interval 15)
 
@@ -503,23 +523,27 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; load-average values below this value won’t be shown in the mode line.
     (customize-set-variable 'display-time-load-average-threshold 1.0)
 
-    ;; enable
+    ;; enable:
     ;; initialize display time mode
     (display-time-mode 1)))
 
-;; always refresh the modeline (reference)
-;; (add-hook 'buffer-list-update-hook 'func)
-
 (customize-set-variable 'eval-expression-print-level nil)
 
-;; file used for storing customization information.
-;; The default is nil, which means to use your init file
-;; as specified by ‘user-init-file’.  If the value is not nil,
-;; it should be an absolute file name.
-(setq custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
+(when (require 'custom nil t)
+  (progn
+    ;; customize:
+    ;; file used for storing customization information.
+    ;; The default is nil, which means to use your init file
+    ;; as specified by ‘user-init-file’.  If the value is not nil,
+    ;; it should be an absolute file name.
+    (customize-set-variable
+     'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
 
-;; load custom file
-(eos/load-file custom-file)
+    ;; hooks:
+    ;; load custom file (enable)
+    (add-hook 'after-emacs-init
+              (lambda()
+                (eos/load-file custom-file)))))
 
 ;; clean startup message/area
 (customize-set-variable 'inhibit-startup-screen t)
@@ -1851,7 +1875,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'cmake-ide nil t)
   (progn
-    ;; setup
+    ;; hooks:
     (add-hook 'c-mode-hook 'cmake-ide-setup)
     (add-hook 'c++-mode-hook 'cmake-ide-setup)))
 
@@ -1956,7 +1980,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'cc-mode nil t)
   (progn
-    ;; hooks
+    ;; hooks:
     (add-hook 'c-mode-hook
               (lambda ()
                 ;; set cc common company backends
@@ -1985,7 +2009,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                 ;; load rtags
                 (eos/cc/load-rtags)))))
 
-;; binds: c-mode-
+;; bind
 (when (boundp 'c-mode-map)
   (progn
     ;; set rtags prefix map in c-mode map (C-c r)
@@ -2264,8 +2288,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; (define-key ctl-x-map (kbd "C-0") nil)
 ;; (define-key ctl-x-map (kbd "C-z") nil)
 ;; (define-key ctl-x-map (kbd "C--") nil)
-;; (define-key ctl-x-map (kbd "C-d") nil)
 ;; (define-key ctl-x-map (kbd "ESC") nil)
+(define-key ctl-x-map (kbd "C-d") nil)
 (define-key ctl-x-map (kbd "]") nil)
 (define-key ctl-x-map (kbd "C-z") nil)
 (define-key ctl-x-map (kbd "C-<left>") nil)

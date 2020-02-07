@@ -77,25 +77,6 @@
 
     #+END_SRC
 
-*** Build
-
-    Tangle emacs-lisp source code blocks and byte-compile it.
-
-    #+BEGIN_SRC emacs-lisp
-
-    (defun eos/build ()
-      "If the current buffer is '~/emacs.d/init.org' the code-blocks are
-    tangled, and the tangled file is compiled."
-      (interactive)
-      (when (equal (buffer-name) "init.org")
-        (progn
-          ;; Avoid running hooks when tangling.
-          (let ((prog-mode-hook nil))
-            (org-babel-tangle)
-            (byte-compile-file (concat user-emacs-directory "init.el"))))))
-
-    #+END_SRC
-
 *** Garbage Collector
 
     This works surprisingly well. While the minibuffer is open,
@@ -122,21 +103,6 @@
 
     ;; reset threshold to inital value
     (add-hook 'minibuffer-exit-hook 'eos/minibuffer/exit-hook)
-
-    #+END_SRC
-
-*** Server
-
-    Allow this Emacs process to be a server for client processes.
-    This starts a server communications subprocess through which
-    client "editors" can send your editing commands to this
-    Emacs job. To use the server, set up the program ‘emacsclient’
-    in the Emacs distribution as your standard "editor".
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; start emacs server
-    (server-start)
 
     #+END_SRC
 
@@ -218,6 +184,25 @@
          (funcall func args)))
 
      #+END_SRC
+
+**** Build
+
+    Tangle emacs-lisp source code blocks and byte-compile it.
+
+    #+BEGIN_SRC emacs-lisp
+
+    (defun eos/build ()
+      "If the current buffer is '~/emacs.d/init.org' the code-blocks are
+    tangled, and the tangled file is compiled."
+      (interactive)
+      (when (equal (buffer-name) "init.org")
+        (progn
+          ;; Avoid running hooks when tangling.
+          (let ((prog-mode-hook nil))
+            (org-babel-tangle)
+            (byte-compile-file (concat user-emacs-directory "init.el"))))))
+
+    #+END_SRC
 
 **** Load
 
@@ -455,7 +440,7 @@
 
       #+END_SRC
 
-***** Binds
+***** Bind
 
       #+BEGIN_SRC emacs-lisp
 
@@ -514,10 +499,40 @@
 
      #+END_SRC
 
+**** Font
+
+     #+BEGIN_SRC emacs-lisp
+
+     (defun eos/set-frame-font (font)
+       "Set the default font to FONT."
+       (cond ((find-font (font-spec :name font))
+              (set-frame-font font nil t))))
+
+     #+END_SRC
+
+*** Server
+
+    Allow this Emacs process to be a server for client processes.
+    This starts a server communications subprocess through which
+    client "editors" can send your editing commands to this
+    Emacs job. To use the server, set up the program ‘emacsclient’
+    in the Emacs distribution as your standard "editor".
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'server nil t)
+      (progn
+        ;; hooks
+        (add-hook 'emacs-startup-hook
+                  (lambda ()
+                    (eos/funcall 'server-start)))))
+
+    #+END_SRC
+
 *** Help
 
     GNU Emacs's built-in help system, the one invoked by
-    `M-x help-for-help'.
+    M-x help-for-help.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -541,29 +556,13 @@
 
     #+END_SRC
 
+*** Info
 *** Font
 
-    Set frame font function.
-
     #+BEGIN_SRC emacs-lisp
-
-    (defun eos/set-frame-font (font)
-      "Set the default font to FONT."
-      (cond ((find-font (font-spec :name font))
-             (set-frame-font font nil t))))
-
-    #+END_SRC
-
-    Define and set the default font.
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; hermit light
-    (defvar eos-font "Hermit Light:pixelsize=18"
-      "Default eos font.")
 
     ;; set frame font
-    (eos/set-frame-font eos-font)
+    (eos/set-frame-font "Hermit Light:pixelsize=18")
 
     ;; set font by face attribute (reference)
     ;; (set-face-attribute 'default nil :height)
@@ -572,58 +571,83 @@
 
 *** Fringe
 
-    Disable fringe, we do not need this ugly icons.
+    Fringe bitmaps
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; disable fringe
-    (add-hook 'after-init-hook
-              (lambda ()
-                (set-fringe-style 1)))
+    (when (require 'fringe nil t)
+      (progn
+        ;; disable
+        (add-hook 'after-init-hook
+                  (lambda ()
+                    ;; set the default appearance of fringes on the selected frame
+                    ;; 1 ->  ("no-fringes" . 0)
+                    (set-fringe-style 1)))))
 
     #+END_SRC
 
-*** Backup
+*** Files
+
+    Defines most of Emacs's file- and directory-handling functions,
+    including basic file visiting, backup generation, link handling,
+    ITS-id version control, load- and write-hook handling, and the like.
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; autosave/backups options
-    (customize-set-variable 'version-control t)
-    (customize-set-variable 'kept-new-versions 6)
-    (customize-set-variable 'backup-by-copying t)
-    (customize-set-variable 'kept-old-versions 2)
-    (customize-set-variable 'delete-old-versions t)
-    (customize-set-variable 'make-backup-files nil)
-    (customize-set-variable 'auto-save-default nil)
+    (when (require 'files nil t)
+      (progn
+        ;; custom:
+        ;; control use of version numbers for backup files.
+        (customize-set-variable 'version-control t)
 
-    ;; set backup directory list
-    (customize-set-variable
-     'backup-directory-alist
-     '(("" . (concat user-emacs-directory "backup"))))
+        ;; non-nil means always use copying to create backup files
+        (customize-set-variable 'backup-by-copying t)
 
-    ;; set autosave locations and format
-    (customize-set-variable
-     'auto-save-list-file-prefix
-     (concat user-emacs-directory "backup/.saves-"))
+        ;; number of newest versions to keep when a new numbered backup is made
+        (customize-set-variable 'kept-new-versions 6)
 
-    #+END_SRC
+        ;; number of oldest versions to keep when a new numbered backup is made
+        (customize-set-variable 'kept-old-versions 2)
 
-*** Cache
+        ;; if t, delete excess backup versions silently
+        (customize-set-variable 'delete-old-versions t)
 
-    #+BEGIN_SRC emacs-lisp
+        ;; non-nil means make a backup of a file the first time it is saved
+        (customize-set-variable 'make-backup-files nil)
+
+        ;; non-nil says by default do auto-saving of every file-visiting buffer
+        (customize-set-variable 'auto-save-default nil)
+
+        ;; set backup directory list
+        ;; alist of filename patterns and backup directory names.
+        (customize-set-variable
+         'backup-directory-alist
+         '(("" . (concat user-emacs-directory "backup"))))))
 
     ;; create cache directory
     (mkdir (concat user-emacs-directory "cache") t)
 
-    ;; recentf location
-    (customize-set-variable
-     'recentf-save-file
-     (concat user-emacs-directory "cache/recentf"))
+    #+END_SRC
 
-    ;; bookmark file location
+*** Recentf
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; custom:
+    ;; file to save the recent list into.
     (customize-set-variable
-     'bookmark-default-file
-     (concat user-emacs-directory "cache/bookmarks"))
+     'recentf-save-file (concat user-emacs-directory "cache/recentf"))
+
+    #+END_SRC
+
+*** Bookmark
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; custom:
+    ;; file in which to save bookmarks by default.
+    (customize-set-variable
+     'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))
 
     #+END_SRC
 
@@ -712,11 +736,11 @@
     (customize-set-variable 'truncate-lines nil)
 
     ;; Most *NIX tools work best when files are terminated
-    ;; with a newline.
+    ;; with a newline
     (customize-set-variable 'require-final-newline t)
 
     ;; sentences should be separated by a single space,
-    ;; so treat two sentences as two when filling.
+    ;; so treat two sentences as two when filling
     (customize-set-variable 'sentence-end-double-space nil)
 
     ;; default indent
@@ -747,7 +771,7 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    (customize-set-variable 'enable-recursive-minibuffers t)
+    (customize-set-variable 'enable-recursive-minibuffers nil)
 
     #+END_SRC
 
@@ -760,7 +784,7 @@
 
     #+END_SRC
 
-*** Comment
+*** Newcomment
 
     #+BEGIN_SRC emacs-lisp
 
@@ -768,17 +792,20 @@
 
     #+END_SRC
 
-*** Encode
-
-    Set the conding-system to utf8.
+*** Coding-system
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; conding-system (utf8)
+    ;; coding system to use with system messages
     (customize-set-variable 'locale-coding-system 'utf-8)
+
+    ;; coding system to be used for encoding the buffer contents on saving
     (customize-set-variable 'buffer-file-coding-system 'utf-8)
 
+    ;; add coding-system at the front of the priority list for automatic detection
     (prefer-coding-system 'utf-8)
+
+    ;; set coding system (UFT8)
     (set-language-environment "UTF-8")
     (set-terminal-coding-system 'utf-8)
     (set-keyboard-coding-system 'utf-8)
@@ -809,7 +836,7 @@
 
     (when (require 'time nil t)
       (progn
-        ;; customize
+        ;; customize:
         ;; seconds between updates of time in the mode line.
         (customize-set-variable 'display-time-interval 15)
 
@@ -822,18 +849,9 @@
         ;; load-average values below this value won’t be shown in the mode line.
         (customize-set-variable 'display-time-load-average-threshold 1.0)
 
-        ;; enable
+        ;; enable:
         ;; initialize display time mode
         (display-time-mode 1)))
-
-    #+END_SRC
-
-*** Mode-line
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; always refresh the modeline (reference)
-    ;; (add-hook 'buffer-list-update-hook 'func)
 
     #+END_SRC
 
@@ -847,18 +865,30 @@
 
     #+END_SRC
 
-*** Custom-file
+*** Custom
+
+    Emacs has many settings which you can change. Most settings are
+    customizable variables, which are also called user options.
+    There is a huge number of customizable variables,
+    controlling numerous aspects of Emacs behavior.
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; file used for storing customization information.
-    ;; The default is nil, which means to use your init file
-    ;; as specified by ‘user-init-file’.  If the value is not nil,
-    ;; it should be an absolute file name.
-    (setq custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
+    (when (require 'custom nil t)
+      (progn
+        ;; customize:
+        ;; file used for storing customization information.
+        ;; The default is nil, which means to use your init file
+        ;; as specified by ‘user-init-file’.  If the value is not nil,
+        ;; it should be an absolute file name.
+        (customize-set-variable
+         'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
 
-    ;; load custom file
-    (eos/load-file custom-file)
+        ;; hooks:
+        ;; load custom file (enable)
+        (add-hook 'after-emacs-init
+                  (lambda()
+                    (eos/load-file custom-file)))))
 
     #+END_SRC
 
@@ -917,7 +947,7 @@
 
      #+END_SRC
 
-**** Binds
+**** Bind
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1590,6 +1620,8 @@
      #+END_SRC
 
 *** Email
+**** Messages
+**** Gnus
 *** Feed
 **** Elfeed
 
@@ -2507,6 +2539,10 @@
 
 **** DocView
 **** Dictionary
+*** Agenda
+*** Web
+**** Webpaste
+**** Org-cms
 *** Analyse
 **** Verb
 *** Apparence
@@ -2931,7 +2967,7 @@
 
      (when (require 'cmake-ide nil t)
        (progn
-         ;; setup
+         ;; hooks:
          (add-hook 'c-mode-hook 'cmake-ide-setup)
          (add-hook 'c++-mode-hook 'cmake-ide-setup)))
 
@@ -3070,7 +3106,7 @@
 
 ** Development
 *** C/C++
-**** Utils
+**** Common
 
      #+BEGIN_SRC emacs-lisp
 
@@ -3101,7 +3137,7 @@
 
      (when (require 'cc-mode nil t)
        (progn
-         ;; hooks
+         ;; hooks:
          (add-hook 'c-mode-hook
                    (lambda ()
                      ;; set cc common company backends
@@ -3130,7 +3166,7 @@
                      ;; load rtags
                      (eos/cc/load-rtags)))))
 
-     ;; binds: c-mode-
+     ;; bind
      (when (boundp 'c-mode-map)
        (progn
          ;; set rtags prefix map in c-mode map (C-c r)
@@ -3217,7 +3253,7 @@
 
      #+END_SRC
 
-**** Binds
+**** Bind
 
      #+BEGIN_SRC emacs-lisp
 
@@ -3574,8 +3610,8 @@
      ;; (define-key ctl-x-map (kbd "C-0") nil)
      ;; (define-key ctl-x-map (kbd "C-z") nil)
      ;; (define-key ctl-x-map (kbd "C--") nil)
-     ;; (define-key ctl-x-map (kbd "C-d") nil)
      ;; (define-key ctl-x-map (kbd "ESC") nil)
+     (define-key ctl-x-map (kbd "C-d") nil)
      (define-key ctl-x-map (kbd "]") nil)
      (define-key ctl-x-map (kbd "C-z") nil)
      (define-key ctl-x-map (kbd "C-<left>") nil)

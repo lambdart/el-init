@@ -1751,16 +1751,25 @@
      (when (require 'helm-swoop nil t)
        (progn
          ;; custom
+         ;; if nil, you can slightly boost invoke speed in exchange for text color
          (customize-set-variable 'helm-swoop-speed-or-color nil)
+
+         ;; split window when having multiple windows open
          (customize-set-variable 'helm-swoop-split-with-multiple-windows t)
+
+         ;; if t, use fuzzy matching functions as well as exact matches
          (customize-set-variable 'helm-swoop-use-fuzzy-match t)
+
+         ;; return to the opposite side of line.
          (customize-set-variable 'helm-swoop-move-to-line-cycle t)
-         (customize-set-variable 'helm-swoop-use-line-number-face t)
+
+         ;; use face to line numbers on helm-swoop buffer
+         (customize-set-variable 'helm-swoop-use-line-number-face nil)
 
          ;; bind global
          (global-set-key (kbd "C-s") 'helm-swoop)))
 
-     ;; bind helm-swoop-map
+     ;; binds
      (when (boundp 'helm-swoop-map)
        (progn
          (define-key helm-swoop-map (kbd "C-s")
@@ -1786,13 +1795,10 @@
      ;; load helm-imenu
      (when (require 'helm-imenu nil t)
        (progn
-         ;; bind
+         ;; binds (C-x) prefix map
          (define-key ctl-x-map (kbd "TAB") 'helm-imenu-in-all-buffers)))
 
-     ;; bind global
-     ;; (global-set-key (kbd "C-M-i") 'helm-imenu-in-all-buffers)))
-
-     ;; bind
+     ;; binds (local map)
      (when (boundp 'helm-imenu-map)
        (progn
          (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
@@ -3642,6 +3648,8 @@
 *** Prefix
 **** Esc
 
+     Quality of life.
+
      #+BEGIN_SRC emacs-lisp
 
      ;; clean esc map
@@ -3651,6 +3659,8 @@
      #+END_SRC
 
 **** Ctl-x
+
+     Quality of life.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -3662,6 +3672,7 @@
      ;; (define-key ctl-x-map (kbd "C--") nil)
      ;; (define-key ctl-x-map (kbd "ESC") nil)
      ;; (define-key ctl-x-map (kbd ".") nil)
+     ;; (define-key ctl-x-map (kbd "C-l") nil)
      (define-key ctl-x-map (kbd "C-d") nil)
      (define-key ctl-x-map (kbd "]") nil)
      (define-key ctl-x-map (kbd "C-z") nil)
@@ -3674,7 +3685,6 @@
      (define-key ctl-x-map (kbd "[") nil)
      (define-key ctl-x-map (kbd "C-+") nil)
      (define-key ctl-x-map (kbd "C-a") nil)
-     (define-key ctl-x-map (kbd "C-l") nil)
      (define-key ctl-x-map (kbd "C-r") nil)
      (define-key ctl-x-map (kbd "C-n") nil)
      (define-key ctl-x-map (kbd "C-p") nil)
@@ -3720,12 +3730,15 @@
 
 *** Global
 
+    Quality of life.
+
     #+BEGIN_SRC emacs-lisp
 
     ;; unset
     (global-unset-key (kbd "C-z"))
     (global-unset-key (kbd "C-@"))
     (global-unset-key (kbd "C-\\"))
+    (global-unset-key (kbd "C-_"))
     (global-unset-key (kbd "M-l"))
     (global-unset-key (kbd "M-h"))
     (global-unset-key (kbd "M-\\"))

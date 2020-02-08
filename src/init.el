@@ -1111,16 +1111,25 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'helm-swoop nil t)
   (progn
     ;; custom
+    ;; if nil, you can slightly boost invoke speed in exchange for text color
     (customize-set-variable 'helm-swoop-speed-or-color nil)
+
+    ;; split window when having multiple windows open
     (customize-set-variable 'helm-swoop-split-with-multiple-windows t)
+
+    ;; if t, use fuzzy matching functions as well as exact matches
     (customize-set-variable 'helm-swoop-use-fuzzy-match t)
+
+    ;; return to the opposite side of line.
     (customize-set-variable 'helm-swoop-move-to-line-cycle t)
-    (customize-set-variable 'helm-swoop-use-line-number-face t)
+
+    ;; use face to line numbers on helm-swoop buffer
+    (customize-set-variable 'helm-swoop-use-line-number-face nil)
 
     ;; bind global
     (global-set-key (kbd "C-s") 'helm-swoop)))
 
-;; bind helm-swoop-map
+;; binds
 (when (boundp 'helm-swoop-map)
   (progn
     (define-key helm-swoop-map (kbd "C-s")
@@ -1134,13 +1143,10 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; load helm-imenu
 (when (require 'helm-imenu nil t)
   (progn
-    ;; bind
+    ;; binds (C-x) prefix map
     (define-key ctl-x-map (kbd "TAB") 'helm-imenu-in-all-buffers)))
 
-;; bind global
-;; (global-set-key (kbd "C-M-i") 'helm-imenu-in-all-buffers)))
-
-;; bind
+;; binds (local map)
 (when (boundp 'helm-imenu-map)
   (progn
     (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
@@ -2291,55 +2297,55 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key esc-map (kbd "<f10>") nil)
 
 ;; unbind
-;; (define-key ctl-x-map (kbd "C-SPC") nil)
-;; (define-key ctl-x-map (kbd "C-=") nil)
-;; (define-key ctl-x-map (kbd "C-0") nil)
-;; (define-key ctl-x-map (kbd "C-z") nil)
-;; (define-key ctl-x-map (kbd "C--") nil)
-;; (define-key ctl-x-map (kbd "ESC") nil)
-;; (define-key ctl-x-map (kbd ".") nil)
-(define-key ctl-x-map (kbd "C-d") nil)
-(define-key ctl-x-map (kbd "]") nil)
-(define-key ctl-x-map (kbd "C-z") nil)
-(define-key ctl-x-map (kbd "C-<left>") nil)
-(define-key ctl-x-map (kbd "C-<right>") nil)
-(define-key ctl-x-map (kbd "C-<up>") nil)
-(define-key ctl-x-map (kbd "C-<down>") nil)
-(define-key ctl-x-map (kbd "<right>") nil)
-(define-key ctl-x-map (kbd "<left>") nil)
-(define-key ctl-x-map (kbd "[") nil)
-(define-key ctl-x-map (kbd "C-+") nil)
-(define-key ctl-x-map (kbd "C-a") nil)
-(define-key ctl-x-map (kbd "C-l") nil)
-(define-key ctl-x-map (kbd "C-r") nil)
-(define-key ctl-x-map (kbd "C-n") nil)
-(define-key ctl-x-map (kbd "C-p") nil)
-(define-key ctl-x-map (kbd "C-o") nil)
-(define-key ctl-x-map (kbd "C-h") nil)
-(define-key ctl-x-map (kbd "C-u") nil)
-(define-key ctl-x-map (kbd "C-\@") nil)
-(define-key ctl-x-map (kbd "M-:") nil)
-(define-key ctl-x-map (kbd "`") nil)
-(define-key ctl-x-map (kbd ")") nil)
-(define-key ctl-x-map (kbd "(") nil)
-(define-key ctl-x-map (kbd "<") nil)
-(define-key ctl-x-map (kbd ">") nil)
-(define-key ctl-x-map (kbd "\@") nil)
-(define-key ctl-x-map (kbd "-") nil)
-(define-key ctl-x-map (kbd ";") nil)
-(define-key ctl-x-map (kbd "#") nil)
-(define-key ctl-x-map (kbd "*") nil)
-(define-key ctl-x-map (kbd "'") nil)
-(define-key ctl-x-map (kbd "$") nil)
-(define-key ctl-x-map (kbd "{") nil)
-(define-key ctl-x-map (kbd "}") nil)
-(define-key ctl-x-map (kbd "^") nil)
-(define-key ctl-x-map (kbd "n") nil)
-(define-key ctl-x-map (kbd "f") nil)
-(define-key ctl-x-map (kbd "a") nil)
-(define-key ctl-x-map (kbd "h") nil)
-(define-key ctl-x-map (kbd "v") nil)
-(define-key ctl-x-map (kbd "X") nil)
+     ;; (define-key ctl-x-map (kbd "C-SPC") nil)
+     ;; (define-key ctl-x-map (kbd "C-=") nil)
+     ;; (define-key ctl-x-map (kbd "C-0") nil)
+     ;; (define-key ctl-x-map (kbd "C-z") nil)
+     ;; (define-key ctl-x-map (kbd "C--") nil)
+     ;; (define-key ctl-x-map (kbd "ESC") nil)
+     ;; (define-key ctl-x-map (kbd ".") nil)
+     (define-key ctl-x-map (kbd "C-d") nil)
+     (define-key ctl-x-map (kbd "]") nil)
+     (define-key ctl-x-map (kbd "C-z") nil)
+     (define-key ctl-x-map (kbd "C-<left>") nil)
+     (define-key ctl-x-map (kbd "C-<right>") nil)
+     (define-key ctl-x-map (kbd "C-<up>") nil)
+     (define-key ctl-x-map (kbd "C-<down>") nil)
+     (define-key ctl-x-map (kbd "<right>") nil)
+     (define-key ctl-x-map (kbd "<left>") nil)
+     (define-key ctl-x-map (kbd "[") nil)
+     (define-key ctl-x-map (kbd "C-+") nil)
+     (define-key ctl-x-map (kbd "C-a") nil)
+;;     (define-key ctl-x-map (kbd "C-l") nil)
+     (define-key ctl-x-map (kbd "C-r") nil)
+     (define-key ctl-x-map (kbd "C-n") nil)
+     (define-key ctl-x-map (kbd "C-p") nil)
+     (define-key ctl-x-map (kbd "C-o") nil)
+     (define-key ctl-x-map (kbd "C-h") nil)
+     (define-key ctl-x-map (kbd "C-u") nil)
+     (define-key ctl-x-map (kbd "C-\@") nil)
+     (define-key ctl-x-map (kbd "M-:") nil)
+     (define-key ctl-x-map (kbd "`") nil)
+     (define-key ctl-x-map (kbd ")") nil)
+     (define-key ctl-x-map (kbd "(") nil)
+     (define-key ctl-x-map (kbd "<") nil)
+     (define-key ctl-x-map (kbd ">") nil)
+     (define-key ctl-x-map (kbd "\@") nil)
+     (define-key ctl-x-map (kbd "-") nil)
+     (define-key ctl-x-map (kbd ";") nil)
+     (define-key ctl-x-map (kbd "#") nil)
+     (define-key ctl-x-map (kbd "*") nil)
+     (define-key ctl-x-map (kbd "'") nil)
+     (define-key ctl-x-map (kbd "$") nil)
+     (define-key ctl-x-map (kbd "{") nil)
+     (define-key ctl-x-map (kbd "}") nil)
+     (define-key ctl-x-map (kbd "^") nil)
+     (define-key ctl-x-map (kbd "n") nil)
+     (define-key ctl-x-map (kbd "f") nil)
+     (define-key ctl-x-map (kbd "a") nil)
+     (define-key ctl-x-map (kbd "h") nil)
+     (define-key ctl-x-map (kbd "v") nil)
+     (define-key ctl-x-map (kbd "X") nil)
 
 ;; clean minor-mode-map-alist
 (setq minor-mode-map-alist nil)
@@ -2348,6 +2354,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-@"))
 (global-unset-key (kbd "C-\\"))
+(global-unset-key (kbd "C-_"))
 (global-unset-key (kbd "M-l"))
 (global-unset-key (kbd "M-h"))
 (global-unset-key (kbd "M-\\"))

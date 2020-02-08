@@ -107,6 +107,12 @@ tangled, and the tangled file is compiled."
   (message "Debug-on-error: %s"
            (if debug-on-error "enabled" "disabled")))
 
+(defun eos/buffer-too-big-p ()
+  "Return t if buffer-size if to big."
+  (interactive)
+  (or (> (buffer-size) (* 5000 80))
+      (> (line-number-at-pos (point-max)) 5000)))
+
 (defun eos/mkdir (dir)
   "Create DIR in the file system."
   ;; (interactive)
@@ -361,6 +367,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; (customize-set-variable 'inhibit-buffer-choice nil)
 
+;; custom
 ;; non-nil means do not display continuation lines.
 (customize-set-variable 'truncate-lines nil)
 
@@ -384,6 +391,12 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; non-nil means load prefers the newest version of a file.
 (customize-set-variable 'load-prefer-newer t)
+
+;; hooks
+;; (add-hook 'buffer-list-update-hook
+;;           (lambda ()
+;;             (if (eos/buffer-too-big-p)
+;;                 (eos/funcall 'display-line-numbers 0))))
 
 (customize-set-variable 'enable-recursive-minibuffers nil)
 

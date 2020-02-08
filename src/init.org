@@ -228,6 +228,18 @@
 
      #+END_SRC
 
+**** Buffer
+
+     #+BEGIN_SRC emacs-lisp
+
+     (defun eos/buffer-too-big-p ()
+       "Return t if buffer-size if to big."
+       (interactive)
+       (or (> (buffer-size) (* 5000 80))
+           (> (line-number-at-pos (point-max)) 5000)))
+
+     #+END_SRC
+
 **** Files
 
      Create a directory in the virtual file system, only if
@@ -592,10 +604,11 @@
 
 *** Buffer
 
-    Customize some buffer options.
+    Buffer options configuration.
 
     #+BEGIN_SRC emacs-lisp
 
+    ;; custom
     ;; non-nil means do not display continuation lines.
     (customize-set-variable 'truncate-lines nil)
 
@@ -619,6 +632,12 @@
 
     ;; non-nil means load prefers the newest version of a file.
     (customize-set-variable 'load-prefer-newer t)
+
+    ;; hooks
+    ;; (add-hook 'buffer-list-update-hook
+    ;;           (lambda ()
+    ;;             (if (eos/buffer-too-big-p)
+    ;;                 (eos/funcall 'display-line-numbers 0))))
 
     #+END_SRC
 

@@ -28,31 +28,17 @@
 
   Download and execute the installation script:
 
-   - via fetch:
-
-     #+BEGIN_SRC
-     fetch https://github.com/esac-io/eos/scripts/install.sh && sh install.sh
-     #+END_SRC
-
-   - via curl:
-
-     #+BEGIN_SRC
+  #+BEGIN_SRC
      sh -c "$(curl -fsSL https://github.com/esac-io/eos/scripts/install.sh)"
-     #+END_SRC
+  #+END_SRC
 
-   - via wget:
+  Script steps:
 
-     #+BEGIN_SRC
-     sh -c "$(wget -O- https://github.com/esac-io/eos/scripts/install.sh)"
-     #+END_SRC
-
-   Script steps:
-
-   1) Check dependencies
-   2) Clone Cask and EOS repositories
-   3) Backup ~.emacs.d~ directory
-   4) Install third-party packages: ~Cask~
-   5) Build and compile: ~init.org~
+  1) Check dependencies
+  2) Clone Cask and EOS repositories
+  3) Backup ~.emacs.d~ directory
+  4) Install third-party packages: ~Cask~
+  5) Build and compile: ~init.org~
 
 * Usage
 
@@ -147,35 +133,15 @@
     You can always use the functions =C-h k= (describe-key) and
     =C-h b= (describe-bindings) to require this information.
 
-# **** TODO: Table!
+    # **** TODO: Table!
 
-     | Keymap | Keybind | function |
-     |        |         |          |
-     - Table 1.3 (Global-map)
+    | Keymap | Keybind | function |
+    |        |         |          |
+    - Table 1.3 (Global-map)
 
 * Applications
   # ** TODO List and summarize apps
   # ** TODO Short by app classification
-** Miscellaneous
-*** Which-key
-
-    I like to think of this package (or app) as a guiding map among
-    the available keybindds. It's usability is quite simple,
-    just press any keybinds sequence, e.g, =C-x=,
-    and wait a litle bit, if the sequence is a prefix
-    it will open a menu with the list of possible keys from
-    the prefix entered.
-
-    Inside a which-key popup you can enter in other
-    prefixs (parent or childs). So, as you can see, it's like
-    a visual map.
-
-    - TIP: If you want to visit a parent prefix, just press =C-h u=,
-      inside the which-key popup.
-
-    - TIP: Within which-key popup press =C-h= (help) and explore its
-      options.
-
 * Package Manager
 ** Add
 
@@ -257,6 +223,5 @@
 
 * EOF
 
-  ... Present day, present time ...
-
-  /me "I feel confined, only free to expan myself within boundaries."
+  I feel confined, only free to expand myself within boundaries.
+  |puppet master|

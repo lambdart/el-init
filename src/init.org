@@ -16,7 +16,7 @@
     #+BEGIN_SRC emacs-lisp
 
     ;;; Package --- eos
-    ;;; Commentary:
+    ;;; Commentary: ... Present day, present time ....
     ;;; Code:
 
     #+END_SRC
@@ -686,40 +686,56 @@
     (when (require 'server nil t)
       (progn
         ;; hooks
-        ;; starts server after startup
+        ;; enable emacs server after startup
         (add-hook 'emacs-startup-hook
                   (lambda ()
-                    ;; server start
                     (eos/funcall 'server-start)))))
 
     #+END_SRC
 
 *** Help
+**** Help
 
-    GNU Emacs's built-in help system, the one invoked by
-    M-x help-for-help.
+     GNU Emacs's built-in help system, the one invoked by
+     M-x help-for-help.
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-    (when (require 'help nil t)
-      (progn
-        ;; custom
-        ;; always select the help window
-        (customize-set-variable 'help-window-select t)))
+     (when (require 'help nil t)
+       (progn
+         ;; custom
+         ;; always select the help window
+         (customize-set-variable 'help-window-select t)))
 
-    ;; binds
-    (when (boundp 'help-map)
-      (progn
-        ;; clean, quality of life
-        (define-key help-map (kbd "<help>") nil)
-        (define-key help-map (kbd "<f1>") nil)
-        (define-key help-map (kbd "C-n") nil)
-        (define-key help-map (kbd "C-h") nil)
-        (define-key help-map (kbd "C-;") nil)
-        (define-key help-map (kbd "K") nil)
-        (define-key help-map (kbd "RET") nil)))
+     ;; binds
+     (when (boundp 'help-map)
+       (progn
+         ;; clean, quality of life
+         (define-key help-map (kbd "<help>") nil)
+         (define-key help-map (kbd "<f1>") nil)
+         (define-key help-map (kbd "C-n") nil)
+         (define-key help-map (kbd "C-h") nil)
+         (define-key help-map (kbd "C-;") nil)
+         (define-key help-map (kbd "K") nil)
+         (define-key help-map (kbd "RET") nil)))
 
-    #+END_SRC
+     #+END_SRC
+
+**** Help-mode
+
+     Help-mode, which is the mode used by *Help* buffers, and
+     associated support machinery, such as adding hyperlinks, etc...
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'help-mode nil t)
+
+     ;; binds
+     (when (boundp 'help-mode-map)
+       (progn
+         (define-key help-mode-map (kbd "C-j") 'push-button)))
+
+     #+END_SRC
 
 *** Info
 *** Fringe
@@ -814,28 +830,28 @@
 
 *** Savehist
 
-     Many editors (e.g. Vim) have the feature of saving minibuffer
-     history to an external file after exit.  This package provides the
-     same feature in Emacs.  When set up, it saves recorded minibuffer
-     histories to a file (`~/.emacs-history' by default).  Additional
-     variables may be specified by customizing
-     `savehist-additional-variables'.
+    Many editors (e.g. Vim) have the feature of saving minibuffer
+    history to an external file after exit.  This package provides the
+    same feature in Emacs.  When set up, it saves recorded minibuffer
+    histories to a file (`~/.emacs-history' by default).  Additional
+    variables may be specified by customizing
+    `savehist-additional-variables'.
 
-     #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
 
-     (when (require 'savehist nil t)
-       (progn
-         ;; file name where minibuffer history is saved to and loaded from.
-         (customize-set-variable
-          'savehist-file (concat user-emacs-directory "cache/history"))
+    (when (require 'savehist nil t)
+      (progn
+        ;; file name where minibuffer history is saved to and loaded from.
+        (customize-set-variable
+         'savehist-file (concat user-emacs-directory "cache/history"))
 
-         ;; if non-nil, save all recorded minibuffer histories.
-         (customize-set-variable 'savehist-save-minibuffer-history t)
+        ;; if non-nil, save all recorded minibuffer histories.
+        (customize-set-variable 'savehist-save-minibuffer-history t)
 
-         ;; enable savehist mode
-         (eos/funcall 'savehist-mode 1)))
+        ;; enable savehist mode
+        (eos/funcall 'savehist-mode 1)))
 
-     #+END_SRC
+    #+END_SRC
 
 *** Frame
 
@@ -884,6 +900,9 @@
 
     ;; binds
     ;; (global-set-key (kbd "M-z") 'other-frame)))
+
+    ;; set font by face attribute (reference)
+    ;; (set-face-attribute 'default nil :height)
 
     #+END_SRC
 
@@ -981,7 +1000,7 @@
         (customize-set-variable 'display-time-load-average-threshold 1.0)
 
         ;; enable display time
-        (eos/funcall display-time-mode 1)))
+        (eos/funcall 'display-time-mode 1)))
 
     #+END_SRC
 
@@ -1137,33 +1156,6 @@
     #+END_SRC
 
 ** Applications
-*** Apparence
-**** Theme
-***** Mesk-term
-
-      Add theme directory to load-path and load the
-      default theme (mesk-term).
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; add eos-theme-dir to theme load path
-      (add-to-list 'custom-theme-load-path
-                   (concat user-emacs-directory "themes"))
-
-      ;; load theme
-      (load-theme 'mesk-term t)
-
-      #+END_SRC
-
-**** Font
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; set font by face attribute (reference)
-     ;; (set-face-attribute 'default nil :height)
-
-     #+END_SRC
-
 *** Package Manager
 **** Cask
 
@@ -1504,6 +1496,24 @@
 
      #+END_SRC
 
+*** Apparence
+**** Theme
+***** Mesk-term
+
+      Add theme directory to load-path and load the
+      default theme.
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; add eos-theme-dir to theme load path
+      (add-to-list 'custom-theme-load-path
+                   (concat user-emacs-directory "themes"))
+
+      ;; load theme
+      (load-theme 'mesk-term t)
+
+      #+END_SRC
+
 *** Session
 **** Desktop
 *** Security
@@ -1600,22 +1610,6 @@
      #+END_SRC
 
 *** Help
-**** Help-mode
-
-     Help-mode, which is the mode used by *Help* buffers, and
-     associated support machinery, such as adding hyperlinks, etc...
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'help-mode nil t)
-
-     ;; binds
-     (when (boundp 'help-mode-map)
-       (progn
-         (define-key help-mode-map (kbd "C-j") 'push-button)))
-
-     #+END_SRC
-
 **** Helm-info
 
      #+BEGIN_SRC emacs-lisp
@@ -1639,9 +1633,12 @@
          (customize-set-variable 'helm-descbinds-window-style 2)
 
          ;; binds
-         (if (boundp 'helm-map)
-             (progn
-               (define-key help-map (kbd "b") 'helm-descbinds)))))
+         ;; help-map (C-h)
+         (if (boundp 'help-map)
+             (define-key help-map (kbd "b") 'helm-descbinds))
+
+         ;; ctl-x-map (C-x)
+         (define-key ctl-x-map (kbd "C-x") 'helm-descbinds)))
 
      #+END_SRC
 
@@ -1727,97 +1724,6 @@
      #+END_SRC
 
 *** View
-**** Which-key
-
-     The mode displays the key bindings following your currently entered incomplete command (a
-     prefix) in a popup. For example, after enabling the minor mode if you enter
-     C-x and wait for the default of 1 second the minibuffer will expand with all
-     of the available key bindings that follow C-x (or as many as space allows
-     given your settings).
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'which-key nil t)
-       (progn
-         ;; custom
-         ;; (customize-set-variable 'which-key-paging-key nil)
-         (customize-set-variable 'which-key-idle-delay 0.5)
-         (customize-set-variable 'which-key-idle-secondary-delay 0.1)
-         (customize-set-variable 'which-key-separator " - ")
-         (customize-set-variable 'which-key-use-C-h-commands t)
-         (customize-set-variable 'which-key-add-column-padding 2)
-         (customize-set-variable 'which-key-side-window-location 'bottom)
-         (customize-set-variable 'which-key-sort-order
-                                 'which-key-key-order-alpha)
-
-         ;; if non-nil allow which-key to use a less intensive method of Hide
-         ;; fitting the popup window to the buffer.
-         (customize-set-variable 'which-key-allow-imprecise-window-fit t)
-
-         ;; bind
-         (define-key ctl-x-map (kbd "x") 'which-key-show-major-mode)
-
-         ;; init which-key-mode after emacs initialize
-         (add-hook 'after-init-hook 'which-key-mode)))
-
-     (when (boundp 'which-key-replacement-alist)
-       (progn
-         ;; custom key replacements
-         (add-to-list 'which-key-replacement-alist
-                      '(("\\(.+\\)" .
-                         "\\(\\(helm-\\)\\|.?\\(projectile\\|rtags\\|gtags\\|flycheck\\|company\\|dash\\|yas\\)[\-]\\)")
-                        . (nil . "")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "helm-dash") . (nil . "search")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "helm-dash-at-point") . (nil . "search-at-point")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "helm-flycheck") . (nil . "list-erros")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "flycheck-list-errors") . (nil . "list-erros-other-window")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "eos-rtags-map") . (nil . "rtags")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "eos-tags-map") . (nil . "gtags")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "eos-pm-map") . (nil . "projectile")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "eos-window-map") . (nil . "window")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "eos-docs-map") . (nil . "dash")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "eos-sc-map") . (nil . "flycheck")))
-
-         (add-to-list 'which-key-replacement-alist
-                      '((nil . "eos-complete-map") . (nil . "complete")))))
-
-     (when (fboundp 'which-key-add-key-based-replacements)
-       (which-key-add-key-based-replacements
-         "C-x @"   "event"
-         "C-x RET" "set"
-         "C-x r"   "regs"
-         "C-x @"   "event"
-         "C-x 4"   "other"
-         "C-x 5"   "frame"
-         "C-x 6"   "2c"
-         "C-x <end>" "eos/lock-screen"
-         "C-x ESC"   "rept"
-         "C-x 8"   "iso"
-         "C-x m"   "kmacro"
-         "C-h 4"   "other"))
-
-     #+END_SRC
-
 *** Search
 **** Helm-swoop
 
@@ -1881,10 +1787,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'dired nil t)
-       (progn
-         ;; enable find-alternate-file
-         (put 'dired-find-alternate-file 'disabled nil)))
+     (require 'dired nil t)
 
      #+END_SRC
 
@@ -1904,45 +1807,8 @@
      ;; binds
      (if (boundp 'dired-mode-map)
          (progn
-           ;;     (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+           (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
            (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)))
-
-     #+END_SRC
-
-**** Dired-sidebar
-
-     This package provides a tree browser similar to `neotree' or `treemacs'
-     but leverages `dired' to do the job of display.
-     Enables a sidebar (small buffer at left) browser using dired.
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'dired-sidebar nil t)
-       (progn
-         ;; custom
-         ;; close sidebar when dired-sidebar-find-file it's called
-         (customize-set-variable
-          'dired-sidebar-close-sidebar-on-file-open t)
-
-         ;; when finding file to point at for
-         ;; dired-sidebar-follow-file-at-point-on-toggle-open, use file at point
-         ;; in magit buffer.
-         (customize-set-variable
-          'dired-sidebar-use-magit-integration t)
-
-         ;; refresh on projectile switch
-         (customize-set-variable
-          'dired-sidebar-refresh-on-projectile-switch t)
-
-         ;; only show one buffer instance for dired-sidebar for each frame
-         (customize-set-variable 'dired-sidebar-one-instance-p t)
-
-         ;; refresh sidebar to match current file.
-         (customize-set-variable 'dired-sidebar-should-follow-file t)
-
-         ;; bind
-         ;; assign C-x C-d to sidebar file browser
-         (define-key ctl-x-map (kbd "C-d") 'dired-sidebar-toggle-sidebar)))
 
      #+END_SRC
 
@@ -2425,7 +2291,7 @@
           (concat user-emacs-directory "cache/dmenu-items"))
 
          ;; bind
-         (define-key ctl-x-map (kbd "C-x") 'dmenu)))
+         (define-key ctl-x-map (kbd "x") 'dmenu)))
 
      #+END_SRC
 
@@ -2609,24 +2475,35 @@
 **** Emms
 
      Emms is the Emacs Multi-Media System. It tries to be a clean and small
-     application to play multimedia files from Emacs using external players.
+     application to play multimedia files from Emacs using external
+     players. The basic functionality of Emms consists of three parts:
+     The core, the sources, and the players.
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'emms-setup nil t)
-       (progn
-         ;; enable emms
-         (add-hook 'after-emacs-init 'emms-all)))
-
      (when (require 'emms nil t)
        (progn
+         (require 'emms-player-simple)
+         (require 'emms-source-file)
+         (require 'emms-source-playlist)
+
          ;; custom
          ;; list of players that emms can use (only mpv)
          (customize-set-variable 'emms-player-list '(emms-player-mpv))
 
          ;; the default directory to look for media files.
          (customize-set-variable
-          'emms-source-file-default-directory (expand-file-name "~/media"))))
+          'emms-source-file-default-directory (expand-file-name "~/media"))
+
+         ;; hooks
+         ;; disable emms mode line
+         (add-hook 'emms-playlist-mode-hook
+                   (lambda ()
+                     (when (and (boundp 'emms-mode-line-active-p)
+                                (fboundp 'emms-mode-line-disable))
+                       (progn
+                         (if emms-mode-line-active-p
+                             (emms-mode-line-disable))))))))
 
      #+END_SRC
 
@@ -2653,6 +2530,17 @@
      #+END_SRC
 
 **** Tex
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'tex-mode nil t)
+       (progn
+         ;; custom
+         ;; hooks
+         ))
+
+     #+END_SRC
+
 **** Text
 
      #+BEGIN_SRC emacs-lisp
@@ -2678,8 +2566,7 @@
                          company-capf
                          company-dabbrev-code
                          company-dabbrev)
-                        (company-files)))))
-         ))
+                        (company-files)))))))
 
      #+END_SRC
 

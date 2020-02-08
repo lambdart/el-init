@@ -1,5 +1,5 @@
 ;;; Package --- eos
-;;; Commentary:
+;;; Commentary: ... Present day, present time ....
 ;;; Code:
 
 ;;; -*- lexical-binding: t -*-
@@ -421,10 +421,9 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'server nil t)
   (progn
     ;; hooks
-    ;; starts server after startup
+    ;; enable emacs server after startup
     (add-hook 'emacs-startup-hook
               (lambda ()
-                ;; server start
                 (eos/funcall 'server-start)))))
 
 (when (require 'help nil t)
@@ -444,6 +443,13 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key help-map (kbd "C-;") nil)
     (define-key help-map (kbd "K") nil)
     (define-key help-map (kbd "RET") nil)))
+
+(require 'help-mode nil t)
+
+;; binds
+(when (boundp 'help-mode-map)
+  (progn
+    (define-key help-mode-map (kbd "C-j") 'push-button)))
 
 (when (require 'fringe nil t)
   (progn
@@ -561,6 +567,9 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; binds
 ;; (global-set-key (kbd "M-z") 'other-frame)))
 
+;; set font by face attribute (reference)
+;; (set-face-attribute 'default nil :height)
+
 (when (require 'windmove nil t)
   (progn
     ;; hooks
@@ -621,7 +630,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'display-time-load-average-threshold 1.0)
 
     ;; enable display time
-    (eos/funcall display-time-mode 1)))
+    (eos/funcall 'display-time-mode 1)))
 
 (when (require 'tool-bar nil t)
   (progn
@@ -696,16 +705,6 @@ point is on a symbol, return that symbol name.  Else return nil."
     (add-hook 'after-emacs-init
               (lambda()
                 (eos/load-file custom-file)))))
-
-;; add eos-theme-dir to theme load path
-(add-to-list 'custom-theme-load-path
-             (concat user-emacs-directory "themes"))
-
-;; load theme
-(load-theme 'mesk-term t)
-
-;; set font by face attribute (reference)
-;; (set-face-attribute 'default nil :height)
 
 ;; avoid warnings when byte-compile
 (eval-when-compile
@@ -978,6 +977,13 @@ point is on a symbol, return that symbol name.  Else return nil."
             helm-source-buffers-list
             helm-source-buffer-not-found))))
 
+;; add eos-theme-dir to theme load path
+(add-to-list 'custom-theme-load-path
+             (concat user-emacs-directory "themes"))
+
+;; load theme
+(load-theme 'mesk-term t)
+
 (defun eos/lookup-password (host user port)
   "Lookup password on auth-source default file."
   (let ((auth (auth-source-search :host host :user user :port port)))
@@ -1024,13 +1030,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'notifications nil t)
 
-(require 'help-mode nil t)
-
-;; binds
-(when (boundp 'help-mode-map)
-  (progn
-    (define-key help-mode-map (kbd "C-j") 'push-button)))
-
 (when (require 'helm-info nil t)
   (progn
     ;; binds
@@ -1044,9 +1043,12 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'helm-descbinds-window-style 2)
 
     ;; binds
-    (if (boundp 'helm-map)
-        (progn
-          (define-key help-map (kbd "b") 'helm-descbinds)))))
+    ;; help-map (C-h)
+    (if (boundp 'help-map)
+        (define-key help-map (kbd "b") 'helm-descbinds))
+
+    ;; ctl-x-map (C-x)
+    (define-key ctl-x-map (kbd "C-x") 'helm-descbinds)))
 
 (when (require 'iedit nil t)
   (progn
@@ -1093,85 +1095,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; binds
 ;; (define-key ctl-x-map (kbd "b") 'ibuffer)))
 
-(when (require 'which-key nil t)
-  (progn
-    ;; custom
-    ;; (customize-set-variable 'which-key-paging-key nil)
-    (customize-set-variable 'which-key-idle-delay 0.5)
-    (customize-set-variable 'which-key-idle-secondary-delay 0.1)
-    (customize-set-variable 'which-key-separator " - ")
-    (customize-set-variable 'which-key-use-C-h-commands t)
-    (customize-set-variable 'which-key-add-column-padding 2)
-    (customize-set-variable 'which-key-side-window-location 'bottom)
-    (customize-set-variable 'which-key-sort-order
-                            'which-key-key-order-alpha)
-
-    ;; if non-nil allow which-key to use a less intensive method of Hide
-    ;; fitting the popup window to the buffer.
-    (customize-set-variable 'which-key-allow-imprecise-window-fit t)
-
-    ;; bind
-    (define-key ctl-x-map (kbd "x") 'which-key-show-major-mode)
-
-    ;; init which-key-mode after emacs initialize
-    (add-hook 'after-init-hook 'which-key-mode)))
-
-(when (boundp 'which-key-replacement-alist)
-  (progn
-    ;; custom key replacements
-    (add-to-list 'which-key-replacement-alist
-                 '(("\\(.+\\)" .
-                    "\\(\\(helm-\\)\\|.?\\(projectile\\|rtags\\|gtags\\|flycheck\\|company\\|dash\\|yas\\)[\-]\\)")
-                   . (nil . "")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "helm-dash") . (nil . "search")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "helm-dash-at-point") . (nil . "search-at-point")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "helm-flycheck") . (nil . "list-erros")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "flycheck-list-errors") . (nil . "list-erros-other-window")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-rtags-map") . (nil . "rtags")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-tags-map") . (nil . "gtags")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-pm-map") . (nil . "projectile")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-window-map") . (nil . "window")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-docs-map") . (nil . "dash")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-sc-map") . (nil . "flycheck")))
-
-    (add-to-list 'which-key-replacement-alist
-                 '((nil . "eos-complete-map") . (nil . "complete")))))
-
-(when (fboundp 'which-key-add-key-based-replacements)
-  (which-key-add-key-based-replacements
-    "C-x @"   "event"
-    "C-x RET" "set"
-    "C-x r"   "regs"
-    "C-x @"   "event"
-    "C-x 4"   "other"
-    "C-x 5"   "frame"
-    "C-x 6"   "2c"
-    "C-x <end>" "eos/lock-screen"
-    "C-x ESC"   "rept"
-    "C-x 8"   "iso"
-    "C-x m"   "kmacro"
-    "C-h 4"   "other"))
-
 (when (require 'helm-swoop nil t)
   (progn
     ;; custom
@@ -1209,10 +1132,7 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
 
-(when (require 'dired nil t)
-  (progn
-    ;; enable find-alternate-file
-    (put 'dired-find-alternate-file 'disabled nil)))
+(require 'dired nil t)
 
 (when (require 'dired-async nil t)
   (progn
@@ -1222,35 +1142,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; binds
 (if (boundp 'dired-mode-map)
     (progn
-      ;;     (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+      (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
       (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)))
-
-(when (require 'dired-sidebar nil t)
-  (progn
-    ;; custom
-    ;; close sidebar when dired-sidebar-find-file it's called
-    (customize-set-variable
-     'dired-sidebar-close-sidebar-on-file-open t)
-
-    ;; when finding file to point at for
-    ;; dired-sidebar-follow-file-at-point-on-toggle-open, use file at point
-    ;; in magit buffer.
-    (customize-set-variable
-     'dired-sidebar-use-magit-integration t)
-
-    ;; refresh on projectile switch
-    (customize-set-variable
-     'dired-sidebar-refresh-on-projectile-switch t)
-
-    ;; only show one buffer instance for dired-sidebar for each frame
-    (customize-set-variable 'dired-sidebar-one-instance-p t)
-
-    ;; refresh sidebar to match current file.
-    (customize-set-variable 'dired-sidebar-should-follow-file t)
-
-    ;; bind
-    ;; assign C-x C-d to sidebar file browser
-    (define-key ctl-x-map (kbd "C-d") 'dired-sidebar-toggle-sidebar)))
 
 (require 'elfeed nil t)
 
@@ -1544,7 +1437,7 @@ point is on a symbol, return that symbol name.  Else return nil."
      (concat user-emacs-directory "cache/dmenu-items"))
 
     ;; bind
-    (define-key ctl-x-map (kbd "C-x") 'dmenu)))
+    (define-key ctl-x-map (kbd "x") 'dmenu)))
 
 (when (require 'comint nil t)
   (progn
@@ -1635,20 +1528,29 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key ctl-x-map (kbd "C--") 'eos/lower-volume)
 (define-key ctl-x-map (kbd "C-=") 'eos/raise-volume)
 
-(when (require 'emms-setup nil t)
-  (progn
-    ;; enable emms
-    (add-hook 'after-emacs-init 'emms-all)))
-
 (when (require 'emms nil t)
   (progn
+    (require 'emms-player-simple)
+    (require 'emms-source-file)
+    (require 'emms-source-playlist)
+
     ;; custom
     ;; list of players that emms can use (only mpv)
     (customize-set-variable 'emms-player-list '(emms-player-mpv))
 
     ;; the default directory to look for media files.
     (customize-set-variable
-     'emms-source-file-default-directory (expand-file-name "~/media"))))
+     'emms-source-file-default-directory (expand-file-name "~/media"))
+
+    ;; hooks
+    ;; disable emms mode line
+    (add-hook 'emms-playlist-mode-hook
+              (lambda ()
+                (when (and (boundp 'emms-mode-line-active-p)
+                           (fboundp 'emms-mode-line-disable))
+                  (progn
+                    (if emms-mode-line-active-p
+                        (emms-mode-line-disable))))))))
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -1664,6 +1566,12 @@ point is on a symbol, return that symbol name.  Else return nil."
                 company-dabbrev
                 company-dabbrev-code)
                (company-files)))))
+
+(when (require 'tex-mode nil t)
+  (progn
+    ;; custom
+    ;; hooks
+    ))
 
 (when (require 'text-mode nil t)
   (progn
@@ -1686,8 +1594,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                     company-capf
                     company-dabbrev-code
                     company-dabbrev)
-                   (company-files)))))
-    ))
+                   (company-files)))))))
 
 (when (require 'markdown-mode nil t)
   (progn

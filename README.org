@@ -1,4 +1,4 @@
-* EOS
+* EMACS OS
 
   Just another org-mode based emacs configuration,
   or a elisp interpreter desktop distribution.
@@ -6,6 +6,10 @@
 * Demo
   # ** TODO Add demo link
   # ** TODO Add screen-shot
+
+  Using emacs (lisp interpreter) as the only IO bridge
+  between human and machine.
+
 * Introduction
 
   Using emacs (elisp interpreter) as the only IO bridge
@@ -28,47 +32,36 @@
 
   Download and execute the installation script:
 
-   - via fetch:
-
-     #+BEGIN_SRC
-     fetch https://github.com/esac-io/eos/scripts/install.sh && sh install.sh
-     #+END_SRC
-
-   - via curl:
-
-     #+BEGIN_SRC
+  #+BEGIN_SRC
      sh -c "$(curl -fsSL https://github.com/esac-io/eos/scripts/install.sh)"
-     #+END_SRC
+  #+END_SRC
 
-   - via wget:
+  Script steps:
 
-     #+BEGIN_SRC
-     sh -c "$(wget -O- https://github.com/esac-io/eos/scripts/install.sh)"
-     #+END_SRC
-
-   Script steps:
-
-   1) Check dependencies
-   2) Clone Cask and EOS repositories
-   3) Backup ~.emacs.d~ directory
-   4) Install third-party packages: ~Cask~
-   5) Build and compile: ~init.org~
+  1) Check dependencies
+  2) Clone Cask and EOS repositories
+  3) Backup ~.emacs.d~ directory
+  4) Install third-party packages using cask: ~Cask~
+  5) Build and compile: ~init.org~
 
 * Usage
 
-  Using this emacs configuration is like using emacs vanilla itself
-  with a “few” reforms.  As such, the official interactive emacs
-  tutorial is a great way to start to understanding a little
-  bit of the emacs universe.
+  Using this Emacs configuration isn't different of using
+  Emacs vanilla itself with a “few” reforms.
+  As such, the official Emacs tutorial is a great way to understanding
+  a little bit of this amazing universe.
 
-  So, open emacs and press =C-h= and wait =0.2 ms=, the which-key
-  popup will bring to you the help options available,
-  press =t= to start the tutorial.
+  So, open Emacs and press =C-h= (the help map prefix) and
+  press =t= to evaluate ~help-with-tutorial~ function that will
+  start the interactive tutorial.
 
-  And, just enjoy your late nights :)
+  - Enjoy your late nights :)
+
+  - Note: The main purpose of the Emacs tutorial is to teach you
+    the most important standard Emacs commands (key bindings).
 
   - Note: Some keybinds will be not the same, in the next session
-    will be available a overview on how we map elisp functions (keybind).
+    will be available a overview on how/where we map elisp function.
 
 ** Keybinds
 
@@ -147,69 +140,17 @@
     You can always use the functions =C-h k= (describe-key) and
     =C-h b= (describe-bindings) to require this information.
 
-# **** TODO: Table!
+    # **** TODO: Table!
 
-     | Keymap | Keybind | function |
-     |        |         |          |
-     - Table 1.3 (Global-map)
+    | Keymap | Keybind | function |
+    |        |         |          |
+    - Table 1.3 (Global-map)
 
 * Applications
   # ** TODO List and summarize apps
   # ** TODO Short by app classification
-** Miscellaneous
-*** Which-key
-
-    I like to think of this package (or app) as a guiding map among
-    the available keybindds. It's usability is quite simple,
-    just press any keybinds sequence, e.g, =C-x=,
-    and wait a litle bit, if the sequence is a prefix
-    it will open a menu with the list of possible keys from
-    the prefix entered.
-
-    Inside a which-key popup you can enter in other
-    prefixs (parent or childs). So, as you can see, it's like
-    a visual map.
-
-    - TIP: If you want to visit a parent prefix, just press =C-h u=,
-      inside the which-key popup.
-
-    - TIP: Within which-key popup press =C-h= (help) and explore its
-      options.
-
 * Package Manager
-** Add
-
-   To add your on packages just edit =~/.emacs.d/Cask= file,
-   you have to add something like this on it:
-
-   #+BEGIN_SRC sh
-
-   (depends-on "<package-name>")
-
-   #+END_SRC
-
-   See Cask documentation[7] for more information.
-
-** Remove
-*** Manually
-
-    You have to manually remove the packages directory from
-    Cask's package-directory, just use the following command
-    to figure it out where your packages are.
-
-    #+BEGIN_SRC sh
-
-    cd ~/.emacs.d; cask package-directory
-
-    #+END_SRC
-
-    And then remove/move the package's directory.
-
-    Important: If the directory is not removed or moved
-    ~init.org~ will continue to load and configure it.
-
 * Miscellaneous
-** A user story
 ** Advices
 
    1. Do one thing and do it well.
@@ -248,15 +189,12 @@
   3. https://github.com/bbatsov/prelude
   4. https://cask.readthedocs.io/en/latest
   5. https://www.gnu.org/software/emacs/manual/html_node/emacs/Keymaps.html
-  6. https://github.com/seagle0128/.emacs.d
-  7. https://github.com/larstvei/dot-emacs/blob/master/init.org
-  8. https://zzamboni.org/post/my-emacs-configuration-with-commentary
+  6. https://github.com/larstvei/dot-emacs/blob/master/init.org
 
 * LICENSE
   MIT
 
 * EOF
 
-  ... Present day, present time ...
-
-  /me "I feel confined, only free to expan myself within boundaries."
+  I feel confined, only free to expand myself within boundaries.
+  |puppet master|

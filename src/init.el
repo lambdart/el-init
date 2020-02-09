@@ -1,4 +1,4 @@
-(when (require 'hs-minor-mode nil t)
+(when (require 'hideshow nil t)
   (progn
     ;; add doxygen
     (add-hook 'prog-mode-hook 'hs-minor-mode)
@@ -2325,7 +2325,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; (define-key ctl-x-map (kbd ".") nil)
 ;; (define-key ctl-x-map (kbd "C-l") nil)
 (define-key ctl-x-map (kbd "C-d") nil)
-(define-key ctl-x-map (kbd "]") nil)
+;;(define-key ctl-x-map (kbd "]") nil)
 (define-key ctl-x-map (kbd "C-z") nil)
 (define-key ctl-x-map (kbd "C-<left>") nil)
 (define-key ctl-x-map (kbd "C-<right>") nil)

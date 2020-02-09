@@ -1184,6 +1184,21 @@
 
     #+END_SRC
 
+*** Hideshow
+
+   Minor mode to hide and show code and comment blocks.
+
+   #+BEGIN_SRC elisp
+
+   (when (require 'hideshow nil t)
+     (progn
+       ;; add doxygen
+       (add-hook 'prog-mode-hook 'hs-minor-mode)
+
+       (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
+
+   #+END_SRC
+
 ** Applications
 *** Package Manager
 **** Cask
@@ -3681,21 +3696,6 @@
 
 *** PHP
 *** HTML
-*** Hide-show (blocks)
-
-    Minor mode to hide and show code and comment blocks.
-
-    #+BEGIN_SRC elisp
-
-    (when (require 'hs-minor-mode nil t)
-      (progn
-        ;; add doxygen
-        (add-hook 'prog-mode-hook 'hs-minor-mode)
-
-        (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
-
-    #+END_SRC
-
 ** Unbind
 *** Prefix
 **** Esc
@@ -3726,7 +3726,7 @@
      ;; (define-key ctl-x-map (kbd ".") nil)
      ;; (define-key ctl-x-map (kbd "C-l") nil)
      (define-key ctl-x-map (kbd "C-d") nil)
-     (define-key ctl-x-map (kbd "]") nil)
+     ;;(define-key ctl-x-map (kbd "]") nil)
      (define-key ctl-x-map (kbd "C-z") nil)
      (define-key ctl-x-map (kbd "C-<left>") nil)
      (define-key ctl-x-map (kbd "C-<right>") nil)

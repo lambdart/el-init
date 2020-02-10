@@ -1,10 +1,3 @@
-(when (require 'hideshow nil t)
-  (progn
-    ;; add doxygen
-    (add-hook 'prog-mode-hook 'hs-minor-mode)
-
-    (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
-
 ;;; Package --- eos
 ;;; Commentary: ... Present day, present time ....
 ;;; Code:
@@ -616,6 +609,14 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; visualization of matching parens
     (eos/funcall 'show-paren-mode 1)))
 
+(when (require 'hideshow nil t)
+  (progn
+    ;; hooks
+    (add-hook 'prog-mode-hook 'hs-minor-mode)
+
+    ;; binds
+    (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
+
 (when (require 'elec-pair nil t)
   (progn
     ;; custom:
@@ -862,14 +863,18 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'exwm-randr nil t)
   (progn
-    ;; customize my monitors: check the xrandr(1) output and use the same name/order
-    ;; TODO: create a func that retrieves these values from xrandr.
-    ;;(customize-set-variable
+    ;; custom
+    ;; monitors: check the xrandr(1) output and use the same name/order
+    ;; TODO: create a func that retrieves these values from xrandr
+    ;; (customize-set-variable
     ;;  'exwm-randr-workspace-monitor-plist '(0 "eDP-1"
     ;;                                        1 "HDMI-1"))
 
     (customize-set-variable 'exwm-workspace-number
-                            (/ (safe-length exwm-randr-workspace-monitor-plist) 2))))
+                            (if (boundp 'exwm-randr-workspace-monitor-plist)
+                                (progn
+                                  (/ (safe-length exwm-randr-workspace-monitor-plist) 2))
+                              1))))
 
 ;; enable
 ;; (exwm-randr-enable)
@@ -887,6 +892,10 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'helm nil t)
   (progn
+    ;; require
+    (require 'helm-config nil t)
+
+    ;; custom
     ;; idle time before updating, specified in seconds (variable defined as float)
     (customize-set-variable 'helm-input-idle-delay 0.01)
 
@@ -906,8 +915,8 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; helm-M-x save command in extended-command-history even when it fail
     (customize-set-variable 'helm-M-x-always-save-history t)
 
-    ;; always show details in buffer list when non--nil
-    (customize-set-variable 'helm-buffer-details-flag nil)
+    ;; always show details in buffer list when non-nil
+    (customize-set-variable 'helm-buffer-details-flag t)
 
     ;; forces split inside selected window when non-nil
     (customize-set-variable 'helm-split-window-inside-p t)
@@ -931,28 +940,32 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; and completion-at-point when non--nil
     (customize-set-variable 'helm-mode-handle-completion-in-region t)
 
+    ;; if non-nil, prevent escaping from minibuffer with other-window
+    ;; during the helm sessions
+    (customize-set-variable 'helm-prevent-escaping-from-minibuffer t)
+
     ;; display header-line when non nil.
     (customize-set-variable 'helm-display-header-line nil)
 
-    ;; bind (C-x)
+    ;; binds (C-x)
     ;; (define-key ctl-x-map (kbd "b") 'helm-buffers-list)
     (define-key ctl-x-map (kbd "C-b") 'helm-mini)
     (define-key ctl-x-map (kbd "C-f") 'helm-find-files)
+    (define-key ctl-x-map (kbd "c") 'helm-command-prefix)
 
-    ;; bind global map
+    ;; binds (C-h) help
+    (define-key help-map (kbd "a") 'helm-apropos)
+
+    ;; binds (global)
     (global-set-key (kbd "M-x") 'helm-M-x)
     (global-set-key (kbd "M-y") 'helm-show-kill-ring)
     (global-set-key (kbd "M-m") 'helm-mark-ring)))
-
-;; init helm mode
-;; (add-hook 'after-init-hook 'helm-mode)
-;; (add-hook 'after-init-hook 'helm-autoresize-mode)))
 
 ;; enable
 (eos/funcall 'helm-mode 1)
 (eos/funcall 'helm-autoresize-mode 1)
 
-;; bind
+;; binds
 (when (boundp 'helm-map)
   (progn
     (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
@@ -995,9 +1008,9 @@ point is on a symbol, return that symbol name.  Else return nil."
     (setq helm-mini-default-sources
           '(eos/helm-source-file-buffers
             eos/helm-source-exwm-buffers
-            eos/helm-source-nonfile-buffers
-            helm-source-recentf
             helm-source-buffers-list
+            helm-source-recentf
+            eos/helm-source-nonfile-buffers
             helm-source-buffer-not-found))))
 
 ;; add eos-theme-dir to theme load path
@@ -1050,8 +1063,6 @@ point is on a symbol, return that symbol name.  Else return nil."
             (error "Auth entry for %s@%s:%s has no secret!"
                    user host port)))
       (error "No auth entry found for %s@%s:%s" user host port))))
-
-(require 'notifications nil t)
 
 (when (require 'helm-info nil t)
   (progn
@@ -1115,9 +1126,6 @@ point is on a symbol, return that symbol name.  Else return nil."
               (lambda ()
                 (when (fboundp 'ibuffer-do-sort-by-filename/process)
                   (ibuffer-do-sort-by-filename/process))))))
-
-;; binds
-;; (define-key ctl-x-map (kbd "b") 'ibuffer)))
 
 (when (require 'helm-swoop nil t)
   (progn
@@ -1294,10 +1302,10 @@ point is on a symbol, return that symbol name.  Else return nil."
                            (boundp 'term-mode-map))
                   (progn
                     ;; term-raw-map
-                    (define-key term-raw-map (kbd "M-SPC") 'term-line-mode)
+                    (define-key term-raw-map (kbd "s-q") 'term-line-mode)
 
                     ;; term-mode-map
-                    (define-key term-mode-map (kbd "M-SPC") 'term-char-mode)))))
+                    (define-key term-mode-map (kbd "s-q") 'term-char-mode)))))
 
     ;; hook
     (add-hook 'term-mode-hook
@@ -1323,7 +1331,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
 
     ;; bind global
-    (global-set-key (kbd "C-z") 'multi-term-dedicated-toggle)))
+    (global-set-key (kbd "<s-return>") 'multi-term-dedicated-toggle)))
 
 (defun eos/launch/st ()
   "Launch urxvt"
@@ -1460,15 +1468,10 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;;     (ispell-change-dictionary change)
 ;;     (message "Dictionary switched from %s to %s" dic change)))))
 
-(when (require 'dmenu nil t)
+(when (require 'helm-external nil t)
   (progn
-    ;; set dmenu-itens cache location
-    (customize-set-variable
-     'dmenu-save-file
-     (concat user-emacs-directory "cache/dmenu-items"))
-
-    ;; bind
-    (define-key ctl-x-map (kbd "x") 'dmenu)))
+    ;; bind (C-x) prefix map
+    (define-key ctl-x-map (kbd "x") 'helm-run-external-command)))
 
 (when (require 'comint nil t)
   (progn
@@ -1503,6 +1506,9 @@ point is on a symbol, return that symbol name.  Else return nil."
 (add-hook 'after-init-hook
           (lambda ()
             (eos/run/async-proc "compton")))
+
+(if (fboundp 'helm-calcul-expression)
+  (define-key ctl-x-map (kbd "C-/") 'helm-calcul-expression))
 
 (when (require 'tramp nil t)
   (progn
@@ -1588,6 +1594,8 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     (funcall 'emms-all)
     (funcall 'emms-default-players)))
+
+(require 'notifications nil t)
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -2152,6 +2160,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
     (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
     (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
+    (define-key emacs-lisp-mode-map (kbd "C-c TAB") 'helm-lisp-completion-at-point)
     (define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)
 
     ;; ubind, qualaty of life
@@ -2325,7 +2334,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; (define-key ctl-x-map (kbd ".") nil)
 ;; (define-key ctl-x-map (kbd "C-l") nil)
 (define-key ctl-x-map (kbd "C-d") nil)
-;;(define-key ctl-x-map (kbd "]") nil)
 (define-key ctl-x-map (kbd "C-z") nil)
 (define-key ctl-x-map (kbd "C-<left>") nil)
 (define-key ctl-x-map (kbd "C-<right>") nil)
@@ -2333,7 +2341,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key ctl-x-map (kbd "C-<down>") nil)
 (define-key ctl-x-map (kbd "<right>") nil)
 (define-key ctl-x-map (kbd "<left>") nil)
-(define-key ctl-x-map (kbd "[") nil)
 (define-key ctl-x-map (kbd "C-+") nil)
 (define-key ctl-x-map (kbd "C-a") nil)
 (define-key ctl-x-map (kbd "C-r") nil)
@@ -2345,6 +2352,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key ctl-x-map (kbd "C-\@") nil)
 (define-key ctl-x-map (kbd "M-:") nil)
 (define-key ctl-x-map (kbd "`") nil)
+(define-key ctl-x-map (kbd "]") nil)
+;; (define-key ctl-x-map (kbd "[") nil)
 (define-key ctl-x-map (kbd ")") nil)
 (define-key ctl-x-map (kbd "(") nil)
 (define-key ctl-x-map (kbd "<") nil)

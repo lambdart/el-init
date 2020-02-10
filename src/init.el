@@ -1010,7 +1010,7 @@ point is on a symbol, return that symbol name.  Else return nil."
             eos/helm-source-exwm-buffers
             helm-source-buffers-list
             helm-source-recentf
-            eos/helm-source-nonfile-buffers
+            ;; eos/helm-source-nonfile-buffers
             helm-source-buffer-not-found))))
 
 ;; add eos-theme-dir to theme load path
@@ -1508,7 +1508,7 @@ point is on a symbol, return that symbol name.  Else return nil."
             (eos/run/async-proc "compton")))
 
 (if (fboundp 'helm-calcul-expression)
-  (define-key ctl-x-map (kbd "C-/") 'helm-calcul-expression))
+    (define-key ctl-x-map (kbd "C-/") 'helm-calcul-expression))
 
 (when (require 'tramp nil t)
   (progn
@@ -1564,6 +1564,13 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; (define-key ctl-x-map (kbd "C-0") 'eos/toggle-audio)
 (define-key ctl-x-map (kbd "C--") 'eos/lower-volume)
 (define-key ctl-x-map (kbd "C-=") 'eos/raise-volume)
+
+(require 'helm-youtube nil t)
+
+;; binds
+(when (boundp 'helm-command-map)
+  (progn
+    (define-key helm-command-map (kbd "m") 'helm-youtube)))
 
 (when (require 'emms nil t)
   (progn
@@ -2497,4 +2504,5 @@ point is on a symbol, return that symbol name.  Else return nil."
 (global-unset-key (kbd "<M-drag-mouse-1>"))
 (global-unset-key (kbd "<S-down-mouse-1>"))
 
-(require 'eos-adapt (expand-file-name "eos-adapt.el" user-emacs-directory) t)
+(require 'eos-adapt
+         (expand-file-name "eos-adapt.el" user-emacs-directory) t)

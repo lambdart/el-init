@@ -3,10 +3,10 @@
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
 
-* EOS
+n* EOS
 
-  Using emacs (lisp interpreter) as the only IO bridge
-  between human and machine.
+Using emacs (lisp interpreter) as the only IO bridge
+between human and machine.
 
 ** Bootstrap
 *** Header
@@ -979,19 +979,19 @@
 
 *** Hideshow
 
-   Minor mode to hide and show code and comment blocks.
+    Minor mode to hide and show code and comment blocks.
 
-   #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
 
-   (when (require 'hideshow nil t)
-     (progn
-       ;; hooks
-       (add-hook 'prog-mode-hook 'hs-minor-mode)
+    (when (require 'hideshow nil t)
+      (progn
+        ;; hooks
+        (add-hook 'prog-mode-hook 'hs-minor-mode)
 
-       ;; binds
-       (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
+        ;; binds
+        (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
 
-   #+END_SRC
+    #+END_SRC
 
 *** Elec-pair
 
@@ -1417,7 +1417,7 @@
 
 *** Frontend
 
-    or Fuzzy Matching Engine (Helm)
+    or to be more precise: Fuzzy Matching Engine (Helm)
 
 **** Helm
 
@@ -1555,7 +1555,7 @@
                  eos/helm-source-exwm-buffers
                  helm-source-buffers-list
                  helm-source-recentf
-                 eos/helm-source-nonfile-buffers
+                 ;; eos/helm-source-nonfile-buffers
                  helm-source-buffer-not-found))))
 
      #+END_SRC
@@ -2440,7 +2440,7 @@
      #+BEGIN_SRC emacs-lisp
 
      (if (fboundp 'helm-calcul-expression)
-       (define-key ctl-x-map (kbd "C-/") 'helm-calcul-expression))
+         (define-key ctl-x-map (kbd "C-/") 'helm-calcul-expression))
 
      #+END_SRC
 
@@ -2539,6 +2539,19 @@
 
 *** Calendar
 *** Multimedia
+**** Helm-youtube
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'helm-youtube nil t)
+
+     ;; binds
+     (when (boundp 'helm-command-map)
+       (progn
+         (define-key helm-command-map (kbd "m") 'helm-youtube)))
+
+     #+END_SRC
+
 **** Emms
 
      Emms is the Emacs Multi-Media System. It tries to be a clean and small
@@ -3927,8 +3940,8 @@
 
    #+BEGIN_SRC emacs-lisp
 
-   (require 'eos-adapt (expand-file-name "eos-adapt.el" user-emacs-directory) t)
-
+      (require 'eos-adapt
+               (expand-file-name "eos-adapt.el" user-emacs-directory) t)
    #+END_SRC
 
 ** EOF

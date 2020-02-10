@@ -1,65 +1,85 @@
 (source melpa)
 
+;; project related
 (depends-on "magit")
-(depends-on "flycheck")
-(depends-on "yasnippet")
+(depends-on "helm-projectile")
 (depends-on "projectile")
 (depends-on "editorconfig")
-(depends-on "multi-term")
-(depends-on "moody")
-(depends-on "ess")
-(depends-on "emms")
-(depends-on "irony")
-(depends-on "password-store")
-(depends-on "go-mode")
-(depends-on "markdown-mode")
-(depends-on "fish-mode")
 (depends-on "cmake-ide")
-(depends-on "anaconda-mode")
-(depends-on "company")
+
+;; syntax & complete
+(depends-on "helm-flycheck")
+(depends-on "flycheck")
+(depends-on "yasnippet")
+(depends-on "helm-company")
 (depends-on "company-shell")
 (depends-on "company-irony")
 (depends-on "company-c-headers")
 (depends-on "company-statistics")
-(depends-on "helm")
-(depends-on "helm-ag")
-(depends-on "helm-dash")
-(depends-on "helm-swoop")
-(depends-on "helm-gtags")
-(depends-on "helm-company")
-(depends-on "helm-descbinds")
-(depends-on "helm-flycheck")
-(depends-on "helm-projectile")
-(depends-on "helm-exwm"
-  :git "https://github.com/emacs-helm/helm-exwm")
+(depends-on "company")
+(depends-on "irony")
 
-;; (depends-on "helm-compile"
-;;               :git "https://github.com/esac-io/helm-compile")
+;; search
+(depends-on "helm-swoop")
+(depends-on "helm-ag")
+
+;; help
+(depends-on "helm-descbinds")
+
+;; office
+(depends-on "markdown-mode")
+
+;; doc
+(depends-on "helm-dash")
+(depends-on "rfc-mode"
+            :git "https://github.com/galdor/rfc-mode")
+
+;; security
+(depends-on "password-store")
 
 ;; (depends-on "moebius-theme"
 ;;              :git "https://github.com/esac-io/moebius-theme")
 
-(depends-on "rfc-mode"
-  :git "https://github.com/galdor/rfc-mode")
-
-(depends-on "telega"
-  :git "https://github.com/zevlg/telega.el")
-
+;; edit
+(depends-on "undo-tree"
+            :git "http://www.dr-qubit.org/git/undo-tree.git")
 (depends-on "iedit")
+
+;; development
+;; (depends-on "helm-compile"
+;;               :git "https://github.com/esac-io/helm-compile")
+(depends-on "helm-gtags")
+(depends-on "ess")
+(depends-on "highlight-doxygen")
+(depends-on "go-mode")
+(depends-on "fish-mode")
+(depends-on "web-mode")
+(depends-on "cmake-mode")
+
+;; launcher
 (depends-on "dmenu")
 
+;; window manager
+;; depends on exwm
+(depends-on "helm-exwm"
+            :git "https://github.com/emacs-helm/helm-exwm")
+;; depends on xelb
 (depends-on "exwm"
-    :git "https://github.com/ch11ng/exwm")
-
+            :git "https://github.com/ch11ng/exwm")
 (depends-on "xelb"
-    :git "https://github.com/ch11ng/xelb")
+            :git "https://github.com/ch11ng/xelb")
 
-(depends-on "undo-tree"
-   :git "http://www.dr-qubit.org/git/undo-tree.git")
-
-(depends-on "htmlize")
+;; dashboard
 (depends-on "dashboard")
+
+;; misc
 (depends-on "buffer-move")
-(depends-on "exec-path-from-shell")
-(depends-on "highlight-doxygen")
-(depends-on "web-mode")
+
+;; term and shells
+(depends-on "multi-term")
+
+;;bar
+(depends-on "moody")
+
+;; fuzzy matching engine
+(depends-on "helm")

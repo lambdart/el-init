@@ -1,3 +1,10 @@
+(when (require 'hideshow nil t)
+  (progn
+    ;; add doxygen
+    (add-hook 'prog-mode-hook 'hs-minor-mode)
+
+    (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
+
 ;;; Package --- eos
 ;;; Commentary: ... Present day, present time ....
 ;;; Code:
@@ -580,7 +587,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                 (eos/funcall 'blink-cursor-mode 0)))))
 
 ;; binds
-;; (global-set-key (kbd "M-z") 'other-frame)))
+(global-set-key (kbd "s-o") 'other-frame)
 
 ;; set font by face attribute (reference)
 ;; (set-face-attribute 'default nil :height)
@@ -855,24 +862,17 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'exwm-randr nil t)
   (progn
-    ;; set exwm workspaces
-    (customize-set-variable 'exwm-workspace-number 2)
+    ;; customize my monitors: check the xrandr(1) output and use the same name/order
+    ;; TODO: create a func that retrieves these values from xrandr.
+    ;;(customize-set-variable
+    ;;  'exwm-randr-workspace-monitor-plist '(0 "eDP-1"
+    ;;                                        1 "HDMI-1"))
 
-    ;; custom monitors
-    (customize-set-variable
-     'exwm-randr-workspace-monitor-plist '(0 "HDMI-1"))
+    (customize-set-variable 'exwm-workspace-number
+                            (/ (safe-length exwm-randr-workspace-monitor-plist) 2))))
 
-    (customize-set-variable
-     'exwm-randr-workspace-monitor-plist '(1 "DP-1"))
-
-    (add-hook 'exwm-randr-screen-change-hook
-              (lambda ()
-                (start-process-shell-command
-                 "xrandr" nil "xrandr --output HDMI-1 --left-of DP-1 --auto")))
-
-    ;; enable
-    ;; (eos/funcall 'exwm-randr-enable)
-    ))
+;; enable
+;; (exwm-randr-enable)
 
 (defvar eos/helm-source-exwm-buffers
   nil
@@ -888,11 +888,11 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'helm nil t)
   (progn
     ;; idle time before updating, specified in seconds (variable defined as float)
-    (customize-set-variable 'helm-input-idle-delay 0.0)
+    (customize-set-variable 'helm-input-idle-delay 0.01)
 
     ;; set autoresize max and mim height
-    (customize-set-variable 'helm-autoresize-max-height 35)
-    (customize-set-variable 'helm-autoresize-min-height 25)
+    (customize-set-variable 'helm-autoresize-max-height 30)
+    (customize-set-variable 'helm-autoresize-min-height 20)
 
     ;; enable fuzzing matching
     (customize-set-variable 'helm-M-x-fuzzy-match t)
@@ -2265,6 +2265,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'verilog nil t)
 
+(require 'cmake-mode nil t)
+
 (add-to-list 'load-path
              (concat user-emacs-directory "elpa/mql-mode"))
 
@@ -2323,7 +2325,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; (define-key ctl-x-map (kbd ".") nil)
 ;; (define-key ctl-x-map (kbd "C-l") nil)
 (define-key ctl-x-map (kbd "C-d") nil)
-(define-key ctl-x-map (kbd "]") nil)
+;;(define-key ctl-x-map (kbd "]") nil)
 (define-key ctl-x-map (kbd "C-z") nil)
 (define-key ctl-x-map (kbd "C-<left>") nil)
 (define-key ctl-x-map (kbd "C-<right>") nil)

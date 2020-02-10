@@ -1,13 +1,13 @@
 (source melpa)
 
-;; project related
+;; project management
 (depends-on "magit")
 (depends-on "helm-projectile")
 (depends-on "projectile")
 (depends-on "editorconfig")
 (depends-on "cmake-ide")
 
-;; syntax & complete
+;; syntax check & completition
 (depends-on "helm-flycheck")
 (depends-on "flycheck")
 (depends-on "yasnippet")
@@ -29,7 +29,7 @@
 ;; office
 (depends-on "markdown-mode")
 
-;; doc
+;; documentation
 (depends-on "helm-dash")
 (depends-on "rfc-mode"
             :git "https://github.com/galdor/rfc-mode")
@@ -37,17 +37,16 @@
 ;; security
 (depends-on "password-store")
 
+;; apparence
 ;; (depends-on "moebius-theme"
 ;;              :git "https://github.com/esac-io/moebius-theme")
 
 ;; edit
+(depends-on "iedit")
 (depends-on "undo-tree"
             :git "http://www.dr-qubit.org/git/undo-tree.git")
-(depends-on "iedit")
 
 ;; development
-;; (depends-on "helm-compile"
-;;               :git "https://github.com/esac-io/helm-compile")
 (depends-on "helm-gtags")
 (depends-on "ess")
 (depends-on "highlight-doxygen")
@@ -55,9 +54,8 @@
 (depends-on "fish-mode")
 (depends-on "web-mode")
 (depends-on "cmake-mode")
-
-;; launcher
-(depends-on "dmenu")
+;; (depends-on "helm-compile"
+;;               :git "https://github.com/esac-io/helm-compile")
 
 ;; window manager
 ;; depends on exwm
@@ -75,10 +73,10 @@
 ;; misc
 (depends-on "buffer-move")
 
-;; term and shells
+;; term & shell
 (depends-on "multi-term")
 
-;;bar
+;; bar
 (depends-on "moody")
 
 ;; fuzzy matching engine

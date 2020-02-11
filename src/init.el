@@ -22,22 +22,43 @@
     (org-babel-do-load-languages 'org-babel-load-languages
                                  '((emacs-lisp . t)))))
 
-(defun eos/minibuffer/setup-hook ()
-  "Set 'gc-cons-threshold most."
+(defun eos/gc/defer-gc-collection ()
+  "Set 'gc-cons-threshold most-positive-fixnum."
   (setq gc-cons-threshold most-positive-fixnum))
 
-(defun eos/minibuffer/exit-hook ()
-  "Set 'gc-cons-threshold to 800000 (magic number)."
-  (setq gc-cons-threshold 800000))
+(defun eos/gc/restore-gc-collection ()
+  "Defer garbage collection."
+  (run-at-time
+   1 nil (lambda () (setq gc-cons-threshold 16777216))))
 
 ;; threshold inital value
-(let ((gc-cons-threshold most-positive-fixnum)))
+(setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
+      gc-cons-percentage 0.6)
 
-;; set threshold to 800000)
-(add-hook 'minibuffer-setup-hook 'eos/minibuffer/setup-hook)
+;; hooks
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold 16777216 ; 16mb
+                  gc-cons-percentage 0.1)))
+
+;; defer garbage collection
+(add-hook 'minibuffer-setup-hook 'eos/gc/defer-gc-collection)
 
 ;; reset threshold to inital value
-(add-hook 'minibuffer-exit-hook 'eos/minibuffer/exit-hook)
+(add-hook 'minibuffer-exit-hook 'eos/gc/restore-gc-collection)
+
+(defvar eos-file-name-handler-alist
+  file-name-handler-alist
+  "Save file-name-handler-alist")
+
+;; clean file-name-handler-alist
+(setq file-name-handler-alist nil)
+
+;; hooks
+;; restore file-name-handler-alist
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq file-name-handler-alist eos-file-name-handler-alist)))
 
 ;; y or n
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -1170,7 +1191,10 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
 
-(require 'dired nil t)
+(when (require 'dired nil t)
+  (progn
+    ;; enable dired-find-alternate-file
+    (put 'dired-find-alternate-file 'disabled nil)))
 
 (when (require 'dired-async nil t)
   (progn
@@ -1270,8 +1294,11 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'term nil t)
   (progn
     ;; custom
-    ;; if non-nil, is file name to use for explicitly requested inferior shell.
-    (customize-set-variable 'explicit-shell-file-name "/usr/local/bin/fish")
+    ;; if non-nil, is file name to use for explicitly requested inferior shell. (reference)
+    (customize-set-variable 'explicit-shell-file-name
+                            (if (eq system-type "gnu/linux")
+                                "/usr/bin/fish"
+                              "/usr/local/bin/fish"))
 
     ;; if non-nil, add a ‘/’ to completed directories
     (customize-set-variable 'term-completion-addsuffix t)
@@ -1496,6 +1523,12 @@ point is on a symbol, return that symbol name.  Else return nil."
   (let ((opacity (or opacity 1.0)))
     (async-shell-command (format "transset -a %.1f" opacity))))
 
+;; hooks
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (interactive)
+            (eos/transset-set 0.9)))
+
 ;; init after exwm
 (add-hook 'exwm-init-hook
           (lambda ()
@@ -1562,8 +1595,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; bind
 ;; (define-key ctl-x-map (kbd "C-0") 'eos/toggle-audio)
-(define-key ctl-x-map (kbd "C--") 'eos/lower-volume)
-(define-key ctl-x-map (kbd "C-=") 'eos/raise-volume)
+(global-set-key (kbd "s--") 'eos/lower-volume)
+(global-set-key (kbd "s-=") 'eos/raise-volume)
 
 (require 'helm-youtube nil t)
 

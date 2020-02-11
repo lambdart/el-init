@@ -3,10 +3,10 @@
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
 
-n* EOS
+* EOS
 
-Using emacs (lisp interpreter) as the only IO bridge
-between human and machine.
+  Using emacs (lisp interpreter) as the only IO bridge
+  between human and machine.
 
 ** Bootstrap
 *** Header
@@ -87,22 +87,49 @@ between human and machine.
 
     #+BEGIN_SRC emacs-lisp
 
-    (defun eos/minibuffer/setup-hook ()
-      "Set 'gc-cons-threshold most."
+    (defun eos/gc/defer-gc-collection ()
+      "Set 'gc-cons-threshold most-positive-fixnum."
       (setq gc-cons-threshold most-positive-fixnum))
 
-    (defun eos/minibuffer/exit-hook ()
-      "Set 'gc-cons-threshold to 800000 (magic number)."
-      (setq gc-cons-threshold 800000))
+    (defun eos/gc/restore-gc-collection ()
+      "Defer garbage collection."
+      (run-at-time
+       1 nil (lambda () (setq gc-cons-threshold 16777216))))
 
     ;; threshold inital value
-    (let ((gc-cons-threshold most-positive-fixnum)))
+    (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
+          gc-cons-percentage 0.6)
 
-    ;; set threshold to 800000)
-    (add-hook 'minibuffer-setup-hook 'eos/minibuffer/setup-hook)
+    ;; hooks
+    (add-hook 'emacs-startup-hook
+              (lambda ()
+                (setq gc-cons-threshold 16777216 ; 16mb
+                      gc-cons-percentage 0.1)))
+
+    ;; defer garbage collection
+    (add-hook 'minibuffer-setup-hook 'eos/gc/defer-gc-collection)
 
     ;; reset threshold to inital value
-    (add-hook 'minibuffer-exit-hook 'eos/minibuffer/exit-hook)
+    (add-hook 'minibuffer-exit-hook 'eos/gc/restore-gc-collection)
+
+    #+END_SRC
+
+*** Defer
+
+    #+BEGIN_SRC emacs-lisp
+
+    (defvar eos-file-name-handler-alist
+      file-name-handler-alist
+      "Save file-name-handler-alist")
+
+    ;; clean file-name-handler-alist
+    (setq file-name-handler-alist nil)
+
+    ;; hooks
+    ;; restore file-name-handler-alist
+    (add-hook 'emacs-startup-hook
+              (lambda ()
+                (setq file-name-handler-alist eos-file-name-handler-alist)))
 
     #+END_SRC
 
@@ -1843,7 +1870,10 @@ between human and machine.
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'dired nil t)
+     (when (require 'dired nil t)
+       (progn
+         ;; enable dired-find-alternate-file
+         (put 'dired-find-alternate-file 'disabled nil)))
 
      #+END_SRC
 
@@ -2035,8 +2065,11 @@ between human and machine.
      (when (require 'term nil t)
        (progn
          ;; custom
-         ;; if non-nil, is file name to use for explicitly requested inferior shell.
-         (customize-set-variable 'explicit-shell-file-name "/usr/local/bin/fish")
+         ;; if non-nil, is file name to use for explicitly requested inferior shell. (reference)
+         (customize-set-variable 'explicit-shell-file-name
+                                 (if (eq system-type "gnu/linux")
+                                     "/usr/bin/fish"
+                                   "/usr/local/bin/fish"))
 
          ;; if non-nil, add a ‘/’ to completed directories
          (customize-set-variable 'term-completion-addsuffix t)
@@ -2080,7 +2113,6 @@ between human and machine.
 
                      ;; disable line numbers mode
                      (display-line-numbers-mode 0)))))
-
      #+END_SRC
 
 **** Multi-term
@@ -2400,12 +2432,17 @@ between human and machine.
      transparency on a window.
 
      #+BEGIN_SRC emacs-lisp
-
      (defun eos/transset-set (opacity)
        "Set transparency on frame window specify by OPACITY."
        (interactive "nOpacity: ")
        (let ((opacity (or opacity 1.0)))
          (async-shell-command (format "transset -a %.1f" opacity))))
+
+     ;; hooks
+     (add-hook 'after-make-frame-functions
+               (lambda (frame)
+                 (interactive)
+                 (eos/transset-set 0.9)))
 
      ;; init after exwm
      (add-hook 'exwm-init-hook
@@ -2532,8 +2569,8 @@ between human and machine.
 
      ;; bind
      ;; (define-key ctl-x-map (kbd "C-0") 'eos/toggle-audio)
-     (define-key ctl-x-map (kbd "C--") 'eos/lower-volume)
-     (define-key ctl-x-map (kbd "C-=") 'eos/raise-volume)
+     (global-set-key (kbd "s--") 'eos/lower-volume)
+     (global-set-key (kbd "s-=") 'eos/raise-volume)
 
      #+END_SRC
 
@@ -3540,6 +3577,7 @@ between human and machine.
 
      #+END_SRC
 
+*** Lua
 *** Tcl
 *** Perl
 **** Cperl-mode
@@ -3940,8 +3978,8 @@ between human and machine.
 
    #+BEGIN_SRC emacs-lisp
 
-      (require 'eos-adapt
-               (expand-file-name "eos-adapt.el" user-emacs-directory) t)
+   (require 'eos-adapt
+            (expand-file-name "eos-adapt.el" user-emacs-directory) t)
    #+END_SRC
 
 ** EOF

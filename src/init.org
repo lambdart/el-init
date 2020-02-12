@@ -1267,8 +1267,7 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    (when (require 'dabbrev nil t)
-      (progn))
+    (require 'dabbrev nil t)
 
     #+END_SRC
 
@@ -2747,6 +2746,8 @@
          ;; bind
          (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
          (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
+         (define-key text-mode-map (kbd "C-M-i") 'eos/company-or-indent)
+
          (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
          (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
 
@@ -2761,7 +2762,6 @@
                       '((company-ispell
                          company-keywords
                          company-capf
-                         company-dabbrev-code
                          company-dabbrev)
                         (company-files)))))))
 

@@ -780,8 +780,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (add-to-list 'display-buffer-alist
              '("\\*Completions\\*" display-buffer-below-selected))
 
-(when (require 'dabbrev nil t)
-  (progn))
+(require 'dabbrev nil t)
 
 ;; avoid warnings when byte-compile
 (eval-when-compile
@@ -1712,6 +1711,8 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; bind
     (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
     (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
+    (define-key text-mode-map (kbd "C-M-i") 'eos/company-or-indent)
+
     (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
     (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
 
@@ -1726,7 +1727,6 @@ point is on a symbol, return that symbol name.  Else return nil."
                  '((company-ispell
                     company-keywords
                     company-capf
-                    company-dabbrev-code
                     company-dabbrev)
                    (company-files)))))))
 

@@ -40,6 +40,9 @@
 ;; security
 (depends-on "password-store")
 
+;; networking
+(depends-on "helm-tramp")
+
 ;; apparence
 (depends-on "all-the-icons")
 ;; (depends-on "moebius-theme"

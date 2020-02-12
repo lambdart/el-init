@@ -7,20 +7,11 @@
 (when (version< emacs-version "26.3")
   (error "This requires Emacs 26.3 and above!"))
 
-(when (require 'org nil t)
-  (progn
-    ;; custom
-    (customize-set-variable 'org-src-fontify-natively t)
-    (customize-set-variable 'org-src-tab-acts-natively t)
-    (customize-set-variable 'org-edit-src-content-indentation 0)
-    (customize-set-variable 'org-export-with-smart-quotes t)
-    (customize-set-variable 'org-confirm-babel-evaluate nil)
-    (customize-set-variable 'org-src-window-setup 'current-window)
-    (customize-set-variable 'org-special-ctrl-a/e t)
+(require 'org)
 
-    ;; load languages
-    (org-babel-do-load-languages 'org-babel-load-languages
-                                 '((emacs-lisp . t)))))
+;; load languages (reference)
+;; (org-babel-do-load-languages 'org-babel-load-languages
+;;                              '((emacs-lisp . t)))))
 
 (defun eos/gc/defer-gc-collection ()
   "Set 'gc-cons-threshold most-positive-fixnum."
@@ -33,7 +24,7 @@
 
 ;; threshold inital value
 (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
-      gc-cons-percentage 0.6)
+      gc-cons-percentage 0.5)
 
 ;; hooks
 (add-hook 'emacs-startup-hook
@@ -376,7 +367,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; kill buffer and window
 (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
 
-;; custom:
+;; custom
 ;; non-nil inhibits the startup screen.
 (customize-set-variable 'inhibit-startup-screen t)
 
@@ -498,7 +489,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'files nil t)
   (progn
-    ;; custom:
+    ;; custom
     ;; control use of version numbers for backup files.
     (customize-set-variable 'version-control t)
 
@@ -535,14 +526,14 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'recentf nil t)
   (progn
-    ;; custom:
+    ;; custom
     ;; file to save the recent list into.
     (customize-set-variable
      'recentf-save-file (concat user-emacs-directory "cache/recentf"))))
 
 (when (require 'bookmark nil t)
   (progn
-    ;; custom:
+    ;; custom
     ;; file in which to save bookmarks by default.
     (customize-set-variable
      'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))))
@@ -640,7 +631,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'elec-pair nil t)
   (progn
-    ;; custom:
+    ;; custom
     ;; alist of pairs that should be used regardless of major mode.
     (customize-set-variable 'electric-pair-pairs
                             '((?\{ . ?\})
@@ -660,7 +651,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'time nil t)
   (progn
-    ;; custom:
+    ;; custom
     ;; seconds between updates of time in the mode line.
     (customize-set-variable 'display-time-interval 15)
 
@@ -703,7 +694,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'linum nil t)
   (progn
-    ;; custom:
+    ;; custom
     ;; format used to display line numbers.
     (customize-set-variable 'linum-format " %2d ")))
 
@@ -739,7 +730,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'custom nil t)
   (progn
-    ;; custom:
+    ;; custom
     ;; file used for storing customization information.
     ;; The default is nil, which means to use your init file
     ;; as specified by ‘user-init-file’.  If the value is not nil,
@@ -749,6 +740,48 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; load custom-file
 (eos/load-file custom-file)
+
+(when (require 'completion nil t)
+  (progn
+    ;; custom
+    ;; how far to search in the buffer when looking for completions. Hide
+    ;; in number of characters.  If nil, search the whole buffer.
+    (customize-set-variable 'completion-search-distance 0)
+
+    ;; if non-nil, the next completion prompt does a cdabbrev search.
+    (customize-set-variable 'completion-cdabbrev-prompt-flag t)
+
+    ;; non-nil means show help message in *Completions* buffer.
+    (customize-set-variable 'completion-show-help t)
+
+    ;; non-nil means separator characters mark previous word as used
+    (customize-set-variable 'completion-on-separator-character t)
+
+    ;;   the filename to save completions to.
+    (customize-set-variable
+     'save-completions-file-name
+     (expand-file-name "cache/completitions" user-emacs-directory))
+
+    ;; non-nil means save most-used completions when exiting emacs
+    (customize-set-variable 'save-completions-flag t)
+
+    ;;    Discard a completion if unused for this many hours. Hide
+    ;; (1 day = 24, 1 week = 168).  If this is 0, non-permanent completions
+    ;; will not be saved unless these are used.  Default is two weeks.
+    (customize-set-variable 'save-completions-retention-time 0)
+
+    ;; enable
+    ;; (completion-mode)
+
+    ;; disable
+    (dynamic-completion-mode 0)))
+
+;; add display-buffer-alist
+(add-to-list 'display-buffer-alist
+             '("\\*Completions\\*" display-buffer-below-selected))
+
+(when (require 'dabbrev nil t)
+  (progn))
 
 ;; avoid warnings when byte-compile
 (eval-when-compile
@@ -791,10 +824,8 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; exwn global keybindings
     (customize-set-variable 'exwm-input-global-keys
                             `(([?\s-r] . exwm-reset)
-                              ([?\s-w] . exwm-workspace-switch)
                               ([?\s-q] . exwm-input-toggle-keyboard)
-                              ([?\s-z] . multi-term-dedicated-toggle)
-
+                              ;; ([?\s-w] . exwm-workspace-switch)
                               ;; ([?\s-k] . exwm-workspace-delete)
                               ;; ([?\s-a] . exwm-workspace-swap)
 
@@ -922,7 +953,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; set autoresize max and mim height
     (customize-set-variable 'helm-autoresize-max-height 30)
-    (customize-set-variable 'helm-autoresize-min-height 20)
+    (customize-set-variable 'helm-autoresize-min-height 15)
 
     ;; enable fuzzing matching
     (customize-set-variable 'helm-M-x-fuzzy-match t)
@@ -1100,10 +1131,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; binds
     ;; help-map (C-h)
     (if (boundp 'help-map)
-        (define-key help-map (kbd "b") 'helm-descbinds))
-
-    ;; ctl-x-map (C-x)
-    (define-key ctl-x-map (kbd "C-x") 'helm-descbinds)))
+        (define-key help-map (kbd "b") 'helm-descbinds))))
 
 (when (require 'iedit nil t)
   (progn
@@ -1225,7 +1253,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                               "%*%& %l:%c | %I "
                               moody-mode-line-buffer-identification
                               " %m "
-                              (moody-vc-mode vc-mode)))))
+                              (vc-mode moody-vc-mode)))))
 
 (when (require 'erc nil t)
   (progn
@@ -1338,7 +1366,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (add-hook 'term-mode-hook
               (lambda()
                 ;; do not display continuation lines.
-                (toggle-truncate-lines)
+                (setq truncate-lines nil)
 
                 ;; disable line numbers mode
                 (display-line-numbers-mode 0)))))
@@ -1356,9 +1384,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; bind (C-x) prefix
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
-
-    ;; bind global
-    (global-set-key (kbd "<s-return>") 'multi-term-dedicated-toggle)))
+    (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
 
 (defun eos/launch/st ()
   "Launch urxvt"
@@ -1420,7 +1446,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'browse-url nil t)
   (progn
-    ;; custom:
+    ;; custom
 
     ;; the name of the browser program used by ‘browse-url-generic’.
     (customize-set-variable 'browse-url-generic-program "eww")
@@ -1435,6 +1461,10 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; custom
     ;; program invoked by M-x ispell-word and M-x ispell-region commands.
     (customize-set-variable 'ispell-program-name "aspell")))
+
+;; add display-buffer-alist
+;; (add-to-list 'display-buffer-alist
+;;              '("\\*Choices\\*" display-buffer-below-selected))
 
 (when (require 'flyspell nil t)
   (progn
@@ -1637,6 +1667,26 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'notifications nil t)
 
+;; custom
+;; when non-nil, fontify code in code blocks
+(customize-set-variable 'org-src-fontify-natively t)
+
+;; if non-nil, the effect of TAB in a code block is as if it were
+;; issued in the language major mode buffer
+(customize-set-variable 'org-src-tab-acts-natively t)
+
+;; indentation for the content of a source code block.
+(customize-set-variable 'org-edit-src-content-indentation 0)
+
+;; confirm before evaluation
+(customize-set-variable 'org-confirm-babel-evaluate nil)
+
+;; how the source code edit buffer should be displayed
+(customize-set-variable 'org-src-window-setup 'current-window)
+
+;; non-nil means C-a and C-e behave specially in headlines and items
+(customize-set-variable 'org-special-ctrl-a/e t)
+
 (add-hook 'org-mode-hook
           (lambda ()
             ;; do not truncate lines
@@ -1644,13 +1694,12 @@ point is on a symbol, return that symbol name.  Else return nil."
 
             ;; set company backends
             (eos/company/set-backends
-             '((company-capf
-                company-keywords
-                company-yasnippet
-                company-ispell
-                company-dabbrev
-                company-dabbrev-code)
+             '((company-ispell
+                company-yasnippet)
                (company-files)))))
+
+;; binds
+(define-key org-mode-map (kbd "C-M-i") 'eos/company-or-indent)
 
 (when (require 'tex-mode nil t)
   (progn
@@ -1803,9 +1852,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; bind eos-docs-map under ctl-x-map
 (define-key ctl-x-map (kbd "l") 'eos-docs-map)
 
-(add-to-list 'display-buffer-alist
-             '("\\*Completions\\*" display-buffer-below-selected))
-
 (when (require 'company nil t)
   (progn
     ;; set echo delay
@@ -1839,12 +1885,10 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; binds
     (define-key eos-complete-map (kbd "M-`") 'company-ispell)
-    (define-key eos-complete-map (kbd "2") 'company-dabbrev)
-    (define-key eos-complete-map (kbd "3") 'company-dabbrev-code)
-    (define-key eos-complete-map (kbd "4") 'company-gtags)
-    (define-key eos-complete-map (kbd "5") 'company-files)
-    (define-key eos-complete-map (kbd "6") 'company-capf)
-    (define-key eos-complete-map (kbd "1") 'company-yasnippet)))
+    (define-key eos-complete-map (kbd "`") 'company-yasnippet)
+    (define-key eos-complete-map (kbd "/") 'company-dabbrev-code)
+    (define-key eos-complete-map (kbd "1") 'company-gtags)
+    (define-key eos-complete-map (kbd "2") 'company-files)))
 
 ;; enable globally
 (eos/funcall 'global-company-mode 1)
@@ -1862,17 +1906,12 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; set company-statistics cache location
     (customize-set-variable
      'company-statistics-file
-     (concat user-emacs-directory "cache/company-statistics-cache.el"))
-
-    ;; init after company mode
-    (add-hook 'company-mode-hook
-              (lambda()
-                (eos/funcall 'company-statistics-mode 1)))))
+     (concat user-emacs-directory "cache/company-statistics-cache.el"))))
 
 (when (require 'yasnippet nil t)
   (progn
-    ;; bind
-    (define-key eos-complete-map (kbd "q") 'yas-expand)
+    ;; binds
+    (define-key eos-complete-map (kbd "e") 'yas-expand)
     (define-key eos-complete-map (kbd "i") 'yas-insert-snippet)
     (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)))
 
@@ -1881,7 +1920,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'helm-company nil t)
   (progn
-    ;; custom:
+    ;; custom
     ;; enable fuzzy matching for helm company
     (customize-set-variable 'helm-company-fuzzy-match t)))
 
@@ -1894,17 +1933,18 @@ point is on a symbol, return that symbol name.  Else return nil."
 (defun eos/company/set-backends (backends)
   "Set company BACKENDS."
   (make-local-variable 'company-backends)
-  (customize-set-variable 'company-backends backends))
+  (when (boundp 'company-backends)
+    (setq company-backends backends)))
 
 ;; calls helm-company if its bounded
-(defun eos/complete ()
+(defun eos/helm-company ()
   "Helm company complete wrapper."
   (interactive)
   (when (fboundp 'helm-company)
     (helm-company)))
 
-;; complete or indent
-(defun eos/complete-or-indent ()
+;; company or indent
+(defun eos/company-or-indent ()
   "Complete or indent (TAB)."
   (interactive)
   (if (looking-at "\\_>")
@@ -1913,11 +1953,36 @@ point is on a symbol, return that symbol name.  Else return nil."
           (helm-company)))
     (indent-according-to-mode)))
 
+(defun eos/complete-or-indent ()
+  (interactive)
+  (if (looking-at "\\_>")
+      (dabbrev-expand nil)
+    (indent-according-to-mode)))
+
+(defun eos/complete-at-point-or-indent ()
+  "This smart tab is minibuffer compliant: it acts as usual in
+the minibuffer. Else, if mark is active, indents region. Else if
+point is at the end of a symbol, expands it. Else indents the
+current line."
+  (interactive)
+  (if (minibufferp)
+      (unless (minibuffer-complete)
+        (complete-symbol nil))
+    (if mark-active
+        (indent-region (region-beginning)
+                       (region-end))
+      (if (looking-at "\\_>")
+          (complete-symbol nil)
+        (indent-according-to-mode)))))
+
 ;; exit, keyboard quit
 (define-key eos-complete-map (kbd "C-g") 'keyboard-quit)
 
-;; set eos-complete-map M-` keybind
+;; binds (global)
 (global-set-key (kbd "TAB") 'eos/complete-or-indent)
+(global-set-key (kbd "C-M-i") 'eos/company-or-indent)
+
+;; binds eos-complete-map prefix M-] map
 (global-set-key (kbd "M-`") 'eos-complete-map)
 
 (when (require 'helm-gtags nil t)
@@ -1954,7 +2019,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'cmake-ide nil t)
   (progn
-    ;; hooks:
+    ;; hooks
     (add-hook 'c-mode-hook 'cmake-ide-setup)
     (add-hook 'c++-mode-hook 'cmake-ide-setup)))
 
@@ -2050,16 +2115,12 @@ point is on a symbol, return that symbol name.  Else return nil."
   (eos/company/set-backends
    '((company-c-headers)
      (company-irony
-      company-yasnippet
-      company-capf
-      company-keywords
-      company-dabbrev
-      company-dabbrev-code)
+      company-yasnippet)
      (company-files))))
 
 (when (require 'cc-mode nil t)
   (progn
-    ;; hooks:
+    ;; hooks
     (add-hook 'c-mode-hook
               (lambda ()
                 ;; set cc common company backends
@@ -2088,14 +2149,15 @@ point is on a symbol, return that symbol name.  Else return nil."
                 ;; load rtags
                 (eos/cc/load-rtags)))))
 
-;; bind
+;; binds
 (when (boundp 'c-mode-map)
   (progn
     ;; set rtags prefix map in c-mode map (C-c r)
     (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
 
     ;; complete or indent
-    (define-key c-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+    (define-key c-mode-map (kbd "TAB") 'eos/complete-or-indent)
+    (define-key c-mode-map (kbd "C-M-i") 'eos/company-or-indent)))
 
 (defun eos/cc/load-rtags ()
   "Load rtags manually."
@@ -2130,18 +2192,15 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'company-irony nil t)
   (progn
-    ;; hooks:
+    ;; hooks
     (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)))
 
 (require 'company-c-headers nil t)
 
-;; eos rtags prefix map
+;; eos rtags prefix map (todo revise)
 (define-key eos-rtags-map (kbd "C-g") 'keyboard-quit)
 (define-key eos-rtags-map (kbd "l") 'rtags-taglist)
 (define-key eos-rtags-map (kbd "I") 'rtags-install)
-(define-key eos-rtags-map (kbd "i") 'rtags-imenu)
-(define-key eos-rtags-map (kbd "t") 'rtags-find-symbol-at-point)
-(define-key eos-rtags-map (kbd "s") 'rtags-find-symbol)
 (define-key eos-rtags-map (kbd "y") 'rtags-symbol-type)
 (define-key eos-rtags-map (kbd "l") 'rtags-symbol-info)
 (define-key eos-rtags-map (kbd "n") 'rtags-rename-symbol)
@@ -2151,21 +2210,23 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key eos-rtags-map (kbd "d") 'rtags-diagnostics)
 (define-key eos-rtags-map (kbd "c") 'rtags-compile-file)
 (define-key eos-rtags-map (kbd "-") 'rtags-compilation-flags)
-(define-key eos-rtags-map (kbd "r") 'rtags-find-references-at-point)
-(define-key eos-rtags-map (kbd "p") 'rtags-find-all-references-at-point)
-(define-key eos-rtags-map (kbd ".")
-  'rtags-find-functions-called-by-this-function)
+(define-key eos-rtags-map (kbd ".") 'rtags-find-functions-called-by-this-function)
+
+;; (define-key eos-rtags-map (kbd "r") 'rtags-find-references-at-point)
+;; (define-key eos-rtags-map (kbd "p") 'rtags-find-all-references-at-point)
+;; (define-key eos-rtags-map (kbd "i") 'rtags-imenu)
+;; (define-key eos-rtags-map (kbd "t") 'rtags-find-symbol-at-point)
+;; (define-key eos-rtags-map (kbd "s") 'rtags-find-symbol)
 
 (when (require 'lisp-mode nil t)
   (progn
-    ;; custom:
-
+    ;; custom
     ;; number of columns to indent the second line of a (def...) form
     (customize-set-variable 'lisp-body-indent 2)))
 
 (when (require 'elisp-mode nil t)
   (progn
-    ;; hooks:
+    ;; hooks
     ;; enable minor modes
     (add-hook 'emacs-lisp-mode-hook
               (lambda()
@@ -2181,11 +2242,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                 ;; set company backends
                 (eos/company/set-backends
                  '((company-elisp
-                    company-capf
-                    company-yasnippet
-                    company-keywords
-                    company-dabbrev
-                    company-dabbrev-code)
+                    company-yasnippet)
                    (company-files)))
 
                 ;; set flycheck checker
@@ -2200,8 +2257,10 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
     (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
     (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
-    (define-key emacs-lisp-mode-map (kbd "C-c TAB") 'helm-lisp-completion-at-point)
+    ;; (define-key emacs-lisp-mode-map (kbd "C-c TAB") 'helm-lisp-completion-at-point)
+
     (define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)
+    (define-key emacs-lisp-mode-map (kbd "C-M-i") 'eos/company-or-indent)
 
     ;; ubind, qualaty of life
     (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
@@ -2214,18 +2273,14 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'sh-script nil t)
   (progn
-    ;; hooks:
+    ;; hooks
     (add-hook 'sh-mode-hook
               (lambda ()
                 ;; set company backends
                 (eos/company/set-backends
                  '((company-shell
                     company-shell-env
-                    company-yasnippet
-                    company-keywords
-                    company-capf
-                    company-dabbrev-code
-                    company-dabbrev)
+                    company-yasnippet)
                    (company-files)))
 
                 ;; set flycheck backends
@@ -2241,27 +2296,23 @@ point is on a symbol, return that symbol name.  Else return nil."
                 ;; set company backends
                 (eos/company/set-backends
                  '((company-fish-shell
-                    company-shell
-                    company-shell-env
                     company-yasnippet
-                    company-keywords
-                    company-capf
-                    company-dabbrev
-                    company-dabbrev-code)
+                    company-shell
+                    company-shell-env)
                    (company-files)))))))
 
 (require 'cperl-mode nil t)
 
 (when (require 'python nil t)
   (progn
-    ;; custom:
+    ;; custom
     ;; default Python interpreter for shell
     (customize-set-variable 'python-shell-interpreter "python2.7")
 
     ;; non-nil means template skeletons will be automagically inserted
     (customize-set-variable 'python-skeleton-autoinsert t)
 
-    ;; hooks:
+    ;; hooks
     ;; enable modes
     (add-hook 'python-mode-hook
               (lambda()
@@ -2275,8 +2326,6 @@ point is on a symbol, return that symbol name.  Else return nil."
                 (eos/company/set-backends
                  '((company-yasnippet
                     company-keywords
-                    company-capf
-                    company-dabbrev
                     company-dabbrev-code)
                    (company-files)))
 
@@ -2292,15 +2341,13 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; init go-mode when a file with the extersion .go is opened
     (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
-    ;; hooks:
+    ;; hooks
     (add-hook 'go-mode-hook
               (lambda ()
                 ;; set company backends
                 (eos/company/set-backends
                  '((company-yasnippet
                     company-keywords
-                    company-capf
-                    company-dabbrev
                     company-dabbrev-code)
                    (company-files)))
 
@@ -2537,5 +2584,4 @@ point is on a symbol, return that symbol name.  Else return nil."
 (global-unset-key (kbd "<M-drag-mouse-1>"))
 (global-unset-key (kbd "<S-down-mouse-1>"))
 
-(require 'eos-adapt
-         (expand-file-name "eos-adapt.el" user-emacs-directory) t)
+(require 'adapt (expand-file-name "adapt.el" user-emacs-directory) t)

@@ -361,7 +361,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key eos-window-map (kbd "q") 'minimize-window)
 (define-key eos-window-map (kbd "w") 'balance-windows)
 
-;; bind ctl-x-map (C-x w)
+;; binds ctl-x-map (C-x w)
 (define-key ctl-x-map (kbd "w") 'eos-window-map)
 
 ;; kill buffer and window
@@ -597,13 +597,13 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; set font by face attribute (reference)
 ;; (set-face-attribute 'default nil :height)
 
-(when (require 'windmove nil t)
-  (progn
-    ;; hooks
-    ;; window move default keybinds (shift-up/down etc..)
-    (add-hook 'after-init-hook 'windmove-default-keybindings)))
+;; (require 'windmove nil t)
 
-;; binds (eos window prefix map)
+;; enable
+;; window move default keybinds (shift-up/down etc..)
+(eos/funcall 'windmove-default-keybindings)
+
+;; binds, eos-window-map (window prefix map)
 ;; (define-key eos-window-map (kbd "j") 'windmove-up)
 ;; (define-key eos-window-map (kbd "k") 'windmove-down)
 ;; (define-key eos-window-map (kbd "h") 'windmove-left)
@@ -614,12 +614,11 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; binds
     (define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
 
-(when (require 'paren nil t)
-  (progn
-    ;; hooks
-    ;; enable paren mode
-    ;; visualization of matching parens
-    (eos/funcall 'show-paren-mode 1)))
+;; (require 'paren nil t)
+
+;; enable
+;; visualization of matching parens
+(eos/funcall 'show-paren-mode 1)
 
 (when (require 'hideshow nil t)
   (progn
@@ -637,12 +636,10 @@ point is on a symbol, return that symbol name.  Else return nil."
                             '((?\{ . ?\})
                               (?\( . ?\))
                               (?\[ . ?\])
-                              (?\" . ?\"))))
-  ;; hook:
-  ;; enable eletric pair mode
-  (add-hook 'emacs-startup-hook
-            (lambda()
-              (eos/funcall electric-pair-mode 1))))
+                              (?\" . ?\")))
+
+    ;; enable
+    (eos/funcall 'electric-pair-mode 1)))
 
 (when (require 'newcomment nil t)
   (progn
@@ -771,8 +768,8 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'save-completions-retention-time 0)
 
     ;; enable
-    ;; (completion-mode)
-    (dynamic-completion-mode 1)))
+    ;; dynamic completion on
+    (eos/funcall 'dynamic-completion-mode 1)))
 
 ;; add display-buffer-alist
 (add-to-list 'display-buffer-alist
@@ -1369,7 +1366,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'eshell nil t)
 
-;; bind
+;; binds
 (define-key ctl-x-map (kbd "&") 'eshell)
 
 (when (require 'term nil t)
@@ -1403,7 +1400,7 @@ point is on a symbol, return that symbol name.  Else return nil."
           (kill-line)
           (term-send-raw-string "\C-k"))))
 
-    ;; bind (with hook)
+    ;; binds (with hook)
     (add-hook 'term-mode-hook
               (lambda ()
                 (when (and (boundp 'term-raw-map)
@@ -1435,7 +1432,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; the buffer name of term buffer.
     (customize-set-variable 'multi-term-buffer-name "Term")
 
-    ;; bind (C-x) prefix
+    ;; binds (C-x) prefix
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
     (define-key ctl-x-map (kbd "x") 'multi-term-dedicated-toggle)))
 
@@ -1531,7 +1528,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'flycheck nil t)
   (progn
-    ;; bind
+    ;; binds
     (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
     (define-key eos-sc-map (kbd "m") 'flycheck-mode)
     (define-key eos-sc-map (kbd "M") 'flycheck-manual)
@@ -1656,15 +1653,17 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
 
     ;; set tramp verbose level
-    (customize-set-variable 'tramp-verbose 2)
+    (customize-set-variable 'tramp-verbose 4)
 
     ;; file which keeps connection history for tramp connections.
     (customize-set-variable
      'tramp-persistency-file-name
      (concat (expand-file-name user-emacs-directory) "cache/tramp"))
 
-    ;; connection timeout 30 seconds
-    (customize-set-variable 'tramp-connection-timeout 30)))
+    ;; connection timeout in seconds
+    (customize-set-variable 'tramp-connection-timeout 60)))
+
+(require 'helm-tramp nil t)
 
 (define-key ctl-x-map (kbd "<end>")
   (lambda ()
@@ -1778,7 +1777,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'text-mode nil t)
   (progn
-    ;; bind
+    ;; binds
     (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
     (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
     (define-key text-mode-map (kbd "C-M-i") 'eos/company-or-indent)
@@ -1805,7 +1804,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; custom
     (customize-set-variable 'markdown-command "multimarkdown")))
 
-;; bind
+;; binds
 (when (boundp 'markdown-mode-map)
   (progn
     (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
@@ -1905,15 +1904,15 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; binds
     (define-key eos-complete-map (kbd "M-`") 'company-yasnippet)
-    (define-key eos-complete-map (kbd "1") 'company-ispell)
-    (define-key eos-complete-map (kbd "2") 'company-gtags)
+    (define-key eos-complete-map (kbd "M-1") 'company-ispell)
+    (define-key eos-complete-map (kbd "M-2") 'company-gtags)
     (define-key eos-complete-map (kbd ".") 'company-dabbrev-code)
     (define-key eos-complete-map (kbd "/") 'company-files)))
 
 ;; enable globally
 (eos/funcall 'global-company-mode 1)
 
-;; bind
+;; binds
 (when (boundp 'company-active-map)
   (progn
     (define-key company-active-map (kbd "C-j") 'company-complete-selection)
@@ -2014,7 +2013,7 @@ current line."
     (customize-set-variable 'helm-gtags-use-input-at-cursor t)
     (customize-set-variable 'helm-gtags-suggested-key-mapping t)
 
-    ;; bind
+    ;; binds
     (define-key eos-tags-map (kbd "t") 'helm-gtags-dwim)
     (define-key eos-tags-map (kbd "s") 'helm-gtags-select)
     (define-key eos-tags-map (kbd "f") 'helm-gtags-find-tag)
@@ -2076,7 +2075,7 @@ current line."
 
 (when (require 'magit nil t)
   (progn
-    ;; bind
+    ;; binds
     (define-key ctl-x-map (kbd "j") 'magit-status)))
 
 (when (require 'projectile nil t)
@@ -2094,7 +2093,7 @@ current line."
     (customize-set-variable 'projectile-cache-file
                             (concat user-emacs-directory "cache/projectile.cache"))
 
-    ;; bind
+    ;; binds
     (define-key eos-pm-map (kbd "g") 'projectile-grep)
     (define-key eos-pm-map (kbd "t") 'projectile-find-tag)
     (define-key eos-pm-map (kbd "x") 'projectile-compile-project)

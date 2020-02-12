@@ -4033,7 +4033,7 @@
 
    #+BEGIN_SRC emacs-lisp
 
-   (require 'adapt (expand-file-name "adapt.el" user-emacs-directory) t)
+   (require 'eos-adapt (expand-file-name "eos-adapt.el" user-emacs-directory) t)
 
    #+END_SRC
 

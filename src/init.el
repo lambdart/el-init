@@ -2584,4 +2584,4 @@ current line."
 (global-unset-key (kbd "<M-drag-mouse-1>"))
 (global-unset-key (kbd "<S-down-mouse-1>"))
 
-(require 'adapt (expand-file-name "adapt.el" user-emacs-directory) t)
+(require 'eos-adapt (expand-file-name "eos-adapt.el" user-emacs-directory) t)

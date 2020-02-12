@@ -772,15 +772,17 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; enable
     ;; (completion-mode)
-
-    ;; disable
-    (dynamic-completion-mode 0)))
+    (dynamic-completion-mode 1)))
 
 ;; add display-buffer-alist
 (add-to-list 'display-buffer-alist
              '("\\*Completions\\*" display-buffer-below-selected))
 
 (require 'dabbrev nil t)
+
+;; custom
+;; whether or not to incrementally update display when flood-filling
+(customize-set-variable 'artist-flood-fill-show-incrementally nil)
 
 ;; avoid warnings when byte-compile
 (eval-when-compile
@@ -1071,6 +1073,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; load theme
 (load-theme 'mesk-term t)
 
+(require 'all-the-icons nil t)
+
 (when (require 'epa nil t)
   (progn
     ;; custom
@@ -1174,6 +1178,56 @@ point is on a symbol, return that symbol name.  Else return nil."
               (lambda ()
                 (when (fboundp 'ibuffer-do-sort-by-filename/process)
                   (ibuffer-do-sort-by-filename/process))))))
+
+(when (require 'dashboard nil t)
+  (progn
+    ;; items
+    (customize-set-variable 'dashboard-items
+                            '((recents . 5)
+                              (projects . 5)
+                              (agenda . 5)
+                              (bookmarks . 5)))
+
+    ;; banners directory
+    (customize-set-variable 'dashboard-banners-directory
+                            (concat user-emacs-directory "banner/"))
+
+    ;; banner
+    (customize-set-variable 'dashboard-startup-banner 1)
+
+    ;; page separator
+    (customize-set-variable 'dashboard-page-separator "
+
+ ")
+
+    ;; footer icon
+    (customize-set-variable 'dashboard-footer-icon
+                            #(" " 0 1 (face dashboard-footer)))
+
+    ;; footer
+    (customize-set-variable 'dashboard-footer
+                            "Litany Against Fear
+
+  I must not fear.
+  Fear is the mind-killer.
+  Fear is the little-death that brings total obliteration.
+  I will face my fear.
+  I will permit it to pass over me and through me.
+  And when it has gone past I will turn the inner eye to see its path.
+  Where the fear has gone there will be nothing.
+  Only I will remain.
+  ")
+
+    ;; set initial buffer choice (emacsclient fix)
+    (customize-set-variable 'initial-buffer-choice
+                            (lambda ()
+                              (let ((initial-buffer (get-buffer "*dashboard*")))
+                                (unless initial-buffer
+                                  (setq initial-buffer (get-buffer "*scratch*")))
+                                initial-buffer)))
+
+    ;; init dashboard after emacs initialize
+    (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
 
 (when (require 'helm-swoop nil t)
   (progn
@@ -1383,7 +1437,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; bind (C-x) prefix
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
-    (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
+    (define-key ctl-x-map (kbd "x") 'multi-term-dedicated-toggle)))
 
 (defun eos/launch/st ()
   "Launch urxvt"
@@ -1527,7 +1581,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'helm-external nil t)
   (progn
     ;; bind (C-x) prefix map
-    (define-key ctl-x-map (kbd "x") 'helm-run-external-command)))
+    (define-key ctl-x-map (kbd "C-x") 'helm-run-external-command)))
 
 (when (require 'comint nil t)
   (progn
@@ -1543,6 +1597,22 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; value to use for TERM when the system uses terminfo.
     (customize-set-variable 'comint-terminfo-terminal "eterm-color")))
+
+(when (require 'ielm nil t)
+  (progn
+    ;; custom
+    ;; if non-nil, after entering the first line of
+    ;; an incomplete sexp, a newline will be inserted after the prompt.
+    (customize-set-variable 'ielm-dynamic-multiline-inputs t)
+
+    ;; if non-nil, IELM will beep on error
+    (customize-set-variable 'ielm-noisy nil)
+
+    ;; prompt used in IELM
+    (customize-set-variable 'ielm-prompt "elisp > ")
+
+    ;; if non-nil, the IELM prompt is read only
+    (customize-set-variable 'ielm-prompt-read-only nil)))
 
 (require 'sql nil t)
 
@@ -1740,56 +1810,6 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
 
-(when (require 'dashboard nil t)
-  (progn
-    ;; items
-    (customize-set-variable 'dashboard-items
-                            '((recents . 5)
-                              (projects . 5)
-                              (agenda . 5)
-                              (bookmarks . 5)))
-
-    ;; banners directory
-    (customize-set-variable 'dashboard-banners-directory
-                            (concat user-emacs-directory "banner/"))
-
-    ;; banner
-    (customize-set-variable 'dashboard-startup-banner 1)
-
-    ;; page separator
-    (customize-set-variable 'dashboard-page-separator "
-
- ")
-
-    ;; footer icon
-    (customize-set-variable 'dashboard-footer-icon
-                            #(" " 0 1 (face dashboard-footer)))
-
-    ;; footer
-    (customize-set-variable 'dashboard-footer
-                            "Litany Against Fear
-
-  I must not fear.
-  Fear is the mind-killer.
-  Fear is the little-death that brings total obliteration.
-  I will face my fear.
-  I will permit it to pass over me and through me.
-  And when it has gone past I will turn the inner eye to see its path.
-  Where the fear has gone there will be nothing.
-  Only I will remain.
-  ")
-
-    ;; set initial buffer choice (emacsclient fix)
-    (customize-set-variable 'initial-buffer-choice
-                            (lambda ()
-                              (let ((initial-buffer (get-buffer "*dashboard*")))
-                                (unless initial-buffer
-                                  (setq initial-buffer (get-buffer "*scratch*")))
-                                initial-buffer)))
-
-    ;; init dashboard after emacs initialize
-    (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
-
 (require 'eldoc nil t)
 
 (when (require 'man nil t)
@@ -1884,11 +1904,11 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'company-show-numbers t)
 
     ;; binds
-    (define-key eos-complete-map (kbd "M-`") 'company-ispell)
-    (define-key eos-complete-map (kbd "`") 'company-yasnippet)
-    (define-key eos-complete-map (kbd "/") 'company-dabbrev-code)
-    (define-key eos-complete-map (kbd "1") 'company-gtags)
-    (define-key eos-complete-map (kbd "2") 'company-files)))
+    (define-key eos-complete-map (kbd "M-`") 'company-yasnippet)
+    (define-key eos-complete-map (kbd "1") 'company-ispell)
+    (define-key eos-complete-map (kbd "2") 'company-gtags)
+    (define-key eos-complete-map (kbd ".") 'company-dabbrev-code)
+    (define-key eos-complete-map (kbd "/") 'company-files)))
 
 ;; enable globally
 (eos/funcall 'global-company-mode 1)
@@ -2016,6 +2036,18 @@ current line."
 (define-key ctl-x-map (kbd "t") 'eos-tags-map)
 
 (require 'gud nil t)
+
+(when (require 'rmsbolt nil t)
+  (progn
+    ;; custom
+    ;; which output assembly format to use.
+    (customize-set-variable 'rmsbolt-asm-format "att")
+
+    ;;    whether we should disassemble an output binary
+    (customize-set-variable 'rmsbolt-disassemble t)
+
+    ;; rmsbolt mode lighter
+    (customize-set-variable 'rmsbolt-mode-lighter "RMS")))
 
 (when (require 'cmake-ide nil t)
   (progn
@@ -2374,11 +2406,7 @@ current line."
                 ;; set company backends
                 (eos/company/set-backends
                  '((company-gtags
-                    company-yasnippet
-                    company-keywords
-                    company-capf
-                    company-dabbrev-code
-                    company-dabbrev)
+                    company-yasnippet)
                    (company-files)))
 
                 ;; select flycheck checker (use gcc)
@@ -2419,7 +2447,7 @@ current line."
 ;; (define-key ctl-x-map (kbd "C--") nil)
 ;; (define-key ctl-x-map (kbd "ESC") nil)
 ;; (define-key ctl-x-map (kbd ".") nil)
-;; (define-key ctl-x-map (kbd "C-l") nil)
+(define-key ctl-x-map (kbd "C-l") nil)
 (define-key ctl-x-map (kbd "C-d") nil)
 (define-key ctl-x-map (kbd "C-z") nil)
 (define-key ctl-x-map (kbd "C-<left>") nil)
@@ -2584,4 +2612,5 @@ current line."
 (global-unset-key (kbd "<M-drag-mouse-1>"))
 (global-unset-key (kbd "<S-down-mouse-1>"))
 
-(require 'eos-adapt (expand-file-name "eos-adapt.el" user-emacs-directory) t)
+(require 'eos-adapt
+         (expand-file-name "eos-adapt.el" user-emacs-directory) t)

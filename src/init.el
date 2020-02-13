@@ -807,7 +807,7 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     (require 'exwm-config nil t)
 
-    ;; set exwm workspaces
+    ;; set exwm workspaces number
     (customize-set-variable 'exwm-workspace-number 0)
 
     ;; show workspaces in all buffers
@@ -1070,7 +1070,17 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; load theme
 (load-theme 'mesk-term t)
 
-(require 'all-the-icons nil t)
+(when (require 'all-the-icons nil t)
+  (progn
+    ;; custom
+    ;; whether or not to include a foreground colour when formatting the icon
+    (customize-set-variable 'all-the-icons-color-icons t)
+
+    ;; the default adjustment to be made to the `raise' display property of an icon
+    (customize-set-variable 'all-the-icons-default-adjust -0.0)
+
+    ;; the base Scale Factor for the `height' face property of an icon
+    (customize-set-variable 'all-the-icons-scale-factor 1.0)))
 
 (when (require 'epa nil t)
   (progn
@@ -1904,9 +1914,9 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; binds
     (define-key eos-complete-map (kbd "M-`") 'company-yasnippet)
-    (define-key eos-complete-map (kbd "M-1") 'company-ispell)
-    (define-key eos-complete-map (kbd "M-2") 'company-gtags)
-    (define-key eos-complete-map (kbd ".") 'company-dabbrev-code)
+    (define-key eos-complete-map (kbd "`") 'company-ispell)
+    (define-key eos-complete-map (kbd ".") 'company-gtags)
+    (define-key eos-complete-map (kbd "'") 'company-dabbrev-code)
     (define-key eos-complete-map (kbd "/") 'company-files)))
 
 ;; enable globally
@@ -2610,6 +2620,8 @@ current line."
 (global-unset-key (kbd "<M-down-mouse-1>"))
 (global-unset-key (kbd "<M-drag-mouse-1>"))
 (global-unset-key (kbd "<S-down-mouse-1>"))
+
+
 
 (require 'eos-adapt
          (expand-file-name "eos-adapt.el" user-emacs-directory) t)

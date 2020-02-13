@@ -1338,7 +1338,7 @@
        (progn
          (require 'exwm-config nil t)
 
-         ;; set exwm workspaces
+         ;; set exwm workspaces number
          (customize-set-variable 'exwm-workspace-number 0)
 
          ;; show workspaces in all buffers
@@ -1656,7 +1656,17 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'all-the-icons nil t)
+     (when (require 'all-the-icons nil t)
+       (progn
+         ;; custom
+         ;; whether or not to include a foreground colour when formatting the icon
+         (customize-set-variable 'all-the-icons-color-icons t)
+
+         ;; the default adjustment to be made to the `raise' display property of an icon
+         (customize-set-variable 'all-the-icons-default-adjust -0.0)
+
+         ;; the base Scale Factor for the `height' face property of an icon
+         (customize-set-variable 'all-the-icons-scale-factor 1.0)))
 
      #+END_SRC
 
@@ -2008,6 +2018,8 @@
      #+END_SRC
 
 *** Email
+**** Sendmail
+**** Feedmail
 **** Messages
 **** Gnus
 *** Feed
@@ -2040,7 +2052,9 @@
                                  '(" "
                                    mode-line-misc-info
                                    mode-line-mule-info
-                                   "%*%& %l:%c | %I "
+                                   ;; "%*%& %l:%c | %I "
+                                   "%*%&  "
+                                   mode-line-position
                                    moody-mode-line-buffer-identification
                                    " %m "
                                    (vc-mode moody-vc-mode)))))
@@ -3050,9 +3064,9 @@
 
          ;; binds
          (define-key eos-complete-map (kbd "M-`") 'company-yasnippet)
-         (define-key eos-complete-map (kbd "M-1") 'company-ispell)
-         (define-key eos-complete-map (kbd "M-2") 'company-gtags)
-         (define-key eos-complete-map (kbd ".") 'company-dabbrev-code)
+         (define-key eos-complete-map (kbd "`") 'company-ispell)
+         (define-key eos-complete-map (kbd ".") 'company-gtags)
+         (define-key eos-complete-map (kbd "'") 'company-dabbrev-code)
          (define-key eos-complete-map (kbd "/") 'company-files)))
 
      ;; enable globally
@@ -4085,6 +4099,12 @@
     (global-unset-key (kbd "<S-down-mouse-1>"))
 
     #+END_SRC
+
+** Lab
+
+   #+BEGIN_SRC emacs-lisp
+
+   #+END_SRC
 
 ** Adapt
 

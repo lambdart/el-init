@@ -511,15 +511,13 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; non-nil says by default do auto-saving of every file-visiting buffer
     (customize-set-variable 'auto-save-default nil)
 
-    ;; Most *NIX tools work best when files are terminated
+    ;; most *NIX tools work best when files are terminated
     ;; with a newline
     (customize-set-variable 'require-final-newline t)
 
-    ;; set backup directory list
-    ;; alist of filename patterns and backup directory names.
-    (customize-set-variable
-     'backup-directory-alist
-     '(("" . (concat user-emacs-directory "backup"))))))
+    ;; backup directory list
+    ;; alist of filename patterns and backup directory names
+    (customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))))
 
 ;; create cache directory
 (eos/mkdir (concat user-emacs-directory "cache"))
@@ -1307,10 +1305,13 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; mode-line format
     (customize-set-variable 'mode-line-format
-                            '(" "
+                            '("%e "
+                              ;; "%*%& %l:%c | %I "
+                              ;; mode-line-mule-info
+                              "%*%& | "
                               mode-line-misc-info
-                              mode-line-mule-info
-                              "%*%& %l:%c | %I "
+                              " | "
+                              "%I "
                               moody-mode-line-buffer-identification
                               " %m "
                               (vc-mode moody-vc-mode)))))

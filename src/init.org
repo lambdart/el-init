@@ -659,6 +659,12 @@
 
     #+END_SRC
 
+*** Buffer-menu
+
+    The Buffer Menu is used to view, edit, delete, or change attributes
+    of buffers. The entry points are C-x C-b (`list-buffers') and
+    M-x buffer-menu.
+
 *** Minibuffer
 
     #+BEGIN_SRC emacs-lisp
@@ -847,6 +853,8 @@
 
     #+END_SRC
 
+*** Diff
+*** Ediff
 *** Recentf
 
     #+BEGIN_SRC emacs-lisp
@@ -1129,20 +1137,6 @@
 
     #+END_SRC
 
-*** Display-line-numbers
-
-    #+BEGIN_SRC emacs-lisp
-
-    (when (require 'display-line-numbers nil t)
-      (progn
-        ;; hooks
-        ;; (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-
-        ;; enable display line numbers mode
-        (eos/funcall 'global-display-line-numbers-mode 1)))
-
-    #+END_SRC
-
 *** Delsel
 
     #+BEGIN_SRC emacs-lisp
@@ -1274,8 +1268,48 @@
 
     #+END_SRC
 
+*** Ede
+
+    EDE is the top level Lisp interface to a
+    project management scheme for Emacs.
+
+    #+BEGIN_SRC emacs-lisp
+
+    (require 'ede nil t)
+
+    #+END_SRC
+
+*** Forms
+
+    Forms mode means visiting a data file which is supposed to consist
+    of records each containing a number of fields. The records are
+    separated by a newline, the fields are separated by a user-defined
+    field separator (default: TAB). When shown, a record is
+    transferred to an Emacs buffer and presented using a user-defined
+    form. One record is shown at a time.
+
+    #+BEGIN_SRC emacs-lisp
+
+    (require 'forms nil t)
+
+    #+END_SRC
+
+*** Display-line-numbers
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'display-line-numbers nil t)
+      (progn
+        ;; hooks
+        ;; (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+        ;; enable display line numbers mode
+        (eos/funcall 'global-display-line-numbers-mode 1)))
+
+    #+END_SRC
+
 ** Applications
-*** Package Manager
+*** Packages
 **** Cask
 
      Cask is a project management tool fo Emacs that helps
@@ -1308,23 +1342,7 @@
 
      #+END_SRC
 
-*** Async
-
-    Adds the ability to call asynchronous functions and process with
-    ease. See the documentation for `async-start' and `async-start-process'.
-
-    #+BEGIN_SRC emacs-lisp
-
-    (require 'async nil t)
-    (require 'async-bytecomp nil t)
-
-    ;; to run command without displaying the output in a window
-    (add-to-list 'display-buffer-alist
-                 '("\\*Async Shell Command\\*" display-buffer-no-window))
-
-    #+END_SRC
-
-*** Window Manager
+*** X
 **** Exwm
 
      EXWM (Emacs X Window Manager) is a full-featured tiling X window manager
@@ -1484,6 +1502,38 @@
          (setq eos/helm-source-exwm-buffers
                (if (fboundp 'helm-exwm-build-source)
                    (helm-exwm-build-source)))))
+
+     #+END_SRC
+
+*** Process
+**** Async
+
+     Adds the ability to call asynchronous functions and process with
+     ease. See the documentation for `async-start' and `async-start-process'.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'async nil t)
+     (require 'async-bytecomp nil t)
+
+     ;; to run command without displaying the output in a window
+     (add-to-list 'display-buffer-alist
+                  '("\\*Async Shell Command\\*" display-buffer-no-window))
+
+     #+END_SRC
+
+*** Window
+**** Buffer-move
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'buffer-move nil t)
+       (progn
+         ;; bind
+         (global-set-key (kbd "C-s-j") 'buf-move-up)
+         (global-set-key (kbd "C-s-k") 'buf-move-down)
+         (global-set-key (kbd "C-s-h") 'buf-move-left)
+         (global-set-key (kbd "C-s-l") 'buf-move-right)))
 
      #+END_SRC
 
@@ -1826,41 +1876,20 @@
 
      #+END_SRC
 
-*** Buffer
-**** Buffer-move
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'buffer-move nil t)
-       (progn
-         ;; bind
-         (global-set-key (kbd "C-s-j") 'buf-move-up)
-         (global-set-key (kbd "C-s-k") 'buf-move-down)
-         (global-set-key (kbd "C-s-h") 'buf-move-left)
-         (global-set-key (kbd "C-s-l") 'buf-move-right)))
-
-     #+END_SRC
-
+*** View
 **** Ibuffer
 
-     Ibuffer.el is an advanced replacement for the `buffer-menu' which
-     is normally distributed with Emacs.  Its interface is intended to
-     be analogous to that of Dired.
+     A major mode for viewing a list of buffers.
+     In Ibuffer, you can conveniently perform many operations on the
+     currently open buffers, in addition to filtering your view to a
+     particular subset of them, and sorting by various criteria.
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'ibuffer nil t)
-       (progn
-         ;; hooks
-         ;; sort by filename/process
-         (add-hook 'ibuffer-mode-hook
-                   (lambda ()
-                     (when (fboundp 'ibuffer-do-sort-by-filename/process)
-                       (ibuffer-do-sort-by-filename/process))))))
+     (require 'ibuffer nil t)
 
      #+END_SRC
 
-*** View
 **** Dashboard
 
      #+BEGIN_SRC emacs-lisp
@@ -2047,16 +2076,20 @@
 
          ;; mode-line format
          (customize-set-variable 'mode-line-format
-                                 '("%e "
+                                 '("%e  "
                                    ;; "%*%& %l:%c | %I "
                                    ;; mode-line-mule-info
-                                   "%*%& | "
+                                   "%*%& "
+                                   ;; mode-line-misc-info
+                                   ;; mode-line-percent-position
+                                   "(%l:%c) / %I  "
                                    mode-line-misc-info
-                                   " | "
-                                   "%I "
+                                   " "
                                    moody-mode-line-buffer-identification
                                    " %m "
-                                   (vc-mode moody-vc-mode)))))
+                                   (vc-mode moody-vc-mode)
+                                   " "
+                                   ))))
 
      #+END_SRC
 
@@ -2626,7 +2659,7 @@
 
      #+END_SRC
 
-*** Networking
+*** Remote
 **** Tramp
 
      TRAMP is for transparently accessing remote files from within Emacs.
@@ -2783,7 +2816,7 @@
 
      #+END_SRC
 
-*** Notification
+*** Notify
 **** Notifications
 
      For proper usage, Emacs must be started in an environment with an
@@ -2795,114 +2828,7 @@
 
      #+END_SRC
 
-*** Office
-**** Org
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; custom
-     ;; when non-nil, fontify code in code blocks
-     (customize-set-variable 'org-src-fontify-natively t)
-
-     ;; if non-nil, the effect of TAB in a code block is as if it were
-     ;; issued in the language major mode buffer
-     (customize-set-variable 'org-src-tab-acts-natively t)
-
-     ;; indentation for the content of a source code block.
-     (customize-set-variable 'org-edit-src-content-indentation 0)
-
-     ;; confirm before evaluation
-     (customize-set-variable 'org-confirm-babel-evaluate nil)
-
-     ;; how the source code edit buffer should be displayed
-     (customize-set-variable 'org-src-window-setup 'current-window)
-
-     ;; non-nil means C-a and C-e behave specially in headlines and items
-     (customize-set-variable 'org-special-ctrl-a/e t)
-
-     (add-hook 'org-mode-hook
-               (lambda ()
-                 ;; do not truncate lines
-                 (setq truncate-lines nil)
-
-                 ;; set company backends
-                 (eos/company/set-backends
-                  '((company-ispell
-                     company-yasnippet)
-                    (company-files)))))
-
-     ;; binds
-     (define-key org-mode-map (kbd "C-M-i") 'eos/company-or-indent)
-
-     #+END_SRC
-
-**** Org-Agenda
-**** Tex
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'tex-mode nil t)
-       (progn
-         ;; custom
-         ;; hooks
-         ))
-
-     #+END_SRC
-
-**** Text
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'text-mode nil t)
-       (progn
-         ;; binds
-         (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-         (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
-         (define-key text-mode-map (kbd "C-M-i") 'eos/company-or-indent)
-
-         (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
-         (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
-
-         ;; text mode hook
-         (add-hook 'text-mode-hook
-                   (lambda ()
-                     ;; turn on auto fill mode
-                     (turn-on-auto-fill)
-
-                     ;; set company backends
-                     (eos/company/set-backends
-                      '((company-ispell
-                         company-keywords
-                         company-capf
-                         company-dabbrev)
-                        (company-files)))))))
-
-     #+END_SRC
-
-**** Markdown
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'markdown-mode nil t)
-       (progn
-         ;; custom
-         (customize-set-variable 'markdown-command "multimarkdown")))
-
-     ;; binds
-     (when (boundp 'markdown-mode-map)
-       (progn
-         (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
-
-     #+END_SRC
-
-**** DocView
-**** Dictionary
-*** Web
-**** Webpaste
-**** Org-cms
-*** Analyse
-**** Verb
-*** Documentation
+*** Library
 **** Eldoc
 
      As you type a function's symbol name as part of a sexp,
@@ -3021,6 +2947,108 @@
 
      #+END_SRC
 
+*** Office
+**** Org
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; custom
+     ;; when non-nil, fontify code in code blocks
+     (customize-set-variable 'org-src-fontify-natively t)
+
+     ;; if non-nil, the effect of TAB in a code block is as if it were
+     ;; issued in the language major mode buffer
+     (customize-set-variable 'org-src-tab-acts-natively t)
+
+     ;; indentation for the content of a source code block.
+     (customize-set-variable 'org-edit-src-content-indentation 0)
+
+     ;; confirm before evaluation
+     (customize-set-variable 'org-confirm-babel-evaluate nil)
+
+     ;; how the source code edit buffer should be displayed
+     (customize-set-variable 'org-src-window-setup 'current-window)
+
+     ;; non-nil means C-a and C-e behave specially in headlines and items
+     (customize-set-variable 'org-special-ctrl-a/e t)
+
+     (add-hook 'org-mode-hook
+               (lambda ()
+                 ;; do not truncate lines
+                 (setq truncate-lines nil)
+
+                 ;; set company backends
+                 (eos/company/set-backends
+                  '((company-ispell
+                     company-yasnippet)
+                    (company-files)))))
+
+     ;; binds
+     (define-key org-mode-map (kbd "C-M-i") 'eos/company-or-indent)
+
+     #+END_SRC
+
+**** Org-Agenda
+**** Tex
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'tex-mode nil t)
+       (progn
+         ;; custom
+         ;; hooks
+         ))
+
+     #+END_SRC
+
+**** Text
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'text-mode nil t)
+       (progn
+         ;; binds
+         (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
+         (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
+         (define-key text-mode-map (kbd "C-M-i") 'eos/company-or-indent)
+
+         (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
+         (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
+
+         ;; text mode hook
+         (add-hook 'text-mode-hook
+                   (lambda ()
+                     ;; turn on auto fill mode
+                     (turn-on-auto-fill)
+
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-ispell
+                         company-keywords
+                         company-capf
+                         company-dabbrev)
+                        (company-files)))))))
+
+     #+END_SRC
+
+**** Markdown
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'markdown-mode nil t)
+       (progn
+         ;; custom
+         (customize-set-variable 'markdown-command "multimarkdown")))
+
+     ;; binds
+     (when (boundp 'markdown-mode-map)
+       (progn
+         (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+
+     #+END_SRC
+
+**** DocView
+**** Dictionary
 *** Completion
 **** Company
 
@@ -3074,6 +3102,7 @@
      ;; binds
      (when (boundp 'company-active-map)
        (progn
+         (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
          (define-key company-active-map (kbd "C-j") 'company-complete-selection)
          (define-key company-active-map (kbd "C-n") 'company-select-next)
          (define-key company-active-map (kbd "C-p") 'company-select-previous)))
@@ -3122,7 +3151,7 @@
 
      (when (boundp 'helm-company-map)
        (define-key helm-company-map (kbd "SPC") 'helm-keyboard-quit)
-       (define-key helm-company-map (kbd "TAB") 'helm-next-line)
+       (define-key helm-company-map (kbd "TAB") 'helm-maybe-exit-minibuffer)
        (define-key helm-company-map (kbd "C-j") 'helm-maybe-exit-minibuffer))
 
      #+END_SRC
@@ -3314,7 +3343,7 @@
 
      #+END_SRC
 
-*** Version Control
+*** Version-control
 **** Magit
 
      #+BEGIN_SRC emacs-lisp
@@ -3326,7 +3355,7 @@
 
      #+END_SRC
 
-*** Project Management
+*** Project
 **** Projectile
 
      Projectile is used as the project management and navigation.
@@ -3711,7 +3740,62 @@
      #+END_SRC
 
 *** Lua
+**** Lua-mode
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'lua-mode nil t)
+       (progn
+         ;; custom
+         ;; non-nil means display lua-process-buffer after sending a command.
+         (customize-set-variable 'lua-process-buffer t)
+
+         ;; default application to run in Lua process
+         (customize-set-variable 'lua-default-application "lua")
+
+         ;; command switches for lua-default-application
+         (customize-set-variable 'lua-default-command-switches "-i")
+
+         ;; amount by which Lua subexpressions are indented
+         (customize-set-variable 'lua-indent-level 4)
+
+         ;; if non-nil, contents of multiline string will be indented
+         (customize-set-variable 'lua-indent-string-contents t)
+
+         ;; jump to innermost traceback location in *lua* buffer
+         ;; when this variable is non-nil and a traceback occurs
+         ;; when running Lua code in a process, jump immediately
+         ;; to the source code of the innermost traceback location
+         (customize-set-variable 'lua-jump-on-traceback t)
+
+         ;; hooks
+         (add-hook 'lua-mode-hook
+                   (lambda ()
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-yasnippet
+                         company-keywords
+                         company-gtags
+                         company-dabbrev-code
+                         company-keywords)
+                        (company-files)))
+
+                     ;; set flycheck checker
+                     (eos/flycheck/set-checker 'lua)
+
+                     ;; activate dash docset
+                     (eos/dash/activate-docset "Lua")))))
+
+     #+END_SRC
+
 *** Tcl
+**** Tcl
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'tcl nil t)
+
+     #+END_SRC
+
 *** Perl
 **** Cperl-mode
 
@@ -3794,27 +3878,52 @@
      #+END_SRC
 
 *** R
+**** Ess-R
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-    (require 'ess-r-mode nil t)
+     (require 'ess-r-mode nil t)
 
-    #+END_SRC
+     #+END_SRC
 
 *** Julia
-*** Forms
+**** Julia-mode
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'julia-mode nil t)
+
+     #+END_SRC
+
+**** Ess-julia
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'ess-julia nil t)
+
+     #+END_SRC
+
 *** Clojure
 *** Vhdl
+**** Vhdl-mode
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'vhdl-mode nil t)
+
+     #+END_SRC
+
 *** Verilog
+**** Verilog
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-    (require 'verilog nil t)
+     (require 'verilog nil t)
 
-    #+END_SRC
+     #+END_SRC
 
 *** Cmake
-**** cmake-mode
+**** Cmake-mode
 
      Enables cmake mode for editing cmake files.
 
@@ -3825,30 +3934,31 @@
      #+END_SRC
 
 *** Mql
+**** Mql-mode
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-    (add-to-list 'load-path
-                 (concat user-emacs-directory "elpa/mql-mode"))
+     (add-to-list 'load-path
+                  (concat user-emacs-directory "elpa/mql-mode"))
 
-    (when (require 'mql-mode nil t)
-      (progn
-        ;; hooks
-        (add-hook 'mql-mode-hook
-                  (lambda ()
-                    ;; set company backends
-                    (eos/company/set-backends
-                     '((company-gtags
-                        company-yasnippet)
-                       (company-files)))
+     (when (require 'mql-mode nil t)
+       (progn
+         ;; hooks
+         (add-hook 'mql-mode-hook
+                   (lambda ()
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-gtags
+                         company-yasnippet)
+                        (company-files)))
 
-                    ;; select flycheck checker (use gcc)
-                    (eos/flycheck/set-checker 'c/c++-gcc)
+                     ;; select flycheck checker (use gcc)
+                     (eos/flycheck/set-checker 'c/c++-gcc)
 
-                    ;; activate mql5 docset
-                    (eos/dash/activate-docset '"mql5")))))
+                     ;; activate mql5 docset
+                     (eos/dash/activate-docset '"mql5")))))
 
-    #+END_SRC
+     #+END_SRC
 
 *** Doxygen
 **** Highlight-doxygen
@@ -3886,8 +3996,6 @@
 
      #+END_SRC
 
-*** PHP
-*** HTML
 ** Unbind
 *** Prefix
 **** Esc
@@ -4098,12 +4206,6 @@
     (global-unset-key (kbd "<S-down-mouse-1>"))
 
     #+END_SRC
-
-** Lab
-
-   #+BEGIN_SRC emacs-lisp
-
-   #+END_SRC
 
 ** Adapt
 

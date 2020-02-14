@@ -693,14 +693,6 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; format used to display line numbers.
     (customize-set-variable 'linum-format " %2d ")))
 
-(when (require 'display-line-numbers nil t)
-  (progn
-    ;; hooks
-    ;; (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-
-    ;; enable display line numbers mode
-    (eos/funcall 'global-display-line-numbers-mode 1)))
-
 (when (require 'delsel nil t)
   (progn
     ;; delete selection-mode
@@ -779,6 +771,18 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; whether or not to incrementally update display when flood-filling
 (customize-set-variable 'artist-flood-fill-show-incrementally nil)
 
+(require 'ede nil t)
+
+(require 'forms nil t)
+
+(when (require 'display-line-numbers nil t)
+  (progn
+    ;; hooks
+    ;; (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+    ;; enable display line numbers mode
+    (eos/funcall 'global-display-line-numbers-mode 1)))
+
 ;; avoid warnings when byte-compile
 (eval-when-compile
   ;; eval require when compile
@@ -793,13 +797,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; initialize cask
 (eos/funcall 'cask-initialize)
-
-(require 'async nil t)
-(require 'async-bytecomp nil t)
-
-;; to run command without displaying the output in a window
-(add-to-list 'display-buffer-alist
-             '("\\*Async Shell Command\\*" display-buffer-no-window))
 
 (when (require 'exwm nil t)
   (progn
@@ -937,6 +934,21 @@ point is on a symbol, return that symbol name.  Else return nil."
     (setq eos/helm-source-exwm-buffers
           (if (fboundp 'helm-exwm-build-source)
               (helm-exwm-build-source)))))
+
+(require 'async nil t)
+(require 'async-bytecomp nil t)
+
+;; to run command without displaying the output in a window
+(add-to-list 'display-buffer-alist
+             '("\\*Async Shell Command\\*" display-buffer-no-window))
+
+(when (require 'buffer-move nil t)
+  (progn
+    ;; bind
+    (global-set-key (kbd "C-s-j") 'buf-move-up)
+    (global-set-key (kbd "C-s-k") 'buf-move-down)
+    (global-set-key (kbd "C-s-h") 'buf-move-left)
+    (global-set-key (kbd "C-s-l") 'buf-move-right)))
 
 (when (require 'helm nil t)
   (progn
@@ -1167,22 +1179,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; enable
 (eos/funcall 'editorconfig-mode)
 
-(when (require 'buffer-move nil t)
-  (progn
-    ;; bind
-    (global-set-key (kbd "C-s-j") 'buf-move-up)
-    (global-set-key (kbd "C-s-k") 'buf-move-down)
-    (global-set-key (kbd "C-s-h") 'buf-move-left)
-    (global-set-key (kbd "C-s-l") 'buf-move-right)))
-
-(when (require 'ibuffer nil t)
-  (progn
-    ;; hooks
-    ;; sort by filename/process
-    (add-hook 'ibuffer-mode-hook
-              (lambda ()
-                (when (fboundp 'ibuffer-do-sort-by-filename/process)
-                  (ibuffer-do-sort-by-filename/process))))))
+(require 'ibuffer nil t)
 
 (when (require 'dashboard nil t)
   (progn
@@ -1305,16 +1302,20 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; mode-line format
     (customize-set-variable 'mode-line-format
-                            '("%e "
+                            '("%e  "
                               ;; "%*%& %l:%c | %I "
                               ;; mode-line-mule-info
-                              "%*%& | "
+                              "%*%& "
+                              ;; mode-line-misc-info
+                              ;; mode-line-percent-position
+                              "(%l:%c) / %I  "
                               mode-line-misc-info
-                              " | "
-                              "%I "
+                              " "
                               moody-mode-line-buffer-identification
                               " %m "
-                              (vc-mode moody-vc-mode)))))
+                              (vc-mode moody-vc-mode)
+                              " "
+                              ))))
 
 (when (require 'erc nil t)
   (progn
@@ -1746,6 +1747,68 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (require 'notifications nil t)
 
+(require 'eldoc nil t)
+
+(when (require 'man nil t)
+  (progn
+    ;; hooks
+    (add-hook 'Man-mode-hook
+              (lambda ()
+                ;; don't truncate lines
+                (setq truncate-lines nil)))))
+
+;; binds
+(when (boundp 'Man-mode-map)
+  (progn
+    (define-key Man-mode-map (kbd "C-j") 'push-button)))
+
+(when (require 'helm-man nil t)
+  (progn
+    ;; bind
+    (define-key eos-docs-map (kbd "m") 'helm-man-woman)))
+
+(when (require 'dash-docs nil t)
+  (progn
+    ;; custom (fix async?)
+    ;; (customize-set-variable
+    ;;  'dash-docs-use-workaround-for-emacs-bug t)
+
+    ;; bind
+    (define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)))
+
+(when (require 'helm-dash nil t)
+  (progn
+    ;; disable helm dash debug
+    (customize-set-variable 'helm-dash-enable-debugging nil)
+
+    ;; set browser function
+    (customize-set-variable 'helm-dash-browser-func 'eww)
+
+    ;; binds
+    (define-key eos-docs-map (kbd "l") 'helm-dash)
+    (define-key eos-docs-map (kbd "p") 'helm-dash-at-point)
+    (define-key eos-docs-map (kbd "i") 'helm-dash-install-docset)
+    (define-key eos-docs-map (kbd "a") 'helm-dash-activate-docset)))
+
+;; activate docset
+(defun eos/dash/activate-docset (docset)
+  "Activate a DOCSET, if available."
+  (when (fboundp 'helm-dash-activate-docset)
+    (funcall 'helm-dash-activate-docset docset)))
+
+(when (require 'rfc-mode nil t)
+  (progn
+    ;; custom
+    ;; the directory where RFC documents are stored
+    (customize-set-variable
+     'rfc-mode-directory (concat (expand-file-name user-emacs-directory) "rfc/"))))
+
+;; bind documentation related functions on eos-docs-map
+(define-key eos-docs-map (kbd "C-g") 'keyboard-quit)
+
+;; bind eos-docs-map under ctl-x-map
+(define-key ctl-x-map (kbd "l") 'eos-docs-map)
+
 ;; custom
 ;; when non-nil, fontify code in code blocks
 (customize-set-variable 'org-src-fontify-natively t)
@@ -1820,68 +1883,6 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
 
-(require 'eldoc nil t)
-
-(when (require 'man nil t)
-  (progn
-    ;; hooks
-    (add-hook 'Man-mode-hook
-              (lambda ()
-                ;; don't truncate lines
-                (setq truncate-lines nil)))))
-
-;; binds
-(when (boundp 'Man-mode-map)
-  (progn
-    (define-key Man-mode-map (kbd "C-j") 'push-button)))
-
-(when (require 'helm-man nil t)
-  (progn
-    ;; bind
-    (define-key eos-docs-map (kbd "m") 'helm-man-woman)))
-
-(when (require 'dash-docs nil t)
-  (progn
-    ;; custom (fix async?)
-    ;; (customize-set-variable
-    ;;  'dash-docs-use-workaround-for-emacs-bug t)
-
-    ;; bind
-    (define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)))
-
-(when (require 'helm-dash nil t)
-  (progn
-    ;; disable helm dash debug
-    (customize-set-variable 'helm-dash-enable-debugging nil)
-
-    ;; set browser function
-    (customize-set-variable 'helm-dash-browser-func 'eww)
-
-    ;; binds
-    (define-key eos-docs-map (kbd "l") 'helm-dash)
-    (define-key eos-docs-map (kbd "p") 'helm-dash-at-point)
-    (define-key eos-docs-map (kbd "i") 'helm-dash-install-docset)
-    (define-key eos-docs-map (kbd "a") 'helm-dash-activate-docset)))
-
-;; activate docset
-(defun eos/dash/activate-docset (docset)
-  "Activate a DOCSET, if available."
-  (when (fboundp 'helm-dash-activate-docset)
-    (funcall 'helm-dash-activate-docset docset)))
-
-(when (require 'rfc-mode nil t)
-  (progn
-    ;; custom
-    ;; the directory where RFC documents are stored
-    (customize-set-variable
-     'rfc-mode-directory (concat (expand-file-name user-emacs-directory) "rfc/"))))
-
-;; bind documentation related functions on eos-docs-map
-(define-key eos-docs-map (kbd "C-g") 'keyboard-quit)
-
-;; bind eos-docs-map under ctl-x-map
-(define-key ctl-x-map (kbd "l") 'eos-docs-map)
-
 (when (require 'company nil t)
   (progn
     ;; set echo delay
@@ -1926,6 +1927,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; binds
 (when (boundp 'company-active-map)
   (progn
+    (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
     (define-key company-active-map (kbd "C-j") 'company-complete-selection)
     (define-key company-active-map (kbd "C-n") 'company-select-next)
     (define-key company-active-map (kbd "C-p") 'company-select-previous)))
@@ -1956,7 +1958,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (boundp 'helm-company-map)
   (define-key helm-company-map (kbd "SPC") 'helm-keyboard-quit)
-  (define-key helm-company-map (kbd "TAB") 'helm-next-line)
+  (define-key helm-company-map (kbd "TAB") 'helm-maybe-exit-minibuffer)
   (define-key helm-company-map (kbd "C-j") 'helm-maybe-exit-minibuffer))
 
 ;; set company backends
@@ -2343,6 +2345,50 @@ current line."
                     company-shell-env)
                    (company-files)))))))
 
+(when (require 'lua-mode nil t)
+  (progn
+    ;; custom
+    ;; non-nil means display lua-process-buffer after sending a command.
+    (customize-set-variable 'lua-process-buffer t)
+
+    ;; default application to run in Lua process
+    (customize-set-variable 'lua-default-application "lua")
+
+    ;; command switches for lua-default-application
+    (customize-set-variable 'lua-default-command-switches "-i")
+
+    ;; amount by which Lua subexpressions are indented
+    (customize-set-variable 'lua-indent-level 4)
+
+    ;; if non-nil, contents of multiline string will be indented
+    (customize-set-variable 'lua-indent-string-contents t)
+
+    ;; jump to innermost traceback location in *lua* buffer
+    ;; when this variable is non-nil and a traceback occurs
+    ;; when running Lua code in a process, jump immediately
+    ;; to the source code of the innermost traceback location
+    (customize-set-variable 'lua-jump-on-traceback t)
+
+    ;; hooks
+    (add-hook 'lua-mode-hook
+              (lambda ()
+                ;; set company backends
+                (eos/company/set-backends
+                 '((company-yasnippet
+                    company-keywords
+                    company-gtags
+                    company-dabbrev-code
+                    company-keywords)
+                   (company-files)))
+
+                ;; set flycheck checker
+                (eos/flycheck/set-checker 'lua)
+
+                ;; activate dash docset
+                (eos/dash/activate-docset "Lua")))))
+
+(require 'tcl nil t)
+
 (require 'cperl-mode nil t)
 
 (when (require 'python nil t)
@@ -2400,6 +2446,12 @@ current line."
                 (eos/dash/activate-docset '"Go")))))
 
 (require 'ess-r-mode nil t)
+
+(require 'julia-mode nil t)
+
+(require 'ess-julia nil t)
+
+(require 'vhdl-mode nil t)
 
 (require 'verilog nil t)
 
@@ -2621,8 +2673,6 @@ current line."
 (global-unset-key (kbd "<M-down-mouse-1>"))
 (global-unset-key (kbd "<M-drag-mouse-1>"))
 (global-unset-key (kbd "<S-down-mouse-1>"))
-
-
 
 (require 'eos-adapt
          (expand-file-name "eos-adapt.el" user-emacs-directory) t)

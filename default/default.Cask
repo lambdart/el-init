@@ -61,6 +61,7 @@
 (depends-on "fish-mode")
 (depends-on "web-mode")
 (depends-on "cmake-mode")
+(depends-on "lua-mode")
 ;; (depends-on "helm-compile"
 ;;               :git "https://github.com/esac-io/helm-compile")
 

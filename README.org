@@ -1,4 +1,10 @@
-* Clear Horizon
+#+title: .emacs.d
+#+author: Isaac "esac-io"
+#+date: <2020-02-17 Mon>
+#+startup: overview
+#+property: header-args :comments yes :results silent
+
+* A Clear Horizon
 
   ... Present Day, heh... Present Time! ...
 
@@ -12,15 +18,13 @@
 
 * Emacs OS
 
-  # ** TODO Add screen-shot
+  #+CAPTION: EMACS OS
+  #+NAME:   fig:EOS-screenshot
+
+  [[./assets/eos.png]]
 
   Just another org-mode based emacs configuration,
   or a elisp interpreter desktop distribution.
-
-* Demo
-
-  # ** TODO Recorde demo
-  # ** TODO Add demo link
 
 * Introduction
 
@@ -37,14 +41,18 @@
     packages and external programs) and will be used intangibly
     throughout this document.
 
-  - Features:
+
+  - Features (overview):
+
     - Just one major language (Elisp) to conquer than all!
     - Information comes to you as required and not other way around.
     - Use the same keybinds everywhere (learn once, use forever and ever).
+
     - Use the same editor capabilities for all applications
-    (or at least try it).
+      (or at least try it).
+
     - Use the same GUI Interface (frames/window/buffers) for all
-    applications.
+      applications.
 
     - Just one development environment for all languages.
       - Editing

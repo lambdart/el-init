@@ -1,10 +1,9 @@
-#+title: .emacs.d
 #+author: Isaac "esac-io"
 #+date: <2020-02-17 Mon>
 #+startup: overview
 #+property: header-args :comments yes :results silent
 
-* A Clear Horizon
+* README
 
   ... Present Day, heh... Present Time! ...
 

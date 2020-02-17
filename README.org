@@ -29,18 +29,16 @@
 
   Using Emacs (Elisp interpreter) as the only IO bridge
   between human and machine. In another words, a emacs configuration
-  well design and integrated, that provides a generic
+  well designed and integrated, that provides a generic
   computer environment for everyday use.
 
   We rely on org-mode to organize the whole configuration in a logic and
   manageable way, so the source code and its documentation are contained
   in only one file: ~init.org~.
 
-
-
- ** Note: The word application(s) in this context means (any elisp
-    packages and external programs) and will be used intangibly
-    throughout this document.
+  * Note: The word application(s) in this context means (any elisp
+          packages and external programs) and will be used intangibly
+          throughout this document.
 
 ** Features (overview):
 
@@ -72,11 +70,11 @@
       through different paths.
 
     - Huge improvements in productivity:
-      - Stay lock down, surfing in the same pleasant and comfortable
-      flow (my prefer kind of mood).
+      - Stay stay focused, surfing in the same pleasant and comfortable
+        flow (my prefer kind of mood).
+      - No useless and annoying distractions.
+      - Just do what was asked and nothing more.
 
-    - No useless and annoying distractions.
-    - Just do what was asked and nothing more.
     - Decrease the gap between the beginning and the end in any
       process of interest.
     - Absolute control!
@@ -90,13 +88,12 @@
   1. Cask
   2. Emacs >= 26.3
 
-  Elisp packages will be describe in =applications= session.
+  Elisp packages will be described in the =applications= session.
 
 ** Optional
 
-   External programs that are massively used by
-   some emacs packages used in this configuration
-   and improve its usability.
+   External programs that are massively used by some Emacs packages
+   used in this configuration to improve its usability.
 
    1. agrep
    2. global
@@ -250,8 +247,9 @@
 
 *** Quality of life
 
-    For the sake of sanity we unbind a lot of keys see ~unbind~
-    session at ~init.org~ file and comment out your missing chords.
+    For the sake of sanity we unbind a lot of keys.
+    See the unbind section at ~init.org~ file and comment
+    out your missing chords.
 
     Note: We clean minor-mode-map-alist completely, this was proven
     to be a huge gain on productivity and pain relief.
@@ -266,7 +264,7 @@
   local Emacs configuration.
 
   It’s based on a Cask file, which identifies an Emacs Lisp package,
-  provides meta information about the package,
+  provides meta information about the package
   and declares its contents and dependencies.
 
 ** Management
@@ -315,8 +313,8 @@
 
 *** Remove
 
-    You have to manually remove target package directory.
-    To find out where the packages are installed uses:
+    You have to manually remove the target package directory.
+    To find out where the packages are installed use:
 
     #+BEGIN_SRC sh
 
@@ -335,9 +333,10 @@
 
     #+END_SRC
 
-    In this example dashboard will be removed the configuration
-    on ~init.org~ will as not effect, actually it will not enter
-    the code block related to the dashboard (skipping it).
+    In this example, the dashboard will be removed and
+    the configuration on init.org will remain unaffected,
+    actually it will not enter the code block related to
+    the dashboard (skipping it).
 
     - IMPORTANT: If just remove the package from ~Cask~ file and
                  not remove its directory ~init.org~ will
@@ -346,7 +345,7 @@
 * Adapt
 
   If you want to modify any aspects (or extend) this configuration
-  without touch the ~/src/init.org~ file, just edit/add your own elisp code
+  without touching the ~/src/init.org~, just edit/add your own elisp code
   at ~/src/eos-adapt.el~, this file is the last thing loaded on
   the ~/src/init.el~ script.
 
@@ -354,11 +353,11 @@
 
   Well like was said, this configuration (EOS) is used as a desktop
   distribution, all common applications with different purposes and
-  classification, so directly or indirectly they passes through the
-  elisp interpreter.
+  classification, so directly or indirectly they passe through the
+  Elisp interpreter.
 
-  The applications list (organize by its classification) can be found
-  at ~docs/apps.org~ and eff course its configuration are done in the
+  The application list (organized by its classification) can be found
+  at ~docs/apps.org~ and, of course, its configurations are done in the
   ~src/init.org~ file.
 
 * Miscellaneous
@@ -376,8 +375,8 @@
       Habits die hard (increases the usability!).
 
    7. Use as few modules(packages) as possible and always try to use
-      modules already installed on emacs to meet our needs. If we can
-      withdraw a module, do so! Most of the time it takes little
+      modules already installed on emacs to meet your needs.
+      If we can withdraw a module, do so! Most of the time it takes little
       or no effort, and the gain is considerable.
       So be alert to identify these situations!
 
@@ -396,13 +395,12 @@
   - Q: Mac/Windows will be supported any time soon?
   - A: Nope.
 
-  - Q: Why you don't uses evil/hydra/which-key/use-package?
+  - Q: Why don't you use evil/hydra/which-key/use-package?
   - A: It is not just a matter of taste, it is simply because
     they get in the way, disturbing, the desired transformation to
-    occur, and I prefer a more direct, simply and effective
-    approach. Remember that's the way I thing, you can always add these
-    modules on your own and make your like a little more miserable,
-    be my guess!
+    occur, and I prefer a more direct, simply and effective approach.
+    Remember that’s the way I think, you can always add these modules
+    on your own and make your life a little more miserable, be my guess!
 
   - Q: And what about ivy/counsel/swiper?
   - A: Well, tried once (a friend recommendation), but never got used
@@ -410,7 +408,8 @@
     that legacy part of my brain speaking louder, or I'm one of the
     lucky ones to not have any problems with it. Who knows? ...
 
-  - Q: Why just no used Doom/Centaur/Spacemacs or any other?
+  - Q: Why won't just use Doom/Centaur/Spacemacs or any other
+    distribution?
   - A: Because I wanted to learn/understand more about Emacs (and
     Elisp) its details and usage, and make your own configuration
     is a great exercise which will provide more control/knowledge
@@ -418,14 +417,14 @@
 
   - Q: Do you think that everyone who uses Emacs should make their own
     configuration ~init.el~?
-  - A: For sure! It's fun like explorer some dungeons and slaughtering
+  - A: For sure! It's fun like explore some dungeons and slay
     some dragons, the reward? Walk over the rotten and stinky
-    carrion of your enemies, those who were defeated by your will,
+    carrion of your enemies, who were defeated by your will,
     and contemplate the symphony formed by the cry of despair
     contained in the last breath of their widows.
 
   - Q: Pull requests will be accepted in this repository?
-  -  A: Probably not, Emacs configurations are to personal,
+  -  A: Probably not, Emacs configurations are too personal,
     fork it or copy any snippet of code that you like:
     MIT License.
 

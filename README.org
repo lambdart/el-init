@@ -1,14 +1,24 @@
-* EMACS OS
+* BEGIN
+
+  ... Present Day, heh... Present Time! ...
+
+  And you don't seem to understand
+  A shame you seemed an honest man
+  And all the fears you hold so dear
+  Will turn to whisper in your ear
+  | Duvet, Boa |
+
+* Emacs OS
+
+  # ** TODO Add screen-shot
 
   Just another org-mode based emacs configuration,
   or a elisp interpreter desktop distribution.
 
 * Demo
-  # ** TODO Add demo link
-  # ** TODO Add screen-shot
 
-  Using emacs (lisp interpreter) as the only IO bridge
-  between human and machine.
+  # ** TODO Recorde demo
+  # ** TODO Add demo link
 
 * Introduction
 
@@ -21,19 +31,76 @@
   manageable way, so the source code and its documentation are contained
   in only one file: ~init.org~.
 
-  # ** TODO List resumed features
+  - Note: The word application(s) in this context means (any elisp packages and
+    external programs) and will be used intangibly throughout this document.
+
+  - Features:
+      . Just one major language to conquer than all (ELISP)!
+      . Information comes to you as required and not other way around.
+      . Use the same keybinds everywhere (learn once, use forever and ever).
+      . Use the same editor capabilities for all applications
+        (or at least try it).
+      . Use the same GUI Interface (frames/window/buffers) for all
+        applications.
+      . Just one development environment for all languages.
+          - Editing
+          - Navigation
+          - Completion
+          - Syntax check
+          - Spell check
+          - Syntax Highlight
+          - Documentation access
+          - Testing
+          - Debugging
+          - Versioning
+          - Rationalization
+          - Measurement
+      . Understand that data is generic and can be manipulated
+        through different paths.
+      . Huge improvements in productivity:
+          - Stay lock down, surfing in the same pleasant and comfortable
+            flow (my prefer kind of mood).
+          - No useless and annoying distractions.
+          - Just do what was asked and nothing more.
+      . Decrease the gap between the beginning and the end in any
+        process of interest.
+      . Absolute control!
+      . All integrated and easily/transparent communication between peers:
+          - Packages
+          - Buffers/Windows/Frames
+          - External applications
 
 * Dependencies
 
   1. Cask
   2. Emacs >= 26.3
 
+  The elisp packages will be describe in =application= session.
+
+** Optional
+
+   External programs that are massively used by
+   some emacs packages used in this configuration
+   and improve its usability.
+
+   1. agrep
+   2. global
+   3. aspell (or ispell)
+   4. compton
+   5. transset
+   6. rtags (server)
+   7. irony (server)
+
+* Tested on
+
+  - FreeBSD 12.1 RELEASE
+
 * Installation
 
   Download and execute the installation script:
 
   #+BEGIN_SRC
-     sh -c "$(curl -fsSL https://github.com/esac-io/eos/scripts/install.sh)"
+     sh -c "$(curl -fsSL https://raw.githubusercontent.com/esac-io/eos/master/scripts/install.sh)"
   #+END_SRC
 
   Script steps:
@@ -57,8 +124,8 @@
 
   - Enjoy your late nights :)
 
-  - Note: The main purpose of the Emacs tutorial is to teach you
-    the most important standard Emacs commands (key bindings).
+  - Note: The main purpose of the Emacs tutorial is teach you
+    the most important standard Emacs commands (functions/keybinds).
 
   - Note: Some keybinds will be not the same, in the next session
     will be available a overview on how/where we map elisp function.
@@ -70,8 +137,8 @@
    their respective maps.
 
    After that, the prefix maps will be placed in the Ctl-x-map prefix
-   map, resulting in the standardization of command
-   (function) access sequences.
+   map, resulting in the standardization of commands (functions)
+   access sequences (keybinds or chords).
 
 *** Basic
 
@@ -89,14 +156,12 @@
     | Crtl       | C-     | Global Command |
     - Table 1.0 (Emacs Basic Prefix)
 
-    | Keymap    | Prefix    | Available       |
-    |           |           |                 |
-    | Ctl-x-map | C-x       | Always (Global) |
-    | minor-map | C-x <key> | Always (Global) |
-    | major-map | C-c       | Maybe* (Major)  |
+    | Keymap      | Prefix    | Available       |
+    |             |           |                 |
+    | Ctl-x-map   | C-x       | Always (Global) |
+    | <minor>-map | C-x <key> | Always (Global) |
+    | <major>-map | C-c       | Always (Major)  |
     - Table 1.1 (Emacs Basic Action Prefix)
-
-    - TIP: Maybe*, means, depends on the current major mode
 
 *** C-x
 
@@ -106,18 +171,17 @@
     according to their logical functionality and the mode in
     which they were defined.
 
-    | Prefix Keymap         | Prefix | Description |
-    |                       |        |             |
-    | window-prefix-map     | C-x w  | Window      |
-    | projectile-prefix-map | C-x p  | Projects    |
-    | flycheck-prefix-map   | C-x e  | Errors      |
-    | tags-prefix-map       | C-x t  | Tags        |
-    | dash-prefix-map       | C-x l  | Library     |
-    | complete-prefix-map   | M-`    | Complete    |
+    | Prefix Keymap       | Prefix | Description |
+    |                     |        |             |
+    | window              | C-x w  | Window      |
+    | projectile          | C-x p  | Projects    |
+    | flycheck            | C-x e  | Errors      |
+    | tags                | C-x t  | Tags        |
+    | dash                | C-x l  | Library     |
+    | complete-prefix-map | M-`    | Complete    |
+    - Table 1.2 (Global Minor/Actions Prefix Maps)
 
-    - Table 1.2 (Global Prefix Keymaps)
-
-    - Note: The complete-prefix-map =M-`= are the only
+    - Note: The complete prefix map =M-`= are the only
       prefix that does not follow the specified pattern.
 
 *** C-c
@@ -128,8 +192,20 @@
     | Mode  | Keymap    | Prefix | Description |
     |       |           |        |             |
     | C/C++ | rtags-map | C-c r  | Rtags       |
+    - Table 1.2 (Global Minor/Actions Prefix Maps)
 
-    - Table 1.2
+    - TIP: You always can verify what keys are mapped using
+      helm-descbinds (M-x helm-descbinds or C-h b), you also
+      can use the chord: (prefix key + C-h)  or (prefix key + ?)
+      for example:
+
+      | Keybind   | Description            |
+      | C-x ?     | global action map help |
+      | C-x C-h   | global action map help |
+      | C-x p ?   | project map help       |
+      | C-x l C-h | library map help       |
+      | C-c C-h   | major mode map help    |
+      - Table 1.3 (Prefix Map Help)
 
 *** Global
 
@@ -137,19 +213,102 @@
     have changed from the standard and some additional ones that we
     think are important.
 
-    You can always use the functions =C-h k= (describe-key) and
-    =C-h b= (describe-bindings) to require this information.
+    Remember that you always can call the functions =C-h k= (describe-key)
+    and =C-h b= (describe-bindings) to require this information.
 
-    # **** TODO: Table!
+    | Keymap | Keybind | Function                     |
+    | Global | M-c     | comment-or-uncomment-region  |
+    | Global | M-j     | eos/duplicate/line-or-region |
+    | Global | M-n     | eos/move/lines               |
+    | Global | M-p     | eos/move/lines               |
+    - Table 1.4 (Global-map)
 
-    | Keymap | Keybind | function |
-    |        |         |          |
-    - Table 1.3 (Global-map)
+*** Quality of life
+
+    For the sake of sanity we unbind a lot of keys see ~unbind~
+    session at ~init.org~ file and comment out your missing chords.
+
+    Note: We clean minor-mode-map-alist completely, this was proven
+    to be a huge gain on productivity and pain relief.
+
+* Cask (Package Manager)
+
+  Cask is a project management tool for Emacs that helps automate the
+  package development cycle; development, dependencies, testing,
+  building, packaging and more.
+
+  Cask can also be used to manage dependencies for your
+  local Emacs configuration.
+
+  It’s based on a Cask file, which identifies an Emacs Lisp package,
+  provides meta information about the package,
+  and declares its contents and dependencies.
+
+** Management
+*** Add
+
+    To add more packages just edit (that means write and save
+    operations) the ~/.emacs.d/Cask~ file generated
+    by the installation script, for example:
+
+    #+BEGIN_SRC
+
+    (depends-on "function-args")
+
+    #+END_SRC
+
+    Sometimes you want a different source than melpa,
+    to specify use :git keyword, e.g:
+
+    #+BEGIN_SRC
+
+    (depends-on "undo-tree"
+            :git "http://www.dr-qubit.org/git/undo-tree.git")
+
+    #+END_SRC
+
+    After that is required to call ~cask~, I generically used
+    like this:
+
+    #+BEGIN_SRC emacs-lisp
+
+    cd ~/emacs.d; cask install
+
+    #+END_SRC
+
+    The command above will perform the installation of the added
+    package.
+
+    - TIP: If you encounter problems with missing dependencies when
+      another source is used, put the dependency code snippet
+      ~(depends-on "package-name)" above the target package, I guess
+      cask install reads (organize the depends-on list data)
+      the ~Cask~ file in a reverse stack.
+
+*** Remove
+
+    Note: The ~/src/Cask~ is ignored by the version control, so
+    don't worry to keep update to the official repository, but
+    forks a strongly recommended.
+
+* Adapt
+
+  If you want to modify any aspects (or extend) of this configuration
+  without touch the ~/src/init.org~ file, just edit/add your own elisp code
+  at ~/src/eos-adapt.el~, this file is the last thing loaded on
+  the ~/src/init.el~ script, and don't
 
 * Applications
-  # ** TODO List and summarize apps
-  # ** TODO Short by app classification
-* Package Manager
+
+  Well like was said, this configuration (EOS) is used as a desktop
+  distribution, all common applications with different purposes and
+  classification, so directly or indirectly they passes through the
+  elisp interpreter.
+
+  The applications list (organize by its classification) can be found
+  at ~docs/apps.org~ and eff course its configuration are done in the
+  ~src/init.org~ file.
+
 * Miscellaneous
 ** Advices
 
@@ -161,26 +320,62 @@
    5. Repeat keybinds for mode-specific commands
       according to their logical classification.
 
-   6. Use popup menus, action-remember-action cycle.
-
-   7. Use the same action flow logic, for the same class of commands.
+   6. Use the same action flow logic, for the same class of commands.
       Habits die hard (increases the usability!).
 
-   8. Use as few modules(packages) as possible and always try to use
+   7. Use as few modules(packages) as possible and always try to use
       modules already installed on emacs to meet our needs. If we can
       withdraw a module, do so! Most of the time it takes little
       or no effort, and the gain is considerable.
       So be alert to identify these situations!
 
-   9. Prioritize emacs's native packages(buildin) over third-party.
+   8. Prioritize emacs's native packages(buildin) over third-party.
       If any demand comes to light try to resolve with these packages
       first, then third-party packages already installed and
       finally(maybe) the internet. Sometimes a little extension
       on this blotted-packages sets, are everything we need to
       bring a new feature to live or resolve a issue.
 
-   10. Successive refinements: in constant refactoring!
-       Always improve, do not fear the winds of change!
+   9. Successive refinements: in constant refactoring!
+      Always improve, do not fear the winds of change!
+
+* FAQ
+
+  - Q: Mac/Windows will be supported any time soon?
+    A: Nope.
+
+  - Q: Why you don't uses evil/hydra/which-key/use-package?
+    A: It is not just a matter of taste, it is simply because
+       they get in the way, disturbing, the desired transformation to
+       occur, and I prefer a more direct, simply and effective
+       approach. Remember that's the way I thing, you can always add these
+       modules on your own and make your like a little more miserable,
+       be my guess!
+
+  - Q: And what about ivy/counsel/swiper?
+    A: Well, tried once (a friend recommendation), but never got used
+    to it, then went back to Helm and never looked back, maybe it's
+    that legacy part of my brain speaking louder, or I'm one of the
+    lucky ones to not have any problems with it. Who knows? ...
+
+  - Q: Why just no used Doom/Centaur/Spacemacs or any other?
+    A: Because I wanted to learn/understand more about Emacs (and
+    Elisp) its details and usage, and make your own configuration
+    is a great exercise which will provide more control/knowledge
+    over your most used tool!
+
+  - Q: Do you think that everyone who uses Emacs should make their own
+       configuration ~init.el~?
+    A: For sure! It's fun like explorer some dungeons and slaughtering
+       some dragons, the reward? Walk over the rotten and stinky
+       carrion of your enemies, those who were defeated by your will,
+       and contemplate the symphony formed by the cry of despair
+       contained in the last breath of your widows.
+
+   - Q: Pull requests will be accepted in this repository?
+     A: Probably not, emacs configurations are to personal,
+        fork it or copy any snippet of code that you like:
+        MIT License.
 
 * References
 
@@ -193,7 +388,6 @@
 
 * LICENSE
   MIT
-
 * EOF
 
   I feel confined, only free to expand myself within boundaries.

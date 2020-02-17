@@ -1,11 +1,13 @@
-* BEGIN
+* Clear Horizon
 
   ... Present Day, heh... Present Time! ...
 
-  And you don't seem to understand
-  A shame you seemed an honest man
-  And all the fears you hold so dear
-  Will turn to whisper in your ear
+  #+BEGIN_SRC
+    And you don't seem to understand
+    A shame you seemed an honest man
+    And all the fears you hold so dear
+    Will turn to whisper in your ear
+  #+END_SRC
   | Duvet, Boa |
 
 * Emacs OS
@@ -22,7 +24,7 @@
 
 * Introduction
 
-  Using emacs (elisp interpreter) as the only IO bridge
+  Using Emacs (Elisp interpreter) as the only IO bridge
   between human and machine. In another words, a emacs configuration
   well design and integrated, that provides a generic
   computer environment for everyday use.
@@ -31,51 +33,60 @@
   manageable way, so the source code and its documentation are contained
   in only one file: ~init.org~.
 
-  - Note: The word application(s) in this context means (any elisp packages and
-    external programs) and will be used intangibly throughout this document.
+  - Note: The word application(s) in this context means (any elisp
+    packages and external programs) and will be used intangibly
+    throughout this document.
 
   - Features:
-      . Just one major language to conquer than all (ELISP)!
-      . Information comes to you as required and not other way around.
-      . Use the same keybinds everywhere (learn once, use forever and ever).
-      . Use the same editor capabilities for all applications
-        (or at least try it).
-      . Use the same GUI Interface (frames/window/buffers) for all
-        applications.
-      . Just one development environment for all languages.
-          - Editing
-          - Navigation
-          - Completion
-          - Syntax check
-          - Spell check
-          - Syntax Highlight
-          - Documentation access
-          - Testing
-          - Debugging
-          - Versioning
-          - Rationalization
-          - Measurement
-      . Understand that data is generic and can be manipulated
-        through different paths.
-      . Huge improvements in productivity:
-          - Stay lock down, surfing in the same pleasant and comfortable
-            flow (my prefer kind of mood).
-          - No useless and annoying distractions.
-          - Just do what was asked and nothing more.
-      . Decrease the gap between the beginning and the end in any
-        process of interest.
-      . Absolute control!
-      . All integrated and easily/transparent communication between peers:
-          - Packages
-          - Buffers/Windows/Frames
-          - External applications
+    - Just one major language (Elisp) to conquer than all!
+    - Information comes to you as required and not other way around.
+    - Use the same keybinds everywhere (learn once, use forever and ever).
+    - Use the same editor capabilities for all applications
+    (or at least try it).
+    - Use the same GUI Interface (frames/window/buffers) for all
+    applications.
+
+    - Just one development environment for all languages.
+      - Editing
+      - Navigation
+      - Completion
+      - Syntax check
+      - Spell check
+      - Syntax Highlight
+      - Documentation access
+      - Testing
+      - Debugging
+      - Versioning
+      - Rationalization
+      - Measurement
+
+  - Understand that data is generic and can be manipulated
+    through different paths.
+
+  - Huge improvements in productivity:
+
+  - Stay lock down, surfing in the same pleasant and comfortable
+    flow (my prefer kind of mood).
+
+  - No useless and annoying distractions.
+  - Just do what was asked and nothing more.
+
+  - Decrease the gap between the beginning and the end in any
+    process of interest.
+
+  - Absolute control!
+
+  - All integrated and easily/transparent communication between peers:
+    - Packages
+    - Buffers/Windows/Frames
+    - External applications
 
 * Dependencies
 
   1. Cask
   2. Emacs >= 26.3
 
-  The elisp packages will be describe in =application= session.
+  Elisp packages will be describe in =applications= session.
 
 ** Optional
 
@@ -216,12 +227,22 @@
     Remember that you always can call the functions =C-h k= (describe-key)
     and =C-h b= (describe-bindings) to require this information.
 
-    | Keymap | Keybind | Function                     |
-    | Global | M-c     | comment-or-uncomment-region  |
-    | Global | M-j     | eos/duplicate/line-or-region |
-    | Global | M-n     | eos/move/lines               |
-    | Global | M-p     | eos/move/lines               |
-    - Table 1.4 (Global-map)
+    | Keymap | Keybind | Function                                  |
+    | Global | C-a     | eos/move/beginning-of-line                |
+    | Global | C-M-v   | scroll-other-window                       |
+    | Global | C-M-y   | scroll-other-window-down                  |
+    | Global | M-i     | eos/edit/indent-region-or-buffer          |
+    | Global | M-c     | comment-or-uncomment-region               |
+    | Global | M-j     | eos/edit/duplicate-current-line-or-region |
+    | Global | M-n     | eos/edit/move-lines-up                    |
+    | Global | M-p     | eos/edit/move-lines-down                  |
+    | Global | C-s-j   | buf-move-up                               |
+    | Global | C-s-k   | buf-move-down                             |
+    | Global | C-s-h   | buf-move-left                             |
+    | Global | C-s-l   | buf-move-right                            |
+    | Help   | C-h C-i | helm-info                                 |
+    | Help   | C-h a   | helm-apropos                              |
+    - Table 1.4 (Remapped)
 
 *** Quality of life
 
@@ -270,9 +291,9 @@
     After that is required to call ~cask~, I generically used
     like this:
 
-    #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC sh
 
-    cd ~/emacs.d; cask install
+    $ cd ~/emacs.d; cask install
 
     #+END_SRC
 
@@ -285,18 +306,45 @@
       cask install reads (organize the depends-on list data)
       the ~Cask~ file in a reverse stack.
 
+    - Note: The ~/src/Cask~ is ignored by the version control
+      using ~.gitignore~ mechanism.
+
 *** Remove
 
-    Note: The ~/src/Cask~ is ignored by the version control, so
-    don't worry to keep update to the official repository, but
-    forks a strongly recommended.
+    You have to manually remove target package directory.
+    To find out where the packages are installed uses:
+
+    #+BEGIN_SRC sh
+
+    $ cd ~/.emacs.d; cd $(cask package-directory)
+
+    #+END_SRC
+
+    - TIP: Usually this directory is located at:
+           ~~/.emacs.d/.cask/<emacs-version>/<source>~
+
+    And delete package target folder:
+
+    #+BEGIN_SRC emacs-lisp
+
+    $ rm -rf dashboard-20200121.1429
+
+    #+END_SRC
+
+    In this example dashboard will be removed the configuration
+    on ~init.org~ will as not effect, actually it will not enter
+    the code block related to the dashboard (skipping it).
+
+    - IMPORTANT: If just remove the package from ~Cask~ file and
+                 not remove its directory ~init.org~ will
+                 continue to load/customize it.
 
 * Adapt
 
-  If you want to modify any aspects (or extend) of this configuration
+  If you want to modify any aspects (or extend) this configuration
   without touch the ~/src/init.org~ file, just edit/add your own elisp code
   at ~/src/eos-adapt.el~, this file is the last thing loaded on
-  the ~/src/init.el~ script, and don't
+  the ~/src/init.el~ script.
 
 * Applications
 
@@ -342,40 +390,40 @@
 * FAQ
 
   - Q: Mac/Windows will be supported any time soon?
-    A: Nope.
+  - A: Nope.
 
   - Q: Why you don't uses evil/hydra/which-key/use-package?
-    A: It is not just a matter of taste, it is simply because
-       they get in the way, disturbing, the desired transformation to
-       occur, and I prefer a more direct, simply and effective
-       approach. Remember that's the way I thing, you can always add these
-       modules on your own and make your like a little more miserable,
-       be my guess!
+  - A: It is not just a matter of taste, it is simply because
+    they get in the way, disturbing, the desired transformation to
+    occur, and I prefer a more direct, simply and effective
+    approach. Remember that's the way I thing, you can always add these
+    modules on your own and make your like a little more miserable,
+    be my guess!
 
   - Q: And what about ivy/counsel/swiper?
-    A: Well, tried once (a friend recommendation), but never got used
+  - A: Well, tried once (a friend recommendation), but never got used
     to it, then went back to Helm and never looked back, maybe it's
     that legacy part of my brain speaking louder, or I'm one of the
     lucky ones to not have any problems with it. Who knows? ...
 
   - Q: Why just no used Doom/Centaur/Spacemacs or any other?
-    A: Because I wanted to learn/understand more about Emacs (and
+  - A: Because I wanted to learn/understand more about Emacs (and
     Elisp) its details and usage, and make your own configuration
     is a great exercise which will provide more control/knowledge
     over your most used tool!
 
   - Q: Do you think that everyone who uses Emacs should make their own
-       configuration ~init.el~?
-    A: For sure! It's fun like explorer some dungeons and slaughtering
-       some dragons, the reward? Walk over the rotten and stinky
-       carrion of your enemies, those who were defeated by your will,
-       and contemplate the symphony formed by the cry of despair
-       contained in the last breath of your widows.
+    configuration ~init.el~?
+  - A: For sure! It's fun like explorer some dungeons and slaughtering
+    some dragons, the reward? Walk over the rotten and stinky
+    carrion of your enemies, those who were defeated by your will,
+    and contemplate the symphony formed by the cry of despair
+    contained in the last breath of their widows.
 
-   - Q: Pull requests will be accepted in this repository?
-     A: Probably not, emacs configurations are to personal,
-        fork it or copy any snippet of code that you like:
-        MIT License.
+  - Q: Pull requests will be accepted in this repository?
+  -  A: Probably not, Emacs configurations are to personal,
+    fork it or copy any snippet of code that you like:
+    MIT License.
 
 * References
 

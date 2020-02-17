@@ -60,7 +60,7 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    (require 'org)
+    (require 'org nil t)
 
     ;; load languages (reference)
     ;; (org-babel-do-load-languages 'org-babel-load-languages
@@ -107,6 +107,8 @@
 
 *** Defer
 
+    Used to seep up the emacs startup time.
+
     #+BEGIN_SRC emacs-lisp
 
     (defvar eos-file-name-handler-alist
@@ -126,6 +128,8 @@
 
 *** Defines
 **** Aliases
+
+     Define some aliases to improve quality of life.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -248,6 +252,8 @@
 
 **** Buffer
 
+     Buffer related functions.
+
      #+BEGIN_SRC emacs-lisp
 
      (defun eos/buffer-too-big-p ()
@@ -291,6 +297,8 @@
 
 **** Move
 
+     Movement related functions and keybinds.
+
      #+BEGIN_SRC emacs-lisp
 
      (defun eos/move/beginning-of-line (arg)
@@ -329,6 +337,9 @@
       #+END_SRC
 
 **** Edit
+
+     Editing related functions and keybinds.
+
 ***** Move
 
       Move related functions.
@@ -481,6 +492,8 @@
 
 **** Kill
 
+     Killing (buffers) related functions.
+
      #+BEGIN_SRC emacs-lisp
 
      (defun eos/kill-buffer (buffer-name)
@@ -497,6 +510,8 @@
 
 **** Run
 
+     Execute related functions.
+
      #+BEGIN_SRC emacs-lisp
 
      (defun eos/run/proc (name)
@@ -507,7 +522,9 @@
 
      #+END_SRC
 
-**** Get
+**** Misc
+
+     Miscellaneous (auxiliary) useful functions.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -527,6 +544,8 @@
      #+END_SRC
 
 **** Font
+
+     A safe set frame font function.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -556,7 +575,22 @@
 
     #+END_SRC
 
-*** Window
+*** Windows
+
+    Emacs windows system.
+
+    Characteristics:
+
+    - Each Emacs window displays one Emacs buffer at any time.
+    - A single buffer may appear in more than one window.
+    - Emacs can split a frame into two or many windows.
+    - Multiple frames always imply multiple windows, because each
+      frame has its own set of windows.
+    - Each window belongs to one and only one frame.
+
+    Configure/customize windows standard/basic options,
+    the description of each one can be found on the
+    commentaries.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -605,25 +639,25 @@
 
 *** Startup
 
+    Customize/configure: ~startup.el~ related options.
+
     #+BEGIN_SRC emacs-lisp
 
     ;; custom
     ;; non-nil inhibits the startup screen.
     (customize-set-variable 'inhibit-startup-screen t)
 
-    ;; non-nil inhibits the startup screen.
-    (customize-set-variable 'inhibit-startup-message nil)
+    ;; non-nil inhibits the startup screen
+    (customize-set-variable 'inhibit-startup-message t)
 
     ;; non-nil inhibits the initial startup echo area message
-    (customize-set-variable 'inhibit-startup-echo-area-message nil)
-
-    ;; (customize-set-variable 'inhibit-buffer-choice nil)
+    (customize-set-variable 'inhibit-startup-echo-area-message t)
 
     #+END_SRC
 
 *** Buffer
 
-    Buffer options configuration.
+    Configure/customize standard/basic buffer options.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -668,13 +702,18 @@
 
 *** Minibuffer
 
+    Minibuffer related options.
+
     #+BEGIN_SRC emacs-lisp
 
-    (customize-set-variable 'enable-recursive-minibuffers nil)
+    ;; non-nil means to allow minibuffer commands while in the minibuffer
+    (customize-set-variable 'enable-recursive-minibuffers t)
 
     #+END_SRC
 
 *** Coding-system
+
+    Configure/set coding-system (UTF8), everywhere!
 
     #+BEGIN_SRC emacs-lisp
 
@@ -696,6 +735,9 @@
     #+END_SRC
 
 *** Simple
+
+    A grab-bag of basic Emacs commands not specifically related to
+    some major mode or to file-handling.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -794,7 +836,9 @@
 *** Info
 *** Fringe
 
-    Fringe bitmaps.
+    Contains code to initialize the built-in fringe bitmaps
+    as well as helpful functions for customizing the appearance of the
+    fringe.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -858,6 +902,11 @@
 *** Ediff
 *** Recentf
 
+    The recent files list is automatically saved across Emacs
+    sessions. You can customize the number of recent files displayed,
+    the location of the menu and others options
+    (see the source code for details).
+
     #+BEGIN_SRC emacs-lisp
 
     (when (require 'recentf nil t)
@@ -870,6 +919,11 @@
     #+END_SRC
 
 *** Bookmark
+
+    The bookmark list is sorted lexically by default, but you can turn
+    this off by setting bookmark-sort-flag to nil. If it is nil, then
+    the list will be presented in the order it is recorded
+    (chronologically), which is actually fairly useful as well.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -908,6 +962,16 @@
     #+END_SRC
 
 *** Frame
+
+    When Emacs is started on a graphical display, e.g., on the X Window
+    System, it occupies a graphical system-level display region.  In this
+    manual, we call this a “frame”, reserving the word “window” for the part
+    of the frame used for displaying a buffer.
+
+    - A frame initially contains one window, but it can be subdivided
+      into multiple windows
+
+    Configure/customize frame related options:
 
     #+BEGIN_SRC emacs-lisp
 
@@ -962,13 +1026,18 @@
 
 *** Windmove
 
+    This package defines a set of routines, windmove-{left,up,right,
+    down}, for selection of windows in a frame geometrically.
+    For example, `windmove-right' selects the window immediately to the
+    right of the currently-selected one.
+
     #+BEGIN_SRC emacs-lisp
 
-    ;; (require 'windmove nil t)
-
-    ;; enable
-    ;; window move default keybinds (shift-up/down etc..)
-    (eos/funcall 'windmove-default-keybindings)
+    (when (require 'windmove nil t)
+      (progn
+        ;; enable
+        ;; window move default keybinds (shift-up/down etc..)
+        (eos/funcall 'windmove-default-keybindings)))
 
     ;; binds, eos-window-map (window prefix map)
     ;; (define-key eos-window-map (kbd "j") 'windmove-up)
@@ -979,6 +1048,10 @@
     #+END_SRC
 
 *** Kmacro
+
+    The kmacro package provides the user interface to emacs' basic
+    keyboard macro functionality.  With kmacro, two function keys are
+    dedicated to keyboard macros, by default F3 and F4.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -991,9 +1064,12 @@
 
 *** Paren
 
+    It will display highlighting on whatever paren matches the one
+    before or after point.
+
     #+BEGIN_SRC emacs-lisp
 
-    ;; (require 'paren nil t)
+    (require 'paren nil t)
 
     ;; enable
     ;; visualization of matching parens
@@ -1019,6 +1095,9 @@
 
 *** Elec-pair
 
+    Electric pairing: automatically matches parenthesis pairs,
+    should be enabled regardless the current major mode.
+
     #+BEGIN_SRC emacs-lisp
 
     (when (require 'elec-pair nil t)
@@ -1037,6 +1116,9 @@
     #+END_SRC
 
 *** Newcomment
+
+    This library contains functions and variables for commenting and
+    uncommenting source code.
 
     #+BEGIN_SRC emacs-lisp
 

@@ -372,13 +372,11 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; non-nil inhibits the startup screen.
 (customize-set-variable 'inhibit-startup-screen t)
 
-;; non-nil inhibits the startup screen.
-(customize-set-variable 'inhibit-startup-message nil)
+;; non-nil inhibits the startup screen
+(customize-set-variable 'inhibit-startup-message t)
 
 ;; non-nil inhibits the initial startup echo area message
-(customize-set-variable 'inhibit-startup-echo-area-message nil)
-
-;; (customize-set-variable 'inhibit-buffer-choice nil)
+(customize-set-variable 'inhibit-startup-echo-area-message t)
 
 ;; custom
 ;; non-nil means do not display continuation lines.
@@ -411,7 +409,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;;             (if (eos/buffer-too-big-p)
 ;;                 (eos/funcall 'display-line-numbers 0))))
 
-(customize-set-variable 'enable-recursive-minibuffers nil)
+;; non-nil means to allow minibuffer commands while in the minibuffer
+(customize-set-variable 'enable-recursive-minibuffers t)
 
 ;; coding system to use with system messages
 (customize-set-variable 'locale-coding-system 'utf-8)
@@ -596,11 +595,11 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; set font by face attribute (reference)
 ;; (set-face-attribute 'default nil :height)
 
-;; (require 'windmove nil t)
-
-;; enable
-;; window move default keybinds (shift-up/down etc..)
-(eos/funcall 'windmove-default-keybindings)
+(when (require 'windmove nil t)
+  (progn
+    ;; enable
+    ;; window move default keybinds (shift-up/down etc..)
+    (eos/funcall 'windmove-default-keybindings)))
 
 ;; binds, eos-window-map (window prefix map)
 ;; (define-key eos-window-map (kbd "j") 'windmove-up)

@@ -38,13 +38,12 @@
 
 
 
-  - Note: The word application(s) in this context means (any elisp
+ ** Note: The word application(s) in this context means (any elisp
     packages and external programs) and will be used intangibly
     throughout this document.
 
+** Features (overview):
 
-
-  - Features (overview):
     - Just one major language (Elisp) to conquer than all!
     - Information comes to you as required and not other way around.
     - Use the same keybinds everywhere (learn once, use forever and ever).

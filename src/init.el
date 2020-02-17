@@ -300,10 +300,11 @@ Just a `compile` function wrapper."
   (interactive)
   (kill-buffer (current-buffer)))
 
-(defun eos/run/async-proc (name)
-  "Run a asynchronous process defined by NAME."
-  (interactive)
-  (start-process name nil name))
+(defun eos/run/proc (name)
+  "Run a process defined by NAME."
+  (if (executable-find name)
+      (start-process name nil name)
+    nil))
 
 ;;; Get symbol at point, maybe
 (defun eos/get-selected-text-or-symbol-at-point ()
@@ -1084,7 +1085,7 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     ;; custom
     ;; whether or not to include a foreground colour when formatting the icon
-    (customize-set-variable 'all-the-icons-color-icons t)
+    (customize-set-variable 'all-the-icons-color-icons nil)
 
     ;; the default adjustment to be made to the `raise' display property of an icon
     (customize-set-variable 'all-the-icons-default-adjust -0.0)
@@ -1310,7 +1311,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                               ;; mode-line-percent-position
                               "(%l:%c) / %I  "
                               mode-line-misc-info
-                              " "
+                              " "
                               moody-mode-line-buffer-identification
                               " %m "
                               (vc-mode moody-vc-mode)
@@ -1451,7 +1452,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (defun eos/launch/st ()
   "Launch urxvt"
   (interactive)
-  (eos/run/async-proc "st"))
+  (eos/run/proc "st"))
 
 (when (require 'shr nil t)
   (progn
@@ -1629,7 +1630,10 @@ point is on a symbol, return that symbol name.  Else return nil."
   "Set transparency on frame window specify by OPACITY."
   (interactive "nOpacity: ")
   (let ((opacity (or opacity 1.0)))
-    (async-shell-command (format "transset -a %.1f" opacity))))
+    (when (executable-find "transset")
+      (progn
+        (async-shell-command (format "transset -a %.1f" opacity)))
+      (message "transset not found"))))
 
 ;; hooks
 (add-hook 'after-make-frame-functions
@@ -1646,7 +1650,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; start compton after emacs initialize
 (add-hook 'after-init-hook
           (lambda ()
-            (eos/run/async-proc "compton")))
+            (eos/run/proc "compton")))
 
 (if (fboundp 'helm-calcul-expression)
     (define-key ctl-x-map (kbd "C-/") 'helm-calcul-expression))
@@ -1680,12 +1684,12 @@ point is on a symbol, return that symbol name.  Else return nil."
 (define-key ctl-x-map (kbd "<end>")
   (lambda ()
     (interactive)
-    (eos/run/async-proc "slock")))
+    (eos/run/proc "slock")))
 
 (global-set-key (kbd "<print>")
                 (lambda ()
                   (interactive)
-                  (eos/run/async-proc "scrot")))
+                  (eos/run/proc "scrot")))
 
 ;; control functions: volume
 ;; (defun eos/toggle-audio ()
@@ -2385,7 +2389,11 @@ current line."
                 (eos/flycheck/set-checker 'lua)
 
                 ;; activate dash docset
-                (eos/dash/activate-docset "Lua")))))
+                (eos/dash/activate-docset "Lua")))
+
+    ;; add auto-mode
+    (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+    (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))))
 
 (require 'tcl nil t)
 

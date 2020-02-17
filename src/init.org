@@ -499,10 +499,11 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (defun eos/run/async-proc (name)
-       "Run a asynchronous process defined by NAME."
-       (interactive)
-       (start-process name nil name))
+     (defun eos/run/proc (name)
+       "Run a process defined by NAME."
+       (if (executable-find name)
+           (start-process name nil name)
+         nil))
 
      #+END_SRC
 
@@ -1708,7 +1709,7 @@
        (progn
          ;; custom
          ;; whether or not to include a foreground colour when formatting the icon
-         (customize-set-variable 'all-the-icons-color-icons t)
+         (customize-set-variable 'all-the-icons-color-icons nil)
 
          ;; the default adjustment to be made to the `raise' display property of an icon
          (customize-set-variable 'all-the-icons-default-adjust -0.0)
@@ -2084,7 +2085,7 @@
                                    ;; mode-line-percent-position
                                    "(%l:%c) / %I  "
                                    mode-line-misc-info
-                                   " "
+                                   " "
                                    moody-mode-line-buffer-identification
                                    " %m "
                                    (vc-mode moody-vc-mode)
@@ -2302,7 +2303,7 @@
      (defun eos/launch/st ()
        "Launch urxvt"
        (interactive)
-       (eos/run/async-proc "st"))
+       (eos/run/proc "st"))
 
      #+END_SRC
 
@@ -2614,7 +2615,10 @@
        "Set transparency on frame window specify by OPACITY."
        (interactive "nOpacity: ")
        (let ((opacity (or opacity 1.0)))
-         (async-shell-command (format "transset -a %.1f" opacity))))
+         (when (executable-find "transset")
+           (progn
+             (async-shell-command (format "transset -a %.1f" opacity)))
+           (message "transset not found"))))
 
      ;; hooks
      (add-hook 'after-make-frame-functions
@@ -2644,7 +2648,7 @@
      ;; start compton after emacs initialize
      (add-hook 'after-init-hook
                (lambda ()
-                 (eos/run/async-proc "compton")))
+                 (eos/run/proc "compton")))
 
      #+END_SRC
 
@@ -2659,7 +2663,7 @@
 
      #+END_SRC
 
-*** Remote
+*** Remote Access
 **** Tramp
 
      TRAMP is for transparently accessing remote files from within Emacs.
@@ -2716,7 +2720,7 @@
       (define-key ctl-x-map (kbd "<end>")
         (lambda ()
           (interactive)
-          (eos/run/async-proc "slock")))
+          (eos/run/proc "slock")))
 
       #+END_SRC
 
@@ -2728,7 +2732,7 @@
       (global-set-key (kbd "<print>")
                       (lambda ()
                         (interactive)
-                        (eos/run/async-proc "scrot")))
+                        (eos/run/proc "scrot")))
 
       #+END_SRC
 
@@ -3343,7 +3347,10 @@
 
      #+END_SRC
 
-*** Version-control
+*** VC
+
+    Version control packages.
+
 **** Magit
 
      #+BEGIN_SRC emacs-lisp
@@ -3784,12 +3791,17 @@
                      (eos/flycheck/set-checker 'lua)
 
                      ;; activate dash docset
-                     (eos/dash/activate-docset "Lua")))))
+                     (eos/dash/activate-docset "Lua")))
+
+         ;; add auto-mode
+         (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+         (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))))
 
      #+END_SRC
 
 *** Tcl
 **** Tcl
+
      #+BEGIN_SRC emacs-lisp
 
      (require 'tcl nil t)

@@ -274,7 +274,7 @@
     operations) the ~/.emacs.d/Cask~ file generated
     by the installation script, for example:
 
-    #+BEGIN_SRC
+    #+BEGIN_SRC sh
 
     (depends-on "function-args")
 
@@ -283,7 +283,7 @@
     Sometimes you want a different source than melpa,
     to specify use :git keyword, e.g:
 
-    #+BEGIN_SRC
+    #+BEGIN_SRC sh
 
     (depends-on "undo-tree"
             :git "http://www.dr-qubit.org/git/undo-tree.git")

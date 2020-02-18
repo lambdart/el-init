@@ -7,7 +7,7 @@
 (when (version< emacs-version "26.3")
   (error "This requires Emacs 26.3 and above!"))
 
-(require 'org)
+(require 'org nil t)
 
 ;; load languages (reference)
 ;; (org-babel-do-load-languages 'org-babel-load-languages
@@ -159,8 +159,8 @@ Just a `compile` function wrapper."
 (global-set-key (kbd "C-e") 'move-end-of-line)
 
 ;; word movement
-(global-set-key (kbd "C-<left>") 'backward-word)
-(global-set-key (kbd "C-<right>") 'forward-whitespace)
+;; (global-set-key (kbd "C-<left>") 'backward-word)
+;; (global-set-key (kbd "C-<right>") 'forward-whitespace)
 
 ;; scroll movement
 (global-set-key (kbd "C-M-v") 'scroll-other-window)
@@ -478,6 +478,16 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     (define-key help-mode-map (kbd "C-j") 'push-button)))
 
+(when (require 'info nil t)
+  (progn
+    ;; custom
+    ;; non-nil means don’t record intermediate Info nodes to the history
+    (customize-set-variable 'info-history-skip-intermediate-nodes nil)
+
+    ;; 0 means do not display breadcrumbs
+    ;; (customize-set-variable 'info-breadcrumbs-depth 0)
+    ))
+
 (when (require 'fringe nil t)
   (progn
     ;; disable
@@ -612,7 +622,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; binds
     (define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
 
-;; (require 'paren nil t)
+(require 'paren nil t)
 
 ;; enable
 ;; visualization of matching parens
@@ -664,7 +674,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'tool-bar nil t)
   (progn
-    ;; disable tool bar
+    ;; disable
     (eos/funcall 'tool-bar-mode 0)))
 
 (when (require 'tooltip nil t)
@@ -692,6 +702,14 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; custom
     ;; format used to display line numbers.
     (customize-set-variable 'linum-format " %2d ")))
+
+(when (require 'display-line-numbers nil t)
+  (progn
+    ;; hooks
+    ;; (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+    ;; enable display line numbers mode
+    (eos/funcall 'global-display-line-numbers-mode 1)))
 
 (when (require 'delsel nil t)
   (progn
@@ -757,6 +775,9 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; will not be saved unless these are used.  Default is two weeks.
     (customize-set-variable 'save-completions-retention-time 0)
 
+    ;; binds
+    (global-set-key (kbd "M-\\") 'complete)
+
     ;; enable
     ;; dynamic completion on
     (eos/funcall 'dynamic-completion-mode 1)))
@@ -765,7 +786,15 @@ point is on a symbol, return that symbol name.  Else return nil."
 (add-to-list 'display-buffer-alist
              '("\\*Completions\\*" display-buffer-below-selected))
 
-(require 'dabbrev nil t)
+(when (require 'dabbrev nil t)
+  (progn
+    ;; custom
+    ;; non-nil means case sensitive search.
+    (customize-set-variable 'dabbrev-upcase-means-case-search t)
+
+    ;; whether dabbrev treats expansions as the same if they differ in case
+    ;; a value of nil means treat them as different.
+    (customize-set-variable 'dabbrev-case-distinction t)))
 
 ;; custom
 ;; whether or not to incrementally update display when flood-filling
@@ -774,14 +803,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 (require 'ede nil t)
 
 (require 'forms nil t)
-
-(when (require 'display-line-numbers nil t)
-  (progn
-    ;; hooks
-    ;; (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-
-    ;; enable display line numbers mode
-    (eos/funcall 'global-display-line-numbers-mode 1)))
 
 ;; avoid warnings when byte-compile
 (eval-when-compile
@@ -1231,6 +1252,13 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; init dashboard after emacs initialize
     (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
 
+(require 'locate nil t)
+
+(when (require 'helm-locate nil t)
+  (progn
+    ;; custom
+    (customize-set-value 'helm-locate-command "locate")))
+
 (when (require 'helm-swoop nil t)
   (progn
     ;; custom
@@ -1260,8 +1288,6 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     (define-key helm-swoop-map (kbd "C-c s c")
       'helm-multi-swoop-current-mode-from-helm-swoop)))
-
-(require 'helm-locate nil t)
 
 ;; load helm-imenu
 (when (require 'helm-imenu nil t)
@@ -1446,7 +1472,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; binds (C-x) prefix
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
-    (define-key ctl-x-map (kbd "x") 'multi-term-dedicated-toggle)))
+    (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
 
 (defun eos/launch/st ()
   "Launch urxvt"
@@ -1590,7 +1616,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'helm-external nil t)
   (progn
     ;; bind (C-x) prefix map
-    (define-key ctl-x-map (kbd "C-x") 'helm-run-external-command)))
+    (define-key ctl-x-map (kbd "x") 'helm-run-external-command)))
 
 (when (require 'comint nil t)
   (progn

@@ -327,8 +327,8 @@
       (global-set-key (kbd "C-e") 'move-end-of-line)
 
       ;; word movement
-      (global-set-key (kbd "C-<left>") 'backward-word)
-      (global-set-key (kbd "C-<right>") 'forward-whitespace)
+      ;; (global-set-key (kbd "C-<left>") 'backward-word)
+      ;; (global-set-key (kbd "C-<right>") 'forward-whitespace)
 
       ;; scroll movement
       (global-set-key (kbd "C-M-v") 'scroll-other-window)
@@ -774,7 +774,7 @@
     Allow this Emacs process to be a server for client processes.
     This starts a server communications subprocess through which
     client "editors" can send your editing commands to this
-    Emacs job. To use the server, set up the program ‘emacsclient’
+    Emacs job. To use the server, set up the program emacsclient
     in the Emacs distribution as your standard "editor".
 
     #+BEGIN_SRC emacs-lisp
@@ -834,6 +834,24 @@
      #+END_SRC
 
 *** Info
+
+    The GNU Project distributes most of its manuals in the Info format,
+    which you read using an Info reader.
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'info nil t)
+      (progn
+        ;; custom
+        ;; non-nil means don’t record intermediate Info nodes to the history
+        (customize-set-variable 'info-history-skip-intermediate-nodes nil)
+
+        ;; 0 means do not display breadcrumbs
+        ;; (customize-set-variable 'info-breadcrumbs-depth 0)
+        ))
+
+    #+END_SRC
+
 *** Fringe
 
     Contains code to initialize the built-in fringe bitmaps
@@ -1131,6 +1149,9 @@
 
 *** Time
 
+    Facilities to display current time/date and a new-mail indicator
+    in the Emacs mode line.
+
     #+BEGIN_SRC emacs-lisp
 
     (when (require 'time nil t)
@@ -1155,16 +1176,28 @@
 
 *** Tool-bar
 
+    Provides `tool-bar-mode' to control display of the tool-bar and
+    bindings for the global tool bar with convenience functions
+    `tool-bar-add-item' and `tool-bar-add-item-from-menu'.
+
+    Tool bar in all graphical frames disabled by default.
+
     #+BEGIN_SRC emacs-lisp
 
     (when (require 'tool-bar nil t)
       (progn
-        ;; disable tool bar
+        ;; disable
         (eos/funcall 'tool-bar-mode 0)))
 
     #+END_SRC
 
 *** Tooltip
+
+    When this global minor mode is enabled, Emacs displays help
+    text (e.g. for buttons and menu items that you put the mouse on)
+    in a pop-up window.
+
+    Disabled by default.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -1177,6 +1210,12 @@
 
 *** Menu-bar
 
+    Each Emacs frame normally has a "menu bar" at the top which you can use
+    to perform common operations. There's no need to list them here, as you
+    can more easily see them yourself.
+
+    Disabled by default.
+
     #+BEGIN_SRC emacs-lisp
 
     (when (require 'menu-bar nil t)
@@ -1187,6 +1226,9 @@
     #+END_SRC
 
 *** Scroll-bar
+
+    Specify whether to have vertical scroll bars, and on which side.
+    Disabled by default.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -1199,6 +1241,10 @@
 
 *** Hl-line
 
+    Provides a local minor mode (toggled by M-x hl-line-mode) and
+    a global minor mode (toggled by M-x global-hl-line-mode) to
+    highlight, on a suitable terminal, the line on which point is.
+
     #+BEGIN_SRC emacs-lisp
 
     (when (require 'hl-line nil t)
@@ -1210,6 +1256,8 @@
 
 *** Linum
 
+    Display line numbers for the current buffer.
+
     #+BEGIN_SRC emacs-lisp
 
     (when (require 'linum nil t)
@@ -1220,7 +1268,28 @@
 
     #+END_SRC
 
+*** Display-line-numbers
+
+    Display line numbers in the buffer.
+    Provides a minor mode interface for `display-line-numbers'.
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'display-line-numbers nil t)
+      (progn
+        ;; hooks
+        ;; (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+        ;; enable display line numbers mode
+        (eos/funcall 'global-display-line-numbers-mode 1)))
+
+    #+END_SRC
+
 *** Delsel
+
+    This package makes the active region be pending delete, meaning that
+    text inserted while the region is active will replace the region contents.
+    This is a popular behavior of personal computers text editors.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -1232,6 +1301,9 @@
     #+END_SRC
 
 *** Whitespace
+
+    This package is a minor mode to visualize and clean
+    blanks (TAB, (HARD) SPACE and NEWLINE).
 
     #+BEGIN_SRC emacs-lisp
 
@@ -1255,6 +1327,10 @@
     #+END_SRC
 
 *** Face-remap
+
+    This package defines some simple operations that can be used for
+    maintaining the `face-remapping-alist' in a cooperative way.
+    This is especially important for the `default' face.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -1292,6 +1368,9 @@
 
 *** Completion
 
+   After you type a few characters, pressing the `complete'
+   key inserts the rest of the word you are likely to type.
+
     #+BEGIN_SRC emacs-lisp
 
     (when (require 'completion nil t)
@@ -1323,6 +1402,9 @@
         ;; will not be saved unless these are used.  Default is two weeks.
         (customize-set-variable 'save-completions-retention-time 0)
 
+        ;; binds
+        (global-set-key (kbd "M-\\") 'complete)
+
         ;; enable
         ;; dynamic completion on
         (eos/funcall 'dynamic-completion-mode 1)))
@@ -1335,9 +1417,21 @@
 
 *** Dabbrev
 
+    The purpose with this package is to let you write just a few
+    characters of words you've written earlier to be able to expand
+    them.
+
     #+BEGIN_SRC emacs-lisp
 
-    (require 'dabbrev nil t)
+    (when (require 'dabbrev nil t)
+      (progn
+        ;; custom
+        ;; non-nil means case sensitive search.
+        (customize-set-variable 'dabbrev-upcase-means-case-search t)
+
+        ;; whether dabbrev treats expansions as the same if they differ in case
+        ;; a value of nil means treat them as different.
+        (customize-set-variable 'dabbrev-case-distinction t)))
 
     #+END_SRC
 
@@ -1374,20 +1468,6 @@
     #+BEGIN_SRC emacs-lisp
 
     (require 'forms nil t)
-
-    #+END_SRC
-
-*** Display-line-numbers
-
-    #+BEGIN_SRC emacs-lisp
-
-    (when (require 'display-line-numbers nil t)
-      (progn
-        ;; hooks
-        ;; (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-
-        ;; enable display line numbers mode
-        (eos/funcall 'global-display-line-numbers-mode 1)))
 
     #+END_SRC
 
@@ -2031,6 +2111,30 @@
 
 *** Graphics
 *** Search
+**** Locate
+
+     Locate.el provides an interface to a program which searches a
+     database of file names. By default, this program is the GNU locate
+     command, but it could also be the BSD-style find command, or even a
+     user specified command.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'locate nil t)
+
+     #+END_SRC
+
+**** Helm-locate
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'helm-locate nil t)
+       (progn
+         ;; custom
+         (customize-set-value 'helm-locate-command "locate")))
+
+     #+END_SRC
+
 **** Helm-swoop
 
      #+BEGIN_SRC emacs-lisp
@@ -2064,14 +2168,6 @@
 
          (define-key helm-swoop-map (kbd "C-c s c")
            'helm-multi-swoop-current-mode-from-helm-swoop)))
-
-     #+END_SRC
-
-**** Helm-locate
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'helm-locate nil t)
 
      #+END_SRC
 
@@ -2374,7 +2470,7 @@
 
          ;; binds (C-x) prefix
          (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
-         (define-key ctl-x-map (kbd "x") 'multi-term-dedicated-toggle)))
+         (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
 
      #+END_SRC
 
@@ -2622,7 +2718,7 @@
      (when (require 'helm-external nil t)
        (progn
          ;; bind (C-x) prefix map
-         (define-key ctl-x-map (kbd "C-x") 'helm-run-external-command)))
+         (define-key ctl-x-map (kbd "x") 'helm-run-external-command)))
 
      #+END_SRC
 

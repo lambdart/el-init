@@ -368,6 +368,12 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; kill buffer and window
 (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
 
+(add-to-list 'display-buffer-alist
+             '(("\\*Choices\\*"
+              (display-buffer-below-selected display-buffer-at-bottom)
+              (inhibit-same-window . t)
+              (window-height . fit-window-to-buffer))))
+
 ;; custom
 ;; non-nil inhibits the startup screen.
 (customize-set-variable 'inhibit-startup-screen t)
@@ -531,6 +537,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; create cache directory
 (eos/mkdir (concat user-emacs-directory "cache"))
+
+
 
 (when (require 'recentf nil t)
   (progn
@@ -987,7 +995,6 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; enable fuzzing matching
     (customize-set-variable 'helm-M-x-fuzzy-match t)
     (customize-set-variable 'helm-imenu-fuzzy-match t)
-    (customize-set-variable 'helm-locate-fuzzy-match t)
     (customize-set-variable 'helm-recentf-fuzzy-match t)
     (customize-set-variable 'helm-apropos-fuzzy-match t)
     (customize-set-variable 'helm-lisp-fuzzy-completion t)
@@ -1052,6 +1059,12 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
     (define-key helm-map (kbd "C-j") 'helm-maybe-exit-minibuffer)
     (define-key helm-map (kbd "C-z") 'helm-select-action)))
+
+(when (require 'helm-lib nil t)
+  (progn
+    ;; custom
+    ;; display help window in full frame when non nil
+    (customize-set-variable 'helm-help-full-frame t)))
 
 ;; for some silency (byte-compile)
 (defvar helm-mini-default-sources nil "")
@@ -1257,7 +1270,12 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'helm-locate nil t)
   (progn
     ;; custom
-    (customize-set-value 'helm-locate-command "locate")))
+    ;; disable fuzzy matching in `helm-locate'.
+    (customize-set-variable 'helm-locate-fuzzy-match nil)
+
+    ;; a list of arguments for locate program
+    ;; berkeley-unix: "locate %s %s" (not working with fuzzing match?)
+    (customize-set-value 'helm-locate-command "locate %s %s")))
 
 (when (require 'helm-swoop nil t)
   (progn

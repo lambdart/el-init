@@ -1,5 +1,5 @@
 #+TITLE: Emacs Configuration File
-#+AUTHOR: esac-io
+#+AUTHOR: Isaac "esac-io"
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
 
@@ -575,7 +575,7 @@
 
     #+END_SRC
 
-*** Windows
+*** Window
 
     Emacs windows system.
 
@@ -636,6 +636,23 @@
     (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
 
     #+END_SRC
+
+**** The Zen of Buffer Display
+
+     In its most simplistic form, a frame accommodates always
+     one single window that can be used for displaying a buffer.
+     As a consequence, it is always the latest call of display-buffer
+     that will have succeeded in placing its buffer there.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (add-to-list 'display-buffer-alist
+                  '(("\\*Choices\\*"
+                   (display-buffer-below-selected display-buffer-at-bottom)
+                   (inhibit-same-window . t)
+                   (window-height . fit-window-to-buffer))))
+
+     #+END_SRC
 
 *** Startup
 
@@ -1368,8 +1385,8 @@
 
 *** Completion
 
-   After you type a few characters, pressing the `complete'
-   key inserts the rest of the word you are likely to type.
+    After you type a few characters, pressing the `complete'
+    key inserts the rest of the word you are likely to type.
 
     #+BEGIN_SRC emacs-lisp
 
@@ -1730,7 +1747,6 @@
          ;; enable fuzzing matching
          (customize-set-variable 'helm-M-x-fuzzy-match t)
          (customize-set-variable 'helm-imenu-fuzzy-match t)
-         (customize-set-variable 'helm-locate-fuzzy-match t)
          (customize-set-variable 'helm-recentf-fuzzy-match t)
          (customize-set-variable 'helm-apropos-fuzzy-match t)
          (customize-set-variable 'helm-lisp-fuzzy-completion t)
@@ -1795,6 +1811,21 @@
          (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
          (define-key helm-map (kbd "C-j") 'helm-maybe-exit-minibuffer)
          (define-key helm-map (kbd "C-z") 'helm-select-action)))
+
+     #+END_SRC
+
+**** Helm-lib
+
+     All helm functions that don't require specific helm code
+     are defined in helm-lib package.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'helm-lib nil t)
+       (progn
+         ;; custom
+         ;; display help window in full frame when non nil
+         (customize-set-variable 'helm-help-full-frame t)))
 
      #+END_SRC
 
@@ -2126,12 +2157,19 @@
 
 **** Helm-locate
 
+     Locate related Applications and libraries for Helm.
+
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'helm-locate nil t)
        (progn
          ;; custom
-         (customize-set-value 'helm-locate-command "locate")))
+         ;; disable fuzzy matching in `helm-locate'.
+         (customize-set-variable 'helm-locate-fuzzy-match nil)
+
+         ;; a list of arguments for locate program
+         ;; berkeley-unix: "locate %s %s" (not working with fuzzing match?)
+         (customize-set-value 'helm-locate-command "locate %s %s")))
 
      #+END_SRC
 

@@ -648,9 +648,9 @@
 
      (add-to-list 'display-buffer-alist
                   '(("\\*Choices\\*"
-                   (display-buffer-below-selected display-buffer-at-bottom)
-                   (inhibit-same-window . t)
-                   (window-height . fit-window-to-buffer))))
+                     (display-buffer-below-selected display-buffer-at-bottom)
+                     (inhibit-same-window . t)
+                     (window-height . fit-window-to-buffer))))
 
      #+END_SRC
 
@@ -933,8 +933,6 @@
 
     #+END_SRC
 
-*** Diff
-*** Ediff
 *** Recentf
 
     The recent files list is automatically saved across Emacs
@@ -1337,9 +1335,17 @@
 
 *** Subword
 
+    This package provides the `subword' minor mode, which merges the
+    old remap-based subword.el (derived from cc-mode code) and
+    cap-words.el, which takes advantage of core Emacs
+    word-motion-customization functionality.
+
     #+BEGIN_SRC emacs-lisp
 
-    ;; global-subword-mode
+    (when (require 'subword nil t)
+      (progn
+        ;; enable
+        (eos/funcall 'global-subword-mode 1)))
 
     #+END_SRC
 
@@ -1383,96 +1389,6 @@
 
     #+END_SRC
 
-*** Completion
-
-    After you type a few characters, pressing the `complete'
-    key inserts the rest of the word you are likely to type.
-
-    #+BEGIN_SRC emacs-lisp
-
-    (when (require 'completion nil t)
-      (progn
-        ;; custom
-        ;; how far to search in the buffer when looking for completions. Hide
-        ;; in number of characters.  If nil, search the whole buffer.
-        (customize-set-variable 'completion-search-distance 0)
-
-        ;; if non-nil, the next completion prompt does a cdabbrev search.
-        (customize-set-variable 'completion-cdabbrev-prompt-flag t)
-
-        ;; non-nil means show help message in *Completions* buffer.
-        (customize-set-variable 'completion-show-help t)
-
-        ;; non-nil means separator characters mark previous word as used
-        (customize-set-variable 'completion-on-separator-character t)
-
-        ;;   the filename to save completions to.
-        (customize-set-variable
-         'save-completions-file-name
-         (expand-file-name "cache/completitions" user-emacs-directory))
-
-        ;; non-nil means save most-used completions when exiting emacs
-        (customize-set-variable 'save-completions-flag t)
-
-        ;;    Discard a completion if unused for this many hours. Hide
-        ;; (1 day = 24, 1 week = 168).  If this is 0, non-permanent completions
-        ;; will not be saved unless these are used.  Default is two weeks.
-        (customize-set-variable 'save-completions-retention-time 0)
-
-        ;; binds
-        (global-set-key (kbd "M-\\") 'complete)
-
-        ;; enable
-        ;; dynamic completion on
-        (eos/funcall 'dynamic-completion-mode 1)))
-
-    ;; add display-buffer-alist
-    (add-to-list 'display-buffer-alist
-                 '("\\*Completions\\*" display-buffer-below-selected))
-
-    #+END_SRC
-
-*** Dabbrev
-
-    The purpose with this package is to let you write just a few
-    characters of words you've written earlier to be able to expand
-    them.
-
-    #+BEGIN_SRC emacs-lisp
-
-    (when (require 'dabbrev nil t)
-      (progn
-        ;; custom
-        ;; non-nil means case sensitive search.
-        (customize-set-variable 'dabbrev-upcase-means-case-search t)
-
-        ;; whether dabbrev treats expansions as the same if they differ in case
-        ;; a value of nil means treat them as different.
-        (customize-set-variable 'dabbrev-case-distinction t)))
-
-    #+END_SRC
-
-*** Artist
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; custom
-    ;; whether or not to incrementally update display when flood-filling
-    (customize-set-variable 'artist-flood-fill-show-incrementally nil)
-
-    #+END_SRC
-
-*** Ede
-
-    EDE is the top level Lisp interface to a
-    project management scheme for Emacs.
-
-    #+BEGIN_SRC emacs-lisp
-
-    (require 'ede nil t)
-
-    #+END_SRC
-
 *** Forms
 
     Forms mode means visiting a data file which is supposed to consist
@@ -1489,7 +1405,7 @@
     #+END_SRC
 
 ** Applications
-*** Packages
+*** Package Management
 **** Cask
 
      Cask is a project management tool fo Emacs that helps
@@ -1522,7 +1438,7 @@
 
      #+END_SRC
 
-*** X
+*** Window Management
 **** Exwm
 
      EXWM (Emacs X Window Manager) is a full-featured tiling X window manager
@@ -1717,9 +1633,9 @@
 
      #+END_SRC
 
-*** Frontend
+*** Selector
 
-    or to be more precise: Fuzzy Matching Engine (Helm)
+    or to be more precise: Fuzzy Matching Engine (Helm)!
 
 **** Helm
 
@@ -1998,6 +1914,8 @@
 *** Help
 **** Helm-info
 
+     Browse info index with Helm.
+
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'helm-info nil t)
@@ -2011,6 +1929,8 @@
 
 **** Helm-descbinds
 
+     This package is a replacement of `describe-bindings' for Helm.
+
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'helm-descbinds nil t)
@@ -2021,7 +1941,9 @@
          ;; binds
          ;; help-map (C-h)
          (if (boundp 'help-map)
-             (define-key help-map (kbd "b") 'helm-descbinds))))
+             (progn
+               ;; (define-key help-map (kbd "b") 'helm-descbinds)
+               (define-key help-map (kbd "C-b") 'helm-descbinds)))))
 
      #+END_SRC
 
@@ -2141,6 +2063,25 @@
      #+END_SRC
 
 *** Graphics
+**** Artist
+
+     Artist is an Emacs lisp package that allows you to draw lines,
+     rectangles and ellipses by using your mouse and/or keyboard.  The
+     shapes are made up with the ascii characters |, -, / and \.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'artist nil t)
+       (progn
+         ;; custom
+         ;; whether or not to incrementally update display when flood-filling
+         (customize-set-variable 'artist-flood-fill-show-incrementally nil)
+
+         ;; whether or not to remove white-space at end of lines
+         (customize-set-variable 'artist-trim-line-endings nil)))
+
+     #+END_SRC
+
 *** Search
 **** Locate
 
@@ -2169,7 +2110,7 @@
 
          ;; a list of arguments for locate program
          ;; berkeley-unix: "locate %s %s" (not working with fuzzing match?)
-         (customize-set-value 'helm-locate-command "locate %s %s")))
+         (customize-set-variable 'helm-locate-command "locate %s %s")))
 
      #+END_SRC
 
@@ -2748,6 +2689,53 @@
 
      #+END_SRC
 
+*** Comparator
+**** Diff
+
+     This package helps you explore differences between files, using the
+     UNIX command diff(1). The commands are `diff' and `diff-backup'.
+     You can specify options with `diff-switches'.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'diff nil t)
+       (progn
+         ;; custom
+         ;; a string or list of strings specifying switches to be passed to diff
+         (customize-set-variable 'diff-switches "-u")))
+
+     #+END_SRC
+
+**** Ediff
+
+     This package provides a convenient way of simultaneous browsing through
+     the differences between a pair (or a triple) of files or buffers.
+     The files being compared, file-A, file-B, and file-C (if applicable) are
+     shown in separate windows (side by side, one above the another, or in
+     separate frames), and the differences are highlighted as you step
+     through them.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'ediff nil t)
+       (progn
+         ;; custom
+         ;; options to pass to `ediff-custom-diff-program'.
+         (customize-set-variable 'ediff-custom-diff-options "-U3")
+
+         ;; the function used to split the main window between buffer-A and buffer-B
+         (customize-set-variable 'ediff-split-window-function 'split-window-horizontally)
+
+         ;; function called to set up windows
+         (customize-set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain)
+
+         ;; hooks
+         (add-hook 'ediff-startup-hook 'ediff-toggle-wide-display)
+         (add-hook 'ediff-cleanup-hook 'ediff-toggle-wide-display)
+         (add-hook 'ediff-suspend-hook 'ediff-toggle-wide-display)))
+
+     #+END_SRC
+
 *** Launcher
 **** Helm-external
 
@@ -2756,11 +2744,16 @@
      (when (require 'helm-external nil t)
        (progn
          ;; bind (C-x) prefix map
-         (define-key ctl-x-map (kbd "x") 'helm-run-external-command)))
+         (define-key ctl-x-map (kbd "C-l") 'helm-run-external-command)))
 
      #+END_SRC
 
 *** Interpreter
+
+    Generic interpreter interface configurations and customization,
+    languages specific interpreters (for example: python)
+    will be placed in the ~Development~ sections.
+
 **** Comint
 
      This package defines a general command-interpreter-in-a-buffer
@@ -2819,6 +2812,24 @@
      #+END_SRC
 
 *** Compositor
+**** Compton
+
+     Compton is a compositor based on Dana Jansens' version of xcompmgr
+     (which itself was written by Keith Packard). It includes some
+     improvements over the original xcompmgr, like window frame opacity and
+     inactive window transparency.
+
+     Start compton after emacs initialize.
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; start compton after emacs initialize
+     (add-hook 'after-init-hook
+               (lambda ()
+                 (eos/run/proc "compton")))
+
+     #+END_SRC
+
 **** Transset
 
      Transset is a simple program for X servers supporting the XFIXES,
@@ -2847,24 +2858,6 @@
                (lambda ()
                  (interactive)
                  (eos/transset-set 0.9)))
-
-     #+END_SRC
-
-**** Compton
-
-     Compton is a compositor based on Dana Jansens' version of xcompmgr
-     (which itself was written by Keith Packard). It includes some
-     improvements over the original xcompmgr, like window frame opacity and
-     inactive window transparency.
-
-     Start compton after emacs initialize.
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; start compton after emacs initialize
-     (add-hook 'after-init-hook
-               (lambda ()
-                 (eos/run/proc "compton")))
 
      #+END_SRC
 
@@ -3036,7 +3029,110 @@
 
      #+END_SRC
 
-*** Notify
+*** Office
+**** Org
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; custom
+     ;; when non-nil, fontify code in code blocks
+     (customize-set-variable 'org-src-fontify-natively t)
+
+     ;; if non-nil, the effect of TAB in a code block is as if it were
+     ;; issued in the language major mode buffer
+     (customize-set-variable 'org-src-tab-acts-natively t)
+
+     ;; indentation for the content of a source code block.
+     (customize-set-variable 'org-edit-src-content-indentation 0)
+
+     ;; confirm before evaluation
+     (customize-set-variable 'org-confirm-babel-evaluate nil)
+
+     ;; how the source code edit buffer should be displayed
+     (customize-set-variable 'org-src-window-setup 'current-window)
+
+     ;; non-nil means C-a and C-e behave specially in headlines and items
+     (customize-set-variable 'org-special-ctrl-a/e t)
+
+     (add-hook 'org-mode-hook
+               (lambda ()
+                 ;; do not truncate lines
+                 (setq truncate-lines nil)
+
+                 ;; set company backends
+                 (eos/company/set-backends
+                  '((company-ispell
+                     company-yasnippet)
+                    (company-files)))))
+
+     ;; binds
+     (define-key org-mode-map (kbd "C-M-i") 'eos/company-or-indent)
+
+     #+END_SRC
+
+**** Org-Agenda
+**** Tex
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'tex-mode nil t)
+       (progn
+         ;; custom
+         ;; hooks
+         ))
+
+     #+END_SRC
+
+**** Text
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'text-mode nil t)
+       (progn
+         ;; binds
+         (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
+         (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
+         (define-key text-mode-map (kbd "C-M-i") 'eos/company-or-indent)
+
+         (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
+         (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
+
+         ;; text mode hook
+         (add-hook 'text-mode-hook
+                   (lambda ()
+                     ;; turn on auto fill mode
+                     (turn-on-auto-fill)
+
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-ispell
+                         company-keywords
+                         company-capf
+                         company-dabbrev)
+                        (company-files)))))))
+
+     #+END_SRC
+
+**** Markdown
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'markdown-mode nil t)
+       (progn
+         ;; custom
+         (customize-set-variable 'markdown-command "multimarkdown")))
+
+     ;; binds
+     (when (boundp 'markdown-mode-map)
+       (progn
+         (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+
+     #+END_SRC
+
+**** DocView
+**** Dictionary
+
+*** Notification
 **** Notifications
 
      For proper usage, Emacs must be started in an environment with an
@@ -3048,7 +3144,7 @@
 
      #+END_SRC
 
-*** Library
+*** Documentation
 **** Eldoc
 
      As you type a function's symbol name as part of a sexp,
@@ -3167,109 +3263,76 @@
 
      #+END_SRC
 
-*** Office
-**** Org
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; custom
-     ;; when non-nil, fontify code in code blocks
-     (customize-set-variable 'org-src-fontify-natively t)
-
-     ;; if non-nil, the effect of TAB in a code block is as if it were
-     ;; issued in the language major mode buffer
-     (customize-set-variable 'org-src-tab-acts-natively t)
-
-     ;; indentation for the content of a source code block.
-     (customize-set-variable 'org-edit-src-content-indentation 0)
-
-     ;; confirm before evaluation
-     (customize-set-variable 'org-confirm-babel-evaluate nil)
-
-     ;; how the source code edit buffer should be displayed
-     (customize-set-variable 'org-src-window-setup 'current-window)
-
-     ;; non-nil means C-a and C-e behave specially in headlines and items
-     (customize-set-variable 'org-special-ctrl-a/e t)
-
-     (add-hook 'org-mode-hook
-               (lambda ()
-                 ;; do not truncate lines
-                 (setq truncate-lines nil)
-
-                 ;; set company backends
-                 (eos/company/set-backends
-                  '((company-ispell
-                     company-yasnippet)
-                    (company-files)))))
-
-     ;; binds
-     (define-key org-mode-map (kbd "C-M-i") 'eos/company-or-indent)
-
-     #+END_SRC
-
-**** Org-Agenda
-**** Tex
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'tex-mode nil t)
-       (progn
-         ;; custom
-         ;; hooks
-         ))
-
-     #+END_SRC
-
-**** Text
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'text-mode nil t)
-       (progn
-         ;; binds
-         (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-         (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
-         (define-key text-mode-map (kbd "C-M-i") 'eos/company-or-indent)
-
-         (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
-         (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
-
-         ;; text mode hook
-         (add-hook 'text-mode-hook
-                   (lambda ()
-                     ;; turn on auto fill mode
-                     (turn-on-auto-fill)
-
-                     ;; set company backends
-                     (eos/company/set-backends
-                      '((company-ispell
-                         company-keywords
-                         company-capf
-                         company-dabbrev)
-                        (company-files)))))))
-
-     #+END_SRC
-
-**** Markdown
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'markdown-mode nil t)
-       (progn
-         ;; custom
-         (customize-set-variable 'markdown-command "multimarkdown")))
-
-     ;; binds
-     (when (boundp 'markdown-mode-map)
-       (progn
-         (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
-
-     #+END_SRC
-
-**** DocView
-**** Dictionary
 *** Completion
+**** Completion
+
+     After you type a few characters, pressing the `complete'
+     key inserts the rest of the word you are likely to type.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'completion nil t)
+       (progn
+         ;; custom
+         ;; how far to search in the buffer when looking for completions. Hide
+         ;; in number of characters.  If nil, search the whole buffer.
+         (customize-set-variable 'completion-search-distance 0)
+
+         ;; if non-nil, the next completion prompt does a cdabbrev search.
+         (customize-set-variable 'completion-cdabbrev-prompt-flag t)
+
+         ;; non-nil means show help message in *Completions* buffer.
+         (customize-set-variable 'completion-show-help t)
+
+         ;; non-nil means separator characters mark previous word as used
+         (customize-set-variable 'completion-on-separator-character t)
+
+         ;;   the filename to save completions to.
+         (customize-set-variable
+          'save-completions-file-name
+          (expand-file-name "cache/completitions" user-emacs-directory))
+
+         ;; non-nil means save most-used completions when exiting emacs
+         (customize-set-variable 'save-completions-flag t)
+
+         ;;    Discard a completion if unused for this many hours. Hide
+         ;; (1 day = 24, 1 week = 168).  If this is 0, non-permanent completions
+         ;; will not be saved unless these are used.  Default is two weeks.
+         (customize-set-variable 'save-completions-retention-time 0)
+
+         ;; binds
+         (global-set-key (kbd "M-\\") 'complete)
+
+         ;; enable
+         ;; dynamic completion on
+         (eos/funcall 'dynamic-completion-mode 1)))
+
+     ;; add display-buffer-alist
+     (add-to-list 'display-buffer-alist
+                  '("\\*Completions\\*" display-buffer-below-selected))
+
+     #+END_SRC
+
+**** Dabbrev
+
+     The purpose with this package is to let you write just a few
+     characters of words you've written earlier to be able to expand
+     them.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'dabbrev nil t)
+       (progn
+         ;; custom
+         ;; non-nil means case sensitive search.
+         (customize-set-variable 'dabbrev-upcase-means-case-search t)
+
+         ;; whether dabbrev treats expansions as the same if they differ in case
+         ;; a value of nil means treat them as different.
+         (customize-set-variable 'dabbrev-case-distinction t)))
+
+     #+END_SRC
+
 **** Company
 
      Company is a modular completion framework.
@@ -3444,7 +3507,7 @@
 
      #+END_SRC
 
-*** Navigator
+*** Navigation
 **** Helm-gtags
 
      #+BEGIN_SRC emacs-lisp
@@ -3489,7 +3552,7 @@
 
      #+END_SRC
 
-*** Debugger
+*** Debugging
 **** Gud
 
      #+BEGIN_SRC emacs-lisp
@@ -3518,7 +3581,7 @@
 
      #+END_SRC
 
-*** Builder
+*** Building
 **** Cmake-ide
 
      #+BEGIN_SRC emacs-lisp
@@ -3563,11 +3626,15 @@
 
      #+END_SRC
 
-*** VC
+*** Versioning
 
     Version control packages.
 
 **** Magit
+
+     Magit is an interface to the version control system Git,
+     implemented as an Emacs package.  Magit aspires to be a complete
+     Git porcelain.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -3578,10 +3645,25 @@
 
      #+END_SRC
 
-*** Project
+*** Project Management
+**** Ede
+
+     EDE is the top level Lisp interface to a
+     project management scheme for Emacs.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'ede nil t)
+
+     #+END_SRC
+
 **** Projectile
 
-     Projectile is used as the project management and navigation.
+     This package provides easy project management and navigation.
+     The concept of a project is pretty basic - just a folder containing
+     special file. Currently git, mercurial and bazaar repos are
+     considered projects by default. If you want to mark a folder
+     manually as a project just create an empty .projectile file in it.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -4252,9 +4334,8 @@
      ;; (define-key ctl-x-map (kbd "C--") nil)
      ;; (define-key ctl-x-map (kbd "ESC") nil)
      ;; (define-key ctl-x-map (kbd ".") nil)
-     (define-key ctl-x-map (kbd "C-l") nil)
+     ;; (define-key ctl-x-map (kbd "C-l") nil)
      (define-key ctl-x-map (kbd "C-d") nil)
-     (define-key ctl-x-map (kbd "C-z") nil)
      (define-key ctl-x-map (kbd "C-<left>") nil)
      (define-key ctl-x-map (kbd "C-<right>") nil)
      (define-key ctl-x-map (kbd "C-<up>") nil)
@@ -4293,6 +4374,7 @@
      (define-key ctl-x-map (kbd "a") nil)
      (define-key ctl-x-map (kbd "h") nil)
      (define-key ctl-x-map (kbd "v") nil)
+     (define-key ctl-x-map (kbd "x") nil)
      (define-key ctl-x-map (kbd "X") nil)
 
      #+END_SRC

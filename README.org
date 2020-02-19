@@ -60,6 +60,7 @@
       - Spell check
       - Syntax Highlight
       - Documentation access
+      - Compilation / Interpretation
       - Testing
       - Debugging
       - Versioning

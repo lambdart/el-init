@@ -1587,6 +1587,8 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;;     (ispell-change-dictionary change)
 ;;     (message "Dictionary switched from %s to %s" dic change)))))
 
+(require 'verb nil t)
+
 (when (require 'diff nil t)
   (progn
     ;; custom

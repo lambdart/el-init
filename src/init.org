@@ -1438,7 +1438,7 @@
 
      #+END_SRC
 
-*** Window Management
+*** X
 **** Exwm
 
      EXWM (Emacs X Window Manager) is a full-featured tiling X window manager
@@ -2686,6 +2686,15 @@
      ;;          (change (if (string= dic "english") "brasileiro" "english")))
      ;;     (ispell-change-dictionary change)
      ;;     (message "Dictionary switched from %s to %s" dic change)))))
+
+     #+END_SRC
+
+*** Tester
+**** Verb
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'verb nil t)
 
      #+END_SRC
 

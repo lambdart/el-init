@@ -88,6 +88,9 @@
 ;; term & shell
 (depends-on "multi-term")
 
+;; tester
+(depends-on "verb")
+
 ;; bar
 (depends-on "moody")
 

@@ -1648,7 +1648,11 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; if non-nil, the IELM prompt is read only
     (customize-set-variable 'ielm-prompt-read-only nil)))
 
-(require 'sql nil t)
+(when (require 'sql nil t)
+  (progn
+    ;; custom
+    ;; select the SQL database product used
+    (customize-set-variable 'sql-product "sqlite")))
 
 ;; start compton after emacs initialize
 (add-hook 'after-init-hook
@@ -1659,9 +1663,8 @@ point is on a symbol, return that symbol name.  Else return nil."
   "Set transparency on frame window specify by OPACITY."
   (interactive "nOpacity: ")
   (let ((opacity (or opacity 1.0)))
-    (when (executable-find "transset")
-      (progn
-        (async-shell-command (format "transset -a %.1f" opacity)))
+    (if (executable-find "transset")
+        (async-shell-command (format "transset -a %.1f" opacity))
       (message "transset not found"))))
 
 ;; hooks

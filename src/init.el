@@ -933,6 +933,9 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; idle time before updating, specified in seconds (variable defined as float)
     (customize-set-variable 'helm-input-idle-delay 0.01)
 
+    ;; the default side to display `helm-buffer'
+    (customize-set-variable 'helm-split-window-default "below")
+
     ;; set autoresize max and mim height
     (customize-set-variable 'helm-autoresize-max-height 30)
     (customize-set-variable 'helm-autoresize-min-height 15)
@@ -979,6 +982,9 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; display header-line when non nil.
     (customize-set-variable 'helm-display-header-line nil)
+
+    ;; use the same state of window split, vertical or horizontal
+    (customize-set-variable 'helm-split-last-window-split-state t)
 
     ;; binds (C-x)
     ;; (define-key ctl-x-map (kbd "b") 'helm-buffers-list)
@@ -1448,8 +1454,26 @@ point is on a symbol, return that symbol name.  Else return nil."
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
     (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
 
+;; load manually
+(add-to-list 'load-path
+             (concat user-emacs-directory "elpa/emacs-libvterm"))
+
+(when (require 'vterm nil t)
+  (progn
+    ;; custom
+
+    ;; the shell that gets run in the vterm
+    (customize-set-variable 'vterm-shell "/bin/sh")
+
+    ;; gf set to t, buffers are killed when the associated process is terminated (for
+    ;; example, by logging out the shell)
+    (customize-set-variable 'vterm-kill-buffer-on-exit t)
+
+    ;; TERM value for terminal
+    (customize-set-variable 'vterm-term-environment-variable "eterm-color")))
+
 (defun eos/launch/st ()
-  "Launch urxvt"
+  "Launch st terminal."
   (interactive)
   (eos/run/proc "st"))
 

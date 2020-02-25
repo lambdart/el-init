@@ -1635,7 +1635,7 @@
 
 *** Selector
 
-    or to be more precise: Fuzzy Matching Engine (Helm)!
+    or to be more precise: Fuzzy Matching Engine!
 
 **** Helm
 
@@ -1655,6 +1655,9 @@
          ;; custom
          ;; idle time before updating, specified in seconds (variable defined as float)
          (customize-set-variable 'helm-input-idle-delay 0.01)
+
+         ;; the default side to display `helm-buffer'
+         (customize-set-variable 'helm-split-window-default "below")
 
          ;; set autoresize max and mim height
          (customize-set-variable 'helm-autoresize-max-height 30)
@@ -1702,6 +1705,9 @@
 
          ;; display header-line when non nil.
          (customize-set-variable 'helm-display-header-line nil)
+
+         ;; use the same state of window split, vertical or horizontal
+         (customize-set-variable 'helm-split-last-window-split-state t)
 
          ;; binds (C-x)
          ;; (define-key ctl-x-map (kbd "b") 'helm-buffers-list)
@@ -2453,12 +2459,41 @@
 
      #+END_SRC
 
+**** Vterm
+
+     This Emacs module implements a bridge to libvterm to display a
+     terminal in a Emacs buffer.
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; load manually
+     (add-to-list 'load-path
+                  (concat user-emacs-directory "elpa/emacs-libvterm"))
+
+     (when (require 'vterm nil t)
+       (progn
+         ;; custom
+
+         ;; the shell that gets run in the vterm
+         (customize-set-variable 'vterm-shell "/bin/sh")
+
+         ;; gf set to t, buffers are killed when the associated process is terminated (for
+         ;; example, by logging out the shell)
+         (customize-set-variable 'vterm-kill-buffer-on-exit t)
+
+         ;; TERM value for terminal
+         (customize-set-variable 'vterm-term-environment-variable "eterm-color")))
+
+     #+END_SRC
+
 **** St
+
+     St - st is a simple terminal implementation for X.
 
      #+BEGIN_SRC emacs-lisp
 
      (defun eos/launch/st ()
-       "Launch urxvt"
+       "Launch st terminal."
        (interactive)
        (eos/run/proc "st"))
 

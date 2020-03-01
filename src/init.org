@@ -1,5 +1,5 @@
 #+TITLE: Emacs Configuration File
-#+AUTHOR: Isaac "esac-io"
+#+AUTHOR: Isaac "esac"
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
 
@@ -1050,7 +1050,7 @@
                     (eos/funcall 'blink-cursor-mode 0)))))
 
     ;; binds
-    (global-set-key (kbd "s-o") 'other-frame)
+    (global-set-key (kbd "C-x C-o") 'other-frame)
 
     ;; set font by face attribute (reference)
     ;; (set-face-attribute 'default nil :height)
@@ -1293,10 +1293,10 @@
     (when (require 'display-line-numbers nil t)
       (progn
         ;; hooks
-        ;; (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+        (add-hook 'prog-mode-hook 'display-line-numbers-mode)))
 
-        ;; enable display line numbers mode
-        (eos/funcall 'global-display-line-numbers-mode 1)))
+    ;; enable display line numbers mode
+    ;; (eos/funcall 'global-display-line-numbers-mode 1)))
 
     #+END_SRC
 
@@ -1365,6 +1365,110 @@
 
     #+END_SRC
 
+*** Completion
+
+    After you type a few characters, pressing the `complete'
+    key inserts the rest of the word you are likely to type.
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'completion nil t)
+      (progn
+        ;; custom
+        ;; how far to search in the buffer when looking for completions. Hide
+        ;; in number of characters.  If nil, search the whole buffer.
+        (customize-set-variable 'completion-search-distance 0)
+
+        ;; if non-nil, the next completion prompt does a cdabbrev search.
+        (customize-set-variable 'completion-cdabbrev-prompt-flag t)
+
+        ;; non-nil means show help message in *Completions* buffer.
+        (customize-set-variable 'completion-show-help t)
+
+        ;; non-nil means separator characters mark previous word as used
+        (customize-set-variable 'completion-on-separator-character t)
+
+        ;; the filename to save completions to.
+        (customize-set-variable
+         'save-completions-file-name
+         (expand-file-name "cache/completitions" user-emacs-directory))
+
+        ;; non-nil means save most-used completions when exiting emacs
+        (customize-set-variable 'save-completions-flag t)
+
+        ;; Discard a completion if unused for this many hours. Hide
+        ;; (1 day = 24, 1 week = 168).  If this is 0, non-permanent completions
+        ;; will not be saved unless these are used.  Default is two weeks.
+        (customize-set-variable 'save-completions-retention-time 0)))
+
+    ;; enable
+    ;; dynamic completion on
+    ;; (eos/funcall 'dynamic-completion-mode 1)))
+
+    ;; add display-buffer-alist
+    (add-to-list 'display-buffer-alist
+                 '("\\*Completions\\*" display-buffer-below-selected))
+
+    #+END_SRC
+
+**** Utils
+
+     #+BEGIN_SRC emacs-lisp
+
+     (defun eos/complete-or-indent ()
+       (interactive)
+       (if (looking-at "\\_>")
+           (when (fboundp 'complete)
+             (complete nil)))
+       (indent-according-to-mode))
+
+     (defun eos/complete-at-point-or-indent ()
+       "This smart tab is minibuffer compliant: it acts as usual in
+     the minibuffer. Else, if mark is active, indents region. Else if
+     point is at the end of a symbol, expands it. Else indents the
+     current line."
+       (interactive)
+       (if (minibufferp)
+           (unless (minibuffer-complete)
+             (complete-symbol nil))
+         (if mark-active
+             (indent-region (region-beginning)
+                            (region-end))
+           (if (looking-at "\\_>")
+               (complete-symbol nil)
+             (indent-according-to-mode)))))
+
+     #+END_SRC
+
+**** Binds
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; binds
+     (global-set-key (kbd "<C-return>") 'eos/complete-or-indent) ; testing
+
+     #+END_SRC
+
+*** Dabbrev
+
+    The purpose with this package is to let you write just a few
+    characters of words you've written earlier to be able to expand
+    them.
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'dabbrev nil t)
+      (progn
+        ;; custom
+        ;; non-nil means case sensitive search.
+        (customize-set-variable 'dabbrev-upcase-means-case-search t)
+
+        ;; whether dabbrev treats expansions as the same if they differ in case
+        ;; a value of nil means treat them as different.
+        (customize-set-variable 'dabbrev-case-distinction t)))
+
+    #+END_SRC
+
 *** Custom
 
     Emacs has many settings which you can change. Most settings are
@@ -1405,7 +1509,7 @@
     #+END_SRC
 
 ** Applications
-*** Package Management
+*** Package Manager
 **** Cask
 
      Cask is a project management tool fo Emacs that helps
@@ -1438,7 +1542,7 @@
 
      #+END_SRC
 
-*** X
+*** Window Manager
 **** Exwm
 
      EXWM (Emacs X Window Manager) is a full-featured tiling X window manager
@@ -1635,7 +1739,7 @@
 
 *** Selector
 
-    or to be more precise: Fuzzy Matching Engine!
+    Front-end selector fuzzing match engine (helm).
 
 **** Helm
 
@@ -1798,7 +1902,7 @@
 
      #+END_SRC
 
-*** Apparence
+*** Appearance
 **** Theme
 ***** Mesk-term
 
@@ -1816,6 +1920,7 @@
 
       #+END_SRC
 
+*** Icons
 **** All-the-icons
 
      #+BEGIN_SRC emacs-lisp
@@ -1942,14 +2047,13 @@
      (when (require 'helm-descbinds nil t)
        (progn
          ;; helm-descbinds, window splitting style (2: vertical)
-         (customize-set-variable 'helm-descbinds-window-style 2)
+         (customize-set-variable 'helm-descbinds-window-style 2)))
 
-         ;; binds
-         ;; help-map (C-h)
-         (if (boundp 'help-map)
-             (progn
-               ;; (define-key help-map (kbd "b") 'helm-descbinds)
-               (define-key help-map (kbd "C-b") 'helm-descbinds)))))
+     ;; binds
+     ;; help-map (C-h)
+     ;; (if (boundp 'help-map)
+     ;;   (progn
+     ;;     (define-key help-map (kbd "b") 'helm-descbinds)))
 
      #+END_SRC
 
@@ -2248,7 +2352,7 @@
                                    ;; mode-line-percent-position
                                    "(%l:%c) / %I  "
                                    mode-line-misc-info
-                                   " "
+                                   ""
                                    moody-mode-line-buffer-identification
                                    " %m "
                                    (vc-mode moody-vc-mode)
@@ -2456,33 +2560,6 @@
          ;; binds (C-x) prefix
          (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
          (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
-
-     #+END_SRC
-
-**** Vterm
-
-     This Emacs module implements a bridge to libvterm to display a
-     terminal in a Emacs buffer.
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; load manually
-     (add-to-list 'load-path
-                  (concat user-emacs-directory "elpa/emacs-libvterm"))
-
-     (when (require 'vterm nil t)
-       (progn
-         ;; custom
-
-         ;; the shell that gets run in the vterm
-         (customize-set-variable 'vterm-shell "/bin/sh")
-
-         ;; gf set to t, buffers are killed when the associated process is terminated (for
-         ;; example, by logging out the shell)
-         (customize-set-variable 'vterm-kill-buffer-on-exit t)
-
-         ;; TERM value for terminal
-         (customize-set-variable 'vterm-term-environment-variable "eterm-color")))
 
      #+END_SRC
 
@@ -2729,7 +2806,15 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'verb nil t)
+     (when (require 'verb nil t)
+       (progn
+         ;; hooks
+         (add-hook 'org-ctrl-c-ctrl-c-hook
+                   (lambda ()
+                     (when (boundp 'verb-mode)
+                       (if verb-mode
+                           (eos/funcall 'verb-send-request-on-point 'this-window)))))
+         ))
 
      #+END_SRC
 
@@ -3122,11 +3207,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'tex-mode nil t)
-       (progn
-         ;; custom
-         ;; hooks
-         ))
+     (require 'tex-mode nil t)
 
      #+END_SRC
 
@@ -3177,6 +3258,8 @@
      #+END_SRC
 
 **** DocView
+**** Pdf-tools
+
 **** Dictionary
 
 *** Notification
@@ -3311,75 +3394,6 @@
      #+END_SRC
 
 *** Completion
-**** Completion
-
-     After you type a few characters, pressing the `complete'
-     key inserts the rest of the word you are likely to type.
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'completion nil t)
-       (progn
-         ;; custom
-         ;; how far to search in the buffer when looking for completions. Hide
-         ;; in number of characters.  If nil, search the whole buffer.
-         (customize-set-variable 'completion-search-distance 0)
-
-         ;; if non-nil, the next completion prompt does a cdabbrev search.
-         (customize-set-variable 'completion-cdabbrev-prompt-flag t)
-
-         ;; non-nil means show help message in *Completions* buffer.
-         (customize-set-variable 'completion-show-help t)
-
-         ;; non-nil means separator characters mark previous word as used
-         (customize-set-variable 'completion-on-separator-character t)
-
-         ;;   the filename to save completions to.
-         (customize-set-variable
-          'save-completions-file-name
-          (expand-file-name "cache/completitions" user-emacs-directory))
-
-         ;; non-nil means save most-used completions when exiting emacs
-         (customize-set-variable 'save-completions-flag t)
-
-         ;;    Discard a completion if unused for this many hours. Hide
-         ;; (1 day = 24, 1 week = 168).  If this is 0, non-permanent completions
-         ;; will not be saved unless these are used.  Default is two weeks.
-         (customize-set-variable 'save-completions-retention-time 0)
-
-         ;; binds
-         (global-set-key (kbd "M-\\") 'complete)
-
-         ;; enable
-         ;; dynamic completion on
-         (eos/funcall 'dynamic-completion-mode 1)))
-
-     ;; add display-buffer-alist
-     (add-to-list 'display-buffer-alist
-                  '("\\*Completions\\*" display-buffer-below-selected))
-
-     #+END_SRC
-
-**** Dabbrev
-
-     The purpose with this package is to let you write just a few
-     characters of words you've written earlier to be able to expand
-     them.
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'dabbrev nil t)
-       (progn
-         ;; custom
-         ;; non-nil means case sensitive search.
-         (customize-set-variable 'dabbrev-upcase-means-case-search t)
-
-         ;; whether dabbrev treats expansions as the same if they differ in case
-         ;; a value of nil means treat them as different.
-         (customize-set-variable 'dabbrev-case-distinction t)))
-
-     #+END_SRC
-
 **** Company
 
      Company is a modular completion framework.
@@ -3410,7 +3424,10 @@
                                  '(company-sort-by-occurrence))
 
          ;; enable dabbrev downcase (most common)
-         (customize-set-variable 'company-dabbrev-downcase nil)
+         (customize-set-variable 'company-dabbrev-downcase t)
+
+         ;; false
+         (customize-set-variable 'company-require-match nil)
 
          ;; align annotations true
          (customize-set-variable 'company-tooltip-align-annotations nil)
@@ -3420,11 +3437,10 @@
          (customize-set-variable 'company-show-numbers t)
 
          ;; binds
-         (define-key eos-complete-map (kbd "M-`") 'company-yasnippet)
          (define-key eos-complete-map (kbd "`") 'company-ispell)
-         (define-key eos-complete-map (kbd ".") 'company-gtags)
-         (define-key eos-complete-map (kbd "'") 'company-dabbrev-code)
-         (define-key eos-complete-map (kbd "/") 'company-files)))
+         (define-key eos-complete-map (kbd "1") 'company-yasnippet)
+         (define-key eos-complete-map (kbd "g") 'company-gtags)
+         (define-key eos-complete-map (kbd "f") 'company-files)))
 
      ;; enable globally
      (eos/funcall 'global-company-mode 1)
@@ -3432,7 +3448,7 @@
      ;; binds
      (when (boundp 'company-active-map)
        (progn
-         (define-key company-active-map (kbd "<tab>") 'company-complete-selection)
+         (define-key company-active-map (kbd "TAB") 'company-complete-common)
          (define-key company-active-map (kbd "C-j") 'company-complete-selection)
          (define-key company-active-map (kbd "C-n") 'company-select-next)
          (define-key company-active-map (kbd "C-p") 'company-select-previous)))
@@ -3460,9 +3476,15 @@
      (when (require 'yasnippet nil t)
        (progn
          ;; binds
-         (define-key eos-complete-map (kbd "e") 'yas-expand)
+         (define-key eos-complete-map (kbd "y") 'yas-expand)
          (define-key eos-complete-map (kbd "i") 'yas-insert-snippet)
          (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)))
+
+     ;; binds
+     ;; (when (boundp 'yas-keymap)
+     ;;   (progn
+     ;;     (define-key yas-keymap (kbd "<tab>") nil)
+     ;;     (define-key yas-keymap (kbd "M-n") 'yas-next-field)))
 
      ;; enable
      (eos/funcall 'yas-global-mode 1)
@@ -3481,7 +3503,7 @@
 
      (when (boundp 'helm-company-map)
        (define-key helm-company-map (kbd "SPC") 'helm-keyboard-quit)
-       (define-key helm-company-map (kbd "TAB") 'helm-maybe-exit-minibuffer)
+       (define-key helm-company-map (kbd "<tab>") 'helm-maybe-exit-minibuffer)
        (define-key helm-company-map (kbd "C-j") 'helm-maybe-exit-minibuffer))
 
      #+END_SRC
@@ -3497,9 +3519,9 @@
        (when (boundp 'company-backends)
          (setq company-backends backends)))
 
-     ;; calls helm-company if its bounded
+     ;; helm-company or indent
      (defun eos/helm-company ()
-       "Helm company complete wrapper."
+       "Helm company wrapper."
        (interactive)
        (when (fboundp 'helm-company)
          (helm-company)))
@@ -3514,28 +3536,6 @@
                (helm-company)))
          (indent-according-to-mode)))
 
-     (defun eos/complete-or-indent ()
-       (interactive)
-       (if (looking-at "\\_>")
-           (dabbrev-expand nil)
-         (indent-according-to-mode)))
-
-     (defun eos/complete-at-point-or-indent ()
-       "This smart tab is minibuffer compliant: it acts as usual in
-     the minibuffer. Else, if mark is active, indents region. Else if
-     point is at the end of a symbol, expands it. Else indents the
-     current line."
-       (interactive)
-       (if (minibufferp)
-           (unless (minibuffer-complete)
-             (complete-symbol nil))
-         (if mark-active
-             (indent-region (region-beginning)
-                            (region-end))
-           (if (looking-at "\\_>")
-               (complete-symbol nil)
-             (indent-according-to-mode)))))
-
      #+END_SRC
 
 **** Binds
@@ -3545,9 +3545,13 @@
      ;; exit, keyboard quit
      (define-key eos-complete-map (kbd "C-g") 'keyboard-quit)
 
+     ;; testing
+     (define-key eos-complete-map (kbd "M-/") 'hippie-expand)
+     ;; (define-key eos-complete-map (kbd "<tab>") 'eos/complete-or-indent)
+
      ;; binds (global)
-     (global-set-key (kbd "TAB") 'eos/complete-or-indent)
-     (global-set-key (kbd "C-M-i") 'eos/company-or-indent)
+     (global-set-key (kbd "<M-tab>") 'eos/helm-company)
+     (global-set-key (kbd "<tab>") 'eos/company-or-indent)
 
      ;; binds eos-complete-map prefix M-] map
      (global-set-key (kbd "M-`") 'eos-complete-map)
@@ -4016,13 +4020,13 @@
      ;; binds
      (when (boundp 'emacs-lisp-mode-map)
        (progn
+         ;; eval keybinds
          (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
          (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
          (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
-         ;; (define-key emacs-lisp-mode-map (kbd "C-c TAB") 'helm-lisp-completion-at-point)
 
-         (define-key emacs-lisp-mode-map (kbd "TAB") 'eos/complete-or-indent)
-         (define-key emacs-lisp-mode-map (kbd "C-M-i") 'eos/company-or-indent)
+         ;; complete keybind
+         (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/company-or-indent)
 
          ;; ubind, qualaty of life
          (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
@@ -4383,6 +4387,7 @@
      ;; (define-key ctl-x-map (kbd ".") nil)
      ;; (define-key ctl-x-map (kbd "C-l") nil)
      (define-key ctl-x-map (kbd "C-d") nil)
+     (define-key ctl-x-map (kbd "C-j") nil)
      (define-key ctl-x-map (kbd "C-<left>") nil)
      (define-key ctl-x-map (kbd "C-<right>") nil)
      (define-key ctl-x-map (kbd "C-<up>") nil)
@@ -4394,7 +4399,7 @@
      (define-key ctl-x-map (kbd "C-r") nil)
      (define-key ctl-x-map (kbd "C-n") nil)
      (define-key ctl-x-map (kbd "C-p") nil)
-     (define-key ctl-x-map (kbd "C-o") nil)
+     ;; (define-key ctl-x-map (kbd "C-o") nil)
      (define-key ctl-x-map (kbd "C-h") nil)
      (define-key ctl-x-map (kbd "C-u") nil)
      (define-key ctl-x-map (kbd "C-\@") nil)
@@ -4576,4 +4581,4 @@
 ** EOF
 
    "See You Space Cowboy.."
-   | Cowboy Bebop |
+   | Cowboy Bebop

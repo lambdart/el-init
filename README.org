@@ -5,9 +5,6 @@
 
 * Emacs OS
 
-  ... Present Day, heh... Present Time! ...
-  |Lain|
-
   #+CAPTION: EMACS OS
   #+NAME:   fig:EOS-screenshot
 
@@ -432,6 +429,9 @@
 * LICENSE
   MIT
 * EOF
+
+  ... Present Day, heh... Present Time! ...
+  |Lain|
 
   #+BEGIN_SRC
     And you don't seem to understand

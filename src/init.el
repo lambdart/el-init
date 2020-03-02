@@ -769,11 +769,11 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; Discard a completion if unused for this many hours. Hide
     ;; (1 day = 24, 1 week = 168).  If this is 0, non-permanent completions
     ;; will not be saved unless these are used.  Default is two weeks.
-    (customize-set-variable 'save-completions-retention-time 0)))
+    (customize-set-variable 'save-completions-retention-time 0)
 
-;; enable
-;; dynamic completion on
-;; (eos/funcall 'dynamic-completion-mode 1)))
+    ;; enable
+    ;; dynamic completion on
+    (eos/funcall 'dynamic-completion-mode 1)))
 
 ;; add display-buffer-alist
 (add-to-list 'display-buffer-alist
@@ -802,8 +802,8 @@ current line."
           (complete-symbol nil)
         (indent-according-to-mode)))))
 
-;; binds
-(global-set-key (kbd "<C-return>") 'eos/complete-or-indent) ; testing
+;; binds (testing)
+(global-set-key (kbd "M-RET") 'eos/complete-or-indent)
 
 (when (require 'dabbrev nil t)
   (progn
@@ -967,7 +967,6 @@ current line."
                                 (progn
                                   (/ (safe-length exwm-randr-workspace-monitor-plist) 2))
                               1))))
-
 ;; enable
 ;; (exwm-randr-enable)
 
@@ -1902,8 +1901,8 @@ current line."
   (progn
     ;; binds
     (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-    (define-key text-mode-map (kbd "TAB") 'eos/complete-or-indent)
-    (define-key text-mode-map (kbd "C-M-i") 'eos/company-or-indent)
+    (define-key text-mode-map (kbd "TAB") 'eos/company-or-indent)
+    (define-key text-mode-map (kbd "C-M-i") 'eos/helm-company)
 
     (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
     (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
@@ -1999,38 +1998,38 @@ current line."
 (when (require 'company nil t)
   (progn
     ;; set echo delay
-    (customize-set-variable 'company-echo-delay 0.0)
+    (customize-set-variable 'company-echo-delay .01)
 
-    ;; disable idle delay
-    (customize-set-variable 'company-idle-delay nil)
+    ;; idle delay in seconds until completion starts automatically
+    (customize-set-variable 'company-idle-delay 0.5)
 
-    ;; set tooltip limit
-    (customize-set-variable 'company-tooltip-limit 20)
+    ;; maximum number of candidates in the tooltip
+    (customize-set-variable 'company-tooltip-limit 4)
 
-    ;; set prefix length
-    (customize-set-variable 'company-minimum-length 2)
+    ;; set minimum prefix length
+    (customize-set-variable 'company-minimum-length 3)
 
-    ;; cycle selection
+    ;; if enabled, selecting item before first or after last wraps around
     (customize-set-variable 'company-selection-wrap-around t)
 
     ;; sort by frequency
     (customize-set-variable 'company-transformers
                             '(company-sort-by-occurrence))
 
-    ;; enable dabbrev downcase (most common)
-    (customize-set-variable 'company-dabbrev-downcase t)
+    ;; whether to downcase the returned candidates.
+    (customize-set-variable 'company-dabbrev-downcase nil)
 
-    ;; false
+    ;; if enabled, disallow non-matching input
     (customize-set-variable 'company-require-match nil)
 
-    ;; align annotations true
+    ;; When non-nil, align annotations to the right tooltip border
     (customize-set-variable 'company-tooltip-align-annotations nil)
 
     ;; show candidates number
     ;; to select completions use: M-1, M-2, etc..
     (customize-set-variable 'company-show-numbers t)
 
-    ;; binds
+    ;; binds (prefix eos-complete map)
     (define-key eos-complete-map (kbd "`") 'company-ispell)
     (define-key eos-complete-map (kbd "1") 'company-yasnippet)
     (define-key eos-complete-map (kbd "g") 'company-gtags)
@@ -2063,10 +2062,10 @@ current line."
     (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)))
 
 ;; binds
-;; (when (boundp 'yas-keymap)
-;;   (progn
-;;     (define-key yas-keymap (kbd "<tab>") nil)
-;;     (define-key yas-keymap (kbd "M-n") 'yas-next-field)))
+(when (boundp 'yas-keymap)
+  (progn
+    (define-key yas-keymap (kbd "TAB") nil)
+    (define-key yas-keymap (kbd "M-n") 'yas-next-field)))
 
 ;; enable
 (eos/funcall 'yas-global-mode 1)
@@ -2079,7 +2078,7 @@ current line."
 
 (when (boundp 'helm-company-map)
   (define-key helm-company-map (kbd "SPC") 'helm-keyboard-quit)
-  (define-key helm-company-map (kbd "<tab>") 'helm-maybe-exit-minibuffer)
+  (define-key helm-company-map (kbd "TAB") 'helm-execute-persistent-action)
   (define-key helm-company-map (kbd "C-j") 'helm-maybe-exit-minibuffer))
 
 ;; set company backends
@@ -2102,8 +2101,8 @@ current line."
   (interactive)
   (if (looking-at "\\_>")
       (progn
-        (when (fboundp 'helm-company)
-          (helm-company)))
+        (when (fboundp 'company-complete)
+          (company-complete)))
     (indent-according-to-mode)))
 
 ;; exit, keyboard quit
@@ -2115,7 +2114,7 @@ current line."
 
 ;; binds (global)
 (global-set-key (kbd "<M-tab>") 'eos/helm-company)
-(global-set-key (kbd "<tab>") 'eos/company-or-indent)
+(global-set-key (kbd "TAB") 'eos/company-or-indent)
 
 ;; binds eos-complete-map prefix M-] map
 (global-set-key (kbd "M-`") 'eos-complete-map)

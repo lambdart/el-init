@@ -3,10 +3,10 @@
 #+startup: overview
 #+property: header-args :comments yes :results silent
 
+* Emacs OS
+
   ... Present Day, heh... Present Time! ...
   |Lain|
-
-* Emacs OS
 
   #+CAPTION: EMACS OS
   #+NAME:   fig:EOS-screenshot

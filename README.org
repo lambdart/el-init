@@ -3,17 +3,8 @@
 #+startup: overview
 #+property: header-args :comments yes :results silent
 
-* README
-
   ... Present Day, heh... Present Time! ...
-
-  #+BEGIN_SRC
-    And you don't seem to understand
-    A shame you seemed an honest man
-    And all the fears you hold so dear
-    Will turn to whisper in your ear
-  #+END_SRC
-  | Duvet, Boa |
+  |Lain|
 
 * Emacs OS
 
@@ -442,5 +433,10 @@
   MIT
 * EOF
 
-  I feel confined, only free to expand myself within boundaries.
-  |puppet master|
+  #+BEGIN_SRC
+    And you don't seem to understand
+    A shame you seemed an honest man
+    And all the fears you hold so dear
+    Will turn to whisper in your ear
+  #+END_SRC
+  | Duvet, Boa |

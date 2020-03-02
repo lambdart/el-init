@@ -196,9 +196,6 @@ setup_eos() {
         test ! $? -eq 0 && \
             die "was not possible to clone eos repository."
     }
-
-    # change working directory (reference)
-    # git -C $_EOS_DIR checkout dev && git -C $_EOS_DIR pull
 }
 
 # install emacs packages listed on Cask file
@@ -213,7 +210,7 @@ build_eos() {
     . ${_EOS_DIR}/scripts/build.sh
 
     # calls cask build
-    cd ${_EMACS_DIR}; ${_CASK_DIR}/bin/cask build
+    (cd ${_EMACS_DIR}; ${_CASK_DIR}/bin/cask build)
 }
 
 # todo: define options

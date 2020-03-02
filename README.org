@@ -3,15 +3,17 @@
 #+startup: overview
 #+property: header-args :comments yes :results silent
 
-* Emacs OS
+* EOS
+
+  Just another org-mode based emacs configuration,
+  or a elisp interpreter desktop distribution.
+
+** Demo
 
   #+CAPTION: EMACS OS
   #+NAME:   fig:EOS-screenshot
 
   [[./assets/eos.png]]
-
-  Just another org-mode based emacs configuration,
-  or a elisp interpreter desktop distribution.
 
 * Introduction
 
@@ -40,7 +42,7 @@
     - Use the same GUI Interface (frames/window/buffers) for all
       applications.
 
-    - Just one development environment for all languages.
+    - Just one development environment for all languages:
       - Editing
       - Navigation
       - Completion
@@ -413,7 +415,7 @@
     contained in the last breath of their widows.
 
   - Q: Pull requests will be accepted in this repository?
-  -  A: Probably not, Emacs configurations are too personal,
+  - A: Probably not, Emacs configurations are too personal,
     fork it or copy any snippet of code that you like:
     MIT License.
 

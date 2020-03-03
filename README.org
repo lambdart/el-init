@@ -6,7 +6,7 @@
 * EOS
 
   Just another org-mode based emacs configuration,
-  or a elisp interpreter desktop distribution.
+  or a elisp interpreter desktop distribution (What!?).
 
 ** Screenshot
 
@@ -22,12 +22,12 @@
   well designed and integrated, that provides a generic
   computer environment for everyday use.
 
-  We rely on org-mode to organize the whole configuration in a logic and
-  manageable way, so the source code and its documentation are contained
-  in only one file: ~init.org~.
+  Org-mode is used to organize the whole configuration ~src/init.org~
+  in a logic and manageable way, it contains documentation and source code
+  blocks that will be tangled generating ~src/init.el~ script file.
 
-  * Note: The word application(s) in this context means (any elisp
-          packages and external programs) and will be used intangibly
+  * Note: For now on the word application(s) means: any elisp
+          packages or external program, and will be used intangibly
           throughout this document.
 
 ** Features (overview):
@@ -94,7 +94,7 @@
    6. rtags (server)
    7. irony (server)
 
-* Tested on
+* Tested On
 
   - FreeBSD 12.1 RELEASE
   - Debian GNU/Linux 10
@@ -242,17 +242,17 @@
   Cask can also be used to manage dependencies for your
   local Emacs configuration.
 
-  It’s based on a Cask file, which identifies an Emacs Lisp package,
-  provides meta information about the package
-  and declares its contents and dependencies.
+  It’s based on a ~Cask~ file, which identifies an Emacs Lisp package,
+  provides meta information about the package and
+  declares its contents and dependencies.
 
 ** Adding Package's Repository
 
     To add more packages just edit the ~/.emacs.d/Cask~ file, generated
-    by the installation script, e.g:
+    by installation script.
 
-    To add 'function-args' package,
-    put the code snippet below inside the ~Cask~ file.
+    To add 'function-args' package, put the code snippet below inside
+    the ~Cask~ file.
 
     #+BEGIN_SRC sh
 
@@ -260,8 +260,8 @@
 
     #+END_SRC
 
-    Using different source then melpa is possible thanks to depends-on
-    acceptable fetcher keyword, e.g:
+    Using different source then Melpa is possible thanks to =`depends-on'=
+    acceptable fetcher keywords:
 
     #+BEGIN_SRC sh
 
@@ -274,9 +274,10 @@
     optionally requiring a minimum-version. In the second variant,
     install the package from a VCS repository.
     Replace fetcher with any of the following: :git, :bzr, :hg,
-    :darcs, :svn or :cvs. repourl is the repository URL to install the package from.
+    :darcs, :svn or :cvs. The argument is the package's repository URL
+    source.
 
-    See more keywords and detailed usage explanation on [[https://cask.readthedocs.io/en/latest/guide/usage.html][cask guide.]]
+    For more detailed information see [[https://cask.readthedocs.io/en/latest/guide/usage.html][cask's manual]].
 
 ** Installing Packages
 

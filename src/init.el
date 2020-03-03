@@ -617,12 +617,6 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; window move default keybinds (shift-up/down etc..)
     (eos/funcall 'windmove-default-keybindings)))
 
-;; binds, eos-window-map (window prefix map)
-;; (define-key eos-window-map (kbd "j") 'windmove-up)
-;; (define-key eos-window-map (kbd "k") 'windmove-down)
-;; (define-key eos-window-map (kbd "h") 'windmove-left)
-;; (define-key eos-window-map (kbd "l") 'windmove-right)
-
 (when (require 'kmacro nil t)
   (progn
     ;; binds
@@ -991,10 +985,10 @@ current line."
 (when (require 'buffer-move nil t)
   (progn
     ;; bind
-    (global-set-key (kbd "C-s-j") 'buf-move-up)
-    (global-set-key (kbd "C-s-k") 'buf-move-down)
-    (global-set-key (kbd "C-s-h") 'buf-move-left)
-    (global-set-key (kbd "C-s-l") 'buf-move-right)))
+    (global-set-key (kbd "<C-S-up>") 'buf-move-up)
+    (global-set-key (kbd "<C-S-down>") 'buf-move-down)
+    (global-set-key (kbd "<C-S-left>") 'buf-move-left)
+    (global-set-key (kbd "<C-S-right>") 'buf-move-right)))
 
 (when (require 'helm nil t)
   (progn
@@ -1009,8 +1003,8 @@ current line."
     (customize-set-variable 'helm-split-window-default "below")
 
     ;; set autoresize max and mim height
-    (customize-set-variable 'helm-autoresize-max-height 30)
-    (customize-set-variable 'helm-autoresize-min-height 15)
+    (customize-set-variable 'helm-autoresize-max-height 40)
+    (customize-set-variable 'helm-autoresize-min-height 20)
 
     ;; enable fuzzing matching
     (customize-set-variable 'helm-M-x-fuzzy-match t)
@@ -1032,16 +1026,22 @@ current line."
     ;; cycle to the beginning or end of the list after reaching the bottom or top
     (customize-set-variable 'helm-move-to-line-cycle-in-source t)
 
-    ;; scroll amount when scrolling other window in a helm session.
+    ;; scroll amount when scrolling other window in a helm session
     (customize-set-variable 'helm-scroll-amount 8)
 
     ;; send current input in header-line when non-nil
     (customize-set-variable 'helm-echo-input-in-header-line t)
 
-    ;; search for library in 'require' and 'declare-function' sexp.
+    ;; display header-line when non nil
+    (customize-set-variable 'helm-display-header-line nil)
+
+    ;; specify the space before prompt in header-line
+    (customize-set-variable 'helm-header-line-space-before-prompt 'left-margin)
+
+    ;; search for library in 'require' and 'declare-function' sexp
     (customize-set-variable 'helm-ff-search-library-in-sexp t)
 
-    ;; use 'recentf-list' instead of 'file-name-history' in 'helm-find-files'.
+    ;; use `recentf-list' instead of `file-name-history' in `helm-find-files'
     (customize-set-variable 'helm-ff-file-name-history-use-recentf t)
 
     ;; this enable support for completing-read-multiple
@@ -1050,13 +1050,16 @@ current line."
 
     ;; if non-nil, prevent escaping from minibuffer with other-window
     ;; during the helm sessions
-    (customize-set-variable 'helm-prevent-escaping-from-minibuffer t)
-
-    ;; display header-line when non nil.
-    (customize-set-variable 'helm-display-header-line nil)
+    (customize-set-variable 'helm-prevent-escaping-from-minibuffer nil)
 
     ;; use the same state of window split, vertical or horizontal
     (customize-set-variable 'helm-split-last-window-split-state t)
+
+    ;; helm left marginal area for display of a buffer
+    (customize-set-variable 'helm-left-margin-width 1)
+
+    ;; left-margin-width value for `helm-mini' and `helm-buffers-list'
+    (customize-set-variable 'helm-buffers-left-margin-width 1)
 
     ;; binds (C-x)
     ;; (define-key ctl-x-map (kbd "b") 'helm-buffers-list)
@@ -1205,11 +1208,10 @@ current line."
     ;; helm-descbinds, window splitting style (2: vertical)
     (customize-set-variable 'helm-descbinds-window-style 2)))
 
-;; binds
-;; help-map (C-h)
-;; (if (boundp 'help-map)
-;;   (progn
-;;     (define-key help-map (kbd "b") 'helm-descbinds)))
+;; binds help-map (C-h)
+(if (boundp 'help-map)
+    (progn
+      (define-key help-map (kbd "C-b") 'helm-descbinds)))
 
 (when (require 'iedit nil t)
   (progn
@@ -1243,10 +1245,10 @@ current line."
   (progn
     ;; items
     (customize-set-variable 'dashboard-items
-                            '((recents . 5)
-                              (projects . 5)
-                              (agenda . 5)
-                              (bookmarks . 5)))
+                            '((recents . 4)
+                              (projects . 4)
+                              (agenda . 4)
+                              (bookmarks . 4)))
 
     ;; banners directory
     (customize-set-variable 'dashboard-banners-directory
@@ -1264,7 +1266,7 @@ current line."
     (customize-set-variable 'dashboard-footer-icon
                             #(" " 0 1 (face dashboard-footer)))
 
-    ;; footer
+    ;; a footer with some short message
     (customize-set-variable 'dashboard-footer
                             "Litany Against Fear
 
@@ -1277,6 +1279,9 @@ current line."
   Where the fear has gone there will be nothing.
   Only I will remain.
   ")
+
+    ;; a list of messages, one of which dashboard chooses to display
+    (customize-set-variable 'dashboard-footer-messages nil)
 
     ;; set initial buffer choice (emacsclient fix)
     (customize-set-variable 'initial-buffer-choice
@@ -1523,7 +1528,7 @@ current line."
 
     ;; binds (C-x) prefix
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
-    (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
+    (define-key ctl-x-map (kbd "x") 'multi-term-dedicated-toggle)))
 
 (defun eos/launch/st ()
   "Launch st terminal."
@@ -1889,7 +1894,9 @@ current line."
             ;; set company backends
             (eos/company/set-backends
              '((company-ispell
-                company-yasnippet)
+                company-yasnippet
+                company-dabbrev
+                company-dabbrev-code)
                (company-files)))))
 
 ;; binds
@@ -1916,8 +1923,6 @@ current line."
                 ;; set company backends
                 (eos/company/set-backends
                  '((company-ispell
-                    company-keywords
-                    company-capf
                     company-dabbrev)
                    (company-files)))))))
 
@@ -2001,13 +2006,13 @@ current line."
     (customize-set-variable 'company-echo-delay .01)
 
     ;; idle delay in seconds until completion starts automatically
-    (customize-set-variable 'company-idle-delay 0.5)
+    (customize-set-variable 'company-idle-delay nil)
 
     ;; maximum number of candidates in the tooltip
     (customize-set-variable 'company-tooltip-limit 4)
 
     ;; set minimum prefix length
-    (customize-set-variable 'company-minimum-length 3)
+    (customize-set-variable 'company-minimum-length 2)
 
     ;; if enabled, selecting item before first or after last wraps around
     (customize-set-variable 'company-selection-wrap-around t)
@@ -2065,7 +2070,7 @@ current line."
 (when (boundp 'yas-keymap)
   (progn
     (define-key yas-keymap (kbd "TAB") nil)
-    (define-key yas-keymap (kbd "M-n") 'yas-next-field)))
+    (define-key yas-keymap (kbd "ESC") 'yas-next-field)))
 
 ;; enable
 (eos/funcall 'yas-global-mode 1)
@@ -2263,7 +2268,9 @@ current line."
   (eos/company/set-backends
    '((company-c-headers)
      (company-irony
-      company-yasnippet)
+      company-yasnippet
+      company-dabbrev
+      company-dabbrev-code)
      (company-files))))
 
 (when (require 'cc-mode nil t)
@@ -2390,7 +2397,9 @@ current line."
                 ;; set company backends
                 (eos/company/set-backends
                  '((company-elisp
-                    company-yasnippet)
+                    company-yasnippet
+                    company-dabbrev
+                    company-dabbrev-code)
                    (company-files)))
 
                 ;; set flycheck checker
@@ -2428,7 +2437,9 @@ current line."
                 (eos/company/set-backends
                  '((company-shell
                     company-shell-env
-                    company-yasnippet)
+                    company-yasnippet
+                    company-dabbrev
+                    company-dabbrev-code)
                    (company-files)))
 
                 ;; set flycheck backends
@@ -2446,7 +2457,9 @@ current line."
                  '((company-fish-shell
                     company-yasnippet
                     company-shell
-                    company-shell-env)
+                    company-shell-env
+                    company-dabbrev
+                    company-dabbrev-code)
                    (company-files)))))))
 
 (when (require 'lua-mode nil t)
@@ -2481,6 +2494,7 @@ current line."
                  '((company-yasnippet
                     company-keywords
                     company-gtags
+                    company-dabbrev
                     company-dabbrev-code
                     company-keywords)
                    (company-files)))
@@ -2522,6 +2536,7 @@ current line."
                 (eos/company/set-backends
                  '((company-yasnippet
                     company-keywords
+                    company-dabbrev
                     company-dabbrev-code)
                    (company-files)))
 
@@ -2544,6 +2559,7 @@ current line."
                 (eos/company/set-backends
                  '((company-yasnippet
                     company-keywords
+                    company-dabbrev
                     company-dabbrev-code)
                    (company-files)))
 
@@ -2576,7 +2592,9 @@ current line."
                 ;; set company backends
                 (eos/company/set-backends
                  '((company-gtags
-                    company-yasnippet)
+                    company-yasnippet
+                    company-dabbrev
+                    company-dabbrev-code)
                    (company-files)))
 
                 ;; select flycheck checker (use gcc)
@@ -2619,6 +2637,7 @@ current line."
 ;; (define-key ctl-x-map (kbd ".") nil)
 ;; (define-key ctl-x-map (kbd "C-l") nil)
 (define-key ctl-x-map (kbd "C-d") nil)
+(define-key ctl-x-map (kbd "C-x") nil)
 (define-key ctl-x-map (kbd "C-j") nil)
 (define-key ctl-x-map (kbd "C-<left>") nil)
 (define-key ctl-x-map (kbd "C-<right>") nil)
@@ -2658,7 +2677,7 @@ current line."
 (define-key ctl-x-map (kbd "a") nil)
 (define-key ctl-x-map (kbd "h") nil)
 (define-key ctl-x-map (kbd "v") nil)
-(define-key ctl-x-map (kbd "x") nil)
+;; (define-key ctl-x-map (kbd "x") nil)
 (define-key ctl-x-map (kbd "X") nil)
 
 ;; clean minor-mode-map-alist

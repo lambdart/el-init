@@ -1072,12 +1072,6 @@
         ;; window move default keybinds (shift-up/down etc..)
         (eos/funcall 'windmove-default-keybindings)))
 
-    ;; binds, eos-window-map (window prefix map)
-    ;; (define-key eos-window-map (kbd "j") 'windmove-up)
-    ;; (define-key eos-window-map (kbd "k") 'windmove-down)
-    ;; (define-key eos-window-map (kbd "h") 'windmove-left)
-    ;; (define-key eos-window-map (kbd "l") 'windmove-right)
-
     #+END_SRC
 
 *** Kmacro
@@ -1729,10 +1723,10 @@
      (when (require 'buffer-move nil t)
        (progn
          ;; bind
-         (global-set-key (kbd "C-s-j") 'buf-move-up)
-         (global-set-key (kbd "C-s-k") 'buf-move-down)
-         (global-set-key (kbd "C-s-h") 'buf-move-left)
-         (global-set-key (kbd "C-s-l") 'buf-move-right)))
+         (global-set-key (kbd "<C-S-up>") 'buf-move-up)
+         (global-set-key (kbd "<C-S-down>") 'buf-move-down)
+         (global-set-key (kbd "<C-S-left>") 'buf-move-left)
+         (global-set-key (kbd "<C-S-right>") 'buf-move-right)))
 
      #+END_SRC
 
@@ -1763,8 +1757,8 @@
          (customize-set-variable 'helm-split-window-default "below")
 
          ;; set autoresize max and mim height
-         (customize-set-variable 'helm-autoresize-max-height 30)
-         (customize-set-variable 'helm-autoresize-min-height 15)
+         (customize-set-variable 'helm-autoresize-max-height 40)
+         (customize-set-variable 'helm-autoresize-min-height 40)
 
          ;; enable fuzzing matching
          (customize-set-variable 'helm-M-x-fuzzy-match t)
@@ -1786,16 +1780,22 @@
          ;; cycle to the beginning or end of the list after reaching the bottom or top
          (customize-set-variable 'helm-move-to-line-cycle-in-source t)
 
-         ;; scroll amount when scrolling other window in a helm session.
+         ;; scroll amount when scrolling other window in a helm session
          (customize-set-variable 'helm-scroll-amount 8)
 
          ;; send current input in header-line when non-nil
          (customize-set-variable 'helm-echo-input-in-header-line t)
 
-         ;; search for library in 'require' and 'declare-function' sexp.
+         ;; display header-line when non nil
+         (customize-set-variable 'helm-display-header-line nil)
+
+         ;; specify the space before prompt in header-line
+         (customize-set-variable 'helm-header-line-space-before-prompt 'left-margin)
+
+         ;; search for library in 'require' and 'declare-function' sexp
          (customize-set-variable 'helm-ff-search-library-in-sexp t)
 
-         ;; use 'recentf-list' instead of 'file-name-history' in 'helm-find-files'.
+         ;; use `recentf-list' instead of `file-name-history' in `helm-find-files'
          (customize-set-variable 'helm-ff-file-name-history-use-recentf t)
 
          ;; this enable support for completing-read-multiple
@@ -1804,13 +1804,16 @@
 
          ;; if non-nil, prevent escaping from minibuffer with other-window
          ;; during the helm sessions
-         (customize-set-variable 'helm-prevent-escaping-from-minibuffer t)
-
-         ;; display header-line when non nil.
-         (customize-set-variable 'helm-display-header-line nil)
+         (customize-set-variable 'helm-prevent-escaping-from-minibuffer nil)
 
          ;; use the same state of window split, vertical or horizontal
          (customize-set-variable 'helm-split-last-window-split-state t)
+
+         ;; helm left marginal area for display of a buffer
+         (customize-set-variable 'helm-left-margin-width 1)
+
+         ;; left-margin-width value for `helm-mini' and `helm-buffers-list'
+         (customize-set-variable 'helm-buffers-left-margin-width 1)
 
          ;; binds (C-x)
          ;; (define-key ctl-x-map (kbd "b") 'helm-buffers-list)
@@ -1901,8 +1904,7 @@
 
      #+END_SRC
 
-*** Appearance
-**** Theme
+*** Theme
 ***** Mesk-term
 
       Add theme directory to load-path and load the
@@ -2048,11 +2050,10 @@
          ;; helm-descbinds, window splitting style (2: vertical)
          (customize-set-variable 'helm-descbinds-window-style 2)))
 
-     ;; binds
-     ;; help-map (C-h)
-     ;; (if (boundp 'help-map)
-     ;;   (progn
-     ;;     (define-key help-map (kbd "b") 'helm-descbinds)))
+     ;; binds help-map (C-h)
+     (if (boundp 'help-map)
+         (progn
+           (define-key help-map (kbd "C-b") 'helm-descbinds)))
 
      #+END_SRC
 
@@ -2101,7 +2102,7 @@
 
      #+END_SRC
 
-*** View
+*** Buffer
 **** Ibuffer
 
      A major mode for viewing a list of buffers.
@@ -2115,7 +2116,11 @@
 
      #+END_SRC
 
+*** View
 **** Dashboard
+
+     An extensible Emacs dashboard, with sections for
+     bookmarks, projectile projects, org-agenda and more.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -2123,10 +2128,10 @@
        (progn
          ;; items
          (customize-set-variable 'dashboard-items
-                                 '((recents . 5)
-                                   (projects . 5)
-                                   (agenda . 5)
-                                   (bookmarks . 5)))
+                                 '((recents . 4)
+                                   (projects . 4)
+                                   (agenda . 4)
+                                   (bookmarks . 4)))
 
          ;; banners directory
          (customize-set-variable 'dashboard-banners-directory
@@ -2144,7 +2149,7 @@
          (customize-set-variable 'dashboard-footer-icon
                                  #(" " 0 1 (face dashboard-footer)))
 
-         ;; footer
+         ;; a footer with some short message
          (customize-set-variable 'dashboard-footer
                                  "Litany Against Fear
 
@@ -2157,6 +2162,9 @@
        Where the fear has gone there will be nothing.
        Only I will remain.
        ")
+
+         ;; a list of messages, one of which dashboard chooses to display
+         (customize-set-variable 'dashboard-footer-messages nil)
 
          ;; set initial buffer choice (emacsclient fix)
          (customize-set-variable 'initial-buffer-choice
@@ -3193,7 +3201,9 @@
                  ;; set company backends
                  (eos/company/set-backends
                   '((company-ispell
-                     company-yasnippet)
+                     company-yasnippet
+                     company-dabbrev
+                     company-dabbrev-code)
                     (company-files)))))
 
      ;; binds
@@ -3233,8 +3243,6 @@
                      ;; set company backends
                      (eos/company/set-backends
                       '((company-ispell
-                         company-keywords
-                         company-capf
                          company-dabbrev)
                         (company-files)))))))
 
@@ -3258,9 +3266,7 @@
 
 **** DocView
 **** Pdf-tools
-
 **** Dictionary
-
 *** Notification
 **** Notifications
 
@@ -3407,13 +3413,13 @@
          (customize-set-variable 'company-echo-delay .01)
 
          ;; idle delay in seconds until completion starts automatically
-         (customize-set-variable 'company-idle-delay 0.5)
+         (customize-set-variable 'company-idle-delay nil)
 
          ;; maximum number of candidates in the tooltip
-         (customize-set-variable 'company-tooltip-limit 4)
+         (customize-set-variable 'company-tooltip-limit 10)
 
          ;; set minimum prefix length
-         (customize-set-variable 'company-minimum-length 3)
+         (customize-set-variable 'company-minimum-length 2)
 
          ;; if enabled, selecting item before first or after last wraps around
          (customize-set-variable 'company-selection-wrap-around t)
@@ -3436,7 +3442,7 @@
          (customize-set-variable 'company-show-numbers t)
 
          ;; binds (prefix eos-complete map)
-         (define-key eos-complete-map (kbd "`") 'company-ispell)
+         (define-key eos-complete-map (kbd "M-`") 'company-ispell)
          (define-key eos-complete-map (kbd "1") 'company-yasnippet)
          (define-key eos-complete-map (kbd "g") 'company-gtags)
          (define-key eos-complete-map (kbd "f") 'company-files)))
@@ -3482,8 +3488,8 @@
      ;; binds
      (when (boundp 'yas-keymap)
        (progn
-         (define-key yas-keymap (kbd "TAB") nil)
-         (define-key yas-keymap (kbd "M-n") 'yas-next-field)))
+         (define-key yas-keymap (kbd "<tab>") nil)
+         (define-key yas-keymap (kbd "ESC") 'yas-next-field)))
 
      ;; enable
      (eos/funcall 'yas-global-mode 1)
@@ -3502,7 +3508,7 @@
 
      (when (boundp 'helm-company-map)
        (define-key helm-company-map (kbd "SPC") 'helm-keyboard-quit)
-       (define-key helm-company-map (kbd "TAB") 'helm-execute-persistent-action)
+       (define-key helm-company-map (kbd "TAB") 'helm-maybe-exit-minibuffer)
        (define-key helm-company-map (kbd "C-j") 'helm-maybe-exit-minibuffer))
 
      #+END_SRC
@@ -3531,8 +3537,8 @@
        (interactive)
        (if (looking-at "\\_>")
            (progn
-             (when (fboundp 'company-complete)
-               (company-complete)))
+             (when (fboundp 'helm-company)
+               (helm-company)))
          (indent-according-to-mode)))
 
      #+END_SRC
@@ -3809,7 +3815,8 @@
        (eos/company/set-backends
         '((company-c-headers)
           (company-irony
-           company-yasnippet)
+           company-yasnippet
+           company-dabbrev-code)
           (company-files))))
 
      #+END_SRC
@@ -4007,7 +4014,8 @@
                      ;; set company backends
                      (eos/company/set-backends
                       '((company-elisp
-                         company-yasnippet)
+                         company-yasnippet
+                         company-dabbrev-code)
                         (company-files)))
 
                      ;; set flycheck checker
@@ -4058,7 +4066,8 @@
                      (eos/company/set-backends
                       '((company-shell
                          company-shell-env
-                         company-yasnippet)
+                         company-yasnippet
+                         company-dabbrev-code)
                         (company-files)))
 
                      ;; set flycheck backends
@@ -4089,7 +4098,8 @@
                       '((company-fish-shell
                          company-yasnippet
                          company-shell
-                         company-shell-env)
+                         company-shell-env
+                         company-dabbrev-code)
                         (company-files)))))))
 
      #+END_SRC
@@ -4131,6 +4141,7 @@
                       '((company-yasnippet
                          company-keywords
                          company-gtags
+                         company-dabbrev
                          company-dabbrev-code
                          company-keywords)
                         (company-files)))
@@ -4263,6 +4274,7 @@
 
      #+END_SRC
 
+*** C#
 *** Clojure
 *** Vhdl
 **** Vhdl-mode
@@ -4309,7 +4321,9 @@
                      ;; set company backends
                      (eos/company/set-backends
                       '((company-gtags
-                         company-yasnippet)
+                         company-yasnippet
+                         company-dabbrev
+                         company-dabbrev-code)
                         (company-files)))
 
                      ;; select flycheck checker (use gcc)
@@ -4386,6 +4400,7 @@
      ;; (define-key ctl-x-map (kbd ".") nil)
      ;; (define-key ctl-x-map (kbd "C-l") nil)
      (define-key ctl-x-map (kbd "C-d") nil)
+     ;; (define-key ctl-x-map (kbd "C-x") nil)
      (define-key ctl-x-map (kbd "C-j") nil)
      (define-key ctl-x-map (kbd "C-<left>") nil)
      (define-key ctl-x-map (kbd "C-<right>") nil)
@@ -4569,6 +4584,9 @@
     #+END_SRC
 
 ** Adapt
+
+   This script will be loaded after ~init.el~, so
+   put more =elisp= code there to attend your needs.
 
    #+BEGIN_SRC emacs-lisp
 

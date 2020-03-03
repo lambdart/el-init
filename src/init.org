@@ -1397,7 +1397,7 @@
 
         ;; enable
         ;; dynamic completion on
-        (eos/funcall 'dynamic-completion-mode 1)))
+        (eos/funcall 'dynamic-completion-mode 0)))
 
     ;; add display-buffer-alist
     (add-to-list 'display-buffer-alist
@@ -2264,23 +2264,6 @@
 
          (define-key helm-swoop-map (kbd "C-c s c")
            'helm-multi-swoop-current-mode-from-helm-swoop)))
-
-     #+END_SRC
-
-**** Helm-imenu
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; load helm-imenu
-     (when (require 'helm-imenu nil t)
-       (progn
-         ;; binds (C-x) prefix map
-         (define-key ctl-x-map (kbd "TAB") 'helm-imenu-in-all-buffers)))
-
-     ;; binds (local map)
-     (when (boundp 'helm-imenu-map)
-       (progn
-         (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
 
      #+END_SRC
 
@@ -3442,7 +3425,7 @@
          (customize-set-variable 'company-show-numbers t)
 
          ;; binds (prefix eos-complete map)
-         (define-key eos-complete-map (kbd "M-`") 'company-ispell)
+         (define-key eos-complete-map (kbd "`") 'company-ispell)
          (define-key eos-complete-map (kbd "1") 'company-yasnippet)
          (define-key eos-complete-map (kbd "g") 'company-gtags)
          (define-key eos-complete-map (kbd "f") 'company-files)))
@@ -3546,12 +3529,11 @@
 **** Binds
 
      #+BEGIN_SRC emacs-lisp
-
      ;; exit, keyboard quit
      (define-key eos-complete-map (kbd "C-g") 'keyboard-quit)
 
      ;; testing
-     (define-key eos-complete-map (kbd "M-/") 'hippie-expand)
+     (define-key eos-complete-map (kbd "TAB") 'hippie-expand)
      ;; (define-key eos-complete-map (kbd "<tab>") 'eos/complete-or-indent)
 
      ;; binds (global)
@@ -3559,11 +3541,32 @@
      (global-set-key (kbd "TAB") 'eos/company-or-indent)
 
      ;; binds eos-complete-map prefix M-] map
-     (global-set-key (kbd "M-`") 'eos-complete-map)
+     (define-key ctl-x-map (kbd "TAB") 'eos-complete-map)
 
      #+END_SRC
 
 *** Navigation
+**** Helm-imenu
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; load helm-imenu
+     (when (require 'helm-imenu nil t)
+       (progn
+         ;; hooks
+         (add-hook 'prog-mode
+                   (lambda ()
+                     ;; binds to C-x `
+                     (define-key ctl-x-map (kbd "`") 'helm-imenu-in-all-buffers)))
+         ))
+
+     ;; binds (local map)
+     (when (boundp 'helm-imenu-map)
+       (progn
+         (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
+
+     #+END_SRC
+
 **** Helm-gtags
 
      #+BEGIN_SRC emacs-lisp

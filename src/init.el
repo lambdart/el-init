@@ -767,7 +767,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; enable
     ;; dynamic completion on
-    (eos/funcall 'dynamic-completion-mode 1)))
+    (eos/funcall 'dynamic-completion-mode 0)))
 
 ;; add display-buffer-alist
 (add-to-list 'display-buffer-alist
@@ -1004,7 +1004,7 @@ current line."
 
     ;; set autoresize max and mim height
     (customize-set-variable 'helm-autoresize-max-height 40)
-    (customize-set-variable 'helm-autoresize-min-height 20)
+    (customize-set-variable 'helm-autoresize-min-height 40)
 
     ;; enable fuzzing matching
     (customize-set-variable 'helm-M-x-fuzzy-match t)
@@ -1348,8 +1348,11 @@ current line."
 ;; load helm-imenu
 (when (require 'helm-imenu nil t)
   (progn
-    ;; binds (C-x) prefix map
-    (define-key ctl-x-map (kbd "TAB") 'helm-imenu-in-all-buffers)))
+    ;; add hooks
+    (add-hook 'prog-mode
+              (lambda ()
+                ;; bind to C-x `
+                (define-key ctl-x-map (kbd "`") 'helm-imenu-in-all-buffers)))))
 
 ;; binds (local map)
 (when (boundp 'helm-imenu-map)
@@ -1528,7 +1531,7 @@ current line."
 
     ;; binds (C-x) prefix
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
-    (define-key ctl-x-map (kbd "x") 'multi-term-dedicated-toggle)))
+    (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
 
 (defun eos/launch/st ()
   "Launch st terminal."
@@ -2009,7 +2012,7 @@ current line."
     (customize-set-variable 'company-idle-delay nil)
 
     ;; maximum number of candidates in the tooltip
-    (customize-set-variable 'company-tooltip-limit 4)
+    (customize-set-variable 'company-tooltip-limit 10)
 
     ;; set minimum prefix length
     (customize-set-variable 'company-minimum-length 2)
@@ -2035,7 +2038,7 @@ current line."
     (customize-set-variable 'company-show-numbers t)
 
     ;; binds (prefix eos-complete map)
-    (define-key eos-complete-map (kbd "`") 'company-ispell)
+    (define-key eos-complete-map (kbd "M-`") 'company-ispell)
     (define-key eos-complete-map (kbd "1") 'company-yasnippet)
     (define-key eos-complete-map (kbd "g") 'company-gtags)
     (define-key eos-complete-map (kbd "f") 'company-files)))
@@ -2069,7 +2072,7 @@ current line."
 ;; binds
 (when (boundp 'yas-keymap)
   (progn
-    (define-key yas-keymap (kbd "TAB") nil)
+    (define-key yas-keymap (kbd "<tab>") nil)
     (define-key yas-keymap (kbd "ESC") 'yas-next-field)))
 
 ;; enable
@@ -2083,7 +2086,7 @@ current line."
 
 (when (boundp 'helm-company-map)
   (define-key helm-company-map (kbd "SPC") 'helm-keyboard-quit)
-  (define-key helm-company-map (kbd "TAB") 'helm-execute-persistent-action)
+  (define-key helm-company-map (kbd "TAB") 'helm-maybe-exit-minibuffer)
   (define-key helm-company-map (kbd "C-j") 'helm-maybe-exit-minibuffer))
 
 ;; set company backends
@@ -2106,8 +2109,8 @@ current line."
   (interactive)
   (if (looking-at "\\_>")
       (progn
-        (when (fboundp 'company-complete)
-          (company-complete)))
+        (when (fboundp 'helm-company)
+          (helm-company)))
     (indent-according-to-mode)))
 
 ;; exit, keyboard quit
@@ -2122,7 +2125,7 @@ current line."
 (global-set-key (kbd "TAB") 'eos/company-or-indent)
 
 ;; binds eos-complete-map prefix M-] map
-(global-set-key (kbd "M-`") 'eos-complete-map)
+(define-key ctl-x-map (kbd "TAB") 'eos-complete-map)
 
 (when (require 'helm-gtags nil t)
   (progn
@@ -2269,7 +2272,6 @@ current line."
    '((company-c-headers)
      (company-irony
       company-yasnippet
-      company-dabbrev
       company-dabbrev-code)
      (company-files))))
 
@@ -2398,7 +2400,6 @@ current line."
                 (eos/company/set-backends
                  '((company-elisp
                     company-yasnippet
-                    company-dabbrev
                     company-dabbrev-code)
                    (company-files)))
 
@@ -2438,7 +2439,6 @@ current line."
                  '((company-shell
                     company-shell-env
                     company-yasnippet
-                    company-dabbrev
                     company-dabbrev-code)
                    (company-files)))
 
@@ -2458,7 +2458,6 @@ current line."
                     company-yasnippet
                     company-shell
                     company-shell-env
-                    company-dabbrev
                     company-dabbrev-code)
                    (company-files)))))))
 
@@ -2536,7 +2535,6 @@ current line."
                 (eos/company/set-backends
                  '((company-yasnippet
                     company-keywords
-                    company-dabbrev
                     company-dabbrev-code)
                    (company-files)))
 
@@ -2559,7 +2557,6 @@ current line."
                 (eos/company/set-backends
                  '((company-yasnippet
                     company-keywords
-                    company-dabbrev
                     company-dabbrev-code)
                    (company-files)))
 
@@ -2637,7 +2634,7 @@ current line."
 ;; (define-key ctl-x-map (kbd ".") nil)
 ;; (define-key ctl-x-map (kbd "C-l") nil)
 (define-key ctl-x-map (kbd "C-d") nil)
-(define-key ctl-x-map (kbd "C-x") nil)
+;; (define-key ctl-x-map (kbd "C-x") nil)
 (define-key ctl-x-map (kbd "C-j") nil)
 (define-key ctl-x-map (kbd "C-<left>") nil)
 (define-key ctl-x-map (kbd "C-<right>") nil)
@@ -2677,7 +2674,7 @@ current line."
 (define-key ctl-x-map (kbd "a") nil)
 (define-key ctl-x-map (kbd "h") nil)
 (define-key ctl-x-map (kbd "v") nil)
-;; (define-key ctl-x-map (kbd "x") nil)
+(define-key ctl-x-map (kbd "x") nil)
 (define-key ctl-x-map (kbd "X") nil)
 
 ;; clean minor-mode-map-alist

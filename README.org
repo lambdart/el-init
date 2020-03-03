@@ -7,7 +7,7 @@
 
   Just another org-mode based emacs configuration,
   or a elisp interpreter desktop distribution.
-  |(What!?)|
+  | What!? |
 
 ** Screenshot
 
@@ -15,6 +15,8 @@
   #+NAME:   fig:EOS-screenshot
 
   [[./assets/eos.png]]
+
+  | Present Day, heh... Present Time |
 
 * Introduction
 
@@ -423,9 +425,6 @@
 * LICENSE
   MIT
 * EOF
-
-  ... Present Day, heh... Present Time! ...
-  |Lain|
 
   #+BEGIN_SRC
     And you don't seem to understand

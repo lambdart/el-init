@@ -247,11 +247,11 @@
   and declares its contents and dependencies.
 
 ** Management
-*** Add
+*** Adding Package's Repository
 
-    To add more packages just edit (that means write and save
-    operations) the ~/.emacs.d/Cask~ file generated
-    by the installation script, for example:
+    To add more packages just edit the ~/.emacs.d/Cask~ file generated
+    by the installation script, e.g, to add 'function-args' packages,
+    put the code snippet below inside the ~Cask~ file.
 
     #+BEGIN_SRC sh
 
@@ -259,8 +259,8 @@
 
     #+END_SRC
 
-    Sometimes you want a different source than melpa,
-    to specify use :git keyword, e.g:
+    If a different source then melpa is required, uses the
+    :git keyword, example:
 
     #+BEGIN_SRC sh
 
@@ -269,8 +269,12 @@
 
     #+END_SRC
 
-    After that is required to call ~cask~, I generically used
-    like this:
+    See more keywords and detailed usage explanation on [[https://cask.readthedocs.io/en/latest/guide/usage.html][cask guide.]]
+
+*** Installing Packages
+
+    To install all packages listed on the ~Cask~ file, uses `cask
+    install` inside the same directory that ~Cask~ file resides, e.g:
 
     #+BEGIN_SRC sh
 
@@ -278,55 +282,50 @@
 
     #+END_SRC
 
-    The command above will perform the installation of the added
-    package.
+    - Tip: When problems with missing dependencies were encountered
+           (happens usually when I'm using another source
+           keyword like :git), put the dependency code snippet
+           ~(depends-on "missing-dep-package-name")
+           above the target package and give `cask install`
+           command another shot.
 
-    - TIP: If you encounter problems with missing dependencies when
-      another source is used, put the dependency code snippet
-      ~(depends-on "package-name)" above the target package, I guess
-      cask install reads (organize the depends-on list data)
-      the ~Cask~ file in a reverse stack.
+*** Removing Packages
 
-    - Note: The ~/src/Cask~ is ignored by the version control
-      using ~.gitignore~ mechanism.
-
-*** Remove
-
-    You have to manually remove the target package directory.
-    To find out where the packages are installed use:
+    Manually remove target package directory.
+    To find out where the packages was installed, use:
 
     #+BEGIN_SRC sh
 
-    $ cd ~/.emacs.d; cd $(cask package-directory)
+    $ find ~/.emacs.d/.cask -type d -name <package-name>*
 
     #+END_SRC
 
-    - TIP: Usually this directory is located at:
-           ~~/.emacs.d/.cask/<emacs-version>/<source>~
+    To avoid package re-installation remove (depends-on
+    <package-name>) before `cask install` calls.
 
-    And delete package target folder:
+    - TIP: Exploration path: ~~/.emacs.d/.cask/<emacs-version>/<source>~
+
+    Delete package's folder:
 
     #+BEGIN_SRC emacs-lisp
 
-    $ rm -rf dashboard-20200121.1429
+    $ rm -rf ~/.emacs.d/.cask/26.3/elpa/dashboard-20200225.745
 
     #+END_SRC
 
-    In this example, the dashboard will be removed and
-    the configuration on init.org will remain unaffected,
-    actually it will not enter the code block related to
-    the dashboard (skipping it).
+    In this example, dashboard package files will be deleted,
+    its configuration will be skipped.
 
-    - IMPORTANT: If just remove the package from ~Cask~ file and
-                 not remove its directory ~init.org~ will
-                 continue to load/customize it.
+    - TIP: IMPORTANT! Don't forgot to remove both: package's folder and
+      repository entry, otherwise the package will continue to be
+      installed/loaded.
 
 * Adapt
 
   If you want to modify any aspects (or extend) this configuration
   without touching the ~/src/init.org~, just edit/add your own elisp code
   at ~/src/eos-adapt.el~, this file is the last thing loaded on
-  the ~/src/init.el~ script.
+  the ~/src/init.el~ tangled script.
 
 * Applications
 

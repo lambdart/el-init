@@ -6,7 +6,8 @@
 * EOS
 
   Just another org-mode based emacs configuration,
-  or a elisp interpreter desktop distribution (What!?).
+  or a elisp interpreter desktop distribution.
+  |(What!?)|
 
 ** Screenshot
 

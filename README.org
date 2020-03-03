@@ -131,7 +131,7 @@
   - Note: The main purpose of the Emacs tutorial is teach you
     the most important standard Emacs commands (functions/keybinds).
 
-** Keybinds Strategy
+* Keybinds Strategy
 
    Basically, new prefix maps are created for the most commonly
    used minor modes and their functions are mapped within
@@ -141,7 +141,7 @@
    map, resulting in the standardization of commands (functions)
    access sequences (keybinds/chords).
 
-*** Basic
+** Basic
 
     If you do not understand the terminology of the tables below,
     it is advisable to read the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Key-Bindings.html][emacs keybinds manual]].
@@ -165,7 +165,7 @@
     | <Minor-mode>-map | C-x <key>  | Always (static)   | Minor Mode Actions |
     | <Major-mode>-map | C-c        | Current (dynamic) | Major Mode Actions |
 
-*** C-x
+** C-x
 
     EOS's keymaps are defined to hold the most
     common/used commands (elisp functions), they are
@@ -180,7 +180,7 @@
     | eos-docs-maps  | C-x l   | Library (Docs)           |
     | eos-ac-map     | C-x TAB | Completion               |
 
-*** C-c
+** C-c
 
     Some maps will be only used in specific modes,
     e.g, cc-mode:
@@ -189,7 +189,7 @@
     |       |           |        |             |
     | C/C++ | rtags-map | C-c r  | Rtags       |
 
-*** Global
+** Global
 
     We are not going to list all the keybinds, just the keybinds we
     have changed from the standard and some additional ones that we
@@ -212,7 +212,7 @@
     | Help   | C-h C-b | helm-descbinds                            |
     | ...    | ...     | ...                                       |
 
-*** Getting help
+** Getting help
 
     To verify what keys are mapped uses list-keybindings
     (M-x list-keybindings RET or C-h b), it's possible to restrict
@@ -224,7 +224,7 @@
    | C-x C-h | ctl-x-map help        |
    | C-x l ? | <minor>-mode-map help |
 
-*** Quality of life
+** Quality of life
 
     For the sake of sanity a lot of keys was unbounded resulting
     in a more error prone Emacs usage. See the unbind section at
@@ -233,7 +233,7 @@
     Note: The `minor-mode-map-alist' was completely cleaned,
     this was proven to be a huge gain on productivity and pain relief.
 
-* Package Manager
+* Package Management
 
   Cask is a project management tool for Emacs that helps automate the
   package development cycle; development, dependencies, testing,
@@ -246,11 +246,12 @@
   provides meta information about the package
   and declares its contents and dependencies.
 
-** Management
-*** Adding Package's Repository
+** Adding Package's Repository
 
-    To add more packages just edit the ~/.emacs.d/Cask~ file generated
-    by the installation script, e.g, to add 'function-args' packages,
+    To add more packages just edit the ~/.emacs.d/Cask~ file, generated
+    by the installation script, e.g:
+
+    To add 'function-args' package,
     put the code snippet below inside the ~Cask~ file.
 
     #+BEGIN_SRC sh
@@ -259,8 +260,8 @@
 
     #+END_SRC
 
-    If a different source then melpa is required, uses the
-    :git keyword, example:
+    Using different source then melpa is possible thanks to depends-on
+    acceptable fetcher keyword, e.g:
 
     #+BEGIN_SRC sh
 
@@ -269,9 +270,15 @@
 
     #+END_SRC
 
+    In the first variant, install the package from a package archive,
+    optionally requiring a minimum-version. In the second variant,
+    install the package from a VCS repository.
+    Replace fetcher with any of the following: :git, :bzr, :hg,
+    :darcs, :svn or :cvs. repourl is the repository URL to install the package from.
+
     See more keywords and detailed usage explanation on [[https://cask.readthedocs.io/en/latest/guide/usage.html][cask guide.]]
 
-*** Installing Packages
+** Installing Packages
 
     To install all packages listed on the ~Cask~ file, uses `cask
     install` inside the same directory that ~Cask~ file resides, e.g:
@@ -283,13 +290,11 @@
     #+END_SRC
 
     - Tip: When problems with missing dependencies were encountered
-           (happens usually when I'm using another source
-           keyword like :git), put the dependency code snippet
-           ~(depends-on "missing-dep-package-name")
-           above the target package and give `cask install`
-           command another shot.
+           (happens usually when I'm using fetcher keyword like :git),
+           put the dependency code snippet ~(depends-on "missing-dep-package-name")
+           above the target package and give `cask install` command another shot.
 
-*** Removing Packages
+** Removing Packages
 
     Manually remove target package directory.
     To find out where the packages was installed, use:
@@ -302,8 +307,6 @@
 
     To avoid package re-installation remove (depends-on
     <package-name>) before `cask install` calls.
-
-    - TIP: Exploration path: ~~/.emacs.d/.cask/<emacs-version>/<source>~
 
     Delete package's folder:
 

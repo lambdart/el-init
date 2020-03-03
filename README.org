@@ -97,6 +97,7 @@
 * Tested on
 
   - FreeBSD 12.1 RELEASE
+  - Debian GNU/Linux 10
 
 * Installation
 
@@ -245,7 +246,7 @@
     Note: We clean minor-mode-map-alist completely, this was proven
     to be a huge gain on productivity and pain relief.
 
-* Cask (Package Manager)
+* Package Manager
 
   Cask is a project management tool for Emacs that helps automate the
   package development cycle; development, dependencies, testing,

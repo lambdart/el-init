@@ -8,7 +8,7 @@
   Just another org-mode based emacs configuration,
   or a elisp interpreter desktop distribution.
 
-** Demo
+** Screenshot
 
   #+CAPTION: EMACS OS
   #+NAME:   fig:EOS-screenshot
@@ -78,8 +78,8 @@
 
   1. Cask
   2. Emacs >= 26.3
-
-  Elisp packages will be described in the =applications= section.
+  3. Emacs Packages (Optional):
+     - Will be described and listed in the =Applications= section.
 
 ** Optional
 
@@ -118,7 +118,7 @@
 * Usage
 
   Using this Emacs configuration isn't different of using
-  Emacs vanilla itself with a “few” reforms.
+  Emacs vanilla itself with a "few" reforms.
   As such, the official Emacs tutorial is a great way to understanding
   a little bit of this amazing universe.
 
@@ -131,10 +131,7 @@
   - Note: The main purpose of the Emacs tutorial is teach you
     the most important standard Emacs commands (functions/keybinds).
 
-  - Note: Some keybinds will not be the same, in the next section
-    will be available a overview on how/where we map elisp function.
-
-** Keybinds
+** Keybinds Strategy
 
    Basically, new prefix maps are created for the most commonly
    used minor modes and their functions are mapped within
@@ -142,74 +139,55 @@
 
    After that, the prefix maps will be placed in the Ctl-x-map prefix
    map, resulting in the standardization of commands (functions)
-   access sequences (keybinds or chords).
+   access sequences (keybinds/chords).
 
 *** Basic
 
     If you do not understand the terminology of the tables below,
-    it is advisable to read the emacs manual in the sections on
-    keys and keymaps.
+    it is advisable to read the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Key-Bindings.html][emacs keybinds manual]].
 
-    - TIP: =C-h r= (info-emacs-manual)
+**** Fundamental
 
-*** Standard
+    | Keyboard | Emacs Notation | Description |
+    |          |                |             |
+    | Alt      | M-             | Meta Key    |
+    | Crtl     | C-             | Command Key |
 
-    | Key        | Prefix | Description    |
-    |            |        |                |
-    | Meta (Alt) | M-     | Global Meta    |
-    | Crtl       | C-     | Global Command |
-    - Table 1.0 (Emacs Basic Prefix)
+**** Keymaps (data structures)
 
-    | Keymap      | Prefix    | Available       |
-    |             |           |                 |
-    | Ctl-x-map   | C-x       | Always (Global) |
-    | <minor>-map | C-x <key> | Always (Global) |
-    | <major>-map | C-c       | Always (Major)  |
-    - Table 1.1 (Emacs Basic Action Prefix)
+     Keymaps are data structures that holds key sequences (chords) and
+     commands (elisp functions).
+
+    | Keymap           | Prefix Key | Available         | Description        |
+    |                  |            |                   |                    |
+    | Global-map       | C- and M-  | Always (static)   | Generic Actions    |
+    | Ctl-x-map        | C-x        | Always (static)   | Generic Actions    |
+    | <Minor-mode>-map | C-x <key>  | Always (static)   | Minor Mode Actions |
+    | <Major-mode>-map | C-c        | Current (dynamic) | Major Mode Actions |
 
 *** C-x
 
-    We define some new keymaps prefix, where the most
-    common and used functions will be placed.
-    The functions are divided between prefix keymaps
-    according to their logical functionality and the mode in
-    which they were defined.
+    EOS's keymaps are defined to hold the most
+    common/used commands (elisp functions), they are
+    divided according to their logical behavior:
 
-    | Prefix Keymap       | Prefix | Description |
-    |                     |        |             |
-    | window              | C-x w  | Window      |
-    | projectile          | C-x p  | Projects    |
-    | flycheck            | C-x e  | Errors      |
-    | tags                | C-x t  | Tags        |
-    | dash                | C-x l  | Library     |
-    | complete-prefix-map | M-`    | Complete    |
-    - Table 1.2 (Global Minor/Actions Prefix Maps)
-
-    - Note: The complete prefix map =M-`= are the only
-      prefix that does not follow the specified pattern.
+    | Prefix Keymap  | Prefix  | Description (Logic Helm) |
+    |                |         |                          |
+    | eos-window-map | C-x w   | Windows                  |
+    | eos-pm-map     | C-x p   | Projects                 |
+    | eos-sc-map     | C-x e   | Errors (Checkers)        |
+    | eos-tags-maps  | C-x t   | Navigation (Tags)        |
+    | eos-docs-maps  | C-x l   | Library (Docs)           |
+    | eos-ac-map     | C-x TAB | Completion               |
 
 *** C-c
 
-    Some maps will be used only in specific modes,
-    like cc-mode for example:
+    Some maps will be only used in specific modes,
+    e.g, cc-mode:
 
     | Mode  | Keymap    | Prefix | Description |
     |       |           |        |             |
     | C/C++ | rtags-map | C-c r  | Rtags       |
-    - Table 1.2 (Global Minor/Actions Prefix Maps)
-
-    - TIP: You always can verify what keys are mapped using
-      helm-descbinds (M-x helm-descbinds or C-h b), you also
-      can use the chord: (prefix key + C-h)  or (prefix key + ?)
-      for example:
-
-      | Keybind   | Description            |
-      | C-x ?     | global action map help |
-      | C-x C-h   | global action map help |
-      | C-x p ?   | project map help       |
-      | C-x l C-h | library map help       |
-      | C-c C-h   | major mode map help    |
-      - Table 1.3 (Prefix Map Help)
 
 *** Global
 
@@ -229,22 +207,31 @@
     | Global | M-j     | eos/edit/duplicate-current-line-or-region |
     | Global | M-n     | eos/edit/move-lines-up                    |
     | Global | M-p     | eos/edit/move-lines-down                  |
-    | Global | C-s-j   | buf-move-up                               |
-    | Global | C-s-k   | buf-move-down                             |
-    | Global | C-s-h   | buf-move-left                             |
-    | Global | C-s-l   | buf-move-right                            |
     | Help   | C-h C-i | helm-info                                 |
     | Help   | C-h a   | helm-apropos                              |
-    - Table 1.4 (Remapped)
+    | Help   | C-h C-b | helm-descbinds                            |
+    | ...    | ...     | ...                                       |
+
+*** Getting help
+
+    To verify what keys are mapped uses list-keybindings
+    (M-x list-keybindings RET or C-h b), it's possible to restrict
+    the search using C-h (or ?) post-fix for a specific map, e.g:
+
+   | Keybind | Description           |
+   | C-h C-h | help-map help         |
+   | C-c C-h | <major>-mode-map help |
+   | C-x C-h | ctl-x-map help        |
+   | C-x l ? | <minor>-mode-map help |
 
 *** Quality of life
 
-    For the sake of sanity we unbind a lot of keys.
-    See the unbind section at ~init.org~ file and comment
-    out your missing chords.
+    For the sake of sanity a lot of keys was unbounded resulting
+    in a more error prone Emacs usage. See the unbind section at
+    ~init.org~ file and comment out your missing chords.
 
-    Note: We clean minor-mode-map-alist completely, this was proven
-    to be a huge gain on productivity and pain relief.
+    Note: The `minor-mode-map-alist' was completely cleaned,
+    this was proven to be a huge gain on productivity and pain relief.
 
 * Package Manager
 
@@ -343,14 +330,14 @@
 
 * Applications
 
-  Well like was said, this configuration (EOS) is used as a desktop
-  distribution, all common applications with different purposes and
-  classification, so directly or indirectly they passe through the
-  Elisp interpreter.
+  Well like was said, this configuration is used as a desktop
+  distribution. All common applications with different purposes and
+  classification (made using elisp or not) directly passes through
+  the Elisp interpreter.
 
   The application list (organized by its classification) can be found
-  at ~docs/apps.org~ and, of course, its configurations are done in the
-  ~src/init.org~ file.
+  at ~docs/apps.org~ and, of course, its configurations (if any) are
+  written in the ~src/init.org~ file.
 
 * Miscellaneous
 ** Advices
@@ -413,12 +400,12 @@
     some dragons, the reward? Walk over the rotten and stinky
     carrion of your enemies, who were defeated by your will,
     and contemplate the symphony formed by the cry of despair
-    contained in the last breath of their widows.
+    contained in their widows.
 
   - Q: Pull requests will be accepted in this repository?
   - A: Probably not, Emacs configurations are too personal,
     fork it or copy any snippet of code that you like:
-    MIT License.
+    MIT License, mate!
 
 * References
 

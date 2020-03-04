@@ -1221,7 +1221,7 @@ current line."
 
 ;; binds
 (when (boundp 'iedit-mode-keymap)
-  (define-key iedit-mode-keymap (kbd "TAB") 'eos/complete-or-indent))
+  (define-key iedit-mode-keymap (kbd "TAB") 'eos/company-or-indent))
 
 (when (require 'undo-tree nil t)
   (progn
@@ -1344,20 +1344,6 @@ current line."
 
     (define-key helm-swoop-map (kbd "C-c s c")
       'helm-multi-swoop-current-mode-from-helm-swoop)))
-
-;; load helm-imenu
-(when (require 'helm-imenu nil t)
-  (progn
-    ;; add hooks
-    (add-hook 'prog-mode
-              (lambda ()
-                ;; bind to C-x `
-                (define-key ctl-x-map (kbd "`") 'helm-imenu-in-all-buffers)))))
-
-;; binds (local map)
-(when (boundp 'helm-imenu-map)
-  (progn
-    (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
 
 (when (require 'dired nil t)
   (progn
@@ -1607,7 +1593,11 @@ current line."
   (progn
     ;; custom
     ;; program invoked by M-x ispell-word and M-x ispell-region commands.
-    (customize-set-variable 'ispell-program-name "aspell")))
+    (customize-set-variable 'ispell-program-name "aspell")
+
+    ;; binds
+    (define-key eos-sc-map (kbd "i") 'ispell-word)
+    (define-key eos-sc-map (kbd "I") 'ispell-buffer)))
 
 ;; add display-buffer-alist
 ;; (add-to-list 'display-buffer-alist
@@ -1627,22 +1617,20 @@ current line."
   (progn
     ;; binds
     (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
-    (define-key eos-sc-map (kbd "m") 'flycheck-mode)
-    (define-key eos-sc-map (kbd "M") 'flycheck-manual)
-    (define-key eos-sc-map (kbd "o") 'flycheck-list-errors)
+    (define-key eos-sc-map (kbd "l") 'flycheck-list-errors)
     (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
+    (define-key eos-sc-map (kbd "d") 'flycheck-disable-checker)
+    ;; (define-key eos-sc-map (kbd "m") 'flycheck-mode)
+    ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
+    ;; (define-key eos-sc-map
+    ;;   (kbd "v") 'flycheck-verify-setup)
 
-    (define-key eos-sc-map
-      (kbd "v") 'flycheck-verify-setup)
+    ;; (define-key eos-sc-map
+    ;;   (kbd "c") 'flycheck-select-checker)
 
-    (define-key eos-sc-map
-      (kbd "c") 'flycheck-select-checker)
 
-    (define-key eos-sc-map
-      (kbd "d") 'flycheck-disable-checker)
-
-    (define-key eos-sc-map
-      (kbd "?") 'flycheck-describe-checker)
+    ;; (define-key eos-sc-map
+    ;;   (kbd "?") 'flycheck-describe-checker)
 
     ;; init flycheck mode after some programming mode
     ;; is activated (c-mode, elisp-mode, etc).
@@ -1937,7 +1925,26 @@ current line."
 ;; binds
 (when (boundp 'markdown-mode-map)
   (progn
-    (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+    (define-key markdown-mode-map (kbd "TAB") 'eos/company-or-indent)))
+
+;; (when (and (require 'google-translate nil t)
+;;            (require 'google-translate-smooth-ui nil t))
+;;   (progn
+;;     ;; custom
+;;     (customize-set-variable
+;;      'google-translate-translation-directions-alist
+;;      '(("pt" . "en") ("en" . "pt")))
+
+;;     ;; default target/source language (e.g: when using at point)
+;;     (customize-set-variable
+;;      'google-translate-default-target-language "pt")
+
+;;     ;;
+;;     (customize-set-variable
+;;      'google-translate-default-source-language "auto")
+
+;;     ;; using pop up buffer, otherwise we can't listen
+;;     (customize-set-variable 'google-translate-output-destination nil)))
 
 (require 'notifications nil t)
 
@@ -1997,9 +2004,6 @@ current line."
     (customize-set-variable
      'rfc-mode-directory (concat (expand-file-name user-emacs-directory) "rfc/"))))
 
-;; bind documentation related functions on eos-docs-map
-(define-key eos-docs-map (kbd "C-g") 'keyboard-quit)
-
 ;; bind eos-docs-map under ctl-x-map
 (define-key ctl-x-map (kbd "l") 'eos-docs-map)
 
@@ -2038,7 +2042,7 @@ current line."
     (customize-set-variable 'company-show-numbers t)
 
     ;; binds (prefix eos-complete map)
-    (define-key eos-complete-map (kbd "M-`") 'company-ispell)
+    (define-key eos-complete-map (kbd "`") 'company-ispell)
     (define-key eos-complete-map (kbd "1") 'company-yasnippet)
     (define-key eos-complete-map (kbd "g") 'company-gtags)
     (define-key eos-complete-map (kbd "f") 'company-files)))
@@ -2117,7 +2121,7 @@ current line."
 (define-key eos-complete-map (kbd "C-g") 'keyboard-quit)
 
 ;; testing
-(define-key eos-complete-map (kbd "M-/") 'hippie-expand)
+(define-key eos-complete-map (kbd "TAB") 'hippie-expand)
 ;; (define-key eos-complete-map (kbd "<tab>") 'eos/complete-or-indent)
 
 ;; binds (global)
@@ -2126,6 +2130,21 @@ current line."
 
 ;; binds eos-complete-map prefix M-] map
 (define-key ctl-x-map (kbd "TAB") 'eos-complete-map)
+
+;; load helm-imenu
+(when (require 'helm-imenu nil t)
+  (progn
+    ;; hooks
+    (add-hook 'prog-mode
+              (lambda ()
+                ;; binds to C-x `
+                (define-key ctl-x-map (kbd "`") 'helm-imenu-in-all-buffers)))
+    ))
+
+;; binds (local map)
+(when (boundp 'helm-imenu-map)
+  (progn
+    (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
 
 (when (require 'helm-gtags nil t)
   (progn
@@ -2259,9 +2278,6 @@ current line."
     ;; hooks
     (add-hook 'projectile-mode-hook 'helm-projectile-on)))
 
-;; exit, keyboard quit
-(define-key eos-pm-map (kbd "C-g") 'keyboard-quit)
-
 ;; set ctl-x-map prefix (C-x p)
 (define-key ctl-x-map (kbd "p") 'eos-pm-map)
 
@@ -2313,8 +2329,8 @@ current line."
     (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
 
     ;; complete or indent
-    (define-key c-mode-map (kbd "TAB") 'eos/complete-or-indent)
-    (define-key c-mode-map (kbd "C-M-i") 'eos/company-or-indent)))
+    (define-key c-mode-map (kbd "TAB") 'eos/company-or-indent)
+    (define-key c-mode-map (kbd "C-M-i") 'eos/helm-company)))
 
 (defun eos/cc/load-rtags ()
   "Load rtags manually."

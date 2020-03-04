@@ -2070,7 +2070,7 @@
 
      ;; binds
      (when (boundp 'iedit-mode-keymap)
-       (define-key iedit-mode-keymap (kbd "TAB") 'eos/complete-or-indent))
+       (define-key iedit-mode-keymap (kbd "TAB") 'eos/company-or-indent))
 
      #+END_SRC
 
@@ -2447,12 +2447,19 @@
 
      - Integration with the Emacs Lisp programming environment
      - A high degree of configurability.
+
      - The ability to have the same shell on every system Emacs has been
        ported to. Since Eshell imposes no external requirements, and
        relies upon only the Lisp functions exposed by Emacs, it is quite
        operating system independent. Several of the common UNIX
        commands, such as ls, mv, rm, ln, etc., have been implemented in
        Lisp in order to provide a more consistent work environment.
+
+      - If there is a command on disk, it will be executed
+        as in a normal shell.  If there is no command by that name on disk,
+        but a Lisp function with that name is defined, the Lisp function
+        will be called, using the arguments passed on the command line.
+
 
 
      #+BEGIN_SRC emacs-lisp
@@ -2679,7 +2686,11 @@
         (progn
           ;; custom
           ;; program invoked by M-x ispell-word and M-x ispell-region commands.
-          (customize-set-variable 'ispell-program-name "aspell")))
+          (customize-set-variable 'ispell-program-name "aspell")
+
+          ;; binds
+          (define-key eos-sc-map (kbd "i") 'ispell-word)
+          (define-key eos-sc-map (kbd "I") 'ispell-buffer)))
 
       ;; add display-buffer-alist
       ;; (add-to-list 'display-buffer-alist
@@ -2717,22 +2728,20 @@
         (progn
           ;; binds
           (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
-          (define-key eos-sc-map (kbd "m") 'flycheck-mode)
-          (define-key eos-sc-map (kbd "M") 'flycheck-manual)
-          (define-key eos-sc-map (kbd "o") 'flycheck-list-errors)
+          (define-key eos-sc-map (kbd "l") 'flycheck-list-errors)
           (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
+          (define-key eos-sc-map (kbd "d") 'flycheck-disable-checker)
+          ;; (define-key eos-sc-map (kbd "m") 'flycheck-mode)
+          ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
+          ;; (define-key eos-sc-map
+          ;;   (kbd "v") 'flycheck-verify-setup)
 
-          (define-key eos-sc-map
-            (kbd "v") 'flycheck-verify-setup)
+          ;; (define-key eos-sc-map
+          ;;   (kbd "c") 'flycheck-select-checker)
 
-          (define-key eos-sc-map
-            (kbd "c") 'flycheck-select-checker)
 
-          (define-key eos-sc-map
-            (kbd "d") 'flycheck-disable-checker)
-
-          (define-key eos-sc-map
-            (kbd "?") 'flycheck-describe-checker)
+          ;; (define-key eos-sc-map
+          ;;   (kbd "?") 'flycheck-describe-checker)
 
           ;; init flycheck mode after some programming mode
           ;; is activated (c-mode, elisp-mode, etc).
@@ -2808,7 +2817,7 @@
 
      #+END_SRC
 
-*** Comparator
+*** Compare
 **** Diff
 
      This package helps you explore differences between files, using the
@@ -3243,13 +3252,40 @@
      ;; binds
      (when (boundp 'markdown-mode-map)
        (progn
-         (define-key markdown-mode-map (kbd "TAB") 'eos/complete-or-indent)))
+         (define-key markdown-mode-map (kbd "TAB") 'eos/company-or-indent)))
 
      #+END_SRC
 
 **** DocView
 **** Pdf-tools
 **** Dictionary
+*** Translate
+**** Google-Translate
+
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (when (and (require 'google-translate nil t)
+     ;;            (require 'google-translate-smooth-ui nil t))
+     ;;   (progn
+     ;;     ;; custom
+     ;;     (customize-set-variable
+     ;;      'google-translate-translation-directions-alist
+     ;;      '(("pt" . "en") ("en" . "pt")))
+
+     ;;     ;; default target/source language (e.g: when using at point)
+     ;;     (customize-set-variable
+     ;;      'google-translate-default-target-language "pt")
+
+     ;;     ;;
+     ;;     (customize-set-variable
+     ;;      'google-translate-default-source-language "auto")
+
+     ;;     ;; using pop up buffer, otherwise we can't listen
+     ;;     (customize-set-variable 'google-translate-output-destination nil)))
+
+     #+END_SRC
+
 *** Notification
 **** Notifications
 
@@ -3372,9 +3408,6 @@
 **** Binds
 
      #+BEGIN_SRC emacs-lisp
-
-     ;; bind documentation related functions on eos-docs-map
-     (define-key eos-docs-map (kbd "C-g") 'keyboard-quit)
 
      ;; bind eos-docs-map under ctl-x-map
      (define-key ctl-x-map (kbd "l") 'eos-docs-map)
@@ -3529,6 +3562,7 @@
 **** Binds
 
      #+BEGIN_SRC emacs-lisp
+
      ;; exit, keyboard quit
      (define-key eos-complete-map (kbd "C-g") 'keyboard-quit)
 
@@ -3798,9 +3832,6 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; exit, keyboard quit
-     (define-key eos-pm-map (kbd "C-g") 'keyboard-quit)
-
      ;; set ctl-x-map prefix (C-x p)
      (define-key ctl-x-map (kbd "p") 'eos-pm-map)
 
@@ -3872,8 +3903,8 @@
          (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
 
          ;; complete or indent
-         (define-key c-mode-map (kbd "TAB") 'eos/complete-or-indent)
-         (define-key c-mode-map (kbd "C-M-i") 'eos/company-or-indent)))
+         (define-key c-mode-map (kbd "TAB") 'eos/company-or-indent)
+         (define-key c-mode-map (kbd "C-M-i") 'eos/helm-company)))
 
      #+END_SRC
 

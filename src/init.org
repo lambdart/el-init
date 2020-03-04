@@ -213,12 +213,19 @@
        "If the current buffer is '~/emacs.d/init.org' the code-blocks are
      tangled, and the tangled file is compiled."
        (interactive)
-       (when (equal (buffer-name) "init.org")
-         (progn
-           ;; Avoid running hooks when tangling.
-           (let ((prog-mode-hook nil))
-             (org-babel-tangle)
-             (byte-compile-file (concat user-emacs-directory "init.el"))))))
+       ;; avoid running hooks when tangling.
+       (let ((prog-mode-hook nil)
+             (buffer (current-buffer)))
+
+         ;; switch or open init.org file
+         (find-file (expand-file-name "init.org" user-emacs-directory))
+
+         ;; tangle and compile
+         (org-babel-tangle)
+         (byte-compile-file (concat user-emacs-directory "init.el"))
+
+         ;; switch to the previous buffer
+         (switch-to-buffer buffer)))
 
      #+END_SRC
 
@@ -1071,6 +1078,21 @@
         ;; enable
         ;; window move default keybinds (shift-up/down etc..)
         (eos/funcall 'windmove-default-keybindings)))
+
+    #+END_SRC
+
+*** Page
+
+    This package provides the page-oriented movement and
+    selection commands documented in the Emacs manual.
+
+    #+BEGIN_SRC emacs-lisp
+
+    (when (require 'page nil t)
+      (progn
+        ;; enable narrow functions
+        (put 'narrow-to-page 'disabled nil)
+        (put 'narrow-to-region 'disabled nil)))
 
     #+END_SRC
 
@@ -2455,10 +2477,10 @@
        commands, such as ls, mv, rm, ln, etc., have been implemented in
        Lisp in order to provide a more consistent work environment.
 
-      - If there is a command on disk, it will be executed
-        as in a normal shell.  If there is no command by that name on disk,
-        but a Lisp function with that name is defined, the Lisp function
-        will be called, using the arguments passed on the command line.
+       - If there is a command on disk, it will be executed
+         as in a normal shell.  If there is no command by that name on disk,
+         but a Lisp function with that name is defined, the Lisp function
+         will be called, using the arguments passed on the command line.
 
 
 
@@ -4469,7 +4491,7 @@
      (define-key ctl-x-map (kbd "{") nil)
      (define-key ctl-x-map (kbd "}") nil)
      (define-key ctl-x-map (kbd "^") nil)
-     (define-key ctl-x-map (kbd "n") nil)
+     ;; (define-key ctl-x-map (kbd "n") nil)
      (define-key ctl-x-map (kbd "f") nil)
      (define-key ctl-x-map (kbd "a") nil)
      (define-key ctl-x-map (kbd "h") nil)

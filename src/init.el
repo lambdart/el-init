@@ -100,12 +100,19 @@
   "If the current buffer is '~/emacs.d/init.org' the code-blocks are
 tangled, and the tangled file is compiled."
   (interactive)
-  (when (equal (buffer-name) "init.org")
-    (progn
-      ;; Avoid running hooks when tangling.
-      (let ((prog-mode-hook nil))
-        (org-babel-tangle)
-        (byte-compile-file (concat user-emacs-directory "init.el"))))))
+  ;; avoid running hooks when tangling.
+  (let ((prog-mode-hook nil)
+        (buffer (current-buffer)))
+
+    ;; switch or open init.org file
+    (find-file (expand-file-name "init.org" user-emacs-directory))
+
+    ;; tangle and compile
+    (org-babel-tangle)
+    (byte-compile-file (concat user-emacs-directory "init.el"))
+
+    ;; switch to the previous buffer
+    (switch-to-buffer buffer)))
 
 (defun eos/load-file (file)
   "Load FILE if exists."
@@ -616,6 +623,12 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; enable
     ;; window move default keybinds (shift-up/down etc..)
     (eos/funcall 'windmove-default-keybindings)))
+
+(when (require 'page nil t)
+  (progn
+    ;; enable narrow functions
+    (put 'narrow-to-page 'disabled nil)
+    (put 'narrow-to-region 'disabled nil)))
 
 (when (require 'kmacro nil t)
   (progn
@@ -2685,7 +2698,7 @@ current line."
 (define-key ctl-x-map (kbd "{") nil)
 (define-key ctl-x-map (kbd "}") nil)
 (define-key ctl-x-map (kbd "^") nil)
-(define-key ctl-x-map (kbd "n") nil)
+;; (define-key ctl-x-map (kbd "n") nil)
 (define-key ctl-x-map (kbd "f") nil)
 (define-key ctl-x-map (kbd "a") nil)
 (define-key ctl-x-map (kbd "h") nil)

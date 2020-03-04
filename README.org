@@ -21,26 +21,26 @@
 * Introduction
 
   Using Emacs (Elisp interpreter) as the only IO bridge
-  between human and machine. In another words, a emacs configuration
+  between human and machine. In other words, an emacs configuration
   well designed and integrated, that provides a generic
   computer environment for everyday use.
 
   Org-mode is used to organize the whole configuration ~src/init.org~
-  in a logic and manageable way, it contains documentation and source code
+  in a logic and manageable way. It contains documentation and source code
   blocks that will be tangled generating ~src/init.el~ script file.
 
-  * Note: For now on the word application(s) means: any elisp
-          packages or external program, and will be used intangibly
-          throughout this document.
+  * Note: For now on the term =application(s)= refers to any
+          elisp package or external program, and will be use
+          without differentiation throughout this document.
 
 ** Features (overview):
 
-    - Just one major language (Elisp) to conquer than all!
-    - Information comes to you as required and not other way around.
+    - Just one major language (Elisp) to conquer them all!
+    - Information comes to you as required and not the other way around.
     - Use the same keybinds everywhere (learn once, use forever and ever).
 
     - Use the same editor capabilities for all applications
-      (or at least try it).
+      (or at least try to).
 
     - Use the same GUI Interface (frames/window/buffers) for all
       applications.
@@ -65,7 +65,7 @@
 
     - Huge improvements in productivity:
       - Stay focused, surfing in the same pleasant and comfortable
-        flow (my prefer kind of mood).
+        flow (my preferred kind of mood).
       - No useless and annoying distractions.
       - Just do what was asked and nothing more.
 
@@ -229,7 +229,7 @@
 
 ** Quality of life
 
-    For the sake of sanity a lot of keys was unbounded resulting
+    For the sake of sanity a lot of keys were unbounded resulting
     in a more error prone Emacs usage. See the unbind section at
     ~init.org~ file and comment out your missing chords.
 

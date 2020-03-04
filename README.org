@@ -29,9 +29,8 @@
   in a logic and manageable way. It contains documentation and source code
   blocks that will be tangled generating ~src/init.el~ script file.
 
-  * Note: For now on the term =application(s)= refers to any
-          elisp package or external program, and will be use
-          without differentiation throughout this document.
+  * Note: Throughout this document, the term =application(s)=
+          refers to any elisp package or external program.
 
 ** Features (overview):
 

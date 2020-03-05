@@ -216,7 +216,7 @@
 
 ** Getting help
 
-    To verify what keys are mapped uses list-keybindings
+    To verify what keys are mapped use list-keybindings
     (M-x list-keybindings RET or C-h b), it's possible to restrict
     the search using C-h (or ?) post-fix for a specific map, e.g:
 
@@ -283,8 +283,8 @@
 
 ** Installing Packages
 
-    To install all packages listed on the ~Cask~ file, uses `cask
-    install` inside the same directory that ~Cask~ file resides, e.g:
+    To install all packages listed on the ~Cask~ file, use `cask
+    install` inside the same directory the ~Cask~ file resides, e.g:
 
     #+BEGIN_SRC sh
 
@@ -292,15 +292,15 @@
 
     #+END_SRC
 
-    - Tip: When problems with missing dependencies were encountered
-           (happens usually when I'm using fetcher keyword like :git),
+    - Tip: When problems with missing dependencies are encountered
+           (usually happens when using fetcher keyword like :git),
            put the dependency code snippet ~(depends-on "missing-dep-package-name")
            above the target package and give `cask install` command another shot.
 
 ** Removing Packages
 
     Manually remove target package directory.
-    To find out where the packages was installed, use:
+    To find out where the packages were installed, use:
 
     #+BEGIN_SRC sh
 

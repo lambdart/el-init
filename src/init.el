@@ -126,11 +126,10 @@ tangled, and the tangled file is compiled."
   (message "Debug-on-error: %s"
            (if debug-on-error "enabled" "disabled")))
 
-(defun eos/buffer-too-big-p ()
-  "Return t if buffer-size if to big."
-  (interactive)
-  (or (> (buffer-size) (* 5000 80))
-      (> (line-number-at-pos (point-max)) 5000)))
+(defun eos/buffer/bigp ()
+  "Return t if buffer-size is too big."
+  (or (> (buffer-size) (* 4086 64))
+      (> (line-number-at-pos (point-max)) 4086)))
 
 (defun eos/mkdir (dir)
   "Create DIR in the file system."
@@ -417,10 +416,11 @@ point is on a symbol, return that symbol name.  Else return nil."
 (customize-set-variable 'load-prefer-newer t)
 
 ;; hooks
-;; (add-hook 'buffer-list-update-hook
-;;           (lambda ()
-;;             (if (eos/buffer-too-big-p)
-;;                 (eos/funcall 'display-line-numbers 0))))
+(add-hook 'buffer-list-update-hook
+          (lambda ()
+            (if (eos/buffer/bigp)
+                (or display-line-numbers
+                    (eos/funcall 'display-line-numbers 0)))))
 
 ;; non-nil means to allow minibuffer commands while in the minibuffer
 (customize-set-variable 'enable-recursive-minibuffers t)
@@ -1344,10 +1344,7 @@ current line."
     (customize-set-variable 'helm-swoop-move-to-line-cycle t)
 
     ;; use face to line numbers on helm-swoop buffer
-    (customize-set-variable 'helm-swoop-use-line-number-face nil)
-
-    ;; bind global
-    (global-set-key (kbd "C-s") 'helm-swoop)))
+    (customize-set-variable 'helm-swoop-use-line-number-face nil)))
 
 ;; binds
 (when (boundp 'helm-swoop-map)
@@ -1357,6 +1354,11 @@ current line."
 
     (define-key helm-swoop-map (kbd "C-c s c")
       'helm-multi-swoop-current-mode-from-helm-swoop)))
+
+(when (require 'helm-occur nil t)
+  (progn
+    ;; binds
+    (global-set-key (kbd "C-s") 'helm-occur)))
 
 (when (require 'dired nil t)
   (progn
@@ -1455,10 +1457,7 @@ current line."
     (add-hook 'shell-mode-hook
               (lambda()
                 ;; do not display continuation lines.
-                (toggle-truncate-lines)
-
-                ;; disable line numbers
-                (display-line-numbers-mode 0)))))
+                (setq truncate-lines nil)))))
 
 (require 'eshell nil t)
 
@@ -1512,10 +1511,7 @@ current line."
     (add-hook 'term-mode-hook
               (lambda()
                 ;; do not display continuation lines.
-                (setq truncate-lines nil)
-
-                ;; disable line numbers mode
-                (display-line-numbers-mode 0)))))
+                (setq truncate-lines nil)))))
 
 (when (require 'multi-term nil t)
   (progn

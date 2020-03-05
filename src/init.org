@@ -263,11 +263,10 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (defun eos/buffer-too-big-p ()
-       "Return t if buffer-size if to big."
-       (interactive)
-       (or (> (buffer-size) (* 5000 80))
-           (> (line-number-at-pos (point-max)) 5000)))
+     (defun eos/buffer/bigp ()
+       "Return t if buffer-size is too big."
+       (or (> (buffer-size) (* 4086 64))
+           (> (line-number-at-pos (point-max)) 4086)))
 
      #+END_SRC
 
@@ -684,7 +683,6 @@
     Configure/customize standard/basic buffer options.
 
     #+BEGIN_SRC emacs-lisp
-
     ;; custom
     ;; non-nil means do not display continuation lines.
     (customize-set-variable 'truncate-lines nil)
@@ -711,10 +709,11 @@
     (customize-set-variable 'load-prefer-newer t)
 
     ;; hooks
-    ;; (add-hook 'buffer-list-update-hook
-    ;;           (lambda ()
-    ;;             (if (eos/buffer-too-big-p)
-    ;;                 (eos/funcall 'display-line-numbers 0))))
+    (add-hook 'buffer-list-update-hook
+              (lambda ()
+                (if (eos/buffer/bigp)
+                    (or display-line-numbers
+                        (eos/funcall 'display-line-numbers 0)))))
 
     #+END_SRC
 
@@ -2273,10 +2272,7 @@
          (customize-set-variable 'helm-swoop-move-to-line-cycle t)
 
          ;; use face to line numbers on helm-swoop buffer
-         (customize-set-variable 'helm-swoop-use-line-number-face nil)
-
-         ;; bind global
-         (global-set-key (kbd "C-s") 'helm-swoop)))
+         (customize-set-variable 'helm-swoop-use-line-number-face nil)))
 
      ;; binds
      (when (boundp 'helm-swoop-map)
@@ -2286,6 +2282,17 @@
 
          (define-key helm-swoop-map (kbd "C-c s c")
            'helm-multi-swoop-current-mode-from-helm-swoop)))
+
+     #+END_SRC
+
+**** Helm-occur
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'helm-occur nil t)
+       (progn
+         ;; binds
+         (global-set-key (kbd "C-s") 'helm-occur)))
 
      #+END_SRC
 
@@ -2455,10 +2462,7 @@
          (add-hook 'shell-mode-hook
                    (lambda()
                      ;; do not display continuation lines.
-                     (toggle-truncate-lines)
-
-                     ;; disable line numbers
-                     (display-line-numbers-mode 0)))))
+                     (setq truncate-lines nil)))))
 
      #+END_SRC
 
@@ -2551,10 +2555,7 @@
          (add-hook 'term-mode-hook
                    (lambda()
                      ;; do not display continuation lines.
-                     (setq truncate-lines nil)
-
-                     ;; disable line numbers mode
-                     (display-line-numbers-mode 0)))))
+                     (setq truncate-lines nil)))))
 
      #+END_SRC
 

@@ -1,15 +1,22 @@
 (source melpa)
 
 ;; project management
-(depends-on "magit")
 (depends-on "helm-projectile")
 (depends-on "projectile")
-(depends-on "editorconfig")
-(depends-on "cmake-ide")
 
-;; syntax check & completition
+;; version control
+(depends-on "magit")
+
+;; compilation
+(depends-on "cmake-ide")
+;; (depends-on "helm-compile"
+;;               :git "https://github.com/esac-io/helm-compile")
+
+;; syntax check
 (depends-on "helm-flycheck")
 (depends-on "flycheck")
+
+;; completion
 (depends-on "yasnippet")
 (depends-on "helm-company")
 (depends-on "company-shell")
@@ -19,15 +26,20 @@
 (depends-on "company")
 (depends-on "irony")
 
+;; office
+(depends-on "dictionary")
+(depends-on "pdf-tools")
+(depends-on "markdown-mode")
+
+;; translate
+(depends-on "google-translate")
+
 ;; search
 (depends-on "helm-swoop")
 (depends-on "helm-ag")
 
 ;; help
 (depends-on "helm-descbinds")
-
-;; office
-(depends-on "markdown-mode")
 
 ;; documentation
 (depends-on "helm-dash")
@@ -40,7 +52,7 @@
 ;; security
 (depends-on "password-store")
 
-;; networking
+;; remote access
 (depends-on "helm-tramp")
 
 ;; apparence
@@ -49,6 +61,7 @@
 ;;              :git "https://github.com/esac-io/moebius-theme")
 
 ;; edit
+(depends-on "editorconfig")
 (depends-on "iedit")
 (depends-on "undo-tree"
             :git "http://www.dr-qubit.org/git/undo-tree.git")
@@ -62,8 +75,8 @@
 (depends-on "web-mode")
 (depends-on "cmake-mode")
 (depends-on "lua-mode")
-;; (depends-on "helm-compile"
-;;               :git "https://github.com/esac-io/helm-compile")
+(depends-on "elixir-mode")
+(depends-on "csharp-mode")
 
 ;; debuggers
 (depends-on "rmsbolt"
@@ -82,13 +95,13 @@
 ;; dashboard
 (depends-on "dashboard")
 
-;; misc
+;; window
 (depends-on "buffer-move")
 
 ;; term & shell
 (depends-on "multi-term")
 
-;; tester
+;; analysis
 (depends-on "verb")
 
 ;; bar

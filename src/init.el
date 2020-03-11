@@ -1063,7 +1063,7 @@ current line."
 
     ;; if non-nil, prevent escaping from minibuffer with other-window
     ;; during the helm sessions
-    (customize-set-variable 'helm-prevent-escaping-from-minibuffer nil)
+    (customize-set-variable 'helm-prevent-escaping-from-minibuffer t)
 
     ;; use the same state of window split, vertical or horizontal
     (customize-set-variable 'helm-split-last-window-split-state t)
@@ -1528,20 +1528,32 @@ current line."
     (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
     (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
 
-(defun eos/launch/st ()
-  "Launch st terminal."
+(defun eos/launch/xterm ()
+  "Launch x11 default terminal."
   (interactive)
-  (eos/run/proc "st"))
+  (eos/run/proc "urxvt"))
 
 (when (require 'shr nil t)
   (progn
-    (customize-set-variable 'shr-width 80)
+    ;; custom
+    ;; frame width to use for rendering
+    (customize-set-variable 'shr-width 120)
+
+    ;; if non-nil, use proportional fonts for text
     (customize-set-variable 'shr-use-fonts nil)
+
+    ;; if non-nil, respect color specifications in the HTML
     (customize-set-variable 'shr-use-colors nil)
-    (customize-set-variable 'shr-inhibit-images t)
-    (customize-set-variable 'shr-blocked-images t)
-    (customize-set-variable 'shr-color-visible-distance-min 10)
-    (customize-set-variable 'shr-color-visible-luminance-min 80)))
+
+    ;; if non-nil, inhibit loading images
+    (customize-set-variable 'shr-inhibit-images nil)
+
+    ;; images that have URLs matching this regexp will be blocked (regexp)
+    (customize-set-variable 'shr-blocked-images nil)))
+
+    ;; todo better research
+    ;; (customize-set-variable 'shr-color-visible-distance-min 10)
+    ;; (customize-set-variable 'shr-color-visible-luminance-min 80)
 
 (when (require 'eww nil t)
   (progn
@@ -1936,24 +1948,25 @@ current line."
   (progn
     (define-key markdown-mode-map (kbd "TAB") 'eos/company-or-indent)))
 
-;; (when (and (require 'google-translate nil t)
-;;            (require 'google-translate-smooth-ui nil t))
-;;   (progn
-;;     ;; custom
-;;     (customize-set-variable
-;;      'google-translate-translation-directions-alist
-;;      '(("pt" . "en") ("en" . "pt")))
+(when (and (require 'google-translate nil t)
+           (require 'google-translate-smooth-ui nil t))
+  (progn
+    ;; custom
 
-;;     ;; default target/source language (e.g: when using at point)
-;;     (customize-set-variable
-;;      'google-translate-default-target-language "pt")
+    ;; translate directions associative list
+    (customize-set-variable
+     'google-translate-translation-directions-alist
+     '(("pt" . "en") ("en" . "pt")))
 
-;;     ;;
-;;     (customize-set-variable
-;;      'google-translate-default-source-language "auto")
+    ;; default target/source language (e.g: when using at point)
+    (customize-set-variable
+     'google-translate-default-target-language "pt")
 
-;;     ;; using pop up buffer, otherwise we can't listen
-;;     (customize-set-variable 'google-translate-output-destination nil)))
+    ;; default source language (automatic)
+    (customize-set-variable 'google-translate-default-source-language "auto")
+
+    ;; using pop up buffer, otherwise we can't listen
+    (customize-set-variable 'google-translate-output-destination nil)))
 
 (require 'notifications nil t)
 
@@ -2596,6 +2609,30 @@ current line."
 (require 'julia-mode nil t)
 
 (require 'ess-julia nil t)
+
+(require 'csharp-mode nil t)
+
+(when (require 'elixir-mode nil t)
+  (progn
+    ;; custom
+    ;; additional arguments to `mix format`'
+    ;; (customize-set-variable 'elixir-format-arguments nil)
+
+    ;; hooks
+    (add-hook 'elixir-mode-hook
+              (lambda ()
+                ;; set company backends
+                (eos/company/set-backends
+                 '((company-yasnippet
+                    company-keywords
+                    company-dabbrev-code)
+                   (company-files)))
+
+                ;; set syntax checker
+                ;; eos/flycheck/set-cheker '<elixir-checker>)
+
+                ;; set dash docsets
+                (eos/dash/activate-docset '"Elixir")))))
 
 (require 'vhdl-mode nil t)
 

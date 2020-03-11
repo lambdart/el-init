@@ -1,5 +1,5 @@
 #+TITLE: Emacs Configuration File
-#+AUTHOR: Isaac "esac"
+#+AUTHOR: esac-io (Isaac)
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
 
@@ -1825,7 +1825,7 @@
 
          ;; if non-nil, prevent escaping from minibuffer with other-window
          ;; during the helm sessions
-         (customize-set-variable 'helm-prevent-escaping-from-minibuffer nil)
+         (customize-set-variable 'helm-prevent-escaping-from-minibuffer t)
 
          ;; use the same state of window split, vertical or horizontal
          (customize-set-variable 'helm-split-last-window-split-state t)
@@ -2583,35 +2583,54 @@
 
      #+END_SRC
 
-**** St
+**** XTerm
 
-     St - st is a simple terminal implementation for X.
+     X11 default terminal of choice: urxvt.
+
+     Rxvt-unicode (ouR XVT, unicode) - (a VT102 emulator for the X
+     window system).
 
      #+BEGIN_SRC emacs-lisp
 
-     (defun eos/launch/st ()
-       "Launch st terminal."
+     (defun eos/launch/xterm ()
+       "Launch x11 default terminal."
        (interactive)
-       (eos/run/proc "st"))
+       (eos/run/proc "urxvt"))
 
      #+END_SRC
 
 *** Browser
 **** Shr
 
-     Html parse options.
+     This package takes a HTML parse tree (as provided by
+     libxml-parse-html-region) and renders it in the current buffer.  It
+     does not do CSS, JavaScript or anything advanced: It's geared
+     towards rendering typical short snippets of HTML, like what you'd
+     find in HTML email and the like.
 
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'shr nil t)
        (progn
-         (customize-set-variable 'shr-width 80)
+         ;; custom
+         ;; frame width to use for rendering
+         (customize-set-variable 'shr-width 120)
+
+         ;; if non-nil, use proportional fonts for text
          (customize-set-variable 'shr-use-fonts nil)
+
+         ;; if non-nil, respect color specifications in the HTML
          (customize-set-variable 'shr-use-colors nil)
-         (customize-set-variable 'shr-inhibit-images t)
-         (customize-set-variable 'shr-blocked-images t)
-         (customize-set-variable 'shr-color-visible-distance-min 10)
-         (customize-set-variable 'shr-color-visible-luminance-min 80)))
+
+         ;; if non-nil, inhibit loading images
+         (customize-set-variable 'shr-inhibit-images nil)
+
+         ;; images that have URLs matching this regexp will be blocked (regexp)
+         (customize-set-variable 'shr-blocked-images nil)))
+
+     ;; todo better research
+     ;; (customize-set-variable 'shr-color-visible-distance-min 10)
+     ;; (customize-set-variable 'shr-color-visible-luminance-min 80)
 
      #+END_SRC
 
@@ -3285,27 +3304,34 @@
 *** Translate
 **** Google-Translate
 
+     Google translate interface.
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; (when (and (require 'google-translate nil t)
-     ;;            (require 'google-translate-smooth-ui nil t))
-     ;;   (progn
-     ;;     ;; custom
-     ;;     (customize-set-variable
-     ;;      'google-translate-translation-directions-alist
-     ;;      '(("pt" . "en") ("en" . "pt")))
+     (when (and (require 'google-translate nil t)
+                (require 'google-translate-smooth-ui nil t))
+       (progn
+         ;; custom
+         ;; alist of translation directions
+         ;; each of direction could be selected directly in
+         ;; the minibuffer during translation.
+         (customize-set-variable
+          'google-translate-translation-directions-alist
+          '(("pt" . "en") ("en" . "pt")))
 
-     ;;     ;; default target/source language (e.g: when using at point)
-     ;;     (customize-set-variable
-     ;;      'google-translate-default-target-language "pt")
+         ;; default target language
+         (customize-set-variable
+          'google-translate-default-target-language "pt")
 
-     ;;     ;;
-     ;;     (customize-set-variable
-     ;;      'google-translate-default-source-language "auto")
+         ;; default source language
+         ;; "auto" if you want Google Translate to always detect the source language
+         (customize-set-variable 'google-translate-default-source-language
+                                 "auto")
 
-     ;;     ;; using pop up buffer, otherwise we can't listen
-     ;;     (customize-set-variable 'google-translate-output-destination nil)))
+         ;; determines where translation output will be displayed, if
+         ;; `nil' the translation output will be displayed in the pop up
+         ;; buffer (default).
+         (customize-set-variable 'google-translate-output-destination nil)))
 
      #+END_SRC
 
@@ -4234,47 +4260,52 @@
      #+END_SRC
 
 *** Python
+**** Python
 
-    Syntax highlighting, Indentation, Movement, Shell
-    interaction, Shell completion, Shell virtualenv support, Shell
-    package support, Shell syntax highlighting, Pdb tracking, Symbol
-    completion, Skeletons, FFAP, Code Check, Eldoc, Imenu.
+     Major mode for editing Python files with some fontification and
+     indentation bits extracted from original Dave Love's python.el
+     found in GNU/Emacs.
 
-    #+BEGIN_SRC emacs-lisp
+     Implements Syntax highlighting, Indentation, Movement, Shell
+     interaction, Shell completion, Shell virtualenv support, Shell
+     package support, Shell syntax highlighting, Pdb tracking, Symbol
+     completion, Skeletons, FFAP, Code Check, Eldoc, Imenu.
 
-    (when (require 'python nil t)
-      (progn
-        ;; custom
-        ;; default Python interpreter for shell
-        (customize-set-variable 'python-shell-interpreter "python2.7")
+     #+BEGIN_SRC emacs-lisp
 
-        ;; non-nil means template skeletons will be automagically inserted
-        (customize-set-variable 'python-skeleton-autoinsert t)
+     (when (require 'python nil t)
+       (progn
+         ;; custom
+         ;; default Python interpreter for shell
+         (customize-set-variable 'python-shell-interpreter "python2.7")
 
-        ;; hooks
-        ;; enable modes
-        (add-hook 'python-mode-hook
-                  (lambda()
-                    ;; enable eldoc mode
-                    (eos/funcall 'eldoc-mode 1)))
+         ;; non-nil means template skeletons will be automagically inserted
+         (customize-set-variable 'python-skeleton-autoinsert t)
 
-        ;; set backends
-        (add-hook 'python-mode-hook
-                  (lambda ()
-                    ;; set company backends
-                    (eos/company/set-backends
-                     '((company-yasnippet
-                        company-keywords
-                        company-dabbrev-code)
-                       (company-files)))
+         ;; hooks
+         ;; enable modes
+         (add-hook 'python-mode-hook
+                   (lambda()
+                     ;; enable eldoc mode
+                     (eos/funcall 'eldoc-mode 1)))
 
-                    ;; set flycheck checker
-                    (eos/flycheck/set-checker 'python-pycompile)
+         ;; set backends
+         (add-hook 'python-mode-hook
+                   (lambda ()
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-yasnippet
+                         company-keywords
+                         company-dabbrev-code)
+                        (company-files)))
 
-                    ;; set dash docsets
-                    (eos/dash/activate-docset '"Python 3")))))
+                     ;; set flycheck checker
+                     (eos/flycheck/set-checker 'python-pycompile)
 
-    #+END_SRC
+                     ;; set dash docsets
+                     (eos/dash/activate-docset '"Python 3")))))
+
+     #+END_SRC
 
 *** Go
 **** Go-mode
@@ -4332,7 +4363,51 @@
      #+END_SRC
 
 *** C#
+**** Csharp-mode
+
+     This is a major mode for editing C# code.  It performs automatic
+     indentation of C# syntax; font locking; and integration with
+     imenu.el.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'csharp-mode nil t)
+
+     #+END_SRC
+
 *** Clojure
+*** Elixir
+**** Elixir-mode
+
+     Provides font-locking, indentation and navigation support
+     for the Elixir programming language.
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'elixir-mode nil t)
+       (progn
+         ;; custom
+         ;; additional arguments to `mix format`'
+         ;; (customize-set-variable 'elixir-format-arguments nil)
+
+         ;; hooks
+         (add-hook 'elixir-mode-hook
+                   (lambda ()
+                     ;; set company backends
+                     (eos/company/set-backends
+                      '((company-yasnippet
+                         company-keywords
+                         company-dabbrev-code)
+                        (company-files)))
+
+                     ;; set syntax checker
+                     ;; eos/flycheck/set-cheker '<elixir-checker>)
+
+                     ;; set dash docsets
+                     (eos/dash/activate-docset '"Elixir")))))
+
+     #+END_SRC
+
 *** Vhdl
 **** Vhdl-mode
 
@@ -4655,4 +4730,4 @@
 ** EOF
 
    "See You Space Cowboy.."
-   | Cowboy Bebop
+   | Cowboy Bebop |

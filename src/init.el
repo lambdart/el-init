@@ -1254,59 +1254,6 @@ current line."
 
 (require 'ibuffer nil t)
 
-(when (require 'dashboard nil t)
-  (progn
-    ;; items
-    (customize-set-variable 'dashboard-items
-                            '((recents . 4)
-                              (projects . 4)
-                              (agenda . 4)
-                              (bookmarks . 4)))
-
-    ;; banners directory
-    (customize-set-variable 'dashboard-banners-directory
-                            (concat user-emacs-directory "banner/"))
-
-    ;; banner
-    (customize-set-variable 'dashboard-startup-banner 1)
-
-    ;; page separator
-    (customize-set-variable 'dashboard-page-separator "
-
- ")
-
-    ;; footer icon
-    (customize-set-variable 'dashboard-footer-icon
-                            #(" " 0 1 (face dashboard-footer)))
-
-    ;; a footer with some short message
-    (customize-set-variable 'dashboard-footer
-                            "Litany Against Fear
-
-  I must not fear.
-  Fear is the mind-killer.
-  Fear is the little-death that brings total obliteration.
-  I will face my fear.
-  I will permit it to pass over me and through me.
-  And when it has gone past I will turn the inner eye to see its path.
-  Where the fear has gone there will be nothing.
-  Only I will remain.
-  ")
-
-    ;; a list of messages, one of which dashboard chooses to display
-    (customize-set-variable 'dashboard-footer-messages nil)
-
-    ;; set initial buffer choice (emacsclient fix)
-    (customize-set-variable 'initial-buffer-choice
-                            (lambda ()
-                              (let ((initial-buffer (get-buffer "*dashboard*")))
-                                (unless initial-buffer
-                                  (setq initial-buffer (get-buffer "*scratch*")))
-                                initial-buffer)))
-
-    ;; init dashboard after emacs initialize
-    (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
-
 (when (require 'artist nil t)
   (progn
     ;; custom
@@ -1375,6 +1322,14 @@ current line."
     (progn
       (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
       (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)))
+
+(require 'dired-subtree nil t)
+
+;; binds
+(when (boundp 'dired-mode-map)
+  (progn
+    (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
+    (define-key dired-mode-map (kbd ";") 'dired-subtree-remove)))
 
 (require 'elfeed nil t)
 
@@ -1546,14 +1501,10 @@ current line."
     (customize-set-variable 'shr-use-colors nil)
 
     ;; if non-nil, inhibit loading images
-    (customize-set-variable 'shr-inhibit-images nil)
+    (customize-set-variable 'shr-inhibit-images t)
 
     ;; images that have URLs matching this regexp will be blocked (regexp)
     (customize-set-variable 'shr-blocked-images nil)))
-
-    ;; todo better research
-    ;; (customize-set-variable 'shr-color-visible-distance-min 10)
-    ;; (customize-set-variable 'shr-color-visible-luminance-min 80)
 
 (when (require 'eww nil t)
   (progn
@@ -1714,10 +1665,12 @@ current line."
     (add-hook 'ediff-cleanup-hook 'ediff-toggle-wide-display)
     (add-hook 'ediff-suspend-hook 'ediff-toggle-wide-display)))
 
-(when (require 'helm-external nil t)
+(when (require 'dmenu nil t)
   (progn
     ;; bind (C-x) prefix map
-    (define-key ctl-x-map (kbd "C-l") 'helm-run-external-command)))
+    (define-key ctl-x-map (kbd "C-l") 'dmenu)))
+
+(require 'helm-external nil t)
 
 (when (require 'comint nil t)
   (progn
@@ -1841,6 +1794,71 @@ current line."
 (global-set-key (kbd "s--") 'eos/lower-volume)
 (global-set-key (kbd "s-=") 'eos/raise-volume)
 
+(when (require 'dashboard nil t)
+  (progn
+    ;; items
+    (customize-set-variable 'dashboard-items
+                            '((recents . 4)
+                              (projects . 4)
+                              (agenda . 4)
+                              (bookmarks . 4)))
+
+    ;; banners directory
+    (customize-set-variable 'dashboard-banners-directory
+                            (concat user-emacs-directory "banner/"))
+
+    ;; banner
+    (customize-set-variable 'dashboard-startup-banner 1)
+
+    ;; page separator
+    (customize-set-variable 'dashboard-page-separator "
+
+ ")
+
+    ;; footer icon
+    (customize-set-variable 'dashboard-footer-icon
+                            #(" " 0 1 (face dashboard-footer)))
+
+    ;; a footer with some short message
+    (customize-set-variable 'dashboard-footer
+                            "Litany Against Fear
+
+  I must not fear.
+  Fear is the mind-killer.
+  Fear is the little-death that brings total obliteration.
+  I will face my fear.
+  I will permit it to pass over me and through me.
+  And when it has gone past I will turn the inner eye to see its path.
+  Where the fear has gone there will be nothing.
+  Only I will remain.
+  ")
+
+    ;; when non nil, a footer will be displayed at the bottom.
+    (customize-set-variable 'dashboard-set-footer t)
+
+    ;; a list of messages, one of which dashboard chooses to display
+    (customize-set-variable 'dashboard-footer-messages nil)
+
+    ;; when non nil, file lists will have icons
+    (customize-set-variable 'dashboard-set-file-icons t)
+
+    ;;    when non nil, heading sections will have icons
+    (customize-set-variable 'dashboard-set-heading-icons t)
+
+    ;; set initial buffer choice (emacsclient fix)
+    (customize-set-variable 'initial-buffer-choice
+                            (lambda ()
+                              (let ((initial-buffer (get-buffer "*dashboard*")))
+                                (unless initial-buffer
+                                  (setq initial-buffer (get-buffer "*scratch*")))
+                                initial-buffer)))
+
+    ;; init dashboard after emacs initialize
+    (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
+
+(add-to-list 'load-path
+             (concat user-emacs-directory "elpa/helm-youtube"))
+
 (require 'helm-youtube nil t)
 
 ;; binds
@@ -1948,24 +1966,52 @@ current line."
   (progn
     (define-key markdown-mode-map (kbd "TAB") 'eos/company-or-indent)))
 
+(when (require 'doc-view nil t)
+  (progn
+    ;; custom
+    ;; the base directory, where the PNG images will be saved
+    (customize-set-variable
+     'doc-view-cache-directory
+     (concat (expand-file-name user-emacs-directory) "cache/docview"))
+
+    ;; in continuous mode reaching the page edge advances to next/previous page
+    (customize-set-variable 'doc-view-continuous t)))
+
+(when (require 'dictionary nil t)
+  (progn
+    ;; custom
+    ;; create some clickable buttons on top of the window if non-nil
+    (customize-set-variable 'dictionary-create-buttons nil)
+
+    ;; should the dictionary command reuse previous dictionary buffers?
+    (customize-set-variable 'dictionary-use-single-buffer t)
+
+    ;; binds
+    (define-key eos-docs-map (kbd "d") 'dictionary-search)))
+
 (when (and (require 'google-translate nil t)
            (require 'google-translate-smooth-ui nil t))
   (progn
     ;; custom
-
-    ;; translate directions associative list
+    ;; alist of translation directions
+    ;; each of direction could be selected directly in
+    ;; the minibuffer during translation.
     (customize-set-variable
      'google-translate-translation-directions-alist
      '(("pt" . "en") ("en" . "pt")))
 
-    ;; default target/source language (e.g: when using at point)
+    ;; default target language
     (customize-set-variable
      'google-translate-default-target-language "pt")
 
-    ;; default source language (automatic)
-    (customize-set-variable 'google-translate-default-source-language "auto")
+    ;; default source language
+    ;; "auto" if you want Google Translate to always detect the source language
+    (customize-set-variable 'google-translate-default-source-language
+                            "auto")
 
-    ;; using pop up buffer, otherwise we can't listen
+    ;; determines where translation output will be displayed, if
+    ;; `nil' the translation output will be displayed in the pop up
+    ;; buffer (default).
     (customize-set-variable 'google-translate-output-destination nil)))
 
 (require 'notifications nil t)

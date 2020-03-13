@@ -1,5 +1,11 @@
 (source melpa)
 
+;; launcher
+(depends-on "dmenu")
+
+;; feeds
+(depends-on "elfeed")
+
 ;; project management
 (depends-on "helm-projectile")
 (depends-on "projectile")
@@ -9,8 +15,8 @@
 
 ;; compilation
 (depends-on "cmake-ide")
-;; (depends-on "helm-compile"
-;;               :git "https://github.com/esac-io/helm-compile")
+;; (depends-on "helm-compile";
+;;             :git "https://github.com/esac-io/helm-compile")
 
 ;; syntax check
 (depends-on "helm-flycheck")
@@ -46,7 +52,7 @@
 (depends-on "rfc-mode")
 
 ;; multimedia
-(depends-on "helm-youtube")
+;; (depends-on "helm-youtube")
 (depends-on "emms")
 
 ;; security
@@ -59,6 +65,10 @@
 (depends-on "all-the-icons")
 ;; (depends-on "moebius-theme"
 ;;              :git "https://github.com/esac-io/moebius-theme")
+
+;; file
+(depends-on "dired-subtree")
+(depends-on "dired-toggle-sudo")
 
 ;; edit
 (depends-on "editorconfig")
@@ -102,6 +112,7 @@
 (depends-on "multi-term")
 
 ;; analysis
+(depends-on "request")
 (depends-on "verb")
 
 ;; bar

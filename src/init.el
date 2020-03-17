@@ -997,7 +997,7 @@ current line."
 
 (when (require 'buffer-move nil t)
   (progn
-    ;; bind
+    ;; binds
     (global-set-key (kbd "<C-S-up>") 'buf-move-up)
     (global-set-key (kbd "<C-S-down>") 'buf-move-down)
     (global-set-key (kbd "<C-S-left>") 'buf-move-left)
@@ -1323,13 +1323,26 @@ current line."
       (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
       (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)))
 
-(require 'dired-subtree nil t)
+(when (require 'dired-subtree nil t)
+  (progn
+    ;; custom
+    ;; default depth expanded by `dired-subtree-cycle'
+    (customize-set-variable 'dired-subtree-cycle-depth 2)
+
+    ;; a prefix put into each nested subtree
+    (customize-set-variable 'dired-subtree-line-prefix "  ")
+
+    ;; specifies how the prefix is fontified, subtree
+    (customize-set-variable 'dired-subtree-line-prefix-face 'subtree)
+
+    ;; when non-nil, add a background face to a subtree listing.
+    (customize-set-variable 'dired-subtree-use-backgrounds nil)))
 
 ;; binds
 (when (boundp 'dired-mode-map)
   (progn
-    (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
-    (define-key dired-mode-map (kbd ";") 'dired-subtree-remove)))
+    (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
+    (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))
 
 (require 'elfeed nil t)
 
@@ -1501,7 +1514,7 @@ current line."
     (customize-set-variable 'shr-use-colors nil)
 
     ;; if non-nil, inhibit loading images
-    (customize-set-variable 'shr-inhibit-images t)
+    (customize-set-variable 'shr-inhibit-images nil)
 
     ;; images that have URLs matching this regexp will be blocked (regexp)
     (customize-set-variable 'shr-blocked-images nil)))

@@ -1739,11 +1739,13 @@
 *** Window
 **** Buffer-move
 
+     Swap windows/buffer position (layout).
+
      #+BEGIN_SRC emacs-lisp
 
      (when (require 'buffer-move nil t)
        (progn
-         ;; bind
+         ;; binds
          (global-set-key (kbd "<C-S-up>") 'buf-move-up)
          (global-set-key (kbd "<C-S-down>") 'buf-move-down)
          (global-set-key (kbd "<C-S-left>") 'buf-move-left)
@@ -2124,7 +2126,6 @@
      #+END_SRC
 
 *** View
-
 *** Buffer
 **** Ibuffer
 
@@ -2272,15 +2273,34 @@
 
 **** Dired-subtree
 
+     This package defines function `dired-subtree-insert' which instead
+     inserts the subdirectory directly below its line in the original
+     listing, and indent the listing of subdirectory to resemble a
+     tree-like structure (somewhat similar to tree(1) except the pretty
+     graphics).
+
      #+BEGIN_SRC emacs-lisp
 
-     (require 'dired-subtree nil t)
+     (when (require 'dired-subtree nil t)
+       (progn
+         ;; custom
+         ;; default depth expanded by `dired-subtree-cycle'
+         (customize-set-variable 'dired-subtree-cycle-depth 2)
+
+         ;; a prefix put into each nested subtree
+         (customize-set-variable 'dired-subtree-line-prefix "  ")
+
+         ;; specifies how the prefix is fontified, subtree
+         (customize-set-variable 'dired-subtree-line-prefix-face 'subtree)
+
+         ;; when non-nil, add a background face to a subtree listing.
+         (customize-set-variable 'dired-subtree-use-backgrounds nil)))
 
      ;; binds
      (when (boundp 'dired-mode-map)
        (progn
-         (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
-         (define-key dired-mode-map (kbd ";") 'dired-subtree-remove)))
+         (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
+         (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))
 
      #+END_SRC
 
@@ -2576,7 +2596,7 @@
          (customize-set-variable 'shr-use-colors nil)
 
          ;; if non-nil, inhibit loading images
-         (customize-set-variable 'shr-inhibit-images t)
+         (customize-set-variable 'shr-inhibit-images nil)
 
          ;; images that have URLs matching this regexp will be blocked (regexp)
          (customize-set-variable 'shr-blocked-images nil)))
@@ -3543,6 +3563,7 @@
      Company is a modular completion framework.
      Modules for retrieving completion candidates are called backends,
      modules for displaying them are front-ends.
+
 
      #+BEGIN_SRC emacs-lisp
 

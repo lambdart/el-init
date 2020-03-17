@@ -121,7 +121,7 @@ rfc
 emms
 request
 image-dired
-dmenu
+dmenu-items
 
 # .el
 custom.el

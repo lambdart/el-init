@@ -1165,6 +1165,49 @@ current line."
     ;; the base Scale Factor for the `height' face property of an icon
     (customize-set-variable 'all-the-icons-scale-factor 1.0)))
 
+(when (require 'nsm nil t)
+  (progn
+    ;; custom
+
+    ;; how secure the network should be.
+    ;; If a potential problem with the security of the network
+    ;; connection is found, the user is asked to give input
+    ;; into how the connection should be handled
+    ;; `high': This warns about additional things that many
+    ;; people would not find useful.
+    ;; `paranoid': On this level, the user is queried for
+    ;; most new connections
+    (customize-set-variable 'network-security-level 'high)))
+
+(when (require 'tls nil t)
+  (progn
+    ;; custom
+
+    ;; indicate if certificates should be checked against trusted root certs
+    ;; if this is ‘ask’, the user can decide whether to accept an
+    ;; untrusted certificate
+    (customize-set-variable 'tls-checktrust 'ask)
+
+    ;; list of strings containing commands to
+    ;; start TLS stream to a host
+    (customize-set-variable
+     'tls-program
+     "openssl s_client -connect %h:%p -no_ssl3 -no_ssl2 -ign_eof -CAfile %t")))
+
+(when (require  'gnutls nil t)
+  (progn
+    ;; custom
+    ;; if non-nil, this should be a TLS priority string
+    (customize-set-variable
+     'gnutls-algorithm-priority "normal:-dhe-rsa")
+
+    ;; if non-nil, this should be t or a list of checks
+    ;; per hostname regex
+    (customize-set-variable 'gnutls-verify-error t)
+
+    ;; functions
+    (defun gnutls-available-p () nil)))
+
 (when (require 'epa nil t)
   (progn
     ;; custom
@@ -1402,22 +1445,13 @@ current line."
     (customize-set-variable 'erc-show-channel-key-p t)
 
     ;; kill all query (also channel) buffers of this server on QUIT.
-    (customize-set-variable 'erc-kill-queries-on-quit t)
-
-    ;; functions
-    (defun eos/irc-tls ()
-      "A `erc-tls function interface."
-      (interactive)
-      (let ((server "irc.freenode.net")
-            (nick "esac-io"))
-        (erc-tls :server server :port 6697 :nick nick
-                 :password (eos/lookup-password server nick 6697))))))
+    (customize-set-variable 'erc-kill-queries-on-quit t)))
 
 ;; binds
 (when (boundp 'erc-mode-map)
   (progn
     ;; use eos/complete
-    (define-key erc-mode-map (kbd "TAB") 'eos/complete)))
+    (define-key erc-mode-map (kbd "TAB") 'eos/company-or-indent)))
 
 (when (require 'shell nil t)
   (progn
@@ -2403,7 +2437,7 @@ current line."
                 ;; load rtags
                 (eos/cc/load-rtags)))))
 
-;; binds
+;; binds (c-mode map)
 (when (boundp 'c-mode-map)
   (progn
     ;; set rtags prefix map in c-mode map (C-c r)
@@ -2412,6 +2446,16 @@ current line."
     ;; complete or indent
     (define-key c-mode-map (kbd "TAB") 'eos/company-or-indent)
     (define-key c-mode-map (kbd "C-M-i") 'eos/helm-company)))
+
+;; binds (c++-mode-map)
+(when (boundp 'c++-mode-map)
+  (progn
+    ;; set rtags prefix map in c-mode map (C-c r)
+    (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
+
+    ;; complete or indent
+    (define-key c++-mode-map (kbd "TAB") 'eos/company-or-indent)
+    (define-key c++-mode-map (kbd "C-M-i") 'eos/helm-company)))
 
 (defun eos/cc/load-rtags ()
   "Load rtags manually."

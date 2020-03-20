@@ -1966,7 +1966,80 @@
 *** Session
 **** Desktop
 *** Security
+**** Network
+***** Nsm
+
+      Network Security Manager.
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'nsm nil t)
+        (progn
+          ;; custom
+
+          ;; how secure the network should be.
+          ;; If a potential problem with the security of the network
+          ;; connection is found, the user is asked to give input
+          ;; into how the connection should be handled
+          ;; `high': This warns about additional things that many
+          ;; people would not find useful.
+          ;; `paranoid': On this level, the user is queried for
+          ;; most new connections
+          (customize-set-variable 'network-security-level 'paranoid)))
+
+      #+END_SRC
+
 **** Encryption
+***** Tls
+
+      This package implements a simple wrapper around "gnutls-cli" to
+      make Emacs support TLS/SSL.
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'tls nil t)
+        (progn
+          ;; custom
+          ;; indicate if certificates should be checked against trusted root certs
+          ;; if this is ‘ask’, the user can decide whether to accept an
+          ;; untrusted certificate
+          (customize-set-variable 'tls-checktrust t)
+
+          ;; list of strings containing commands to
+          ;; start TLS stream to a host
+          ;; (customize-set-variable
+          ;;  'tls-program
+          ;;  '("openssl s_client -connect %h:%p -CAfile %t"))
+          (customize-set-variable
+           'tls-program
+           '("gnutls-cli --x509cafile %t -p %p %h" "gnutls-cli --x509cafile %t -p %p %h --protocols ssl3 ssl2"))))
+
+      #+END_SRC
+
+***** Gnutls
+
+      This package provides language bindings for the GnuTLS library
+      using the corresponding core functions in gnutls.c
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require  'gnutls nil t)
+         (progn
+           ;; custom
+           ;; if non-nil, this should be a TLS priority string
+           (customize-set-variable 'gnutls-algorithm-priority nil)
+
+           ;; if non-nil, this should be t or a list of checks
+           ;; per hostname regex
+           (customize-set-variable 'gnutls-verify-error t)))
+
+           ;; functions
+           (defun gnutls-available-p ()
+             "Function redefined in order not to use built-in GnuTLS support"
+           nil)
+
+      #+END_SRC
+
 ***** Epa
 
       EasyPG is an all-in-one GnuPG interface for Emacs.
@@ -2392,22 +2465,13 @@
          (customize-set-variable 'erc-show-channel-key-p t)
 
          ;; kill all query (also channel) buffers of this server on QUIT.
-         (customize-set-variable 'erc-kill-queries-on-quit t)
-
-         ;; functions
-         (defun eos/irc-tls ()
-           "A `erc-tls function interface."
-           (interactive)
-           (let ((server "irc.freenode.net")
-                 (nick "esac-io"))
-             (erc-tls :server server :port 6697 :nick nick
-                      :password (eos/lookup-password server nick 6697))))))
+         (customize-set-variable 'erc-kill-queries-on-quit t)))
 
      ;; binds
      (when (boundp 'erc-mode-map)
        (progn
          ;; use eos/complete
-         (define-key erc-mode-map (kbd "TAB") 'eos/complete)))
+         (define-key erc-mode-map (kbd "TAB") 'eos/company-or-indent)))
 
      #+END_SRC
 
@@ -4042,7 +4106,7 @@
                      ;; load rtags
                      (eos/cc/load-rtags)))))
 
-     ;; binds
+     ;; binds (c-mode map)
      (when (boundp 'c-mode-map)
        (progn
          ;; set rtags prefix map in c-mode map (C-c r)
@@ -4051,6 +4115,16 @@
          ;; complete or indent
          (define-key c-mode-map (kbd "TAB") 'eos/company-or-indent)
          (define-key c-mode-map (kbd "C-M-i") 'eos/helm-company)))
+
+     ;; binds (c++-mode-map)
+     (when (boundp 'c++-mode-map)
+       (progn
+         ;; set rtags prefix map in c-mode map (C-c r)
+         (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
+
+         ;; complete or indent
+         (define-key c++-mode-map (kbd "TAB") 'eos/company-or-indent)
+         (define-key c++-mode-map (kbd "C-M-i") 'eos/helm-company)))
 
      #+END_SRC
 

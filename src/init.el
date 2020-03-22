@@ -508,7 +508,7 @@ point is on a symbol, return that symbol name.  Else return nil."
               (lambda ()
                 ;; set the default appearance of fringes on the selected frame
                 ;; 1 ->  ("no-fringes" . 0)
-                (set-fringe-style 1)))))
+                (set-fringe-style 0)))))
 
 (when (require 'files nil t)
   (progn
@@ -995,14 +995,6 @@ current line."
 (add-to-list 'display-buffer-alist
              '("\\*Async Shell Command\\*" display-buffer-no-window))
 
-(when (require 'buffer-move nil t)
-  (progn
-    ;; binds
-    (global-set-key (kbd "<C-S-up>") 'buf-move-up)
-    (global-set-key (kbd "<C-S-down>") 'buf-move-down)
-    (global-set-key (kbd "<C-S-left>") 'buf-move-left)
-    (global-set-key (kbd "<C-S-right>") 'buf-move-right)))
-
 (when (require 'helm nil t)
   (progn
     ;; require
@@ -1177,36 +1169,39 @@ current line."
     ;; people would not find useful.
     ;; `paranoid': On this level, the user is queried for
     ;; most new connections
-    (customize-set-variable 'network-security-level 'high)))
+    (customize-set-variable 'network-security-level 'paranoid)))
 
 (when (require 'tls nil t)
   (progn
     ;; custom
-
     ;; indicate if certificates should be checked against trusted root certs
     ;; if this is ‘ask’, the user can decide whether to accept an
     ;; untrusted certificate
-    (customize-set-variable 'tls-checktrust 'ask)
+    (customize-set-variable 'tls-checktrust t)
 
     ;; list of strings containing commands to
     ;; start TLS stream to a host
+    ;; (customize-set-variable
+    ;;  'tls-program
+    ;;  '("openssl s_client -connect %h:%p -CAfile %t"))
     (customize-set-variable
      'tls-program
-     "openssl s_client -connect %h:%p -no_ssl3 -no_ssl2 -ign_eof -CAfile %t")))
+     '("gnutls-cli --x509cafile %t -p %p %h" "gnutls-cli --x509cafile %t -p %p %h --protocols ssl3 ssl2"))))
 
 (when (require  'gnutls nil t)
   (progn
     ;; custom
     ;; if non-nil, this should be a TLS priority string
-    (customize-set-variable
-     'gnutls-algorithm-priority "normal:-dhe-rsa")
+    (customize-set-variable 'gnutls-algorithm-priority nil)
 
     ;; if non-nil, this should be t or a list of checks
     ;; per hostname regex
-    (customize-set-variable 'gnutls-verify-error t)
+    (customize-set-variable 'gnutls-verify-error t)))
 
-    ;; functions
-    (defun gnutls-available-p () nil)))
+;; functions
+(defun gnutls-available-p ()
+  "Function redefined in order not to use built-in GnuTLS support"
+  nil)
 
 (when (require 'epa nil t)
   (progn
@@ -1296,6 +1291,14 @@ current line."
 (eos/funcall 'editorconfig-mode)
 
 (require 'ibuffer nil t)
+
+(when (require 'buffer-move nil t)
+  (progn
+    ;; binds
+    (define-key ctl-x-map (kbd "<C-up>") 'buf-move-up)
+    (define-key ctl-x-map (kbd "<C-down>") 'buf-move-down)
+    (define-key ctl-x-map (kbd "<C-left>") 'buf-move-left)
+    (define-key ctl-x-map (kbd "<C-right>")'buf-move-right)))
 
 (when (require 'artist nil t)
   (progn
@@ -1714,6 +1717,20 @@ current line."
 
 (when (require 'dmenu nil t)
   (progn
+    ;; custom
+    ;; string to display in the dmenu prompt
+    (customize-set-variable 'dmenu-prompt-string "dmenu: ")
+
+    ;; determines on how many recently executed commands
+    ;; dmenu should keep a record
+    (customize-set-variable 'dmenu-history-size 8)
+
+    ;; file in which the dmenu state is
+    ;; saved between Emacs sessions
+    (customize-set-variable
+     'dmenu-save-file
+     (concat (expand-file-name user-emacs-directory) "dmenu-items"))
+
     ;; bind (C-x) prefix map
     (define-key ctl-x-map (kbd "C-l") 'dmenu)))
 
@@ -2793,30 +2810,33 @@ current line."
 ;; (define-key ctl-x-map (kbd "C-SPC") nil)
 ;; (define-key ctl-x-map (kbd "C-=") nil)
 ;; (define-key ctl-x-map (kbd "C-0") nil)
-;; (define-key ctl-x-map (kbd "C-z") nil)
 ;; (define-key ctl-x-map (kbd "C--") nil)
 ;; (define-key ctl-x-map (kbd "ESC") nil)
 ;; (define-key ctl-x-map (kbd ".") nil)
 ;; (define-key ctl-x-map (kbd "C-l") nil)
-(define-key ctl-x-map (kbd "C-d") nil)
 ;; (define-key ctl-x-map (kbd "C-x") nil)
-(define-key ctl-x-map (kbd "C-j") nil)
-(define-key ctl-x-map (kbd "C-<left>") nil)
-(define-key ctl-x-map (kbd "C-<right>") nil)
-(define-key ctl-x-map (kbd "C-<up>") nil)
-(define-key ctl-x-map (kbd "C-<down>") nil)
+;; (define-key ctl-x-map (kbd "C-<left>") nil)
+;; (define-key ctl-x-map (kbd "C-<right>") nil)
+;; (define-key ctl-x-map (kbd "C-<up>") nil)
+;; (define-key ctl-x-map (kbd "C-<down>") nil)
 (define-key ctl-x-map (kbd "<right>") nil)
 (define-key ctl-x-map (kbd "<left>") nil)
+
+(define-key ctl-x-map (kbd "C-o") nil)
+(define-key ctl-x-map (kbd "C-d") nil)
+(define-key ctl-x-map (kbd "C-c") nil)
+(define-key ctl-x-map (kbd "C-j") nil)
 (define-key ctl-x-map (kbd "C-+") nil)
 (define-key ctl-x-map (kbd "C-a") nil)
 (define-key ctl-x-map (kbd "C-r") nil)
 (define-key ctl-x-map (kbd "C-n") nil)
+(define-key ctl-x-map (kbd "C-z") nil)
 (define-key ctl-x-map (kbd "C-p") nil)
-;; (define-key ctl-x-map (kbd "C-o") nil)
 (define-key ctl-x-map (kbd "C-h") nil)
 (define-key ctl-x-map (kbd "C-u") nil)
 (define-key ctl-x-map (kbd "C-\@") nil)
 (define-key ctl-x-map (kbd "M-:") nil)
+
 (define-key ctl-x-map (kbd "`") nil)
 (define-key ctl-x-map (kbd "]") nil)
 ;; (define-key ctl-x-map (kbd "[") nil)

@@ -1390,7 +1390,18 @@ current line."
     (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
     (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))
 
-(require 'elfeed nil t)
+(when (require 'elfeed nil t)
+  (progn
+    ;; custom
+    ;; directory where elfeed will store its database.
+    (customize-set-variable
+     'elfeed-db-directory
+     (concat (expand-file-name user-emacs-directory) "elfeed"))
+
+    ;; default directory for saving enclosures. Hide
+    (customize-set-variable
+     'elfeed-enclosure-default-dir
+     (concat (expand-file-name user-emacs-directory) "cache/elfeed"))))
 
 (when (require 'moody nil t)
   (progn
@@ -1472,11 +1483,10 @@ current line."
 (when (require 'term nil t)
   (progn
     ;; custom
-    ;; if non-nil, is file name to use for explicitly requested inferior shell. (reference)
-    (customize-set-variable 'explicit-shell-file-name
-                            (if (eq system-type "gnu/linux")
-                                "/usr/bin/fish"
-                              "/usr/local/bin/fish"))
+    ;; if non-nil, is file name to use for explicitly
+    ;; requested inferior shell
+    (customize-set-variable
+     'explicit-shell-file-name (getenv "SHELL"))
 
     ;; if non-nil, add a ‘/’ to completed directories
     (customize-set-variable 'term-completion-addsuffix t)
@@ -1575,6 +1585,7 @@ current line."
     ;; (customize-set-variable eww-form-checkbox-symbol "☐") ; Unicode hex 2610
     ;; (customize-set-variable eww-form-checkbox-selected-symbol "☑") ; Unicode hex 2611
 
+    ;; functions
     ;; Re-write of the `eww-search-words' definition.
     (defun eos/eww-search-words ()
       "Search the web for the text between BEG and END.
@@ -1592,6 +1603,14 @@ current line."
         (if (stringp search-string)
             (eww search-string)
           (call-interactively #'eww))))
+
+    ;; hooks
+    (add-hook 'eww-mode-hook
+              (lambda ()
+                ;; disable truncate lines
+                (setq truncate-lines nil)))
+
+    ;; when-progn ends here
     ))
 
 ;; binds
@@ -2102,11 +2121,16 @@ current line."
 
 (when (require 'dash-docs nil t)
   (progn
-    ;; custom (fix async?)
-    ;; (customize-set-variable
-    ;;  'dash-docs-use-workaround-for-emacs-bug t)
+    ;; custom
+    ;; default path for docsets
+    (customize-set-variable
+     'dash-docs-docsets-path
+     (concat (expand-file-name user-emacs-directory) "docsets"))
 
-    ;; bind
+    ;; minimum length to start searching in docsets
+    (customize-set-variable 'dash-docs-min-length 2)
+
+    ;; binds
     (define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)))
 
 (when (require 'helm-dash nil t)
@@ -2134,7 +2158,8 @@ current line."
     ;; custom
     ;; the directory where RFC documents are stored
     (customize-set-variable
-     'rfc-mode-directory (concat (expand-file-name user-emacs-directory) "rfc/"))))
+     'rfc-mode-directory
+     (concat (expand-file-name user-emacs-directory) "rfc/"))))
 
 ;; bind eos-docs-map under ctl-x-map
 (define-key ctl-x-map (kbd "l") 'eos-docs-map)
@@ -2801,6 +2826,12 @@ current line."
 (when (boundp 'web-mode-engines-alist)
   (progn
     (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'")))))
+
+(when (require 'conf-mode nil t)
+  (progn
+    ;; add files extensions to be handled by conf-mode
+    (add-to-list 'auto-mode-alist '("\\.compose\\'" . conf-mode))
+    (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))))
 
 ;; clean esc map
 (define-key esc-map (kbd "ESC") nil)

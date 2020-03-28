@@ -102,7 +102,7 @@ history
 # Cask file
 Cask
 
-# Emacs Dirs (Packages)
+# Emacs Packages directories
 tutorial
 irony
 eshell
@@ -122,8 +122,10 @@ emms
 request
 image-dired
 dmenu-items
+elfeed
+docsets
 
-# .el
+# Emacs private/custom elisp files
 custom.el
 private.el
 eos-adapt.el

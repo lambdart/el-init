@@ -1,5 +1,4 @@
-#+author: Isaac "esac-io"
-#+date: <2020-02-17 Mon>
+#+author: esac
 #+startup: overview
 #+property: header-args :comments yes :results silent
 
@@ -7,7 +6,7 @@
 
   Just another org-mode based emacs configuration,
   or a elisp interpreter desktop distribution.
-  | What!? |
+  | Wait... What!? |
 
 ** Screenshot
 
@@ -21,16 +20,18 @@
 * Introduction
 
   Using Emacs (Elisp interpreter) as the only IO bridge
-  between human and machine. In other words, an emacs configuration
-  well designed and integrated, that provides a generic
+  between human and machine. In another words, an emacs configuration
+  well designed and integrated that provides a generic
   computer environment for everyday use.
 
-  Org-mode is used to organize the whole configuration ~src/init.org~
-  in a logic and manageable way. It contains documentation and source code
-  blocks that will be tangled generating ~src/init.el~ script file.
+  Org-mode is used to organize the whole configuration in just
+  one file ~src/init.org~. It contains source code blocks
+  (plus/maybe a little documentation) that will be tangled,
+  generating ~src/init.el~ script file.
 
-  * Note: Throughout this document, the term =application(s)=
-          refers to any elisp package or external program.
+  * Note: Throughout this document the word =application(s)=
+          is used in reference of =elisp packages= and =external
+          programs= and is used without distinction!
 
 ** Features (overview):
 
@@ -41,7 +42,7 @@
     - Use the same editor capabilities for all applications
       (or at least try to).
 
-    - Use the same GUI Interface (frames/window/buffers) for all
+    - Use the same =GUI Interface= (frames/window/buffers) for all
       applications.
 
     - Just one development environment for all languages:
@@ -59,19 +60,23 @@
       - Rationalization
       - Measurement
 
-    - Understand that data is generic and can be manipulated
+    - Understand that data is generic (in computer science we deal
+      with idealize components) and can be manipulated (transformed)
       through different paths.
 
     - Huge improvements in productivity:
-      - Stay focused, surfing in the same pleasant and comfortable
+      - Stay focused, surfing in the same pleasant/comfortable
         flow (my preferred kind of mood).
-      - No useless and annoying distractions.
+      - No useless/annoying distractions.
       - Just do what was asked and nothing more.
 
-    - Decrease the gap between the beginning and the end in any
-      process of interest.
-    - Absolute control!
-    - All integrated and easily/transparent communication between peers:
+    - Decrease the gap between: =a prof of concept - "final" release!=
+
+    - Provide tools to easily investigate any process/procedure of
+      interest.
+
+    - Communication between peers are transparent, proving easy
+      integration for any module (streaming of data):
       - Packages
       - Buffers/Windows/Frames
       - External applications
@@ -85,8 +90,8 @@
 
 ** Optional
 
-   External programs that are massively used by some Emacs packages
-   used in this configuration to improve its usability.
+   Some =emacs packages= used in this configuration require
+   external (non-lisp) programs:
 
    1. agrep
    2. global
@@ -122,7 +127,7 @@
   Using this Emacs configuration isn't different of using
   Emacs vanilla itself with a "few" reforms.
   As such, the official Emacs tutorial is a great way to understanding
-  a little bit of this amazing universe.
+  a little bit of its universe.
 
   So, open Emacs and press =C-h= (the help map prefix) and
   press =t= to evaluate ~help-with-tutorial~ function that will
@@ -131,7 +136,13 @@
   - Enjoy your late nights :)
 
   - Note: The main purpose of the Emacs tutorial is teach you
-    the most important standard Emacs commands (functions/keybinds).
+    the most important standard Emacs commands and the mapped
+    keybinds used to trigger then.
+
+  - Key binds -> Functions : (-> means map)
+
+  - Remember everything (literally, `every-fuck-thing) is a function inside
+    the lisp interpreter (elisp).
 
 * Keybinds Strategy
 
@@ -356,7 +367,7 @@
       according to their logical classification.
 
    6. Use the same action flow logic, for the same class of commands.
-      Habits die hard (increases the usability!).
+      Habits die hard (usability - KISS!).
 
    7. Use as few modules(packages) as possible and always try to use
       modules already installed on emacs to meet your needs.
@@ -364,11 +375,11 @@
       or no effort, and the gain is considerable.
       So be alert to identify these situations!
 
-   8. Prioritize emacs's native packages(buildin) over third-party.
+   8. Prioritize emacs's native packages(builtin) over third-party.
       If any demand comes to light try to resolve with these packages
       first, then third-party packages already installed and
       finally(maybe) the internet. Sometimes a little extension
-      on this blotted-packages sets, are everything we need to
+      on this blotted-packages sets are everything we need to
       bring a new feature to live or resolve a issue.
 
    9. Successive refinements: in constant refactoring!
@@ -381,9 +392,9 @@
 
   - Q: Why don't you use evil/hydra/which-key/use-package?
   - A: It is not just a matter of taste, it is simply because
-    they get in the way, disturbing, the desired transformation to
-    occur, and I prefer a more direct, simply and effective approach.
-    Remember that’s the way I think, you can always add these modules
+    they get in the way disturbing the desired transformation to
+    occur, and I prefer a more direct/effective approach.
+    Remember that’s the way I think, you can add these modules
     on your own and make your life a little more miserable, be my guess!
 
   - Q: And what about ivy/counsel/swiper?
@@ -394,18 +405,18 @@
 
   - Q: Why won't just use Doom/Centaur/Spacemacs or any other
     distribution?
-  - A: Because I wanted to learn/understand more about Emacs (and
-    Elisp) its details and usage, and make your own configuration
-    is a great exercise which will provide more control/knowledge
-    over your most used tool!
+  - A: Because I wanted to learn more about Emacs (and
+    Elisp in general) its details (where the devil lives), so make
+    your own configuration is a great exercise which will provide
+    more control/knowledge over your most used tool!
 
   - Q: Do you think that everyone who uses Emacs should make their own
     configuration ~init.el~?
-  - A: For sure! It's fun like explore some dungeons and slay
-    some dragons, the reward? Walk over the rotten and stinky
+  - A: For sure! It's fun like explore mystical dungeons and slay
+    some horrible dragons. The reward? Walk over the rotten and stinky
     carrion of your enemies, who were defeated by your will,
     and contemplate the symphony formed by the cry of despair
-    contained in their widows.
+    whispered by their widows.
 
   - Q: Pull requests will be accepted in this repository?
   - A: Probably not, Emacs configurations are too personal,

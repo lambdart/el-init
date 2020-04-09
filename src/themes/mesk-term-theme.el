@@ -83,6 +83,7 @@
     `(font-lock-variable-name-face ((t (:foreground ,fgyellow))))
     `(font-lock-warning-face ((t (:foreground ,fgorange :inherit unspecified :weight bold))))
     `(fringe ((t (:background unspecified :inherit default))))
+    ;; `(fringe ((t nil)))
     `(italic ((t (:slant italic))))
     `(match ((t (:background ,yellow :foreground "#262626"))))
     `(nobreak-hyphen ((t (:foreground ,red))))
@@ -101,9 +102,15 @@
     `(link-visited ((t (:foreground ,magenta :underline t))))
 
     ;;; Mode Line
-    `(mode-line ((t (:background "#222222" :foreground ,white :box (:color "#222222" :line-width 2 :style nil)))))
-    `(mode-line-buffer-id ((t (:foreground ,blue :weight semi-bold))))
-    `(mode-line-inactive ((t (:weight normal :background ,bggray :foreground ,white))))
+    ;; `(mode-line ((t nil)))))
+    ;; `(mode-line-emphasis ((t nil)))
+    ;; `(mode-line-inactive ((t nil)))
+
+    ;; `(mode-line ((t (:background "#262626" :foreground "#bfbfbf" :box (:color "#262626" :line-width 2 :style nil)))))
+    `(mode-line ((t (:background "#262626" :foreground "#bfbfbf"))))
+    `(mode-line-buffer-id ((t (:foreground ,blue :weight normal))))
+    ;; `(mode-line-inactive ((t (:weight 1 :background ,bggray :foreground ,white))))
+    ;; `(mode-line-inactive ((t (:weight 1 :background ,bggray :foreground ,white))))
 
     ;;; Highlight numbers
     `(highlight ((t (:background "#1c1c1c"))))

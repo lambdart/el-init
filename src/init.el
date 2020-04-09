@@ -503,12 +503,11 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 (when (require 'fringe nil t)
   (progn
-    ;; disable
-    (add-hook 'after-init-hook
-              (lambda ()
-                ;; set the default appearance of fringes on the selected frame
-                ;; 1 ->  ("no-fringes" . 0)
-                (set-fringe-style 0)))))
+    ;; custom
+    ;; 0 -> ("no-fringes" . 0), remove ugly icons to represet new lines
+    ;; ascii is more than enough to represent this information
+    ;; default appearance of fringes on all frame
+    (customize-set-variable 'fringe-mode 0)))
 
 (when (require 'files nil t)
   (progn
@@ -1004,12 +1003,9 @@ current line."
     ;; idle time before updating, specified in seconds (variable defined as float)
     (customize-set-variable 'helm-input-idle-delay 0.01)
 
-    ;; the default side to display `helm-buffer'
-    (customize-set-variable 'helm-split-window-default "below")
-
     ;; set autoresize max and mim height
-    (customize-set-variable 'helm-autoresize-max-height 40)
-    (customize-set-variable 'helm-autoresize-min-height 40)
+    (customize-set-variable 'helm-autoresize-max-height 30)
+    (customize-set-variable 'helm-autoresize-min-height 30)
 
     ;; enable fuzzing matching
     (customize-set-variable 'helm-M-x-fuzzy-match t)
@@ -1028,6 +1024,12 @@ current line."
     ;; forces split inside selected window when non-nil
     (customize-set-variable 'helm-split-window-inside-p t)
 
+    ;;
+    (customize-set-variable 'helm-always-two-windows t)
+
+    ;;
+    (customize-set-variable 'helm-full-frame nil)
+
     ;; cycle to the beginning or end of the list after reaching the bottom or top
     (customize-set-variable 'helm-move-to-line-cycle-in-source t)
 
@@ -1035,7 +1037,7 @@ current line."
     (customize-set-variable 'helm-scroll-amount 8)
 
     ;; send current input in header-line when non-nil
-    (customize-set-variable 'helm-echo-input-in-header-line t)
+    (customize-set-variable 'helm-echo-input-in-header-line nil)
 
     ;; display header-line when non nil
     (customize-set-variable 'helm-display-header-line nil)
@@ -1050,15 +1052,15 @@ current line."
     (customize-set-variable 'helm-ff-file-name-history-use-recentf t)
 
     ;; this enable support for completing-read-multiple
-    ;; and completion-at-point when non--nil
-    (customize-set-variable 'helm-mode-handle-completion-in-region t)
+    ;; and completion-at-point when non nil
+    (customize-set-variable 'helm-mode-handle-completion-in-region nil)
 
     ;; if non-nil, prevent escaping from minibuffer with other-window
     ;; during the helm sessions
     (customize-set-variable 'helm-prevent-escaping-from-minibuffer t)
 
     ;; use the same state of window split, vertical or horizontal
-    (customize-set-variable 'helm-split-last-window-split-state t)
+    ;; (customize-set-variable 'helm-split-last-window-split-state t)
 
     ;; helm left marginal area for display of a buffer
     (customize-set-variable 'helm-left-margin-width 1)
@@ -1409,20 +1411,23 @@ current line."
     (customize-set-variable 'x-underline-at-descent-line t)
 
     ;; change line height
-    (customize-set-variable 'moody-mode-line-height 32)
+    (customize-set-variable 'moody-mode-line-height 2)
 
     ;; mode-line format
     (customize-set-variable 'mode-line-format
-                            '("%e  "
+                            '("%e"
                               ;; "%*%& %l:%c | %I "
-                              ;; mode-line-mule-info
-                              "%*%& "
+                              " "
+                              mode-line-mule-info
+                              mode-line-modified
+                              ;; " %*%& "
                               ;; mode-line-misc-info
                               ;; mode-line-percent-position
-                              "(%l:%c) / %I  "
-                              mode-line-misc-info
-                              ""
+                              ;; "(%l:%c)  %I  "
+                              " %l:%c "
+                              ;; mode-line-misc-info
                               moody-mode-line-buffer-identification
+                              ""
                               " %m "
                               (vc-mode moody-vc-mode)
                               " "
@@ -1999,6 +2004,11 @@ current line."
 ;; non-nil means C-a and C-e behave specially in headlines and items
 (customize-set-variable 'org-special-ctrl-a/e t)
 
+;; languages which can be evaluated in Org buffers.
+(customize-set-variable 'org-babel-load-languages
+                        '((emacs-lisp . t)
+                          (python . t)))
+
 (add-hook 'org-mode-hook
           (lambda ()
             ;; do not truncate lines
@@ -2059,6 +2069,8 @@ current line."
 
     ;; in continuous mode reaching the page edge advances to next/previous page
     (customize-set-variable 'doc-view-continuous t)))
+
+
 
 (when (require 'dictionary nil t)
   (progn

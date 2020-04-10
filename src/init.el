@@ -371,6 +371,9 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; binds ctl-x-map (C-x w)
 (define-key ctl-x-map (kbd "w") 'eos-window-map)
 
+;; switch to buffer
+(define-key ctl-x-map (kbd "C-b") 'switch-to-buffer)
+
 ;; kill buffer and window
 (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
 
@@ -424,6 +427,63 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; non-nil means to allow minibuffer commands while in the minibuffer
 (customize-set-variable 'enable-recursive-minibuffers t)
+
+;; if non-nil, `read-answer' accepts single-character answers
+(customize-set-variable 'read-answer-short t)
+
+;; non-nil means completion ignores case when reading a buffer name.
+(customize-set-variable 'read-buffer-completion-ignore-case t)
+
+(when (require 'minibuffer nil t)
+  (progn
+    ;; custom
+
+    ;; number of completion candidates below which cycling is used
+    (customize-set-variable 'completion-cycle-threshold 3)
+
+    ;; treat the SPC or - inserted by `minibuffer-complete-word as delimiters
+    (customize-set-variable 'completion-pcm-complete-word-inserts-delimiters t)
+
+    ;; a string of characters treated as word delimiters for completion
+    (customize-set-variable 'completion-pcm-word-delimiters "-_./:| ")
+
+    ;; on-nil means show help message in *Completions* buffer
+    (customize-set-variable 'completion-show-help nil)
+
+    ;; list of completion styles to use: see `completion-styles-alist variable
+    (customize-set-variable 'completion-styles '(partial-completion substring initials flex))
+
+    ;; list of category-specific user overrides for completion styles.
+    (customize-set-variable 'completion-category-overrides
+                            '((file (styles initials basic))
+                              (buffer (styles initials basic))
+                              (info-menu (styles basic))))
+
+    ;; define the appearance and sorting of completions
+    (customize-set-variable 'completions-format 'vertical)   ; *Completions* buffer
+
+    ;; non-nil means when reading a file name completion ignores case
+    (customize-set-variable 'read-file-name-completion-ignore-case t)
+
+    ;; how to resize mini-windows (the minibuffer and the echo area)
+    ;; a value of t means resize them to fit the text displayed in them
+    (customize-set-variable 'resize-mini-windows t)
+
+    ;; enable
+    ;; If `file-name-shadow-mode' is active, any part of the
+    ;; minibuffer text that would be ignored because of this is given the
+    ;; properties in `file-name-shadow-properties', which may
+    ;; be used to make the ignored text invisible, dim, etc.
+    (file-name-shadow-mode 1)
+
+    ;; when active, any recursive use of the minibuffer will show
+    ;; the recursion depth in the minibuffer prompt, this is only
+    ;; useful if `enable-recursive-minibuffers' is non-nil
+    (minibuffer-depth-indicate-mode 1)
+
+    ;; when active, minibuffer prompts that show a default value only show
+    ;; the default when it's applicable
+    (minibuffer-electric-default-mode 1)))
 
 ;; coding system to use with system messages
 (customize-set-variable 'locale-coding-system 'utf-8)
@@ -753,7 +813,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; custom
     ;; how far to search in the buffer when looking for completions. Hide
     ;; in number of characters.  If nil, search the whole buffer.
-    (customize-set-variable 'completion-search-distance 0)
+    (customize-set-variable 'completion-search-distance nil)
 
     ;; if non-nil, the next completion prompt does a cdabbrev search.
     (customize-set-variable 'completion-cdabbrev-prompt-flag t)
@@ -976,17 +1036,6 @@ current line."
 ;; enable
 ;; (exwm-randr-enable)
 
-(defvar eos/helm-source-exwm-buffers
-  nil
-  "Helm exwm buffers source.")
-
-(when (require 'helm-exwm nil t)
-  (progn
-    ;; exwm buffers list
-    (setq eos/helm-source-exwm-buffers
-          (if (fboundp 'helm-exwm-build-source)
-              (helm-exwm-build-source)))))
-
 (require 'async nil t)
 (require 'async-bytecomp nil t)
 
@@ -994,151 +1043,40 @@ current line."
 (add-to-list 'display-buffer-alist
              '("\\*Async Shell Command\\*" display-buffer-no-window))
 
-(when (require 'helm nil t)
-  (progn
-    ;; require
-    (require 'helm-config nil t)
-
-    ;; custom
-    ;; idle time before updating, specified in seconds (variable defined as float)
-    (customize-set-variable 'helm-input-idle-delay 0.01)
-
-    ;; set autoresize max and mim height
-    (customize-set-variable 'helm-autoresize-max-height 30)
-    (customize-set-variable 'helm-autoresize-min-height 30)
-
-    ;; enable fuzzing matching
-    (customize-set-variable 'helm-M-x-fuzzy-match t)
-    (customize-set-variable 'helm-imenu-fuzzy-match t)
-    (customize-set-variable 'helm-recentf-fuzzy-match t)
-    (customize-set-variable 'helm-apropos-fuzzy-match t)
-    (customize-set-variable 'helm-lisp-fuzzy-completion t)
-    (customize-set-variable 'helm-buffers-fuzzy-matching t)
-
-    ;; helm-M-x save command in extended-command-history even when it fail
-    (customize-set-variable 'helm-M-x-always-save-history t)
-
-    ;; always show details in buffer list when non-nil
-    (customize-set-variable 'helm-buffer-details-flag t)
-
-    ;; forces split inside selected window when non-nil
-    (customize-set-variable 'helm-split-window-inside-p t)
-
-    ;;
-    (customize-set-variable 'helm-always-two-windows t)
-
-    ;;
-    (customize-set-variable 'helm-full-frame nil)
-
-    ;; cycle to the beginning or end of the list after reaching the bottom or top
-    (customize-set-variable 'helm-move-to-line-cycle-in-source t)
-
-    ;; scroll amount when scrolling other window in a helm session
-    (customize-set-variable 'helm-scroll-amount 8)
-
-    ;; send current input in header-line when non-nil
-    (customize-set-variable 'helm-echo-input-in-header-line nil)
-
-    ;; display header-line when non nil
-    (customize-set-variable 'helm-display-header-line nil)
-
-    ;; specify the space before prompt in header-line
-    (customize-set-variable 'helm-header-line-space-before-prompt 'left-margin)
-
-    ;; search for library in 'require' and 'declare-function' sexp
-    (customize-set-variable 'helm-ff-search-library-in-sexp t)
-
-    ;; use `recentf-list' instead of `file-name-history' in `helm-find-files'
-    (customize-set-variable 'helm-ff-file-name-history-use-recentf t)
-
-    ;; this enable support for completing-read-multiple
-    ;; and completion-at-point when non nil
-    (customize-set-variable 'helm-mode-handle-completion-in-region nil)
-
-    ;; if non-nil, prevent escaping from minibuffer with other-window
-    ;; during the helm sessions
-    (customize-set-variable 'helm-prevent-escaping-from-minibuffer t)
-
-    ;; use the same state of window split, vertical or horizontal
-    ;; (customize-set-variable 'helm-split-last-window-split-state t)
-
-    ;; helm left marginal area for display of a buffer
-    (customize-set-variable 'helm-left-margin-width 1)
-
-    ;; left-margin-width value for `helm-mini' and `helm-buffers-list'
-    (customize-set-variable 'helm-buffers-left-margin-width 1)
-
-    ;; binds (C-x)
-    ;; (define-key ctl-x-map (kbd "b") 'helm-buffers-list)
-    (define-key ctl-x-map (kbd "C-b") 'helm-mini)
-    (define-key ctl-x-map (kbd "C-f") 'helm-find-files)
-    (define-key ctl-x-map (kbd "c") 'helm-command-prefix)
-
-    ;; binds (C-h) help
-    (define-key help-map (kbd "a") 'helm-apropos)
-
-    ;; binds (global)
-    (global-set-key (kbd "M-x") 'helm-M-x)
-    (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-    (global-set-key (kbd "M-m") 'helm-mark-ring)))
-
-;; enable
-(eos/funcall 'helm-mode 1)
-(eos/funcall 'helm-autoresize-mode 1)
-
-;; binds
-(when (boundp 'helm-map)
-  (progn
-    (define-key helm-map (kbd "TAB") 'helm-execute-persistent-action)
-    (define-key helm-map (kbd "C-j") 'helm-maybe-exit-minibuffer)
-    (define-key helm-map (kbd "C-z") 'helm-select-action)))
-
-(when (require 'helm-lib nil t)
+(when (require 'icomplete nil t)
   (progn
     ;; custom
-    ;; display help window in full frame when non nil
-    (customize-set-variable 'helm-help-full-frame t)))
+    ;; pending-completions number over which to apply `icomplete-compute-delay
+    (customize-set-variable 'icomplete-delay-completions-threshold 0)
 
-;; for some silency (byte-compile)
-(defvar helm-mini-default-sources nil "")
+    ;; maximum number of initial chars to apply `icomplete-compute-delay
+    (customize-set-variable 'icomplete-max-delay-chars 0)
 
-(when (require 'helm-source nil t)
-  (progn
-    ;; files buffers list
-    (defvar eos/helm-source-file-buffers
-      (if (fboundp 'helm-make-source)
-          (helm-make-source "File Buffers" 'helm-source-in-buffer
-            :data 'helm-buffer-list
-            :candidate-transformer (lambda (buffers)
-                                     (cl-loop for buf in buffers
-                                              when (with-current-buffer
-                                                       buf buffer-file-name)
-                                              collect buf))
-            :action 'helm-type-buffer-actions))
-      "Helm file buffers source.")
+    ;; completions-computation stall, used only with large-number completions
+    (customize-set-variable 'icomplete-compute-delay 0)
 
-    ;; non files buffers list
-    (defvar eos/helm-source-nonfile-buffers
-      (if (fboundp 'helm-make-source)
-          (helm-make-source "Non-file Buffers" 'helm-source-in-buffer
-            :data 'helm-buffer-list
-            :candidate-transformer (lambda (buffers)
-                                     (cl-loop for buf in buffers
-                                              unless (with-current-buffer
-                                                         buf buffer-file-name)
-                                              collect buf))
-            :filtered-candidate-transformer 'helm-skip-boring-buffers
-            :action 'helm-type-buffer-actions))
-      "Helm nonfile buffers source.")
+    ;; when non-nil, show completions when first prompting for input
+    (customize-set-variable 'icomplete-show-matches-on-no-input nil)
 
-    ;; setq helm-mini default sources
-    (setq helm-mini-default-sources
-          '(eos/helm-source-file-buffers
-            eos/helm-source-exwm-buffers
-            helm-source-buffers-list
-            helm-source-recentf
-            ;; eos/helm-source-nonfile-buffers
-            helm-source-buffer-not-found))))
+    ;; when non-nil, hide common prefix from completion candidates
+    (customize-set-variable 'icomplete-hide-common-prefix nil)
+
+    ;; maximum number of lines to use in the minibuffer
+    (customize-set-variable 'icomplete-prospects-height 1)
+
+    ;; string used by Icomplete to separate alternatives in the minibuffer
+    (customize-set-variable 'icomplete-separator " · ")
+
+    ;; specialized completion tables with which `icomplete should operate,
+    ;; if this is t, `icomplete operates on all tables
+    (customize-set-variable 'icomplete-with-completion-tables t)
+
+    ;; if non-nil, also use icomplete when completing in non-mini buffers
+    ;; TODO: research
+    (customize-set-variable 'icomplete-in-buffer nil)
+
+    ;; enable (global)
+    (icomplete-mode 1)))
 
 ;; add eos-theme-dir to theme load path
 (add-to-list 'custom-theme-load-path
@@ -1249,23 +1187,6 @@ current line."
                    user host port)))
       (error "No auth entry found for %s@%s:%s" user host port))))
 
-(when (require 'helm-info nil t)
-  (progn
-    ;; binds
-    (if (boundp 'helm-map)
-        (progn
-          (define-key help-map (kbd "C-i") 'helm-info)))))
-
-(when (require 'helm-descbinds nil t)
-  (progn
-    ;; helm-descbinds, window splitting style (2: vertical)
-    (customize-set-variable 'helm-descbinds-window-style 2)))
-
-;; binds help-map (C-h)
-(if (boundp 'help-map)
-    (progn
-      (define-key help-map (kbd "C-b") 'helm-descbinds)))
-
 (when (require 'iedit nil t)
   (progn
     ;; if no-nil, the key is inserted into global-map,
@@ -1292,7 +1213,11 @@ current line."
 ;; enable
 (eos/funcall 'editorconfig-mode)
 
-(require 'ibuffer nil t)
+(when (require 'ibuffer nil t)
+  (progn
+    ;; custom
+    ;; bind
+    (define-key ctl-x-map (kbd "b") 'ibuffer)))
 
 (when (require 'buffer-move nil t)
   (progn
@@ -1312,48 +1237,6 @@ current line."
     (customize-set-variable 'artist-trim-line-endings nil)))
 
 (require 'locate nil t)
-
-(when (require 'helm-locate nil t)
-  (progn
-    ;; custom
-    ;; disable fuzzy matching in `helm-locate'.
-    (customize-set-variable 'helm-locate-fuzzy-match nil)
-
-    ;; a list of arguments for locate program
-    ;; berkeley-unix: "locate %s %s" (not working with fuzzing match?)
-    (customize-set-variable 'helm-locate-command "locate %s %s")))
-
-(when (require 'helm-swoop nil t)
-  (progn
-    ;; custom
-    ;; if nil, you can slightly boost invoke speed in exchange for text color
-    (customize-set-variable 'helm-swoop-speed-or-color nil)
-
-    ;; split window when having multiple windows open
-    (customize-set-variable 'helm-swoop-split-with-multiple-windows t)
-
-    ;; if t, use fuzzy matching functions as well as exact matches
-    (customize-set-variable 'helm-swoop-use-fuzzy-match t)
-
-    ;; return to the opposite side of line.
-    (customize-set-variable 'helm-swoop-move-to-line-cycle t)
-
-    ;; use face to line numbers on helm-swoop buffer
-    (customize-set-variable 'helm-swoop-use-line-number-face nil)))
-
-;; binds
-(when (boundp 'helm-swoop-map)
-  (progn
-    (define-key helm-swoop-map (kbd "C-s")
-      'helm-multi-swoop-all-from-helm-swoop)
-
-    (define-key helm-swoop-map (kbd "C-c s c")
-      'helm-multi-swoop-current-mode-from-helm-swoop)))
-
-(when (require 'helm-occur nil t)
-  (progn
-    ;; binds
-    (global-set-key (kbd "C-s") 'helm-occur)))
 
 (when (require 'dired nil t)
   (progn
@@ -1633,8 +1516,6 @@ current line."
     ;; function to display the current buffer in a WWW browser: eww
     (customize-set-variable 'browse-url-browser-function 'eww-browse-url)))
 
-(require 'helm-ag nil t)
-
 (when (require 'ispell nil t)
   (progn
     ;; custom
@@ -1681,12 +1562,6 @@ current line."
     ;; init flycheck mode after some programming mode
     ;; is activated (c-mode, elisp-mode, etc).
     (add-hook 'prog-mode-hook 'flycheck-mode)))
-
-(when (require 'helm-flycheck nil t)
-  (progn
-    ;; binds
-    (define-key eos-sc-map (kbd "e") 'helm-flycheck)
-    (define-key ctl-x-map (kbd ";") 'helm-flycheck)))
 
 ;; auxiliary function
 (defun eos/flycheck/set-checker (checker)
@@ -1758,8 +1633,6 @@ current line."
     ;; bind (C-x) prefix map
     (define-key ctl-x-map (kbd "C-l") 'dmenu)))
 
-(require 'helm-external nil t)
-
 (when (require 'comint nil t)
   (progn
     ;; custom
@@ -1822,9 +1695,6 @@ current line."
             (interactive)
             (eos/transset-set 0.9)))
 
-(if (fboundp 'helm-calcul-expression)
-    (define-key ctl-x-map (kbd "C-/") 'helm-calcul-expression))
-
 (when (require 'tramp nil t)
   (progn
     ;; custom
@@ -1848,8 +1718,6 @@ current line."
 
     ;; connection timeout in seconds
     (customize-set-variable 'tramp-connection-timeout 60)))
-
-(require 'helm-tramp nil t)
 
 (define-key ctl-x-map (kbd "<end>")
   (lambda ()
@@ -1944,16 +1812,6 @@ current line."
     ;; init dashboard after emacs initialize
     (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
 
-(add-to-list 'load-path
-             (concat user-emacs-directory "elpa/helm-youtube"))
-
-(require 'helm-youtube nil t)
-
-;; binds
-(when (boundp 'helm-command-map)
-  (progn
-    (define-key helm-command-map (kbd "m") 'helm-youtube)))
-
 (when (require 'emms nil t)
   (progn
     ;; the 'emms-setup' feature is provided by the file 'emms-setup.el'
@@ -2032,7 +1890,6 @@ current line."
     ;; binds
     (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
     (define-key text-mode-map (kbd "TAB") 'eos/company-or-indent)
-    (define-key text-mode-map (kbd "C-M-i") 'eos/helm-company)
 
     (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
     (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
@@ -2126,11 +1983,6 @@ current line."
   (progn
     (define-key Man-mode-map (kbd "C-j") 'push-button)))
 
-(when (require 'helm-man nil t)
-  (progn
-    ;; bind
-    (define-key eos-docs-map (kbd "m") 'helm-man-woman)))
-
 (when (require 'dash-docs nil t)
   (progn
     ;; custom
@@ -2145,26 +1997,6 @@ current line."
     ;; binds
     (define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)))
 
-(when (require 'helm-dash nil t)
-  (progn
-    ;; disable helm dash debug
-    (customize-set-variable 'helm-dash-enable-debugging nil)
-
-    ;; set browser function
-    (customize-set-variable 'helm-dash-browser-func 'eww)
-
-    ;; binds
-    (define-key eos-docs-map (kbd "l") 'helm-dash)
-    (define-key eos-docs-map (kbd "p") 'helm-dash-at-point)
-    (define-key eos-docs-map (kbd "i") 'helm-dash-install-docset)
-    (define-key eos-docs-map (kbd "a") 'helm-dash-activate-docset)))
-
-;; activate docset
-(defun eos/dash/activate-docset (docset)
-  "Activate a DOCSET, if available."
-  (when (fboundp 'helm-dash-activate-docset)
-    (funcall 'helm-dash-activate-docset docset)))
-
 (when (require 'rfc-mode nil t)
   (progn
     ;; custom
@@ -2172,6 +2004,11 @@ current line."
     (customize-set-variable
      'rfc-mode-directory
      (concat (expand-file-name user-emacs-directory) "rfc/"))))
+
+(defun eos/dash/activate-docset (docset)
+  "Activate a DOCSET, if available."
+  (when (fboundp 'dash-docs-activate-docset)
+    (funcall 'dash-docs-activate-docset docset)))
 
 ;; bind eos-docs-map under ctl-x-map
 (define-key ctl-x-map (kbd "l") 'eos-docs-map)
@@ -2251,17 +2088,6 @@ current line."
 ;; enable
 (eos/funcall 'yas-global-mode 1)
 
-(when (require 'helm-company nil t)
-  (progn
-    ;; custom
-    ;; enable fuzzy matching for helm company
-    (customize-set-variable 'helm-company-fuzzy-match t)))
-
-(when (boundp 'helm-company-map)
-  (define-key helm-company-map (kbd "SPC") 'helm-keyboard-quit)
-  (define-key helm-company-map (kbd "TAB") 'helm-maybe-exit-minibuffer)
-  (define-key helm-company-map (kbd "C-j") 'helm-maybe-exit-minibuffer))
-
 ;; set company backends
 (defun eos/company/set-backends (backends)
   "Set company BACKENDS."
@@ -2269,75 +2095,30 @@ current line."
   (when (boundp 'company-backends)
     (setq company-backends backends)))
 
-;; helm-company or indent
-(defun eos/helm-company ()
-  "Helm company wrapper."
-  (interactive)
-  (when (fboundp 'helm-company)
-    (helm-company)))
-
 ;; company or indent
 (defun eos/company-or-indent ()
   "Complete or indent (TAB)."
   (interactive)
   (if (looking-at "\\_>")
       (progn
-        (when (fboundp 'helm-company)
-          (helm-company)))
+        (when (fboundp 'company-complete)
+          (company-complete)))
     (indent-according-to-mode)))
 
 ;; exit, keyboard quit
 (define-key eos-complete-map (kbd "C-g") 'keyboard-quit)
 
 ;; testing
-(define-key eos-complete-map (kbd "TAB") 'hippie-expand)
 ;; (define-key eos-complete-map (kbd "<tab>") 'eos/complete-or-indent)
+(define-key eos-complete-map (kbd "/") 'hippie-expand)
+(define-key eos-complete-map (kbd "TAB") 'company-complete)
 
 ;; binds (global)
-(global-set-key (kbd "<M-tab>") 'eos/helm-company)
+(global-set-key (kbd "<M-tab>") 'eos/complete-at-point-or-indent)
 (global-set-key (kbd "TAB") 'eos/company-or-indent)
 
 ;; binds eos-complete-map prefix M-] map
 (define-key ctl-x-map (kbd "TAB") 'eos-complete-map)
-
-;; load helm-imenu
-(when (require 'helm-imenu nil t)
-  (progn
-    ;; hooks
-    (add-hook 'prog-mode
-              (lambda ()
-                ;; binds to C-x `
-                (define-key ctl-x-map (kbd "`") 'helm-imenu-in-all-buffers)))
-    ))
-
-;; binds (local map)
-(when (boundp 'helm-imenu-map)
-  (progn
-    (define-key helm-imenu-map (kbd "C-M-i") 'helm-next-source)))
-
-(when (require 'helm-gtags nil t)
-  (progn
-    ;; custom
-    (customize-set-variable 'helm-gtags-ignore-case t)
-    (customize-set-variable 'helm-gtags-auto-update t)
-    (customize-set-variable 'helm-gtags-pulse-at-cursor t)
-    (customize-set-variable 'helm-gtags-use-input-at-cursor t)
-    (customize-set-variable 'helm-gtags-suggested-key-mapping t)
-
-    ;; binds
-    (define-key eos-tags-map (kbd "t") 'helm-gtags-dwim)
-    (define-key eos-tags-map (kbd "s") 'helm-gtags-select)
-    (define-key eos-tags-map (kbd "f") 'helm-gtags-find-tag)
-    (define-key eos-tags-map (kbd "+") 'helm-gtags-show-stack)
-    (define-key eos-tags-map (kbd "a") 'helm-gtags-parse-file)
-    (define-key eos-tags-map (kbd "c") 'helm-gtags-create-tags)
-    (define-key eos-tags-map (kbd "u") 'helm-gtags-update-tags)
-    (define-key eos-tags-map (kbd "p") 'helm-gtags-find-pattern)
-    (define-key eos-tags-map (kbd "r") 'helm-gtags-find-rtag)
-    (define-key eos-tags-map (kbd "o") 'helm-gtags-find-tag-other-window)))
-
-;; enable helm-gtags
-(eos/funcall 'helm-gtags-mode 1)
 
 ;; exit, keyboard quit
 (define-key eos-tags-map (kbd "C-g") 'keyboard-quit)
@@ -2379,11 +2160,6 @@ current line."
               (ansi-color-apply-on-region
                compilation-filter-start (point-max)))))
 
-(add-to-list 'load-path
-             (concat user-emacs-directory "elpa/helm-compile"))
-
-(require 'helm-compile nil t)
-
 (when (require 'magit nil t)
   (progn
     ;; binds
@@ -2397,7 +2173,7 @@ current line."
     ;; enable cache and choose indexing method
     (customize-set-variable 'projectile-enable-caching t)
     (customize-set-variable 'projectile-indexing-method 'hybrid)
-    (customize-set-variable 'projectile-completion-system 'helm)
+    (customize-set-variable 'projectile-completion-system nil)
 
     ;; set bookmarks file localtion (cache)
     (customize-set-variable 'projectile-known-projects-file
@@ -2426,26 +2202,6 @@ current line."
 
 ;; enable
 (eos/funcall 'projectile-mode)
-
-(when (require 'helm-projectile nil t)
-  (progn
-    ;; binds
-    (define-key eos-pm-map (kbd "p") 'helm-projectile-ag)
-    (define-key eos-pm-map (kbd "n") 'helm-projectile-recentf)
-    (define-key eos-pm-map (kbd "/") 'helm-projectile-find-dir)
-    (define-key eos-pm-map (kbd "f") 'helm-projectile-find-file)
-    (define-key eos-pm-map (kbd "b") 'helm-projectile-browse-dirty-projects)
-    (define-key eos-pm-map (kbd "a")
-      'helm-projectile-find-file-in-known-projects)
-
-    ;; helm-swoop
-    (define-key eos-pm-map (kbd "S") 'helm-multi-swoop-projectile)
-
-    ;; dwin
-    (define-key eos-pm-map (kbd "w") 'helm-projectile-find-file-dwim)
-
-    ;; hooks
-    (add-hook 'projectile-mode-hook 'helm-projectile-on)))
 
 ;; set ctl-x-map prefix (C-x p)
 (define-key ctl-x-map (kbd "p") 'eos-pm-map)
@@ -2498,8 +2254,7 @@ current line."
     (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
 
     ;; complete or indent
-    (define-key c-mode-map (kbd "TAB") 'eos/company-or-indent)
-    (define-key c-mode-map (kbd "C-M-i") 'eos/helm-company)))
+    (define-key c-mode-map (kbd "TAB") 'eos/company-or-indent)))
 
 ;; binds (c++-mode-map)
 (when (boundp 'c++-mode-map)
@@ -2508,24 +2263,22 @@ current line."
     (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
 
     ;; complete or indent
-    (define-key c++-mode-map (kbd "TAB") 'eos/company-or-indent)
-    (define-key c++-mode-map (kbd "C-M-i") 'eos/helm-company)))
+    (define-key c++-mode-map (kbd "TAB") 'eos/company-or-indent)))
 
 (defun eos/cc/load-rtags ()
   "Load rtags manually."
   (eos/load-file (concat user-emacs-directory "rtags/src/rtags.el"))
-
-  ;; load helm-rtags
-  (eos/load-file (concat user-emacs-directory "rtags/src/helm-rtags.el"))
 
   ;; set rtags binary path
   (customize-set-variable
    'rtags-path
    (concat user-emacs-directory "rtags/build/bin/"))
 
-  ;; set helm as the frontend
-  (customize-set-variable 'rtags-display-result-backend 'helm)
-  (customize-set-variable 'rtags-completing-read-behavior 'helm))
+  ;; method to use to display RTags results, like references
+  (customize-set-variable 'rtags-display-result-backend 'default)
+
+  ;; behavior for completing-read
+  (customize-set-variable 'rtags-completing-read-behavior 'insert-default-marked))
 
 (when (require 'irony nil t)
   (progn

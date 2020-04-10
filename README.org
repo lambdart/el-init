@@ -117,10 +117,10 @@
   Script steps:
 
   1) Check dependencies
-  2) Clone Cask and EOS repositories
+  2) Clone =cask= and =eos= repositories
   3) Backup ~.emacs.d~ directory
-  4) Install third-party packages using cask: ~Cask~
-  5) Build and compile: ~init.org~
+  4) Install third-party packages listed in ~/src/Cask~ file
+  5) Build and compile: ~src/init.org~
 
 * Usage
 
@@ -184,14 +184,14 @@
     common/used commands (elisp functions), they are
     divided according to their logical behavior:
 
-    | Prefix Keymap  | Prefix  | Description (Logic Helm) |
-    |                |         |                          |
-    | eos-window-map | C-x w   | Windows                  |
-    | eos-pm-map     | C-x p   | Projects                 |
-    | eos-sc-map     | C-x e   | Errors (Checkers)        |
-    | eos-tags-maps  | C-x t   | Navigation (Tags)        |
-    | eos-docs-maps  | C-x l   | Library (Docs)           |
-    | eos-ac-map     | C-x TAB | Completion               |
+    | Prefix Keymap  | Prefix  | Description       |
+    |                |         |                   |
+    | eos-window-map | C-x w   | Windows           |
+    | eos-pm-map     | C-x p   | Projects          |
+    | eos-sc-map     | C-x e   | Errors (Checkers) |
+    | eos-tags-maps  | C-x t   | Navigation (Tags) |
+    | eos-docs-maps  | C-x l   | Library (Docs)    |
+    | eos-ac-map     | C-x TAB | Completion        |
 
 ** C-c
 
@@ -220,9 +220,6 @@
     | Global | M-j     | eos/edit/duplicate-current-line-or-region |
     | Global | M-n     | eos/edit/move-lines-up                    |
     | Global | M-p     | eos/edit/move-lines-down                  |
-    | Help   | C-h C-i | helm-info                                 |
-    | Help   | C-h a   | helm-apropos                              |
-    | Help   | C-h C-b | helm-descbinds                            |
     | ...    | ...     | ...                                       |
 
 ** Getting help
@@ -390,18 +387,18 @@
   - Q: Mac/Windows will be supported any time soon?
   - A: Nope.
 
-  - Q: Why don't you use evil/hydra/which-key/use-package?
+  - Q: Why don't you use evil/hydra/which-key/use-package/etc?
   - A: It is not just a matter of taste, it is simply because
     they get in the way disturbing the desired transformation to
     occur, and I prefer a more direct/effective approach.
     Remember that’s the way I think, you can add these modules
     on your own and make your life a little more miserable, be my guess!
 
-  - Q: And what about ivy/counsel/swiper?
-  - A: Well, tried once (a friend recommendation), but never got used
-    to it, then went back to Helm and never looked back, maybe it's
-    that legacy part of my brain speaking louder, or I'm one of the
-    lucky ones to not have any problems with it. Who knows? ...
+  - Q: And what about helm/ivy/counsel/swiper?
+  - A: Well, Icomplete its minimal (works very similar to the beloved
+    dmenu), generic, fast, less intrusive, and fulfill
+    all the needs that I have, (thanks Protesilaos, to bring this
+    forgotten package to light)!
 
   - Q: Why won't just use Doom/Centaur/Spacemacs or any other
     distribution?
@@ -431,6 +428,7 @@
   4. https://cask.readthedocs.io/en/latest
   5. https://www.gnu.org/software/emacs/manual/html_node/emacs/Keymaps.html
   6. https://github.com/larstvei/dot-emacs/blob/master/init.org
+  7. https://gitlab.com/protesilaos/dotfiles/-/blob/master/emacs/.emacs.d/emacs-init.org
 
 * LICENSE
   MIT

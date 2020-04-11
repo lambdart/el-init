@@ -9,10 +9,6 @@
 
 (require 'org nil t)
 
-;; load languages (reference)
-;; (org-babel-do-load-languages 'org-babel-load-languages
-;;                              '((emacs-lisp . t)))))
-
 (defun eos/gc/defer-gc-collection ()
   "Set 'gc-cons-threshold most-positive-fixnum."
   (setq gc-cons-threshold most-positive-fixnum))
@@ -91,77 +87,33 @@
                       eos-rtags-map))
   (define-prefix-command prefix-map))
 
-(defun eos/funcall (func &optional args)
-  "Call FUNC if it's bounded."
-  (when (fboundp func)
-    (funcall func args)))
+;; load eos-load.el script
+(eval-when-compile
+  ;; load eos-load.el script
+  (load-file (expand-file-name "lisp/eos-load.el" user-emacs-directory))
 
-(defun eos/build ()
-  "If the current buffer is '~/emacs.d/init.org' the code-blocks are
-tangled, and the tangled file is compiled."
-  (interactive)
-  ;; avoid running hooks when tangling.
-  (let ((prog-mode-hook nil)
-        (buffer (current-buffer)))
+  ;; update load path
+  (eos-update-load-path)
+  (eos-add-subdirs-to-load-path))
 
-    ;; switch or open init.org file
-    (find-file (expand-file-name "init.org" user-emacs-directory))
+(autoload 'eos-load-file
+  (expand-file-name "lisp/eos-load.el" user-emacs-directory))
 
-    ;; tangle and compile
-    (org-babel-tangle)
-    (byte-compile-file (concat user-emacs-directory "init.el"))
+(autoload 'eos-update-load-path
+  (expand-file-name "lisp/eos-load.el" user-emacs-directory))
 
-    ;; switch to the previous buffer
-    (switch-to-buffer buffer)))
+(autoload 'eos-add-subdirs-to-load-path
+  (expand-file-name "lisp/eos-load.el" user-emacs-directory))
 
-(defun eos/load-file (file)
-  "Load FILE if exists."
-  (if (file-exists-p file)
-      (load (expand-file-name file) t nil nil)))
+;; update load-path
+(eos-update-load-path)
+(eos-add-subdirs-to-load-path)
 
-(defun eos/toggle-debug-on-error ()
-  "Toggle `debug-on-error`."
-  (interactive)
-  (customize-set-variable 'debug-on-error (not debug-on-error))
-  (message "Debug-on-error: %s"
-           (if debug-on-error "enabled" "disabled")))
-
-(defun eos/buffer/bigp ()
-  "Return t if buffer-size is too big."
-  (or (> (buffer-size) (* 4086 64))
-      (> (line-number-at-pos (point-max)) 4086)))
-
-(defun eos/mkdir (dir)
-  "Create DIR in the file system."
-  ;; (interactive)
-  (when (and (not (file-exists-p dir))
-             (make-directory dir :parents))))
-
-(defun eos/compile (dir command)
-  "Compile COMMAND at specific DIR.
-Just a `compile` function wrapper."
-  (interactive)
-  (if (file-exists-p dir)
-      (let ((default-directory dir))
-        (compile command))))
-
-(defun eos/move/beginning-of-line (arg)
-  "Move point back to indentation(ARG) start, or line(ARG) start."
-  (interactive "^p")
-  (setq arg (or arg 1))
-
-  ;; Move lines first
-  (when (/= arg 1)
-    (let ((line-move-visual nil))
-      (forward-line (1- arg))))
-
-  (let ((orig-point (point)))
-    (back-to-indentation)
-    (when (= orig-point (point))
-      (move-beginning-of-line 1))))
+;; init eos
+(require 'eos-init)
 
 ;; line movement
-(global-set-key (kbd "C-a") 'eos/move/beginning-of-line)
+(global-set-key (kbd "C-a") 'eos/move-beginning-of-line)
 (global-set-key (kbd "C-e") 'move-end-of-line)
 
 ;; word movement
@@ -172,163 +124,12 @@ Just a `compile` function wrapper."
 (global-set-key (kbd "C-M-v") 'scroll-other-window)
 (global-set-key (kbd "C-M-y") 'scroll-other-window-down)
 
-(defun eos/edit/move-lines (n)
-  "Move N lines, up if N is positive, else down."
-  (let* (text-start
-         text-end
-         (region-start (point))
-         (region-end region-start)
-         swap-point-mark
-         delete-latest-newline)
-
-    ;; STEP 1: identifying the text to cut.
-    (when (region-active-p)
-      (if (> (point) (mark))
-          (setq region-start (mark))
-        (exchange-point-and-mark)
-        (setq swap-point-mark t
-              region-end (point))))
-
-    ;; text-end and region-end
-    (end-of-line)
-
-    (if (< (point) (point-max))
-        (forward-char 1)
-      (setq delete-latest-newline t)
-      (insert-char ?\n))
-    (setq text-end (point)
-          region-end (- region-end text-end))
-
-    ;; text-start and region-start
-    (goto-char region-start)
-    (beginning-of-line)
-    (setq text-start (point)
-          region-start (- region-start text-end))
-
-    ;; STEP 2: cut and paste.
-    (let ((text (delete-and-extract-region text-start text-end)))
-      (forward-line n)
-      ;; If the current-column != 0, I have moved the region at the bottom of a
-      ;; buffer doesn't have the trailing newline.
-      (when (not (= (current-column) 0))
-        (insert-char ?\n)
-        (setq delete-latest-newline t))
-      (insert text))
-
-    ;; STEP 3: Restoring.
-    (forward-char region-end)
-
-    (when delete-latest-newline
-      (save-excursion
-        (goto-char (point-max))
-        (delete-char -1)))
-
-    (when (region-active-p)
-      (setq deactivate-mark nil)
-      (set-mark (+ (point) (- region-start region-end)))
-      (if swap-point-mark
-          (exchange-point-and-mark)))))
-
-(defun eos/edit/move-lines-up (n)
-  "Move N lines up."
-  (interactive "p")
-  (if (eq n nil)
-      (setq n 1))
-  (eos/edit/move-lines (- n)))
-
-(defun eos/edit/move-lines-down (n)
-  "Move N lines down."
-  (interactive "p")
-  (if (eq n nil)
-      (setq n 1))
-  (eos/edit/move-lines n))
-
-(defun eos/edit/move-words-left (n)
-  "Move word N times to the left."
-  (interactive "p")
-  (if (eq n nil)
-      (setq n 1))
-  (transpose-words (- n)))
-
-(defun eos/edit/indent-buffer ()
-  "Indent the currently visited buffer."
-  (interactive)
-  (indent-region (point-min) (point-max)))
-
-(defun eos/edit/indent-region-or-buffer ()
-  "Indent a region if selected, otherwise the whole buffer."
-  (interactive)
-  (save-excursion
-    (if (region-active-p)
-        (progn
-          (indent-region (region-beginning) (region-end))
-          (message "Indented selected region."))
-      (progn
-        (eos/edit/indent-buffer)
-        (message "Indented buffer.")))))
-
-(defun eos/edit/duplicate-current-line-or-region (arg)
-  "Duplicates the current line or region ARG times.
-  If there's no region, the current line will be duplicated.
-  However, if there's a region, all lines that region covers will be duplicated."
-  (interactive "p")
-  (let (beg end (origin (point)))
-    (if (and mark-active (> (point) (mark)))
-        (exchange-point-and-mark))
-    (setq beg (line-beginning-position))
-    (if mark-active
-        (exchange-point-and-mark))
-    (setq end (line-end-position))
-    (let ((region (buffer-substring-no-properties beg end))
-          (i arg))
-      (while (> i 0)
-        (goto-char end)
-        (newline)
-        (insert region)
-        (setq end (point))
-        (setq i (1- i)))
-      (goto-char (+ origin (* (length region) arg) arg)))))
-
 ;; edit
-(global-set-key (kbd "M-i") 'eos/edit/indent-region-or-buffer)
-(global-set-key (kbd "M-j") 'eos/edit/duplicate-current-line-or-region)
+(global-set-key (kbd "M-i") 'eos/edit-indent-region-or-buffer)
+(global-set-key (kbd "M-j") 'eos/edit-duplicate-current-line-or-region)
 
-(global-set-key (kbd "M-p") 'eos/edit/move-lines-up)
-(global-set-key (kbd "M-n") 'eos/edit/move-lines-down)
-
-(defun eos/kill-buffer (buffer-name)
-  "Kill BUFFER-NAME if exists."
-  (when (get-buffer buffer-name)
-    (kill-buffer buffer-name)))
-
-(defun eos/kill/current-buffer ()
-  "Kill the current buffer without prompting."
-  (interactive)
-  (kill-buffer (current-buffer)))
-
-(defun eos/run/proc (name)
-  "Run a process defined by NAME."
-  (if (executable-find name)
-      (start-process name nil name)
-    nil))
-
-;;; Get symbol at point, maybe
-(defun eos/get-selected-text-or-symbol-at-point ()
-  "Get the text in region or symbol at point.
-
-If region is active, return the text in that region.  Else if the
-point is on a symbol, return that symbol name.  Else return nil."
-  (cond ((use-region-p)
-         (buffer-substring-no-properties (region-beginning) (region-end)))
-        ((symbol-at-point)
-         (substring-no-properties (thing-at-point 'symbol)))
-        (t
-         nil)))
-
-(defun eos/set-frame-font (font)
-  "Set the default font to FONT."
-  (cond ((find-font (font-spec :name font))
-         (set-frame-font font nil t))))
+(global-set-key (kbd "M-p") 'eos/edit-move-lines-up)
+(global-set-key (kbd "M-n") 'eos/edit-move-lines-down)
 
 ;; non-nil means to make the cursor very visible
 (customize-set-variable 'visible-cursor nil)
@@ -352,6 +153,15 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; width in columns of right marginal area for display of a buffer.
 (customize-set-variable 'right-margin-width 1)
+
+;; if t, resize window combinations proportionally
+(customize-set-variable 'window-combination-resize t)
+
+;; if non-nil ‘display-buffer’ will try to even window sizes
+(customize-set-variable 'even-window-sizes 'height-only)
+
+;; if non-nil, left and right side windows occupy full frame height
+(customize-set-variable 'window-sides-vertical nil)
 
 ;; binds (global)
 (global-set-key (kbd "s-l") 'shrink-window-horizontally)
@@ -421,12 +231,13 @@ point is on a symbol, return that symbol name.  Else return nil."
 ;; hooks
 (add-hook 'buffer-list-update-hook
           (lambda ()
-            (if (eos/buffer/bigp)
+            (when (boundp 'eos/big-file-p)
+            (if (eos/big-file-p)
                 (or display-line-numbers
-                    (eos/funcall 'display-line-numbers 0)))))
+                    (setq display-line-numbers 0))))))
 
 ;; non-nil means to allow minibuffer commands while in the minibuffer
-(customize-set-variable 'enable-recursive-minibuffers t)
+(customize-set-variable 'enable-recursive-minibuffers nil)
 
 ;; if non-nil, `read-answer' accepts single-character answers
 (customize-set-variable 'read-answer-short t)
@@ -451,7 +262,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'completion-show-help nil)
 
     ;; list of completion styles to use: see `completion-styles-alist variable
-    (customize-set-variable 'completion-styles '(partial-completion substring initials flex))
+    (customize-set-variable 'completion-styles '(partial-completion substring initials))
 
     ;; list of category-specific user overrides for completion styles.
     (customize-set-variable 'completion-category-overrides
@@ -460,7 +271,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                               (info-menu (styles basic))))
 
     ;; define the appearance and sorting of completions
-    (customize-set-variable 'completions-format 'vertical)   ; *Completions* buffer
+    (customize-set-variable 'completions-format 'vertical)
 
     ;; non-nil means when reading a file name completion ignores case
     (customize-set-variable 'read-file-name-completion-ignore-case t)
@@ -470,7 +281,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'resize-mini-windows t)
 
     ;; enable
-    ;; If `file-name-shadow-mode' is active, any part of the
+    ;; if `file-name-shadow-mode' is active, any part of the
     ;; minibuffer text that would be ignored because of this is given the
     ;; properties in `file-name-shadow-properties', which may
     ;; be used to make the ignored text invisible, dim, etc.
@@ -511,10 +322,10 @@ point is on a symbol, return that symbol name.  Else return nil."
 
     ;; enable
     ;; column number display in the mode line
-    (eos/funcall 'column-number-mode 1)
+    (eos-call-func 'column-number-mode 1)
 
     ;; buffer size display in the mode line
-    (eos/funcall 'size-indication-mode 1)))
+    (eos-call-func 'size-indication-mode 1)))
 
 (require 'prog-mode nil t)
 
@@ -524,7 +335,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; enable emacs server after startup
     (add-hook 'emacs-startup-hook
               (lambda ()
-                (eos/funcall 'server-start)))))
+                (eos-call-func 'server-start)))))
 
 (when (require 'help nil t)
   (progn
@@ -602,7 +413,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))))
 
 ;; create cache directory
-(eos/mkdir (concat user-emacs-directory "cache"))
+(eos-mkdir (concat user-emacs-directory "cache"))
 
 (when (require 'recentf nil t)
   (progn
@@ -628,7 +439,7 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'savehist-save-minibuffer-history t)
 
     ;; enable savehist mode
-    (eos/funcall 'savehist-mode 1)))
+    (eos-call-func 'savehist-mode 1)))
 
 (when (require 'frame nil t)
   (progn
@@ -658,18 +469,18 @@ point is on a symbol, return that symbol name.  Else return nil."
     (add-to-list 'default-frame-alist '(internal-border-width . 2))
 
     ;; set frame font
-    (eos/set-frame-font "Hermit Light:pixelsize=18")
+    (eos-set-frame-font "Hermit Light:pixelsize=18")
 
     ;; hooks
     ;; enable window divider
     (add-hook 'after-init-hook
               (lambda()
-                (eos/funcall 'window-divider-mode)))
+                (eos-call-func 'window-divider-mode)))
 
     ;; disable blink cursor
     (add-hook 'emacs-startup-hook
               (lambda()
-                (eos/funcall 'blink-cursor-mode 0)))))
+                (eos-call-func 'blink-cursor-mode 0)))))
 
 ;; binds
 (global-set-key (kbd "C-x C-o") 'other-frame)
@@ -681,7 +492,7 @@ point is on a symbol, return that symbol name.  Else return nil."
   (progn
     ;; enable
     ;; window move default keybinds (shift-up/down etc..)
-    (eos/funcall 'windmove-default-keybindings)))
+    (eos-call-func 'windmove-default-keybindings)))
 
 (when (require 'page nil t)
   (progn
@@ -698,7 +509,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 
 ;; enable
 ;; visualization of matching parens
-(eos/funcall 'show-paren-mode 1)
+(eos-call-func 'show-paren-mode 1)
 
 (when (require 'hideshow nil t)
   (progn
@@ -719,7 +530,7 @@ point is on a symbol, return that symbol name.  Else return nil."
                               (?\" . ?\")))
 
     ;; enable
-    (eos/funcall 'electric-pair-mode 1)))
+    (eos-call-func 'electric-pair-mode 1)))
 
 (when (require 'newcomment nil t)
   (progn
@@ -742,32 +553,32 @@ point is on a symbol, return that symbol name.  Else return nil."
     (customize-set-variable 'display-time-load-average-threshold 1.0)
 
     ;; enable display time
-    (eos/funcall 'display-time-mode 1)))
+    (eos-call-func 'display-time-mode 1)))
 
 (when (require 'tool-bar nil t)
   (progn
     ;; disable
-    (eos/funcall 'tool-bar-mode 0)))
+    (eos-call-func 'tool-bar-mode 0)))
 
 (when (require 'tooltip nil t)
   (progn
     ;; disable tooltip
-    (eos/funcall 'tooltip-mode 0)))
+    (eos-call-func 'tooltip-mode 0)))
 
 (when (require 'menu-bar nil t)
   (progn
     ;; disable menu-bar
-    (eos/funcall 'menu-bar-mode 0)))
+    (eos-call-func 'menu-bar-mode 0)))
 
 (when (require 'scroll-bar nil t)
   (progn
     ;; disable scroll bar
-    (eos/funcall 'scroll-bar-mode 0)))
+    (eos-call-func 'scroll-bar-mode 0)))
 
 (when (require 'hl-line nil t)
   (progn
     ;; enable highlight line
-    (eos/funcall 'global-hl-line-mode 1)))
+    (eos-call-func 'global-hl-line-mode 1)))
 
 (when (require 'linum nil t)
   (progn
@@ -781,12 +592,12 @@ point is on a symbol, return that symbol name.  Else return nil."
     (add-hook 'prog-mode-hook 'display-line-numbers-mode)))
 
 ;; enable display line numbers mode
-;; (eos/funcall 'global-display-line-numbers-mode 1)))
+;; (eos-call-func 'global-display-line-numbers-mode 1)))
 
 (when (require 'delsel nil t)
   (progn
     ;; delete selection-mode
-    (eos/funcall 'delete-selection-mode 1)))
+    (eos-call-func 'delete-selection-mode 1)))
 
 (when (require 'whitespace nil t)
   (progn
@@ -800,7 +611,7 @@ point is on a symbol, return that symbol name.  Else return nil."
 (when (require 'subword nil t)
   (progn
     ;; enable
-    (eos/funcall 'global-subword-mode 1)))
+    (eos-call-func 'global-subword-mode 1)))
 
 (when (require 'face-remap nil t)
   (progn
@@ -835,38 +646,22 @@ point is on a symbol, return that symbol name.  Else return nil."
     ;; Discard a completion if unused for this many hours. Hide
     ;; (1 day = 24, 1 week = 168).  If this is 0, non-permanent completions
     ;; will not be saved unless these are used.  Default is two weeks.
-    (customize-set-variable 'save-completions-retention-time 0)
+    (customize-set-variable 'save-completions-retention-time 24)
 
     ;; enable
     ;; dynamic completion on
-    (eos/funcall 'dynamic-completion-mode 0)))
+    (eos-call-func 'dynamic-completion-mode 1)))
+
+;; (setq display-buffer-alist nil)
 
 ;; add display-buffer-alist
 (add-to-list 'display-buffer-alist
-             '("\\*Completions\\*" display-buffer-below-selected))
-
-(defun eos/complete-or-indent ()
-  (interactive)
-  (if (looking-at "\\_>")
-      (when (fboundp 'complete)
-        (complete nil)))
-  (indent-according-to-mode))
-
-(defun eos/complete-at-point-or-indent ()
-  "This smart tab is minibuffer compliant: it acts as usual in
-the minibuffer. Else, if mark is active, indents region. Else if
-point is at the end of a symbol, expands it. Else indents the
-current line."
-  (interactive)
-  (if (minibufferp)
-      (unless (minibuffer-complete)
-        (complete-symbol nil))
-    (if mark-active
-        (indent-region (region-beginning)
-                       (region-end))
-      (if (looking-at "\\_>")
-          (complete-symbol nil)
-        (indent-according-to-mode)))))
+             '(".*\\*Completions.*"
+               (display-buffer-in-side-window)
+               (window-height . 0.16)
+               (side . bottom)
+               (slot . 0)
+               (window-parameters . ((no-other-window . t)))))
 
 ;; binds (testing)
 (global-set-key (kbd "M-RET") 'eos/complete-or-indent)
@@ -892,24 +687,9 @@ current line."
      'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))))
 
 ;; load custom-file
-(eos/load-file custom-file)
+(eos-load-file custom-file)
 
 (require 'forms nil t)
-
-;; avoid warnings when byte-compile
-(eval-when-compile
-  ;; eval require when compile
-  (require 'cask "~/.cask/cask.el" t)
-
-  ;; enable
-  (if (fboundp 'cask-initialize)
-      (cask-initialize)))
-
-;; load cask
-(require 'cask "~/.cask/cask.el" t)
-
-;; initialize cask
-(eos/funcall 'cask-initialize)
 
 (when (require 'exwm nil t)
   (progn
@@ -999,7 +779,7 @@ current line."
         (cl-pushnew key exwm-input-prefix-keys))))
 
 ;; enable exwm
-(eos/funcall 'exwm-enable)
+(eos-call-func 'exwm-enable)
 
 ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
 ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
@@ -1024,6 +804,7 @@ current line."
     ;; custom
     ;; monitors: check the xrandr(1) output and use the same name/order
     ;; TODO: create a func that retrieves these values from xrandr
+
     ;; (customize-set-variable
     ;;  'exwm-randr-workspace-monitor-plist '(0 "eDP-1"
     ;;                                        1 "HDMI-1"))
@@ -1056,7 +837,7 @@ current line."
     (customize-set-variable 'icomplete-compute-delay 0)
 
     ;; when non-nil, show completions when first prompting for input
-    (customize-set-variable 'icomplete-show-matches-on-no-input nil)
+    (customize-set-variable 'icomplete-show-matches-on-no-input t)
 
     ;; when non-nil, hide common prefix from completion candidates
     (customize-set-variable 'icomplete-hide-common-prefix nil)
@@ -1065,7 +846,7 @@ current line."
     (customize-set-variable 'icomplete-prospects-height 1)
 
     ;; string used by Icomplete to separate alternatives in the minibuffer
-    (customize-set-variable 'icomplete-separator " · ")
+    (customize-set-variable 'icomplete-separator "  |  ")
 
     ;; specialized completion tables with which `icomplete should operate,
     ;; if this is t, `icomplete operates on all tables
@@ -1077,6 +858,89 @@ current line."
 
     ;; enable (global)
     (icomplete-mode 1)))
+
+;; binds
+(when (boundp 'icomplete-minibuffer-map)
+  (progn
+    (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
+    (define-key icomplete-minibuffer-map (kbd "C-n") 'icomplete-forward-completions)
+    (define-key icomplete-minibuffer-map (kbd "C-p") 'icomplete-backward-completions)
+    (define-key icomplete-minibuffer-map (kbd "RET") 'minibuffer-complete-and-exit)
+
+    ;; flex
+    (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
+
+    ;; basic
+    (define-key icomplete-minibuffer-map (kbd "C-.")
+      (lambda ()
+        (interactive)
+        (let ((current-prefix-arg t))
+          (funcall 'eos/icomplete/toggle-completion-styles))))))
+
+;; (when (require 'icomplete-vertical nil t)
+;;   (progn
+;;     ;; custom
+;;     ;; `minibuffer' height when using icomplete vertically.
+;;     (customize-set-variable
+;;      'icomplete-vertical-prospects-height (/ (window-height) 4))
+
+;;     ;; binds (icomplete-minibuffer-map)
+;;     (define-key icomplete-minibuffer-map (kbd "C-v") 'icomplete-vertical-toggle)
+
+;;     ;; binds (global)
+;;     (global-set-key (kbd "M-y") nil)
+
+;;     ;; disable (not used as default)
+;;     (icomplete-vertical-mode -1)))
+
+;; (defvar parameters
+;;        '(window-parameters . ((no-other-window . t)
+;;                               (no-delete-other-windows . t))))
+;; (setq fit-window-to-buffer-horizontally t)
+;; (setq window-resize-pixelwise t)
+;; (setq window-combination-resize t)
+
+;; (defun eos/icomplete-recentf ()
+;;   "Open `recent-list' item in a new buffer.
+
+;;      The user's $HOME directory is abbreviated as a tilde."
+;;   (interactive)
+;;   (eos-call-func 'icomplete-vertical-do ()
+;;                (let ((files (mapcar 'abbreviate-file-name recentf-list)))
+;;                  (find-file
+;;                   (completing-read "switch-to-buffer(recentf): " files nil t)))))
+
+;; (defun eos/icomplete-font-family-list ()
+;;   "Add item from the `font-family-list' to the `kill-ring'.
+
+;;      This allows you to save the name of a font, which can then be
+;;      used in commands such as `set-frame-font'."
+;;   (interactive)
+;;   (eos-call-func 'icomplete-vertical-do ()
+;;                (kill-new
+;;                 (completing-read "copy-font-family: "
+;;                                  (print (font-family-list))
+;;                                  nil t))))
+
+;; (defun eos/icomplete-yank-kill-ring ()
+;;   "Insert the selected `kill-ring' item directly at point.
+;;      When region is active, `delete-region'.
+
+;;      Sorting of the `kill-ring' is disabled.  Items appear as they
+;;      normally would when calling `yank' followed by `yank-pop'."
+;;   (interactive)
+;;   (let ((kills                    ; do not sort items
+;;          (lambda (string pred action)
+;;            (if (eq action 'metadata)
+;;                '(metadata (display-sort-function . identity)
+;;                           (cycle-sort-function . identity))
+;;              (complete-with-action
+;;               action kill-ring string pred)))))
+;;     (eos-call-func 'icomplete-vertical-do ()
+;;                  (when (use-region-p)
+;;                    (delete-region (region-beginning) (region-end)))
+;;                  (insert
+;;                   (completing-read "yank-kill-ring: " kills nil t)))))
 
 ;; add eos-theme-dir to theme load path
 (add-to-list 'custom-theme-load-path
@@ -1176,26 +1040,21 @@ current line."
 
 (require 'password-store nil t)
 
-(defun eos/lookup-password (host user port)
-  "Lookup password on auth-source default file."
-  (let ((auth (auth-source-search :host host :user user :port port)))
-    (if auth
-        (let ((secretf (plist-get (car auth) :secret)))
-          (if secretf
-              (funcall secretf)
-            (error "Auth entry for %s@%s:%s has no secret!"
-                   user host port)))
-      (error "No auth entry found for %s@%s:%s" user host port))))
-
 (when (require 'iedit nil t)
   (progn
+    ;;
     ;; if no-nil, the key is inserted into global-map,
     ;; isearch-mode-map, esc-map and help-map.
-    (customize-set-variable 'iedit-toggle-key-default nil)))
+    (customize-set-variable 'iedit-toggle-key-default nil)
 
-;; binds
-(when (boundp 'iedit-mode-keymap)
-  (define-key iedit-mode-keymap (kbd "TAB") 'eos/company-or-indent))
+    ;; bind (iedit-mode-keymap)
+    (when (boundp 'iedit-mode-keymap)
+      (progn
+        (define-key iedit-mode-keymap (kbd "<tab>") 'eos/complete-buffer-or-indent)
+        (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence)))
+
+    ;; bind (global)
+    (global-set-key (kbd "C-;") 'iedit-mode)))
 
 (when (require 'undo-tree nil t)
   (progn
@@ -1206,12 +1065,12 @@ current line."
     (define-key ctl-x-map (kbd "u") 'undo-tree-visualize)))
 
 ;; enable
-(eos/funcall 'global-undo-tree-mode 1)
+(eos-call-func 'global-undo-tree-mode 1)
 
 (require 'editorconfig nil t)
 
 ;; enable
-(eos/funcall 'editorconfig-mode)
+(eos-call-func 'editorconfig-mode)
 
 (when (require 'ibuffer nil t)
   (progn
@@ -1246,7 +1105,7 @@ current line."
 (when (require 'dired-async nil t)
   (progn
     ;; enable dired-aysnc-mode
-    (eos/funcall 'dired-async-mode 1)))
+    (eos-call-func 'dired-async-mode 1)))
 
 ;; binds
 (if (boundp 'dired-mode-map)
@@ -1353,7 +1212,7 @@ current line."
 (when (boundp 'erc-mode-map)
   (progn
     ;; use eos/complete
-    (define-key erc-mode-map (kbd "TAB") 'eos/company-or-indent)))
+    (define-key erc-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
 
 (when (require 'shell nil t)
   (progn
@@ -1434,7 +1293,7 @@ current line."
 (defun eos/launch/xterm ()
   "Launch x11 default terminal."
   (interactive)
-  (eos/run/proc "urxvt"))
+  (eos-call-proc "urxvt"))
 
 (when (require 'shr nil t)
   (progn
@@ -1484,7 +1343,7 @@ current line."
       Else prompt the user for a search string.
       See the `eww-search-prefix' variable for the search engine used."
       (interactive)
-      (let ((search-string (eos/get-selected-text-or-symbol-at-point)))
+      (let ((search-string (eos-grab-selected-text-or-symbol-at-point)))
         (when (and (stringp search-string)
                    (string-match-p "\\`[[:blank:]]*\\'" search-string))
           (customize-set-variable search-string nil))
@@ -1540,38 +1399,6 @@ current line."
     (add-hook 'text-mode-hook 'flyspell-mode)
     (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
 
-(when (require 'flycheck nil t)
-  (progn
-    ;; binds
-    (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
-    (define-key eos-sc-map (kbd "l") 'flycheck-list-errors)
-    (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
-    (define-key eos-sc-map (kbd "d") 'flycheck-disable-checker)
-    ;; (define-key eos-sc-map (kbd "m") 'flycheck-mode)
-    ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
-    ;; (define-key eos-sc-map
-    ;;   (kbd "v") 'flycheck-verify-setup)
-
-    ;; (define-key eos-sc-map
-    ;;   (kbd "c") 'flycheck-select-checker)
-
-
-    ;; (define-key eos-sc-map
-    ;;   (kbd "?") 'flycheck-describe-checker)
-
-    ;; init flycheck mode after some programming mode
-    ;; is activated (c-mode, elisp-mode, etc).
-    (add-hook 'prog-mode-hook 'flycheck-mode)))
-
-;; auxiliary function
-(defun eos/flycheck/set-checker (checker)
-  "Set flycheck CHECKER variable."
-  (make-local-variable 'flycheck-checker)
-  (customize-set-variable 'flycheck-checker checker))
-
-;; bind eos-sc-map prefix to C-x e
-(define-key ctl-x-map (kbd "e") 'eos-sc-map)
-
 ;; function (reference)
 ;; (defun eos/ispell/switch-dictionary ()
 ;;   "Switch dictionaries."
@@ -1581,6 +1408,28 @@ current line."
 ;;     (ispell-change-dictionary change)
 ;;     (message "Dictionary switched from %s to %s" dic change)))))
 
+(when (require 'flycheck nil t)
+  (progn
+    ;; binds
+    (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
+    (define-key eos-sc-map (kbd "e") 'flycheck-list-errors)
+    (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
+    (define-key eos-sc-map (kbd "d") 'flycheck-disable-checker)
+    (define-key eos-sc-map (kbd "m") 'flycheck-mode)
+    (define-key eos-sc-map (kbd "s") 'flycheck-select-checker)
+    (define-key eos-sc-map (kbd "?") 'flycheck-describe-checker)
+
+    ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
+    ;; (define-key eos-sc-map
+    ;;   (kbd "v") 'flycheck-verify-setup)
+
+    ;; init flycheck mode after some programming mode
+    ;; is activated (c-mode, elisp-mode, etc).
+    (add-hook 'prog-mode-hook 'flycheck-mode)))
+
+;; bind eos-sc-map prefix to C-x e
+(define-key ctl-x-map (kbd "e") 'eos-sc-map)
+
 (when (require 'verb nil t)
   (progn
     ;; hooks
@@ -1588,8 +1437,7 @@ current line."
               (lambda ()
                 (when (boundp 'verb-mode)
                   (if verb-mode
-                      (eos/funcall 'verb-send-request-on-point 'this-window)))))
-    ))
+                      (eos-call-func 'verb-send-request-on-point 'this-window)))))))
 
 (when (require 'diff nil t)
   (progn
@@ -1618,7 +1466,7 @@ current line."
   (progn
     ;; custom
     ;; string to display in the dmenu prompt
-    (customize-set-variable 'dmenu-prompt-string "dmenu: ")
+    (customize-set-variable 'dmenu-prompt-string "exec: ")
 
     ;; determines on how many recently executed commands
     ;; dmenu should keep a record
@@ -1673,27 +1521,20 @@ current line."
 ;; start compton after emacs initialize
 (add-hook 'after-init-hook
           (lambda ()
-            (eos/run/proc "compton")))
+            (eos-call-proc "compton")))
 
-(defun eos/transset-set (opacity)
-  "Set transparency on frame window specify by OPACITY."
-  (interactive "nOpacity: ")
-  (let ((opacity (or opacity 1.0)))
-    (if (executable-find "transset")
-        (async-shell-command (format "transset -a %.1f" opacity))
-      (message "transset not found"))))
-
-;; hooks
+;; hooks:
+;; after a frame is created
 (add-hook 'after-make-frame-functions
           (lambda (frame)
             (interactive)
-            (eos/transset-set 0.9)))
+            (eos/set-frame-opacy 0.9)))
 
-;; init after exwm
+;; init after exwm is alive
 (add-hook 'exwm-init-hook
           (lambda ()
             (interactive)
-            (eos/transset-set 0.9)))
+            (eos/set-frame-opacy 0.9)))
 
 (when (require 'tramp nil t)
   (progn
@@ -1722,33 +1563,17 @@ current line."
 (define-key ctl-x-map (kbd "<end>")
   (lambda ()
     (interactive)
-    (eos/run/proc "slock")))
+    (eos-call-proc "slock")))
 
 (global-set-key (kbd "<print>")
                 (lambda ()
                   (interactive)
-                  (eos/run/proc "scrot")))
+                  (eos-call-proc "scrot")))
 
-;; control functions: volume
-;; (defun eos/toggle-audio ()
-;;   "Toggle audio (mute or unmute)."
-;;   (interactive)
-;;   (async-shell-command "amixer -D default set Master"))
-
-(defun eos/raise-volume ()
-  "Raise the volume (factor +5)."
-  (interactive)
-  (async-shell-command "amixer -D default set Master 5+ unmute"))
-
-(defun eos/lower-volume ()
-  "Lower the volume (factor -5)."
-  (interactive)
-  (async-shell-command "amixer -D default set Master 5- unmute"))
-
-;; bind
-;; (define-key ctl-x-map (kbd "C-0") 'eos/toggle-audio)
-(global-set-key (kbd "s--") 'eos/lower-volume)
-(global-set-key (kbd "s-=") 'eos/raise-volume)
+;; bind (global)
+(global-set-key (kbd "s-0") 'eos/misc/toggle-audio)
+(global-set-key (kbd "s--") 'eos/misc/reduce-volume)
+(global-set-key (kbd "s-=") 'eos/misc/raise-volume)
 
 (when (require 'dashboard nil t)
   (progn
@@ -1873,7 +1698,7 @@ current line."
             (setq truncate-lines nil)
 
             ;; set company backends
-            (eos/company/set-backends
+            (eos-set-company-backends
              '((company-ispell
                 company-yasnippet
                 company-dabbrev
@@ -1881,7 +1706,7 @@ current line."
                (company-files)))))
 
 ;; binds
-(define-key org-mode-map (kbd "C-M-i") 'eos/company-or-indent)
+(define-key org-mode-map (kbd "C-M-i") 'eos/complete-buffer-or-indent)
 
 (require 'tex-mode nil t)
 
@@ -1889,7 +1714,7 @@ current line."
   (progn
     ;; binds
     (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-    (define-key text-mode-map (kbd "TAB") 'eos/company-or-indent)
+    (define-key text-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)
 
     (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
     (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
@@ -1901,7 +1726,7 @@ current line."
                 (turn-on-auto-fill)
 
                 ;; set company backends
-                (eos/company/set-backends
+                (eos-set-company-backends
                  '((company-ispell
                     company-dabbrev)
                    (company-files)))))))
@@ -1914,7 +1739,7 @@ current line."
 ;; binds
 (when (boundp 'markdown-mode-map)
   (progn
-    (define-key markdown-mode-map (kbd "TAB") 'eos/company-or-indent)))
+    (define-key markdown-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
 
 (when (require 'doc-view nil t)
   (progn
@@ -1972,6 +1797,9 @@ current line."
 
 (when (require 'man nil t)
   (progn
+    ;; binds (eos-docs-map) docs actions prefix map
+    (define-key eos-docs-map (kbd "m") 'man)
+
     ;; hooks
     (add-hook 'Man-mode-hook
               (lambda ()
@@ -1995,7 +1823,11 @@ current line."
     (customize-set-variable 'dash-docs-min-length 2)
 
     ;; binds
-    (define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)))
+    (define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)
+    ;; (define-key eos-docs-map (kbd "i") 'dash-docs-async-install-docset)
+    (define-key eos-docs-map (kbd "i") 'dash-docs-install-docset)
+    (define-key eos-docs-map (kbd "a") 'dash-docs-activate-docset)
+    (define-key eos-docs-map (kbd "d") 'dash-docs-deactivate-docset)))
 
 (when (require 'rfc-mode nil t)
   (progn
@@ -2005,12 +1837,7 @@ current line."
      'rfc-mode-directory
      (concat (expand-file-name user-emacs-directory) "rfc/"))))
 
-(defun eos/dash/activate-docset (docset)
-  "Activate a DOCSET, if available."
-  (when (fboundp 'dash-docs-activate-docset)
-    (funcall 'dash-docs-activate-docset docset)))
-
-;; bind eos-docs-map under ctl-x-map
+;; bind eos-docs-map under ctl-x-map prefix map
 (define-key ctl-x-map (kbd "l") 'eos-docs-map)
 
 (when (require 'company nil t)
@@ -2054,7 +1881,7 @@ current line."
     (define-key eos-complete-map (kbd "f") 'company-files)))
 
 ;; enable globally
-(eos/funcall 'global-company-mode 1)
+(eos-call-func 'global-company-mode 1)
 
 ;; binds
 (when (boundp 'company-active-map)
@@ -2083,30 +1910,10 @@ current line."
 (when (boundp 'yas-keymap)
   (progn
     (define-key yas-keymap (kbd "<tab>") nil)
-    (define-key yas-keymap (kbd "ESC") 'yas-next-field)))
+    (define-key yas-keymap (kbd "M-`") 'yas-next-field)))
 
 ;; enable
-(eos/funcall 'yas-global-mode 1)
-
-;; set company backends
-(defun eos/company/set-backends (backends)
-  "Set company BACKENDS."
-  (make-local-variable 'company-backends)
-  (when (boundp 'company-backends)
-    (setq company-backends backends)))
-
-;; company or indent
-(defun eos/company-or-indent ()
-  "Complete or indent (TAB)."
-  (interactive)
-  (if (looking-at "\\_>")
-      (progn
-        (when (fboundp 'company-complete)
-          (company-complete)))
-    (indent-according-to-mode)))
-
-;; exit, keyboard quit
-(define-key eos-complete-map (kbd "C-g") 'keyboard-quit)
+(eos-call-func 'yas-global-mode 1)
 
 ;; testing
 ;; (define-key eos-complete-map (kbd "<tab>") 'eos/complete-or-indent)
@@ -2115,10 +1922,10 @@ current line."
 
 ;; binds (global)
 (global-set-key (kbd "<M-tab>") 'eos/complete-at-point-or-indent)
-(global-set-key (kbd "TAB") 'eos/company-or-indent)
+(global-set-key (kbd "TAB") 'eos/complete-buffer-or-indent)
 
-;; binds eos-complete-map prefix M-] map
-(define-key ctl-x-map (kbd "TAB") 'eos-complete-map)
+;; binds eos-complete-map prefix map
+(define-key ctl-x-map (kbd "<tab>") 'eos-complete-map)
 
 ;; exit, keyboard quit
 (define-key eos-tags-map (kbd "C-g") 'keyboard-quit)
@@ -2173,7 +1980,7 @@ current line."
     ;; enable cache and choose indexing method
     (customize-set-variable 'projectile-enable-caching t)
     (customize-set-variable 'projectile-indexing-method 'hybrid)
-    (customize-set-variable 'projectile-completion-system nil)
+    (customize-set-variable 'projectile-completion-system 'default)
 
     ;; set bookmarks file localtion (cache)
     (customize-set-variable 'projectile-known-projects-file
@@ -2185,8 +1992,9 @@ current line."
     ;; binds
     (define-key eos-pm-map (kbd "g") 'projectile-grep)
     (define-key eos-pm-map (kbd "t") 'projectile-find-tag)
-    (define-key eos-pm-map (kbd "x") 'projectile-compile-project)
-    (define-key eos-pm-map (kbd "!") 'projectile-run-eshell)
+    (define-key eos-pm-map (kbd "f") 'projectile-find-file)
+    (define-key eos-pm-map (kbd "<f5>") 'projectile-compile-project)
+    (define-key eos-pm-map (kbd "&") 'projectile-run-eshell)
     (define-key eos-pm-map (kbd "o") 'projectile-switch-project)
     (define-key eos-pm-map (kbd "r") 'projectile-replace-regexp)
     (define-key eos-pm-map (kbd "R") 'projectile-replace)
@@ -2201,15 +2009,15 @@ current line."
     (define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)))
 
 ;; enable
-(eos/funcall 'projectile-mode)
+(eos-call-func 'projectile-mode)
 
 ;; set ctl-x-map prefix (C-x p)
 (define-key ctl-x-map (kbd "p") 'eos-pm-map)
 
-;; c/c++ garage
+;; c/c++ company backends
 (defun eos/cc/set-company-backends ()
   "Set C/C++ common company backends."
-  (eos/company/set-backends
+  (eos-set-company-backends
    '((company-c-headers)
      (company-irony
       company-yasnippet
@@ -2225,10 +2033,10 @@ current line."
                 (eos/cc/set-company-backends)
 
                 ;; set dash docset
-                (eos/dash/activate-docset '"C")
+                (eos-set-dash-docset '"C")
 
                 ;; set flycheck checker
-                (eos/flycheck/set-checker 'c/c++-clang)
+                (eos/set-flycheck-checker 'c/c++-clang)
 
                 ;; load rtags
                 (eos/cc/load-rtags)))
@@ -2239,10 +2047,10 @@ current line."
                 (eos/cc/set-company-backends)
 
                 ;; set flycheck checker
-                (eos/flycheck/set-checker 'c++-cppcheck)
+                (eos/set-flycheck-checker 'c++-cppcheck)
 
                 ;; set dash docset
-                (eos/dash/activate-docset '"C++")
+                (eos-set-dash-docset '"C++")
 
                 ;; load rtags
                 (eos/cc/load-rtags)))))
@@ -2254,7 +2062,7 @@ current line."
     (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
 
     ;; complete or indent
-    (define-key c-mode-map (kbd "TAB") 'eos/company-or-indent)))
+    (define-key c-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
 
 ;; binds (c++-mode-map)
 (when (boundp 'c++-mode-map)
@@ -2263,11 +2071,11 @@ current line."
     (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
 
     ;; complete or indent
-    (define-key c++-mode-map (kbd "TAB") 'eos/company-or-indent)))
+    (define-key c++-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
 
 (defun eos/cc/load-rtags ()
   "Load rtags manually."
-  (eos/load-file (concat user-emacs-directory "rtags/src/rtags.el"))
+  (eos-load-file (concat user-emacs-directory "rtags/src/rtags.el"))
 
   ;; set rtags binary path
   (customize-set-variable
@@ -2303,7 +2111,6 @@ current line."
 (require 'company-c-headers nil t)
 
 ;; eos rtags prefix map (todo revise)
-(define-key eos-rtags-map (kbd "C-g") 'keyboard-quit)
 (define-key eos-rtags-map (kbd "l") 'rtags-taglist)
 (define-key eos-rtags-map (kbd "I") 'rtags-install)
 (define-key eos-rtags-map (kbd "y") 'rtags-symbol-type)
@@ -2335,27 +2142,27 @@ current line."
     ;; enable minor modes
     (add-hook 'emacs-lisp-mode-hook
               (lambda()
-                (eos/funcall 'eldoc-mode 1)))
+                (eos-call-func 'eldoc-mode 1)))
 
     (add-hook 'lisp-interaction-mode-hook
               (lambda()
-                (eos/funcall 'eldoc-mode 1)))
+                (eos-call-func 'eldoc-mode 1)))
 
     ;; set backends
     (add-hook 'emacs-lisp-mode-hook
               (lambda ()
                 ;; set company backends
-                (eos/company/set-backends
+                (eos-set-company-backends
                  '((company-elisp
                     company-yasnippet
                     company-dabbrev-code)
                    (company-files)))
 
                 ;; set flycheck checker
-                (eos/flycheck/set-checker 'emacs-lisp)
+                (eos/set-flycheck-checker 'emacs-lisp)
 
                 ;; activate dash docset (emacs)
-                (eos/dash/activate-docset "Emacs Lisp")))))
+                (eos-set-dash-docset "Emacs Lisp")))))
 
 ;; binds
 (when (boundp 'emacs-lisp-mode-map)
@@ -2366,7 +2173,7 @@ current line."
     (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
 
     ;; complete keybind
-    (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/company-or-indent)
+    (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/complete-buffer-or-indent)
 
     ;; ubind, qualaty of life
     (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
@@ -2383,7 +2190,7 @@ current line."
     (add-hook 'sh-mode-hook
               (lambda ()
                 ;; set company backends
-                (eos/company/set-backends
+                (eos-set-company-backends
                  '((company-shell
                     company-shell-env
                     company-yasnippet
@@ -2391,7 +2198,7 @@ current line."
                    (company-files)))
 
                 ;; set flycheck backends
-                (eos/flycheck/set-checker 'sh-shellcheck)))))
+                (eos/set-flycheck-checker 'sh-shellcheck)))))
 
 (require 'company-shell nil t)
 
@@ -2401,7 +2208,7 @@ current line."
     (add-hook 'fish-mode-hook
               (lambda ()
                 ;; set company backends
-                (eos/company/set-backends
+                (eos-set-company-backends
                  '((company-fish-shell
                     company-yasnippet
                     company-shell
@@ -2437,7 +2244,7 @@ current line."
     (add-hook 'lua-mode-hook
               (lambda ()
                 ;; set company backends
-                (eos/company/set-backends
+                (eos-set-company-backends
                  '((company-yasnippet
                     company-keywords
                     company-gtags
@@ -2447,10 +2254,10 @@ current line."
                    (company-files)))
 
                 ;; set flycheck checker
-                (eos/flycheck/set-checker 'lua)
+                (eos/set-flycheck-checker 'lua)
 
                 ;; activate dash docset
-                (eos/dash/activate-docset "Lua")))
+                (eos-set-dash-docset "Lua")))
 
     ;; add auto-mode
     (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
@@ -2474,23 +2281,23 @@ current line."
     (add-hook 'python-mode-hook
               (lambda()
                 ;; enable eldoc mode
-                (eos/funcall 'eldoc-mode 1)))
+                (eos-call-func 'eldoc-mode 1)))
 
     ;; set backends
     (add-hook 'python-mode-hook
               (lambda ()
                 ;; set company backends
-                (eos/company/set-backends
+                (eos-set-company-backends
                  '((company-yasnippet
                     company-keywords
                     company-dabbrev-code)
                    (company-files)))
 
                 ;; set flycheck checker
-                (eos/flycheck/set-checker 'python-pycompile)
+                (eos/set-flycheck-checker 'python-pycompile)
 
                 ;; set dash docsets
-                (eos/dash/activate-docset '"Python 3")))))
+                (eos-set-dash-docset '"Python 3")))))
 
 (when (require 'go-mode nil t)
   (progn
@@ -2502,17 +2309,17 @@ current line."
     (add-hook 'go-mode-hook
               (lambda ()
                 ;; set company backends
-                (eos/company/set-backends
+                (eos-set-company-backends
                  '((company-yasnippet
                     company-keywords
                     company-dabbrev-code)
                    (company-files)))
 
                 ;; set flycheck checker (go lint)
-                (eos/flycheck/set-checker 'go-golint)
+                (eos/set-flycheck-checker 'go-golint)
 
                 ;; set dash docsets
-                (eos/dash/activate-docset '"Go")))))
+                (eos-set-dash-docset '"Go")))))
 
 (require 'ess-r-mode nil t)
 
@@ -2532,7 +2339,7 @@ current line."
     (add-hook 'elixir-mode-hook
               (lambda ()
                 ;; set company backends
-                (eos/company/set-backends
+                (eos-set-company-backends
                  '((company-yasnippet
                     company-keywords
                     company-dabbrev-code)
@@ -2542,7 +2349,7 @@ current line."
                 ;; eos/flycheck/set-cheker '<elixir-checker>)
 
                 ;; set dash docsets
-                (eos/dash/activate-docset '"Elixir")))))
+                (eos-set-dash-docset '"Elixir")))))
 
 (require 'vhdl-mode nil t)
 
@@ -2559,7 +2366,7 @@ current line."
     (add-hook 'mql-mode-hook
               (lambda ()
                 ;; set company backends
-                (eos/company/set-backends
+                (eos-set-company-backends
                  '((company-gtags
                     company-yasnippet
                     company-dabbrev
@@ -2567,10 +2374,10 @@ current line."
                    (company-files)))
 
                 ;; select flycheck checker (use gcc)
-                (eos/flycheck/set-checker 'c/c++-gcc)
+                (eos/set-flycheck-checker 'c/c++-gcc)
 
                 ;; activate mql5 docset
-                (eos/dash/activate-docset '"mql5")))))
+                (eos-set-dash-docset '"mql5")))))
 
 (when (require 'highlight-doxygen nil t)
   (progn
@@ -2780,5 +2587,4 @@ current line."
 (global-unset-key (kbd "<M-drag-mouse-1>"))
 (global-unset-key (kbd "<S-down-mouse-1>"))
 
-(require 'eos-adapt
-         (expand-file-name "eos-adapt.el" user-emacs-directory) t)
+(eos-load-file (expand-file-name "adapt.el" user-emacs-directory))

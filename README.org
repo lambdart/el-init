@@ -35,7 +35,7 @@
   different purposes and classification (made using elisp or
   not) (in)directly passes through the Elisp interpreter.
 
-  So again, =application(s)= equals =elisp packages= or =external programns)=.
+  So again, =application(s)= implies =elisp packages= or =external programns=.
 
 ** Features (overview):
 

@@ -107,6 +107,7 @@ tutorial
 irony
 eshell
 cache
+games
 autosave
 elpa
 transient
@@ -124,11 +125,12 @@ image-dired
 dmenu-items
 elfeed
 docsets
+site-lisp
 
 # Emacs private/custom elisp files
 custom.el
 private.el
-eos-adapt.el
+adapt.el
 yoshi-theme.el
 
 # docs

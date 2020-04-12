@@ -18,7 +18,7 @@ current buffer"
       (progn
         (select-window (get-mru-window))
         (insert (car kill-ring)
-        (abort-recursive-edit))))))
+          (abort-recursive-edit))))))
 
 (defun eos/icomplete/toggle-completion-styles (&optional arg)
   "Toggle between completion styles.
@@ -49,13 +49,28 @@ The user's $HOME directory is abbreviated as a tilde."
   (interactive)
   (let ((files (mapcar 'abbreviate-file-name recentf-list)))
     (find-file
-      (completing-read "recentf: " files nil t))))
+      (completing-read "ic-recentf: " files nil t))))
 
 (defun eos/icomplete/insert-kill-ring ()
   "Insert the selected `kill-ring' item directly at point."
   (interactive)
   (insert
-    (completing-read "Kill-ring: " kill-ring nil t)))
+    (completing-read "ic-kill-ring: " kill-ring nil t)))
+
+(defun eos/icomplete/company ()
+  "Insert the selected company candidate directly at point."
+  (interactive)
+  (if (and (boundp 'company-candidates)
+        (boundp 'company-common)
+        (fboundp 'company-complete))
+    (progn
+      (unless company-candidates
+        (company-complete))
+      (unless (= (length company-candidates) 0)
+        (let ((candidate (completing-read "ic-company: " company-candidates nil nil)))
+          (delete-char (- (length company-common)))
+          (insert candidate))))
+    nil))
 
 (provide 'eos-icomplete)
 ;;; eos-icomplete.el ends here

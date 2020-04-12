@@ -32,8 +32,6 @@
   * Note: Throughout this document the word =application(s)=
     refers to any =elisp packages= or =external programns=.
 
-  * Note: ~src/lisp~ contains the scripts, and ~src/lisp~ the packages.
-
   Its important to understand that all applications with
   different purposes and classification (made with elisp or
   not) (in)directly passes through the Elisp interpreter.

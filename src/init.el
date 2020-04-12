@@ -74,6 +74,14 @@
   (make-sparse-keymap)
   "Keymap for documentation keybinds.")
 
+(defvar eos-find-map
+  (make-sparse-keymap)
+  "Keymap for find keybinds.")
+
+(defvar eos-utils-map
+  (make-sparse-keymap)
+  "Keymap for utils keybinds.")
+
 (defvar eos-rtags-map
   (make-sparse-keymap)
   "Keymap for rtag minor mode keybinds.")
@@ -82,6 +90,7 @@
                       eos-pm-map
                       eos-sc-map
                       eos-docs-map
+                      eos-find-map
                       eos-window-map
                       eos-complete-map
                       eos-rtags-map))
@@ -158,7 +167,7 @@
 (customize-set-variable 'window-combination-resize t)
 
 ;; if non-nil ‘display-buffer’ will try to even window sizes
-(customize-set-variable 'even-window-sizes 'height-only)
+(customize-set-variable 'even-window-sizes t)
 
 ;; if non-nil, left and right side windows occupy full frame height
 (customize-set-variable 'window-sides-vertical nil)
@@ -232,9 +241,9 @@
 (add-hook 'buffer-list-update-hook
           (lambda ()
             (when (boundp 'eos/big-file-p)
-            (if (eos/big-file-p)
-                (or display-line-numbers
-                    (setq display-line-numbers 0))))))
+              (if (eos/big-file-p)
+                  (or display-line-numbers
+                      (setq display-line-numbers 0))))))
 
 ;; non-nil means to allow minibuffer commands while in the minibuffer
 (customize-set-variable 'enable-recursive-minibuffers nil)
@@ -248,9 +257,8 @@
 (when (require 'minibuffer nil t)
   (progn
     ;; custom
-
     ;; number of completion candidates below which cycling is used
-    (customize-set-variable 'completion-cycle-threshold 3)
+    (customize-set-variable 'completion-cycle-threshold t)
 
     ;; treat the SPC or - inserted by `minibuffer-complete-word as delimiters
     (customize-set-variable 'completion-pcm-complete-word-inserts-delimiters t)
@@ -258,7 +266,7 @@
     ;; a string of characters treated as word delimiters for completion
     (customize-set-variable 'completion-pcm-word-delimiters "-_./:| ")
 
-    ;; on-nil means show help message in *Completions* buffer
+    ;; non-nil means show help message in *Completions* buffer
     (customize-set-variable 'completion-show-help nil)
 
     ;; list of completion styles to use: see `completion-styles-alist variable
@@ -271,30 +279,84 @@
                               (info-menu (styles basic))))
 
     ;; define the appearance and sorting of completions
-    (customize-set-variable 'completions-format 'vertical)
+    (customize-set-variable 'completions-format nil)
 
     ;; non-nil means when reading a file name completion ignores case
     (customize-set-variable 'read-file-name-completion-ignore-case t)
 
     ;; how to resize mini-windows (the minibuffer and the echo area)
     ;; a value of t means resize them to fit the text displayed in them
-    (customize-set-variable 'resize-mini-windows t)
+    (customize-set-variable 'resize-mini-windows nil)
+
+    ;; non-nil means to delete duplicates in history
+    (customize-set-variable 'history-delete-duplicates t)
+
+    ;; bind (minibuffer-local-map
+    (define-key minibuffer-local-map (kbd "M-`") 'minibuffer-completion-help)
+    (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
+
+    ;; bind (global)
+    (global-set-key (kbd "M-g v") 'eos/focus-minibuffer-or-completions)
 
     ;; enable
     ;; if `file-name-shadow-mode' is active, any part of the
     ;; minibuffer text that would be ignored because of this is given the
     ;; properties in `file-name-shadow-properties', which may
     ;; be used to make the ignored text invisible, dim, etc.
-    (file-name-shadow-mode 1)
+    (file-name-shadow-mode -1)
 
     ;; when active, any recursive use of the minibuffer will show
     ;; the recursion depth in the minibuffer prompt, this is only
     ;; useful if `enable-recursive-minibuffers' is non-nil
-    (minibuffer-depth-indicate-mode 1)
+    (minibuffer-depth-indicate-mode -1)
 
     ;; when active, minibuffer prompts that show a default value only show
     ;; the default when it's applicable
     (minibuffer-electric-default-mode 1)))
+
+(when (require 'completion nil t)
+  (progn
+    ;; custom
+    ;; how far to search in the buffer when looking for completions,
+    ;; if nil, search the whole buffer.
+    (customize-set-variable 'completion-search-distance nil)
+
+    ;; if non-nil, the next completion prompt does a cdabbrev search.
+    (customize-set-variable 'completion-cdabbrev-prompt-flag nil)
+
+    ;; non-nil means show help message in *Completions* buffer.
+    (customize-set-variable 'completion-show-help nil)
+
+    ;; non-nil means separator characters mark previous word as used
+    (customize-set-variable 'completion-on-separator-character t)
+
+    ;; the filename to save completions to.
+    (customize-set-variable
+     'save-completions-file-name
+     (expand-file-name "cache/completitions" user-emacs-directory))
+
+    ;; non-nil means save most-used completions when exiting emacs
+    (customize-set-variable 'save-completions-flag t)
+
+    ;; discard a completion if unused for this many hours.
+    ;; (1 day = 24, 1 week = 168)
+    ;; if this is 0, non-permanent completions
+    ;; will not be saved unless these are used
+    (customize-set-variable 'save-completions-retention-time 168)
+
+    ;; bind completiion-list-mode-map
+    (define-key completion-list-mode-map (kbd "h") 'eos/describe-symbol-at-point)
+    (define-key completion-list-mode-map (kbd "q") 'delete-completion-window)
+    (define-key completion-list-mode-map (kbd "d") 'delete-completion-line)
+    (define-key completion-list-mode-map (kbd "TAB") 'next-completion)
+    (define-key completion-list-mode-map (kbd "SPC") 'previous-completion)
+    (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
+    (define-key completion-list-mode-map (kbd "M-w") 'eos/kill-line)
+    (define-key completion-list-mode-map (kbd "M-v") 'eos/focus-minibuffer-or-completions)
+
+    ;; enable
+    ;; dynamic completion on
+    (eos-call-func 'dynamic-completion-mode 1)))
 
 ;; coding system to use with system messages
 (customize-set-variable 'locale-coding-system 'utf-8)
@@ -341,7 +403,21 @@
   (progn
     ;; custom
     ;; always select the help window
-    (customize-set-variable 'help-window-select t)))
+    (customize-set-variable 'help-window-select t)
+
+    ;; maximum height of a window displaying a temporary buffer.
+    (customize-set-variable 'temp-buffer-max-height
+                            (lambda
+                              (buffer)
+                              (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
+                                  (/ (x-display-pixel-height) (frame-char-height) 4)
+                                (/ (- (frame-height) 4) 4))))
+
+    ;; reference
+    ;; (customize-set-variable 'temp-buffer-max-height 12)
+
+    ;; enable
+    (temp-buffer-resize-mode 1)))
 
 ;; binds
 (when (boundp 'help-map)
@@ -420,7 +496,10 @@
     ;; custom
     ;; file to save the recent list into.
     (customize-set-variable
-     'recentf-save-file (concat user-emacs-directory "cache/recentf"))))
+     'recentf-save-file (concat user-emacs-directory "cache/recentf"))
+
+    ;; bind (eos-find-map)
+    (define-key eos-find-map (kbd "C-r") 'recentf-open-files)))
 
 (when (require 'bookmark nil t)
   (progn
@@ -619,53 +698,6 @@
     ;; text scale adjust
     (define-key ctl-x-map (kbd "=") 'text-scale-adjust)))
 
-(when (require 'completion nil t)
-  (progn
-    ;; custom
-    ;; how far to search in the buffer when looking for completions. Hide
-    ;; in number of characters.  If nil, search the whole buffer.
-    (customize-set-variable 'completion-search-distance nil)
-
-    ;; if non-nil, the next completion prompt does a cdabbrev search.
-    (customize-set-variable 'completion-cdabbrev-prompt-flag t)
-
-    ;; non-nil means show help message in *Completions* buffer.
-    (customize-set-variable 'completion-show-help t)
-
-    ;; non-nil means separator characters mark previous word as used
-    (customize-set-variable 'completion-on-separator-character t)
-
-    ;; the filename to save completions to.
-    (customize-set-variable
-     'save-completions-file-name
-     (expand-file-name "cache/completitions" user-emacs-directory))
-
-    ;; non-nil means save most-used completions when exiting emacs
-    (customize-set-variable 'save-completions-flag t)
-
-    ;; Discard a completion if unused for this many hours. Hide
-    ;; (1 day = 24, 1 week = 168).  If this is 0, non-permanent completions
-    ;; will not be saved unless these are used.  Default is two weeks.
-    (customize-set-variable 'save-completions-retention-time 24)
-
-    ;; enable
-    ;; dynamic completion on
-    (eos-call-func 'dynamic-completion-mode 1)))
-
-;; (setq display-buffer-alist nil)
-
-;; add display-buffer-alist
-(add-to-list 'display-buffer-alist
-             '(".*\\*Completions.*"
-               (display-buffer-in-side-window)
-               (window-height . 0.16)
-               (side . bottom)
-               (slot . 0)
-               (window-parameters . ((no-other-window . t)))))
-
-;; binds (testing)
-(global-set-key (kbd "M-RET") 'eos/complete-or-indent)
-
 (when (require 'dabbrev nil t)
   (progn
     ;; custom
@@ -690,6 +722,17 @@
 (eos-load-file custom-file)
 
 (require 'forms nil t)
+
+(when (require 'package nil t)
+  (progn
+    ;; custom
+    (customize-set-variable
+     'package-archives
+     '(("gnu" . "https://elpa.gnu.org/packages/")
+       ("MELPA" . "https://melpa.org/packages/")))))
+
+;; enable
+;; (package-initialize)))
 
 (when (require 'exwm nil t)
   (progn
@@ -797,7 +840,7 @@
 (add-hook 'exwm-update-title-hook
           (lambda ()
             (exwm-workspace-rename-buffer
-             (concat "[" exwm-class-name "] " exwm-title))))
+             (concat exwm-class-name "|" exwm-title))))
 
 (when (require 'exwm-randr nil t)
   (progn
@@ -846,7 +889,7 @@
     (customize-set-variable 'icomplete-prospects-height 1)
 
     ;; string used by Icomplete to separate alternatives in the minibuffer
-    (customize-set-variable 'icomplete-separator "  |  ")
+    (customize-set-variable 'icomplete-separator "  •  ")
 
     ;; specialized completion tables with which `icomplete should operate,
     ;; if this is t, `icomplete operates on all tables
@@ -855,6 +898,12 @@
     ;; if non-nil, also use icomplete when completing in non-mini buffers
     ;; TODO: research
     (customize-set-variable 'icomplete-in-buffer nil)
+
+    ;; bind (eos-find-map)
+    (define-key eos-find-map (kbd "r") 'eos/icomplete/open-recent-file)
+
+    ;; bind (global)
+    (global-set-key (kbd "M-y") 'eos/icomplete/insert-kill-ring)
 
     ;; enable (global)
     (icomplete-mode 1)))
@@ -876,71 +925,6 @@
         (interactive)
         (let ((current-prefix-arg t))
           (funcall 'eos/icomplete/toggle-completion-styles))))))
-
-;; (when (require 'icomplete-vertical nil t)
-;;   (progn
-;;     ;; custom
-;;     ;; `minibuffer' height when using icomplete vertically.
-;;     (customize-set-variable
-;;      'icomplete-vertical-prospects-height (/ (window-height) 4))
-
-;;     ;; binds (icomplete-minibuffer-map)
-;;     (define-key icomplete-minibuffer-map (kbd "C-v") 'icomplete-vertical-toggle)
-
-;;     ;; binds (global)
-;;     (global-set-key (kbd "M-y") nil)
-
-;;     ;; disable (not used as default)
-;;     (icomplete-vertical-mode -1)))
-
-;; (defvar parameters
-;;        '(window-parameters . ((no-other-window . t)
-;;                               (no-delete-other-windows . t))))
-;; (setq fit-window-to-buffer-horizontally t)
-;; (setq window-resize-pixelwise t)
-;; (setq window-combination-resize t)
-
-;; (defun eos/icomplete-recentf ()
-;;   "Open `recent-list' item in a new buffer.
-
-;;      The user's $HOME directory is abbreviated as a tilde."
-;;   (interactive)
-;;   (eos-call-func 'icomplete-vertical-do ()
-;;                (let ((files (mapcar 'abbreviate-file-name recentf-list)))
-;;                  (find-file
-;;                   (completing-read "switch-to-buffer(recentf): " files nil t)))))
-
-;; (defun eos/icomplete-font-family-list ()
-;;   "Add item from the `font-family-list' to the `kill-ring'.
-
-;;      This allows you to save the name of a font, which can then be
-;;      used in commands such as `set-frame-font'."
-;;   (interactive)
-;;   (eos-call-func 'icomplete-vertical-do ()
-;;                (kill-new
-;;                 (completing-read "copy-font-family: "
-;;                                  (print (font-family-list))
-;;                                  nil t))))
-
-;; (defun eos/icomplete-yank-kill-ring ()
-;;   "Insert the selected `kill-ring' item directly at point.
-;;      When region is active, `delete-region'.
-
-;;      Sorting of the `kill-ring' is disabled.  Items appear as they
-;;      normally would when calling `yank' followed by `yank-pop'."
-;;   (interactive)
-;;   (let ((kills                    ; do not sort items
-;;          (lambda (string pred action)
-;;            (if (eq action 'metadata)
-;;                '(metadata (display-sort-function . identity)
-;;                           (cycle-sort-function . identity))
-;;              (complete-with-action
-;;               action kill-ring string pred)))))
-;;     (eos-call-func 'icomplete-vertical-do ()
-;;                  (when (use-region-p)
-;;                    (delete-region (region-beginning) (region-end)))
-;;                  (insert
-;;                   (completing-read "yank-kill-ring: " kills nil t)))))
 
 ;; add eos-theme-dir to theme load path
 (add-to-list 'custom-theme-load-path
@@ -1095,7 +1079,21 @@
     ;; whether or not to remove white-space at end of lines
     (customize-set-variable 'artist-trim-line-endings nil)))
 
-(require 'locate nil t)
+(require 'isearch nil t)
+
+(when (require 'ffap nil t)
+  (progn
+    ;; bind (eos-find-map)
+    (define-key eos-find-map (kbd "f") 'find-file-at-point)
+    (define-key eos-find-map (kbd "d") 'dired-at-point)
+    (define-key eos-find-map (kbd "C-d") 'ffap-list-directory)))
+
+(when (require 'locate nil t)
+  (progn
+    ;; bind
+    (define-key eos-find-map (kbd "l") 'locate)))
+
+(define-key ctl-x-map (kbd "f") 'eos-find-map)
 
 (when (require 'dired nil t)
   (progn
@@ -1568,6 +1566,7 @@
 (global-set-key (kbd "<print>")
                 (lambda ()
                   (interactive)
+                  (message "Saved at %s" (pwd))
                   (eos-call-proc "scrot")))
 
 ;; bind (global)
@@ -1926,6 +1925,14 @@
 
 ;; binds eos-complete-map prefix map
 (define-key ctl-x-map (kbd "<tab>") 'eos-complete-map)
+
+(when (require 'imenu nil t)
+  ;; custom
+  ;; use a popup menu rather than a minibuffer prompt (no)
+  (customize-set-variable 'imenu-use-popup-menu nil)
+
+  ;; bind
+  (define-key eos-tags-map (kbd "i") 'imenu))
 
 ;; exit, keyboard quit
 (define-key eos-tags-map (kbd "C-g") 'keyboard-quit)

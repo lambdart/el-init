@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'recentf)
 (require 'minibuffer)
 (require 'icomplete)
 
@@ -12,12 +13,12 @@ current buffer"
   (interactive "*P")
   (when (and (minibufferp)
           (bound-and-true-p icomplete-mode))
-    (icomplete-force-complete-and-exit)
     (kill-new (field-string-no-properties))
     (if current-prefix-arg
       (progn
         (select-window (get-mru-window))
-        (insert (car kill-ring))))))
+        (insert (car kill-ring)
+        (abort-recursive-edit))))))
 
 (defun eos/icomplete/toggle-completion-styles (&optional arg)
   "Toggle between completion styles.
@@ -41,6 +42,20 @@ These styles are described in `completion-styles-alist'."
       ;; show completion style
       (message "completion style: %s "
         (propertize (format "%s" (car completion-styles)) 'face 'highlight)))))
+
+(defun eos/icomplete/open-recent-file ()
+  "Open `recent-list' item in a new buffer.
+The user's $HOME directory is abbreviated as a tilde."
+  (interactive)
+  (let ((files (mapcar 'abbreviate-file-name recentf-list)))
+    (find-file
+      (completing-read "recentf: " files nil t))))
+
+(defun eos/icomplete/insert-kill-ring ()
+  "Insert the selected `kill-ring' item directly at point."
+  (interactive)
+  (insert
+    (completing-read "Kill-ring: " kill-ring nil t)))
 
 (provide 'eos-icomplete)
 ;;; eos-icomplete.el ends here

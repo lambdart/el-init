@@ -11,6 +11,7 @@
 (require 'eos-util)
 (require 'eos-misc)
 (require 'eos-build)
+(require 'eos-focus)
 (require 'eos-toggle)
 (require 'eos-compile)
 (require 'eos-describe)

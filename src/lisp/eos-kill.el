@@ -2,6 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'simple)
+
 (defun eos-kill-buffer (buffer-name)
   "Kill BUFFER-NAME if exists."
   (when (get-buffer buffer-name)
@@ -17,18 +19,16 @@
   (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
     (abort-recursive-edit)))
 
-(defun eos-kill-minibuffer-first (sub-read &rest args)
-  "Kill minibuffer before open another one."
-  (let ((active (active-minibuffer-window)))
-    (if active
-      (progn
-        ;; we have to trampoline, since we're IN the minibuffer right now.
-        (apply 'run-at-time 0 nil sub-read args)
-        (abort-recursive-edit))
-      (apply sub-read args))))
-
-;; testing works
-;; (advice-add 'read-from-minibuffer :around 'eos-kill-minibuffer-first)
+(defun eos/kill-line (&optional arg)
+  "Do a kill-line but copy rather than kill. This function directly calls
+kill-line, so see documentation of kill-line for how to use it including prefix
+argument and relevant variables. This function works by temporarily making the
+buffer read-only."
+  (interactive "P")
+  (let ((buffer-read-only t)
+         (kill-read-only-ok t))
+    (kill-line arg))
+    (move-beginning-of-line nil))
 
 (provide 'eos-kill)
 ;;; eos-edit.el ends here

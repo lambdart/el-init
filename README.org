@@ -4,7 +4,7 @@
 
 * EOS
 
-  Just another org-mode, elisp, emacs configuration,
+  Just another emacs configuration,
   or a elisp interpreter desktop distribution.
   | Wait... What!? |
 
@@ -24,15 +24,18 @@
   well designed and integrated that provides a generic
   computer environment for everyday use.
 
-  Org-mode is used to organize the load-set cycle in
-  just one file ~src/init.org~. It contains source code blocks,
-  that will be tangled, generating ~src/init.el~ script file.
+  Org-mode is used to organize/instantiate elisp resources
+  (scripts and packages) in just one file ~src/init.org~.
+  It contains source code blocks, that will be tangled,
+  generating ~src/init.el~ final file.
 
-  * Note: Throughout this document the word =application(s)= and
+  * Note: Throughout this document the word =application(s)=
     refers to any =elisp packages= or =external programns=.
 
+  * Note: ~src/lisp~ contains the scripts, and ~src/lisp~ the packages.
+
   Its important to understand that all applications with
-  different purposes and classification (made using elisp or
+  different purposes and classification (made with elisp or
   not) (in)directly passes through the Elisp interpreter.
 
   So again, =application(s)= implies =elisp packages= or =external programns=.

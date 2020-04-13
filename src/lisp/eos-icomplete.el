@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
+(require 'simple)
 (require 'recentf)
 (require 'minibuffer)
 (require 'icomplete)
@@ -43,7 +44,7 @@ These styles are described in `completion-styles-alist'."
       (message "completion style: %s "
         (propertize (format "%s" (car completion-styles)) 'face 'highlight)))))
 
-(defun eos/icomplete/open-recent-file ()
+(defun eos/icomplete/recentf-open-file ()
   "Open `recent-list' item in a new buffer.
 The user's $HOME directory is abbreviated as a tilde."
   (interactive)
@@ -51,11 +52,47 @@ The user's $HOME directory is abbreviated as a tilde."
     (find-file
       (completing-read "ic-recentf: " files nil t))))
 
-(defun eos/icomplete/insert-kill-ring ()
+(defun eos/icomplete/kill-ring ()
   "Insert the selected `kill-ring' item directly at point."
   (interactive)
   (insert
     (completing-read "ic-kill-ring: " kill-ring nil t)))
+
+(defun eos/icomplete/mark-ring ()
+  "Browse `mark-ring' interactively."
+  (interactive)
+  (let*
+    ((marks (copy-sequence mark-ring))
+      (marks (delete-dups marks))
+      (marks (if (equal (mark-marker) (make-marker)) marks
+               (cons (copy-marker (mark-marker)) marks)))
+
+      ;; parse auxiliary control variables
+      (width (length (number-to-string (line-number-at-pos (point-max)))))
+      (fmt (format "%%%dd %%s" width))
+
+      ;; parse mark candidates
+      (candidates (mapcar (lambda (mark)
+                            (goto-char (marker-position mark))
+                            (let ((linum (line-number-at-pos))
+                                   (line  (buffer-substring
+                                            (line-beginning-position) (line-end-position))))
+                              (propertize (format fmt linum line) 'point (point))))
+                    marks)))
+
+    ;; candidates? if yes select one
+      (if candidates
+        (progn
+          (let* ((candidate (completing-read "ic-mark-ring: " candidates nil t))
+                 (pos (get-text-property 0 'point candidate)))
+            ;; action (goto char)
+            (when pos
+              (unless (<= (point-min) pos (point-max))
+                (if widen-automatically
+                  (widen)
+                  (error "Position outside buffer bounds")))
+              (goto-char pos))))
+        (message "Mark ring is empty"))))
 
 (defun eos/icomplete/company ()
   "Insert the selected company candidate directly at point."
@@ -73,24 +110,27 @@ The user's $HOME directory is abbreviated as a tilde."
     nil))
 
 (defun eos/icomplete/dash-docs-search ()
-  "Provide dash-docs candidates to `icomplete (first version)."
+  "Provide dash-docs candidates to `icomplete."
   (interactive)
-
   ;; setup dash docs
   (dash-docs-create-common-connections)
   (dash-docs-create-buffer-connections)
 
+  ;; get candidates
   (let* ((candidates (cl-loop for docset in (dash-docs-maybe-narrow-docsets "")
                        appending (dash-docs-search-docset docset "")))
           (candidate (completing-read "ic-docs-search: " candidates nil nil)))
+    ;; parse candidate
     (let* ((i 0)
-           (n (catch 'nth-elt
-                (dolist (value candidates)
-                  (when (equal candidate (car value))
-                    (throw 'nth-elt i))
-                  (setq i (+ 1 i)))))
+            (n (catch 'nth-elt
+                 (dolist (value candidates)
+                   (when (equal candidate (car value))
+                     (throw 'nth-elt i))
+                   (setq i (+ 1 i)))))
             (search-result (nth n candidates)))
       (pop search-result)
+
+      ;; action: open documentation file
       (dash-docs-browse-url search-result))))
 
 (provide 'eos-icomplete)

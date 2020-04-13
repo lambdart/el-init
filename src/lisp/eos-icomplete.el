@@ -28,15 +28,15 @@ These styles are described in `completion-styles-alist'."
   (when (and (minibufferp)
           (bound-and-true-p icomplete-mode))
     (let* ((completion-styles-original completion-styles)
-            (basic  '(basic emacs22))
-            (flex   '(helm-flex initials substring partial-completion))
-            (prefix '(partial-completion substring initials)))
+            (basic    '(basic emacs22))
+            (initials '(initials substring partial-completion))
+            (prefix   '(partial-completion substring initials)))
 
       ;; maybe toggle (basic or flex)
       (if current-prefix-arg
         (setq-local completion-styles basic)
-        (if (not (eq (car completion-styles) 'helm-flex))
-          (setq-local completion-styles flex)
+        (if (not (eq (car completion-styles) 'initials))
+          (setq-local completion-styles initials)
           (setq-local completion-styles prefix)))
 
       ;; show completion style
@@ -71,6 +71,27 @@ The user's $HOME directory is abbreviated as a tilde."
           (delete-char (- (length company-common)))
           (insert candidate))))
     nil))
+
+(defun eos/icomplete/dash-docs-search ()
+  "Provide dash-docs candidates to `icomplete (first version)."
+  (interactive)
+
+  ;; setup dash docs
+  (dash-docs-create-common-connections)
+  (dash-docs-create-buffer-connections)
+
+  (let* ((candidates (cl-loop for docset in (dash-docs-maybe-narrow-docsets "")
+                       appending (dash-docs-search-docset docset "")))
+          (candidate (completing-read "ic-docs-search: " candidates nil nil)))
+    (let* ((i 0)
+           (n (catch 'nth-elt
+                (dolist (value candidates)
+                  (when (equal candidate (car value))
+                    (throw 'nth-elt i))
+                  (setq i (+ 1 i)))))
+            (search-result (nth n candidates)))
+      (pop search-result)
+      (dash-docs-browse-url search-result))))
 
 (provide 'eos-icomplete)
 ;;; eos-icomplete.el ends here

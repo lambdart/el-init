@@ -251,8 +251,11 @@
 ;; if non-nil, `read-answer' accepts single-character answers
 (customize-set-variable 'read-answer-short t)
 
-;; non-nil means completion ignores case when reading a buffer name.
+;; non-nil means completion ignores case when reading a buffer name
 (customize-set-variable 'read-buffer-completion-ignore-case t)
+
+;; non-nil means when reading a file name completion ignores case
+(customize-set-variable 'read-file-name-completion-ignore-case t)
 
 (when (require 'minibuffer nil t)
   (progn
@@ -974,7 +977,7 @@
     ;;  '("openssl s_client -connect %h:%p -CAfile %t"))
     (customize-set-variable
      'tls-program
-     '("gnutls-cli --x509cafile %t -p %p %h" "gnutls-cli --x509cafile %t -p %p %h --protocols ssl3 ssl2"))))
+     '("gnutls-cli --x509cafile %t -p %p %h --insecure"))))
 
 (when (require  'gnutls nil t)
   (progn
@@ -984,12 +987,7 @@
 
     ;; if non-nil, this should be t or a list of checks
     ;; per hostname regex
-    (customize-set-variable 'gnutls-verify-error t)))
-
-;; functions
-(defun gnutls-available-p ()
-  "Function redefined in order not to use built-in GnuTLS support"
-  nil)
+    (customize-set-variable 'gnutls-verify-error nil)))
 
 (when (require 'epa nil t)
   (progn
@@ -1188,7 +1186,7 @@
     ;; or whether to enter a new one.
     (customize-set-variable 'erc-prompt-for-password t)
 
-    ;; if nil, ERC will call system-name to get this information.
+    ;; if nil, erc will call system-name to get this information.
     (customize-set-variable 'erc-system-name "eos")
 
     ;;   if non-nil, then all incoming CTCP requests will be shown.
@@ -1825,6 +1823,7 @@
     (define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)
     ;; (define-key eos-docs-map (kbd "i") 'dash-docs-async-install-docset)
     (define-key eos-docs-map (kbd "i") 'dash-docs-install-docset)
+    (define-key eos-docs-map (kbd "l") 'eos/icomplete/dash-docs-search)
     (define-key eos-docs-map (kbd "a") 'dash-docs-activate-docset)
     (define-key eos-docs-map (kbd "d") 'dash-docs-deactivate-docset)))
 
@@ -2465,7 +2464,7 @@
 (define-key ctl-x-map (kbd "}") nil)
 (define-key ctl-x-map (kbd "^") nil)
 ;; (define-key ctl-x-map (kbd "n") nil)
-(define-key ctl-x-map (kbd "f") nil)
+;; (define-key ctl-x-map (kbd "f") nil)
 (define-key ctl-x-map (kbd "a") nil)
 (define-key ctl-x-map (kbd "h") nil)
 (define-key ctl-x-map (kbd "v") nil)

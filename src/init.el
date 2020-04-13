@@ -82,6 +82,10 @@
   (make-sparse-keymap)
   "Keymap for utils keybinds.")
 
+(defvar eos-mark-map
+  (make-sparse-keymap)
+  "Keymap for mark keybinds.")
+
 (defvar eos-rtags-map
   (make-sparse-keymap)
   "Keymap for rtag minor mode keybinds.")
@@ -91,6 +95,7 @@
                       eos-sc-map
                       eos-docs-map
                       eos-find-map
+                      eos-mark-map
                       eos-window-map
                       eos-complete-map
                       eos-rtags-map))
@@ -136,9 +141,17 @@
 ;; edit
 (global-set-key (kbd "M-i") 'eos/edit-indent-region-or-buffer)
 (global-set-key (kbd "M-j") 'eos/edit-duplicate-current-line-or-region)
-
 (global-set-key (kbd "M-p") 'eos/edit-move-lines-up)
 (global-set-key (kbd "M-n") 'eos/edit-move-lines-down)
+
+;; mark
+(define-key eos-mark-map (kbd "h") 'mark-whole-buffer)
+(define-key eos-mark-map (kbd "s") 'mark-sexp)
+(define-key eos-mark-map (kbd "p") 'mark-paragraph)
+(define-key eos-mark-map (kbd "w") 'mark-word)
+
+;; bind mark to clt-x-map
+(define-key ctl-x-map (kbd "m") 'eos-mark-map)
 
 ;; non-nil means to make the cursor very visible
 (customize-set-variable 'visible-cursor nil)
@@ -291,15 +304,22 @@
     ;; a value of t means resize them to fit the text displayed in them
     (customize-set-variable 'resize-mini-windows nil)
 
+    ;; if non-nil, shorten "(default ...)" to "[...]" in minibuffer prompts
+    (customize-set-variable 'minibuffer-eldef-shorten-default t)
+
     ;; non-nil means to delete duplicates in history
     (customize-set-variable 'history-delete-duplicates t)
 
     ;; bind (minibuffer-local-map
     (define-key minibuffer-local-map (kbd "M-`") 'minibuffer-completion-help)
-    (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
+    (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete-word)
+
+    ;; research (maybe this is not necessary) (C-k: kill line)
+    ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
     ;; bind (global)
-    (global-set-key (kbd "M-g v") 'eos/focus-minibuffer-or-completions)
+    ; goto to minibuffer or completions
+    (global-set-key (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
 
     ;; enable
     ;; if `file-name-shadow-mode' is active, any part of the
@@ -349,13 +369,15 @@
 
     ;; bind completiion-list-mode-map
     (define-key completion-list-mode-map (kbd "h") 'eos/describe-symbol-at-point)
+    (define-key completion-list-mode-map (kbd "?") 'eos/describe-symbol-at-point)
     (define-key completion-list-mode-map (kbd "q") 'delete-completion-window)
     (define-key completion-list-mode-map (kbd "d") 'delete-completion-line)
     (define-key completion-list-mode-map (kbd "TAB") 'next-completion)
     (define-key completion-list-mode-map (kbd "SPC") 'previous-completion)
     (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
-    (define-key completion-list-mode-map (kbd "M-w") 'eos/kill-line)
-    (define-key completion-list-mode-map (kbd "M-v") 'eos/focus-minibuffer-or-completions)
+    (define-key completion-list-mode-map (kbd "RET") 'choose-completion)
+    (define-key completion-list-mode-map (kbd "C-k") 'eos/kill-line)
+    (define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
 
     ;; enable
     ;; dynamic completion on
@@ -502,7 +524,8 @@
      'recentf-save-file (concat user-emacs-directory "cache/recentf"))
 
     ;; bind (eos-find-map)
-    (define-key eos-find-map (kbd "C-r") 'recentf-open-files)))
+    (define-key eos-find-map (kbd "C-r") 'recentf-open-files)
+    (define-key eos-find-map (kbd "r") 'eos/icomplete/recentf-open-files)))
 
 (when (require 'bookmark nil t)
   (progn
@@ -732,9 +755,9 @@
     (customize-set-variable
      'package-archives
      '(("gnu" . "https://elpa.gnu.org/packages/")
-       ("MELPA" . "https://melpa.org/packages/")))))
+       ("melpa" . "https://melpa.org/packages/")))))
 
-;; enable
+;; enable (manually only)
 ;; (package-initialize)))
 
 (when (require 'exwm nil t)
@@ -902,11 +925,12 @@
     ;; TODO: research
     (customize-set-variable 'icomplete-in-buffer nil)
 
-    ;; bind (eos-find-map)
-    (define-key eos-find-map (kbd "r") 'eos/icomplete/open-recent-file)
+    ;; bind (prefix-maps)
+    (define-key eos-find-map (kbd "r") 'eos/icomplete/recentf-open-file)
+    (define-key eos-mark-map (kbd "m") 'eos/icomplete/mark-ring)
 
     ;; bind (global)
-    (global-set-key (kbd "M-y") 'eos/icomplete/insert-kill-ring)
+    (global-set-key (kbd "M-y") 'eos/icomplete/kill-ring)
 
     ;; enable (global)
     (icomplete-mode 1)))
@@ -915,11 +939,13 @@
 (when (boundp 'icomplete-minibuffer-map)
   (progn
     (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-    (define-key icomplete-minibuffer-map (kbd "C-n") 'icomplete-forward-completions)
-    (define-key icomplete-minibuffer-map (kbd "C-p") 'icomplete-backward-completions)
+    (define-key icomplete-minibuffer-map (kbd "C-f") 'icomplete-forward-completions)
+    (define-key icomplete-minibuffer-map (kbd "C-b") 'icomplete-backward-completions)
+
+    ;; todo verify if predicate arg is avaiable else icomplete-force-complete-and-exit
     (define-key icomplete-minibuffer-map (kbd "RET") 'minibuffer-complete-and-exit)
 
-    ;; flex
+    ;; toogle styles
     (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
 
     ;; basic
@@ -1171,44 +1197,30 @@
                               " "
                               ))))
 
-(when (require 'erc nil t)
+(when (require 'rcirc nil t)
   (progn
-    ;; the string to append to the nick if it is already in use.
-    (customize-set-variable 'erc-nick-uniquifier "_")
+    ;; custom
+    ;; non-nil means log IRC activity to disk
+    ;; logfiles are kept in `rcirc-log-directory
+    (customize-set-variable 'rcirc-log-flag nil)
 
-    ;; non-nil means rename buffers with network name, if available.
-    (customize-set-variable 'erc-rename-buffers t)
+    ;; major-mode function to use in multiline edit buffers
+    (customize-set-variable 'rcirc-multiline-major-mode 'text-mode)
 
-    ;; prompt for channel key when using erc-join-channel interactively.
-    (customize-set-variable 'erc-prompt-for-channel-key t)
+    ;; format string to use in nick completions
+    (customize-set-variable 'rcirc-completion-fomart "%s:")
 
-    ;; asks before using the default password,
-    ;; or whether to enter a new one.
-    (customize-set-variable 'erc-prompt-for-password t)
+    ;; list of authentication passwords (not your job)
+    (customize-set-variable 'rcirc-authinfo nil)
 
-    ;; if nil, erc will call system-name to get this information.
-    (customize-set-variable 'erc-system-name "eos")
+    ;; coding system used to decode incoming irc messages
+    (customize-set-variable 'rcirc-decode-coding-system "utf-8")
 
-    ;;   if non-nil, then all incoming CTCP requests will be shown.
-    (customize-set-variable 'erc-paranoid t)
-
-    ;; disable replies to CTCP requests that require a reply.
-    (customize-set-variable 'erc-disable-ctcp-replies t)
-
-    ;; be paranoid, don’t give away your machine name.
-    (customize-set-variable 'erc-anonymous-login t)
-
-    ;; show the channel key in the header line.
-    (customize-set-variable 'erc-show-channel-key-p t)
-
-    ;; kill all query (also channel) buffers of this server on QUIT.
-    (customize-set-variable 'erc-kill-queries-on-quit t)))
-
-;; binds
-(when (boundp 'erc-mode-map)
-  (progn
-    ;; use eos/complete
-    (define-key erc-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
+    ;; responses which will be hidden when `rcirc-omit-mode is enable
+    (customize-set-variable 'rcirc-omit-responses
+                            '("JOIN" "PART" "QUIT" "NICK"))))
+    ;; enable
+    ;; (rcirc-omit-mode 1)))
 
 (when (require 'shell nil t)
   (progn
@@ -2446,6 +2458,7 @@
 (define-key ctl-x-map (kbd "C-\@") nil)
 (define-key ctl-x-map (kbd "M-:") nil)
 
+(define-key ctl-x-map (kbd "RET") nil)
 (define-key ctl-x-map (kbd "`") nil)
 (define-key ctl-x-map (kbd "]") nil)
 ;; (define-key ctl-x-map (kbd "[") nil)

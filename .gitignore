@@ -7,6 +7,7 @@ build
 *.o
 *.obj
 *.core
+*.data
 
 # Precompiled Headers
 *.gch
@@ -126,6 +127,7 @@ dmenu-items
 elfeed
 docsets
 site-lisp
+todo
 
 # Emacs private/custom elisp files
 custom.el

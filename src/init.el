@@ -144,6 +144,9 @@
 (global-set-key (kbd "M-p") 'eos/edit-move-lines-up)
 (global-set-key (kbd "M-n") 'eos/edit-move-lines-down)
 
+;; kill
+(define-key ctl-x-map (kbd "k") 'eos/kill-current-buffer)
+
 ;; mark
 (define-key eos-mark-map (kbd "h") 'mark-whole-buffer)
 (define-key eos-mark-map (kbd "s") 'mark-sexp)
@@ -285,6 +288,9 @@
     ;; non-nil means show help message in *Completions* buffer
     (customize-set-variable 'completion-show-help nil)
 
+    ;; non-nil means automatically provide help for invalid completion input
+    (customize-set-variable 'completion-auto-help 'lazy)
+
     ;; list of completion styles to use: see `completion-styles-alist variable
     (customize-set-variable 'completion-styles '(partial-completion substring initials))
 
@@ -312,13 +318,13 @@
 
     ;; bind (minibuffer-local-map
     (define-key minibuffer-local-map (kbd "M-`") 'minibuffer-completion-help)
-    (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete-word)
+    (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
 
     ;; research (maybe this is not necessary) (C-k: kill line)
     ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
     ;; bind (global)
-    ; goto to minibuffer or completions
+                                        ; goto to minibuffer or completions
     (global-set-key (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
 
     ;; enable
@@ -341,17 +347,17 @@
   (progn
     ;; custom
     ;; how far to search in the buffer when looking for completions,
-    ;; if nil, search the whole buffer.
-    (customize-set-variable 'completion-search-distance nil)
+    ;; if nil, search the whole buffer
+    (customize-set-variable 'completion-search-distance 12000)
 
-    ;; if non-nil, the next completion prompt does a cdabbrev search.
-    (customize-set-variable 'completion-cdabbrev-prompt-flag nil)
+    ;; if non-nil, the next completion prompt does a cdabbrev search
+    (customize-set-variable 'completion-cdabbrev-prompt-flag t)
 
-    ;; non-nil means show help message in *Completions* buffer.
+    ;; non-nil means show help message in *Completions* buffer
     (customize-set-variable 'completion-show-help nil)
 
     ;; non-nil means separator characters mark previous word as used
-    (customize-set-variable 'completion-on-separator-character t)
+    (customize-set-variable 'completion-on-separator-characthfer t)
 
     ;; the filename to save completions to.
     (customize-set-variable
@@ -734,6 +740,10 @@
     ;; a value of nil means treat them as different.
     (customize-set-variable 'dabbrev-case-distinction t)))
 
+(require 'hippie-exp nil t)
+
+(define-key eos-complete-map (kbd "/") 'hippie-expand)
+
 (when (require 'custom nil t)
   (progn
     ;; custom
@@ -1064,6 +1074,11 @@
     ;; bind (global)
     (global-set-key (kbd "C-;") 'iedit-mode)))
 
+(when (require 'replace nil t)
+  (progn
+    ;; bind (global)
+    (global-set-key (kbd "M-s M-o") 'eos/occur-at-point)))
+
 (when (require 'undo-tree nil t)
   (progn
     ;; define alias for redo
@@ -1219,8 +1234,8 @@
     ;; responses which will be hidden when `rcirc-omit-mode is enable
     (customize-set-variable 'rcirc-omit-responses
                             '("JOIN" "PART" "QUIT" "NICK"))))
-    ;; enable
-    ;; (rcirc-omit-mode 1)))
+;; enable
+;; (rcirc-omit-mode 1)))
 
 (when (require 'shell nil t)
   (progn
@@ -1323,12 +1338,8 @@
 
 (when (require 'eww nil t)
   (progn
-    ;; define google search url
-    (defvar eos/eww-google-search-url "https://www.google.com/search?q="
-      "URL for Google searches.")
-
     ;; custom search prefix
-    (customize-set-variable 'eww-search-prefix eos/eww-google-search-url)
+    (customize-set-variable 'eww-search-prefix "https://www.google.com/search?q=")
     ;; (customize-set-variable eww-search-prefix "https://duckduckgo.com/html/?q=")
 
     ;; custom download directory
@@ -1340,34 +1351,11 @@
     ;; (customize-set-variable eww-form-checkbox-symbol "☐") ; Unicode hex 2610
     ;; (customize-set-variable eww-form-checkbox-selected-symbol "☑") ; Unicode hex 2611
 
-    ;; functions
-    ;; Re-write of the `eww-search-words' definition.
-    (defun eos/eww-search-words ()
-      "Search the web for the text between BEG and END.
-      If region is active (and not whitespace), search the web for
-      the text in that region.
-      Else if the region is not active, and the point is on a symbol,
-      search the web for that symbol.
-      Else prompt the user for a search string.
-      See the `eww-search-prefix' variable for the search engine used."
-      (interactive)
-      (let ((search-string (eos-grab-selected-text-or-symbol-at-point)))
-        (when (and (stringp search-string)
-                   (string-match-p "\\`[[:blank:]]*\\'" search-string))
-          (customize-set-variable search-string nil))
-        (if (stringp search-string)
-            (eww search-string)
-          (call-interactively #'eww))))
-
     ;; hooks
     (add-hook 'eww-mode-hook
               (lambda ()
                 ;; disable truncate lines
-                (setq truncate-lines nil)))
-
-    ;; when-progn ends here
-    ))
-
+                (setq truncate-lines nil)))))
 ;; binds
 (when (boundp 'eww-mode-map)
   (progn
@@ -1376,7 +1364,6 @@
 (when (require 'browse-url nil t)
   (progn
     ;; custom
-
     ;; the name of the browser program used by ‘browse-url-generic’.
     (customize-set-variable 'browse-url-generic-program "eww")
 
@@ -1885,10 +1872,10 @@
     (customize-set-variable 'company-show-numbers t)
 
     ;; binds (prefix eos-complete map)
-    (define-key eos-complete-map (kbd "`") 'company-ispell)
-    (define-key eos-complete-map (kbd "1") 'company-yasnippet)
-    (define-key eos-complete-map (kbd "g") 'company-gtags)
-    (define-key eos-complete-map (kbd "f") 'company-files)))
+    (define-key eos-complete-map (kbd "TAB") 'company-ispell)
+
+    (define-key eos-complete-map (kbd "f") 'company-files)
+    (define-key eos-complete-map (kbd "g") 'company-gtags)))
 
 ;; enable globally
 (eos-call-func 'global-company-mode 1)
@@ -1912,7 +1899,7 @@
 (when (require 'yasnippet nil t)
   (progn
     ;; binds
-    (define-key eos-complete-map (kbd "y") 'yas-expand)
+    (define-key eos-complete-map (kbd "e") 'yas-expand)
     (define-key eos-complete-map (kbd "i") 'yas-insert-snippet)
     (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)))
 
@@ -1924,11 +1911,6 @@
 
 ;; enable
 (eos-call-func 'yas-global-mode 1)
-
-;; testing
-;; (define-key eos-complete-map (kbd "<tab>") 'eos/complete-or-indent)
-(define-key eos-complete-map (kbd "/") 'hippie-expand)
-(define-key eos-complete-map (kbd "TAB") 'company-complete)
 
 ;; binds (global)
 (global-set-key (kbd "<M-tab>") 'eos/complete-at-point-or-indent)

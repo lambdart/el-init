@@ -33,16 +33,17 @@ These styles are described in `completion-styles-alist'."
             (initials '(initials substring partial-completion))
             (prefix   '(partial-completion substring initials)))
 
-      ;; maybe toggle (basic or flex)
+      ;; choose basic, initials or prefix
       (if current-prefix-arg
         (setq-local completion-styles basic)
-        (if (not (eq (car completion-styles) 'initials))
-          (setq-local completion-styles initials)
-          (setq-local completion-styles prefix)))
+        (progn
+          (if (not (eq (car completion-styles) 'initials))
+            (setq-local completion-styles initials)
+            (setq-local completion-styles prefix))))
 
-      ;; show completion style
-      (message "completion style: %s "
-        (propertize (format "%s" (car completion-styles)) 'face 'highlight)))))
+      ;; show which current completion style
+      (message "Completion style: %s "
+        (format "%s" (car completion-styles))))))
 
 (defun eos/icomplete/recentf-open-file ()
   "Open `recent-list' item in a new buffer.
@@ -61,44 +62,40 @@ The user's $HOME directory is abbreviated as a tilde."
 (defun eos/icomplete/mark-ring ()
   "Browse `mark-ring' interactively."
   (interactive)
-  (let*
-    ((marks (copy-sequence mark-ring))
-      (marks (delete-dups marks))
-      (marks (if (equal (mark-marker) (make-marker)) marks
-               (cons (copy-marker (mark-marker)) marks)))
 
-      ;; parse auxiliary control variables
-      (width (length (number-to-string (line-number-at-pos (point-max)))))
-      (fmt (format "%%%dd %%s" width))
-
-      ;; parse mark candidates
-      (candidates (mapcar (lambda (mark)
+  ;; get marks
+  (let* ((marks (delete-dups (copy-sequence mark-ring)))
+          (marks (if (equal (mark-marker) (make-marker)) marks
+                   (cons (copy-marker (mark-marker)) marks))))
+    ;; parse mark candidates
+    (let* ((width (length (number-to-string (line-number-at-pos (point-max)))))
+            (fmt  (format "%%%dd %%s" width))
+            (candidates (mapcar
+                          (lambda (mark)
                             (goto-char (marker-position mark))
-                            (let ((linum (line-number-at-pos))
-                                   (line  (buffer-substring
-                                            (line-beginning-position) (line-end-position))))
-                              (propertize (format fmt linum line) 'point (point))))
-                    marks)))
-
-    ;; candidates? if yes select one
+                            (let ((line-num (line-number-at-pos))
+                                   (line-str (buffer-substring
+                                               (line-beginning-position) (line-end-position))))
+                              (propertize (format fmt line-num line-str) 'point (point))))
+                          marks)))
+      ;; candidates? if yes, goto action
       (if candidates
         (progn
           (let* ((candidate (completing-read "ic-mark-ring: " candidates nil t))
-                 (pos (get-text-property 0 'point candidate)))
-            ;; action (goto char)
+                  (pos (get-text-property 0 'point candidate)))
             (when pos
               (unless (<= (point-min) pos (point-max))
-                (if widen-automatically
-                  (widen)
+                (if widen-automatically (widen)
                   (error "Position outside buffer bounds")))
               (goto-char pos))))
-        (message "Mark ring is empty"))))
+        (message "Mark ring is empty")))))
 
 (defun eos/icomplete/company ()
   "Insert the selected company candidate directly at point."
   (interactive)
-  (if (and (boundp 'company-candidates)
+  (if (and
         (boundp 'company-common)
+        (boundp 'company-candidates)
         (fboundp 'company-complete))
     (progn
       (unless company-candidates
@@ -112,7 +109,6 @@ The user's $HOME directory is abbreviated as a tilde."
 (defun eos/icomplete/dash-docs-search ()
   "Provide dash-docs candidates to `icomplete."
   (interactive)
-  ;; setup dash docs
   (dash-docs-create-common-connections)
   (dash-docs-create-buffer-connections)
 

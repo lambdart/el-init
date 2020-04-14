@@ -9,15 +9,15 @@
   (when (get-buffer buffer-name)
     (kill-buffer buffer-name)))
 
-(defun eos-kill-current-buffer ()
-  "Kill the current buffer without prompting."
-  (interactive)
-  (kill-buffer (current-buffer)))
-
 (defun eos-kill-minibuffer ()
   "Kill the minibuffer."
   (when (and (>= (recursion-depth) 1) (active-minibuffer-window))
     (abort-recursive-edit)))
+
+(defun eos/kill-current-buffer ()
+  "Kill the current buffer without prompting."
+  (interactive)
+  (kill-buffer (current-buffer)))
 
 (defun eos/kill-line (&optional arg)
   "Do a kill-line but copy rather than kill. This function directly calls

@@ -7,14 +7,16 @@ EMACS		:= $(EMACS_COMMAND) -Q -q -batch
 EVAL   := $(EMACS) --eval
 SCRIPT := $(EMACS) --script
 
-ASYNC   := ~/.emacs.d/site-lisp/async-20200113.1745
-XELB    := ~/.emacs.d/site-lisp/xelb-20190914.0
-EXWM    := ~/.emacs.d/site-lisp/exwm-20200329.0
-DASH    := ~/.emacs.d/site-lisp/dash-docs-20190516.1702
-COMPANY := ~/.emacs.d/site-lisp/company-20200324.2145
+ASYNC     := ~/.emacs.d/site-lisp/async-20200113.1745
+XELB      := ~/.emacs.d/site-lisp/xelb-20190914.0
+EXWM      := ~/.emacs.d/site-lisp/exwm-20200329.0
+DASH      := ~/.emacs.d/site-lisp/dash-20200119.2310
+DASH-DOCS := ~/.emacs.d/site-lisp/dash-docs-20190516.1702
+COMPANY   := ~/.emacs.d/site-lisp/company-20200324.2145
+FLYCHECK  := ~/.emacs.d/site-lisp/flycheck-20200405.2310
 
 # Additional emacs loadpath
-LOADPATH	:= -L $(XELB) -L $(EXWM) -L $(DASH) -L $(ASYNC)  -L $(COMPANY)
+LOADPATH	:= -L $(DASH) -L $(XELB) -L $(EXWM) -L $(DASH-DOCS) -L $(ASYNC)  -L $(COMPANY) -L $(FLYCHECK)
 
 # Scritps to eval
 TANGLE			:= tangle.el

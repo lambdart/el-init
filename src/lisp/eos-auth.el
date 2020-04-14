@@ -1,8 +1,8 @@
-;;; Package --- Security
+;;; Package --- Authentication
 ;;; Commentary:
 ;;; Code:
 
-(defun eos-lookup-password (host user port)
+(defun eos-auth-lookup-password (host user port)
   "Lookup (format HOST USER PORT) password on auth-source default file."
   (let ((auth (auth-source-search :host host :user user :port port)))
     (if auth
@@ -13,5 +13,5 @@
             user host port)))
       (error "No auth entry found for %s@%s:%s" user host port))))
 
-(provide 'eos-security)
-;;; eos-security.el ends here
+(provide 'eos-auth)
+;;; eos-auth.el ends here

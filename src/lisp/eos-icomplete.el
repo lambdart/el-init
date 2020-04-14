@@ -51,44 +51,48 @@ The user's $HOME directory is abbreviated as a tilde."
   (interactive)
   (let ((files (mapcar 'abbreviate-file-name recentf-list)))
     (find-file
-      (completing-read "ic-recentf: " files nil t))))
+      (completing-read "Recentf: " files nil t))))
 
 (defun eos/icomplete/kill-ring ()
   "Insert the selected `kill-ring' item directly at point."
   (interactive)
   (insert
-    (completing-read "ic-kill-ring: " kill-ring nil t)))
+    (completing-read "Kill-ring: " kill-ring nil t)))
+
+(defun eos/icomplete-mark-ring-line-string-at-pos (pos)
+  "Return line string at position POS."
+  (save-excursion
+    (goto-char pos)
+    (forward-line 0)
+    (let ((line (car (split-string (thing-at-point 'line) "[\n\r]"))))
+      (remove-text-properties 0 (length line) '(read-only) line)
+      (if (string= "" line)
+        "<EMPTY LINE>"
+        line))))
 
 (defun eos/icomplete/mark-ring ()
   "Browse `mark-ring' interactively."
   (interactive)
-
-  ;; get marks
-  (let* ((marks (delete-dups (copy-sequence mark-ring)))
-          (marks (if (equal (mark-marker) (make-marker)) marks
-                   (cons (copy-marker (mark-marker)) marks))))
-    ;; parse mark candidates
-    (let* ((width (length (number-to-string (line-number-at-pos (point-max)))))
-            (fmt  (format "%%%dd %%s" width))
-            (candidates (mapcar
-                          (lambda (mark)
-                            (goto-char (marker-position mark))
-                            (let ((line-num (line-number-at-pos))
-                                   (line-str (buffer-substring
-                                               (line-beginning-position) (line-end-position))))
-                              (propertize (format fmt line-num line-str) 'point (point))))
-                          marks)))
-      ;; candidates? if yes, goto action
-      (if candidates
-        (progn
-          (let* ((candidate (completing-read "ic-mark-ring: " candidates nil t))
-                  (pos (get-text-property 0 'point candidate)))
-            (when pos
-              (unless (<= (point-min) pos (point-max))
-                (if widen-automatically (widen)
-                  (error "Position outside buffer bounds")))
-              (goto-char pos))))
-        (message "Mark ring is empty")))))
+  (let* (candidates)
+    (setq candidates
+      (cl-loop with marks = (if (mark t)
+                              (cons (mark-marker) mark-ring)
+                              mark-ring)
+        for marker in marks
+        with max-line-number = (line-number-at-pos (point-max))
+        with width = (length (number-to-string max-line-number))
+        for m = (format (concat "%" (number-to-string width) "d: %s")
+                  (line-number-at-pos marker)
+                  (eos/icomplete-mark-ring-line-string-at-pos marker))
+        unless (and recip (assoc m recip))
+        collect (cons m marker) into recip
+        finally return recip))
+    (if candidates
+      (progn
+        (let (candidate)
+          (setq candidate (completing-read "Mark-ring: " candidates nil t))
+          (goto-char (cdr (assoc candidate candidates))))))
+    (message "Mark ring is empty")))
 
 (defun eos/icomplete/company ()
   "Insert the selected company candidate directly at point."

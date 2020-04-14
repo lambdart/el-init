@@ -7,48 +7,41 @@
 (when (version< emacs-version "26.3")
   (error "This requires Emacs 26.3 and above!"))
 
-(require 'org nil t)
-
-(defun eos/gc/defer-gc-collection ()
-  "Set 'gc-cons-threshold most-positive-fixnum."
-  (setq gc-cons-threshold most-positive-fixnum))
-
-(defun eos/gc/restore-gc-collection ()
-  "Defer garbage collection."
-  (run-at-time
-   1 nil (lambda () (setq gc-cons-threshold 16777216))))
+;; (require 'org nil t)
 
 ;; threshold inital value
 (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
       gc-cons-percentage 0.5)
 
-;; hooks
+;; defer garbage collection
+;; (add-hook 'minibuffer-setup-hook 'eos/gc/defer-gc-collection)
+
+;; reset threshold to inital value
+;; (add-hook 'minibuffer-exit-hook 'eos/gc/restore-gc-collection)
+
+(defun eos/defer-gc-collection ()
+  "Set `gc-cons-threshold' to most positive fix number,
+The largest value that is representable in a Lisp integer."
+  (setq gc-cons-threshold most-positive-fixnum))
+
+(defun eos/reset-gc-collection ()
+  "Reset garbage collection."
+  (run-at-time
+   1 nil
+   (lambda ()
+     (setq gc-cons-threshold 16777216))))
+
 (add-hook 'emacs-startup-hook
           (lambda ()
             (setq gc-cons-threshold 16777216 ; 16mb
                   gc-cons-percentage 0.1)))
 
-;; defer garbage collection
-(add-hook 'minibuffer-setup-hook 'eos/gc/defer-gc-collection)
-
-;; reset threshold to inital value
-(add-hook 'minibuffer-exit-hook 'eos/gc/restore-gc-collection)
+;; y or n
+(defalias 'yes-or-no-p 'y-or-n-p)
 
 (defvar eos-file-name-handler-alist
   file-name-handler-alist
   "Save file-name-handler-alist")
-
-;; clean file-name-handler-alist
-(setq file-name-handler-alist nil)
-
-;; hooks
-;; restore file-name-handler-alist
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (setq file-name-handler-alist eos-file-name-handler-alist)))
-
-;; y or n
-(defalias 'yes-or-no-p 'y-or-n-p)
 
 (defvar eos-tags-map
   (make-sparse-keymap)
@@ -101,30 +94,244 @@
                       eos-rtags-map))
   (define-prefix-command prefix-map))
 
-;; load eos-load.el script
-(eval-when-compile
-  ;; load eos-load.el script
-  (load-file (expand-file-name "lisp/eos-load.el" user-emacs-directory))
+;; clean file-name-handler-alist
+(setq file-name-handler-alist nil)
 
-  ;; update load path
-  (eos-update-load-path)
-  (eos-add-subdirs-to-load-path))
+;; restore file-name-handler-alist
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq file-name-handler-alist eos-file-name-handler-alist)))
 
-(autoload 'eos-load-file
-  (expand-file-name "lisp/eos-load.el" user-emacs-directory))
+(require 'cl-seq)
 
-(autoload 'eos-update-load-path
-  (expand-file-name "lisp/eos-load.el" user-emacs-directory))
+     (defun eos-update-load-path (&rest _)
+       "Update `load-path'."
+       (dolist (dir '("site-lisp" "lisp"))
+         (push (expand-file-name dir user-emacs-directory) load-path)))
 
-(autoload 'eos-add-subdirs-to-load-path
-  (expand-file-name "lisp/eos-load.el" user-emacs-directory))
+     (defun eos-add-subdirs-to-load-path (&rest _)
+       "Add sub-directories to `load-path'."
+       (interactive)
+       (let ((default-directory (expand-file-name "site-lisp" user-emacs-directory)))
+         (normal-top-level-add-subdirs-to-load-path)
+         (cl-remove-duplicates load-path)))
 
-;; update load-path
+     (defun eos-load-file (file)
+       "Load FILE if exists."
+       (if (file-exists-p file)
+           (load (expand-file-name file) t nil nil)
+         (message "file %s not found" file)))
+
+;; update load path
 (eos-update-load-path)
 (eos-add-subdirs-to-load-path)
 
-;; init eos
-(require 'eos-init)
+;; add eos-theme-dir to theme load path
+(add-to-list 'custom-theme-load-path
+             (concat user-emacs-directory "themes"))
+
+;; load theme
+(load-theme 'mesk-term t)
+
+(defun eos-call-proc (name)
+  "Call (execute) a process by NAME."
+  (if (executable-find name)
+      (start-process name nil name)
+    nil))
+
+(defun eos-call-func (func &rest args)
+  "Call FUNC with ARGS, if it's bounded."
+  (when (fboundp func)
+    (funcall func args)))
+
+(defun eos-edit-move-lines (n)
+  "Move N lines, up if N is positive, else down."
+  (let* (text-start
+         text-end
+         (region-start (point))
+         (region-end region-start)
+         swap-point-mark
+         delete-latest-newline)
+
+    ;; STEP 1: identifying the text to cut.
+    (when (region-active-p)
+      (if (> (point) (mark))
+          (setq region-start (mark))
+        (exchange-point-and-mark)
+        (setq swap-point-mark t
+              region-end (point))))
+
+    ;; text-end and region-end
+    (end-of-line)
+
+    (if (< (point) (point-max))
+        (forward-char 1)
+      (setq delete-latest-newline t)
+      (insert-char ?\n))
+    (setq text-end (point)
+          region-end (- region-end text-end))
+
+    ;; text-start and region-start
+    (goto-char region-start)
+    (beginning-of-line)
+    (setq text-start (point)
+          region-start (- region-start text-end))
+
+    ;; STEP 2: cut and paste.
+    (let ((text (delete-and-extract-region text-start text-end)))
+      (forward-line n)
+      ;; If the current-column != 0, I have moved the region at the bottom of a
+      ;; buffer doesn't have the trailing newline.
+      (when (not (= (current-column) 0))
+        (insert-char ?\n)
+        (setq delete-latest-newline t))
+      (insert text))
+
+    ;; STEP 3: Restoring.
+    (forward-char region-end)
+
+    (when delete-latest-newline
+      (save-excursion
+        (goto-char (point-max))
+        (delete-char -1)))
+
+    (when (region-active-p)
+      (setq deactivate-mark nil)
+      (set-mark (+ (point) (- region-start region-end)))
+      (if swap-point-mark
+          (exchange-point-and-mark)))))
+
+(defun eos/edit-move-lines-up (n)
+  "Move N lines up."
+  (interactive "p")
+  (if (eq n nil)
+      (setq n 1))
+  (eos-edit-move-lines (- n)))
+
+(defun eos/edit-move-lines-down (n)
+  "Move N lines down."
+  (interactive "p")
+  (if (eq n nil)
+      (setq n 1))
+  (eos-edit-move-lines n))
+
+(defun eos/edit-move-words-left (n)
+  "Move word N times to the left."
+  (interactive "p")
+  (if (eq n nil)
+      (setq n 1))
+  (transpose-words (- n)))
+
+(defun eos/edit-indent-buffer ()
+  "Indent the currently visited buffer."
+  (interactive)
+  (indent-region (point-min) (point-max)))
+
+(defun eos/edit-indent-region-or-buffer ()
+  "Indent a region if selected, otherwise the whole buffer."
+  (interactive)
+  (save-excursion
+    (if (region-active-p)
+        (progn
+          (indent-region (region-beginning) (region-end))
+          (message "Indented selected region."))
+      (progn
+        (eos/edit-indent-buffer)
+        (message "Indented buffer.")))))
+
+(defun eos/edit-duplicate-current-line-or-region (arg)
+  "Duplicates the current line or region ARG times.
+
+If there's no region, the current line will be duplicated.
+However, if there's a region, all lines that region covers will be duplicated."
+
+  (interactive "p")
+  (let (beg end (origin (point)))
+    (if (and mark-active (> (point) (mark)))
+        (exchange-point-and-mark))
+    (setq beg (line-beginning-position))
+    (if mark-active
+        (exchange-point-and-mark))
+    (setq end (line-end-position))
+    (let ((region (buffer-substring-no-properties beg end))
+          (i arg))
+      (while (> i 0)
+        (goto-char end)
+        (newline)
+        (insert region)
+        (setq end (point))
+        (setq i (1- i)))
+      (goto-char (+ origin (* (length region) arg) arg)))))
+
+(defun eos-copy-text-or-symbol-at-point ()
+  "Get the text in region or symbol at point.
+      If region is active, return the text in that region.  Else if the
+      point is on a symbol, return that symbol name.  Else return nil."
+  (cond ((use-region-p)
+         (buffer-substring-no-properties
+          (region-beginning) (region-end)))
+        ((symbol-at-point)
+         (substring-no-properties (thing-at-point 'symbol)))
+        (t
+         nil)))
+
+(defun eos-copy-line (&optional arg)
+  "Do a kill-line but copy rather than kill. This function directly calls
+kill-line, so see documentation of kill-line for how to use it including prefix
+argument and relevant variables. This function works by temporarily making the
+buffer read-only."
+  (interactive "P")
+  (let ((buffer-read-only t)
+        (kill-read-only-ok t))
+    (kill-line arg))
+  (move-beginning-of-line nil))
+
+(defun eos/move-beginning-of-line (arg)
+  "Move point back to indentation(ARG) start, or line(ARG) start."
+  (interactive "^p")
+  (setq arg (or arg 1))
+
+  ;; Move lines first
+  (when (/= arg 1)
+    (let ((line-move-visual nil))
+      (forward-line (1- arg))))
+
+  (let ((orig-point (point)))
+    (back-to-indentation)
+    (when (= orig-point (point))
+      (move-beginning-of-line 1))))
+
+(defun eos-kill-buffer (buffer-name)
+  "Kill BUFFER-NAME if exists."
+  (when (get-buffer buffer-name)
+    (kill-buffer buffer-name)))
+
+(defun eos/kill-current-buffer ()
+  "Kill the current buffer without prompting."
+  (interactive)
+  (kill-buffer (current-buffer)))
+
+(defun eos-mkdir (dir)
+  "Create DIR in the file system."
+  (when (and (not (file-exists-p dir))
+             (make-directory dir :parents))))
+
+(defun eos/search-keymaps (key)
+  "Search for KEY in all known keymaps.
+Keymaps list will be printed on *Messages* buffer."
+  (interactive "kPress key: ")
+  (mapatoms (lambda (ob)
+              (when (and (boundp ob) (keymapp (symbol-value ob)))
+                (when (functionp (lookup-key (symbol-value ob) key))
+                  (message "%s" ob))))))
+
+(defun eos/set-frame-opacy (alpha)
+  "Set ALPHA opacity in current frame."
+  (interactive "nAlpha: ")
+  (let ((alpha (or alpha 1.0)))
+    (if (executable-find "transset")
+        (async-shell-command (format "transset -a %.1f" alpha))
+      (error "Transset not found"))))
 
 ;; line movement
 (global-set-key (kbd "C-a") 'eos/move-beginning-of-line)
@@ -144,17 +351,18 @@
 (global-set-key (kbd "M-p") 'eos/edit-move-lines-up)
 (global-set-key (kbd "M-n") 'eos/edit-move-lines-down)
 
-;; kill
+;; bind kill-current-buffer to clt-x-map
 (define-key ctl-x-map (kbd "k") 'eos/kill-current-buffer)
 
-;; mark
+;; bind to eos-mark-map
 (define-key eos-mark-map (kbd "h") 'mark-whole-buffer)
 (define-key eos-mark-map (kbd "s") 'mark-sexp)
 (define-key eos-mark-map (kbd "p") 'mark-paragraph)
 (define-key eos-mark-map (kbd "w") 'mark-word)
 
-;; bind mark to clt-x-map
+;; binds clt-x-map (eos prefix commands)
 (define-key ctl-x-map (kbd "m") 'eos-mark-map)
+(define-key ctl-x-map (kbd "e") 'eos-sc-map)
 
 ;; non-nil means to make the cursor very visible
 (customize-set-variable 'visible-cursor nil)
@@ -212,11 +420,11 @@
 ;; kill buffer and window
 (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
 
-(add-to-list 'display-buffer-alist
-             '(("\\*Choices\\*"
-                (display-buffer-below-selected display-buffer-at-bottom)
-                (inhibit-same-window . t)
-                (window-height . fit-window-to-buffer))))
+;; (add-to-list 'display-buffer-alist
+;;              '(("\\*Choices\\*"
+;;                 (display-buffer-below-selected display-buffer-at-bottom)
+;;                 (inhibit-same-window . t)
+;;                 (window-height . fit-window-to-buffer))))
 
 ;; custom
 ;; non-nil inhibits the startup screen.
@@ -253,13 +461,15 @@
 ;; non-nil means load prefers the newest version of a file.
 (customize-set-variable 'load-prefer-newer t)
 
-;; hooks
-(add-hook 'buffer-list-update-hook
-          (lambda ()
-            (when (boundp 'eos/big-file-p)
-              (if (eos/big-file-p)
-                  (or display-line-numbers
-                      (setq display-line-numbers 0))))))
+;; (add-hook 'buffer-list-update-hook
+;;           (lambda ()
+;;             (when (boundp 'eos/big-file-p)
+;;               (if (eos/big-file-p)
+;;                   (or display-line-numbers
+;;                       (setq display-line-numbers 0))))))
+
+(when (require 'minibuffer nil t)
+  (progn
 
 ;; non-nil means to allow minibuffer commands while in the minibuffer
 (customize-set-variable 'enable-recursive-minibuffers nil)
@@ -273,75 +483,110 @@
 ;; non-nil means when reading a file name completion ignores case
 (customize-set-variable 'read-file-name-completion-ignore-case t)
 
-(when (require 'minibuffer nil t)
-  (progn
-    ;; custom
-    ;; number of completion candidates below which cycling is used
-    (customize-set-variable 'completion-cycle-threshold t)
+;; number of completion candidates below which cycling is used
+(customize-set-variable 'completion-cycle-threshold t)
 
-    ;; treat the SPC or - inserted by `minibuffer-complete-word as delimiters
-    (customize-set-variable 'completion-pcm-complete-word-inserts-delimiters t)
+;; treat the SPC or - inserted by `minibuffer-complete-word as delimiters
+(customize-set-variable 'completion-pcm-complete-word-inserts-delimiters t)
 
-    ;; a string of characters treated as word delimiters for completion
-    (customize-set-variable 'completion-pcm-word-delimiters "-_./:| ")
+;; a string of characters treated as word delimiters for completion
+(customize-set-variable 'completion-pcm-word-delimiters "-_./:| ")
 
-    ;; non-nil means show help message in *Completions* buffer
-    (customize-set-variable 'completion-show-help nil)
+;; non-nil means show help message in *Completions* buffer
+(customize-set-variable 'completion-show-help nil)
 
-    ;; non-nil means automatically provide help for invalid completion input
-    (customize-set-variable 'completion-auto-help 'lazy)
+;; non-nil means automatically provide help for invalid completion input
+(customize-set-variable 'completion-auto-help 'lazy)
 
-    ;; list of completion styles to use: see `completion-styles-alist variable
-    (customize-set-variable 'completion-styles '(partial-completion substring initials))
+;; list of completion styles to use: see `completion-styles-alist variable
+(customize-set-variable 'completion-styles '(partial-completion substring initials))
 
-    ;; list of category-specific user overrides for completion styles.
-    (customize-set-variable 'completion-category-overrides
-                            '((file (styles initials basic))
-                              (buffer (styles initials basic))
-                              (info-menu (styles basic))))
+;; list of category-specific user overrides for completion styles.
+(customize-set-variable 'completion-category-overrides
+                        '((file (styles initials basic))
+                          (buffer (styles initials basic))
+                          (info-menu (styles basic))))
 
-    ;; define the appearance and sorting of completions
-    (customize-set-variable 'completions-format nil)
+;; define the appearance and sorting of completions
+(customize-set-variable 'completions-format 'vertical)
 
-    ;; non-nil means when reading a file name completion ignores case
-    (customize-set-variable 'read-file-name-completion-ignore-case t)
+;; non-nil means when reading a file name completion ignores case
+(customize-set-variable 'read-file-name-completion-ignore-case t)
 
-    ;; how to resize mini-windows (the minibuffer and the echo area)
-    ;; a value of t means resize them to fit the text displayed in them
-    (customize-set-variable 'resize-mini-windows nil)
+;; how to resize mini-windows (the minibuffer and the echo area)
+;; a value of t means resize them to fit the text displayed in them
+(customize-set-variable 'resize-mini-windows nil)
 
-    ;; if non-nil, shorten "(default ...)" to "[...]" in minibuffer prompts
-    (customize-set-variable 'minibuffer-eldef-shorten-default t)
+;; if non-nil, shorten "(default ...)" to "[...]" in minibuffer prompts
+(customize-set-variable 'minibuffer-eldef-shorten-default t)
 
-    ;; non-nil means to delete duplicates in history
-    (customize-set-variable 'history-delete-duplicates t)
+;; non-nil means to delete duplicates in history
+(customize-set-variable 'history-delete-duplicates t)))
 
-    ;; bind (minibuffer-local-map
-    (define-key minibuffer-local-map (kbd "M-`") 'minibuffer-completion-help)
-    (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
+(defun eos/focus-minibuffer ()
+  "Focus the active minibuffer.
 
-    ;; research (maybe this is not necessary) (C-k: kill line)
-    ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
+Bind this to `completion-list-mode-map' to easily jump
+between the list of candidates present in the \\*Completions\\*
+buffer and the minibuffer."
 
-    ;; bind (global)
-                                        ; goto to minibuffer or completions
-    (global-set-key (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
+  (interactive)
+  (let ((mini (active-minibuffer-window)))
+    (when mini
+      (select-window mini))))
 
-    ;; enable
-    ;; if `file-name-shadow-mode' is active, any part of the
-    ;; minibuffer text that would be ignored because of this is given the
-    ;; properties in `file-name-shadow-properties', which may
-    ;; be used to make the ignored text invisible, dim, etc.
-    (file-name-shadow-mode -1)
+(defun eos/focus-minibuffer-or-completions ()
+  "Focus the active minibuffer or the \\*Completions\\*.
 
-    ;; when active, any recursive use of the minibuffer will show
-    ;; the recursion depth in the minibuffer prompt, this is only
-    ;; useful if `enable-recursive-minibuffers' is non-nil
-    (minibuffer-depth-indicate-mode -1)
+      If both the minibuffer and the Completions are present, this
+      command will first move per invocation to the former, then the
+      latter, and then continue to switch between the two.
 
-    ;; when active, minibuffer prompts that show a default value only show
-    ;; the default when it's applicable
-    (minibuffer-electric-default-mode 1)))
+      The continuous switch is essentially the same as running
+      `eos/focus-minibuffer' and `switch-to-completions' in
+      succession."
+  (interactive)
+  (let* ((mini (active-minibuffer-window))
+         (completions (get-buffer-window "*Completions*")))
+    (cond ((and mini
+                (not (minibufferp)))
+           (select-window mini nil))
+          ((and completions
+                (not (eq (selected-window)
+                         completions)))
+           (select-window completions nil)))))
+
+;; defer garbage collection
+(add-hook 'minibuffer-setup-hook 'eos/defer-gc-collection)
+
+;; reset threshold to inital value
+(add-hook 'minibuffer-exit-hook 'eos/reset-gc-collection)
+
+;; minibuffer-local-map
+(define-key minibuffer-local-map (kbd "M-`") 'minibuffer-completion-help)
+(define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
+;; (define-key minibuffer-local-map (kbd "RET") 'minibuffer-complete-and-exit)
+
+;; research (maybe this is not necessary) (C-k: kill line)
+;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
+
+;; global-map
+(global-set-key (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
+
+;; if `file-name-shadow-mode' is active, any part of the
+;; minibuffer text that would be ignored because of this is given the
+;; properties in `file-name-shadow-properties', which may
+;; be used to make the ignored text invisible, dim, etc.
+(file-name-shadow-mode -1)
+
+;; when active, any recursive use of the minibuffer will show
+;; the recursion depth in the minibuffer prompt, this is only
+;; useful if `enable-recursive-minibuffers' is non-nil
+(minibuffer-depth-indicate-mode -1)
+
+;; when active, minibuffer prompts that show a default value only show
+;; the default when it's applicable
+(minibuffer-electric-default-mode 1)
 
 (when (require 'completion nil t)
   (progn
@@ -373,21 +618,245 @@
     ;; will not be saved unless these are used
     (customize-set-variable 'save-completions-retention-time 168)
 
-    ;; bind completiion-list-mode-map
-    (define-key completion-list-mode-map (kbd "h") 'eos/describe-symbol-at-point)
-    (define-key completion-list-mode-map (kbd "?") 'eos/describe-symbol-at-point)
-    (define-key completion-list-mode-map (kbd "q") 'delete-completion-window)
-    (define-key completion-list-mode-map (kbd "d") 'delete-completion-line)
-    (define-key completion-list-mode-map (kbd "TAB") 'next-completion)
-    (define-key completion-list-mode-map (kbd "SPC") 'previous-completion)
-    (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
-    (define-key completion-list-mode-map (kbd "RET") 'choose-completion)
-    (define-key completion-list-mode-map (kbd "C-k") 'eos/kill-line)
-    (define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
+(defun eos/complete-or-indent ()
+  "Complete or indent."
+  (interactive)
+  (if (looking-at "\\_>")
+      (when (fboundp 'complete)
+        (complete nil)))
+  (indent-according-to-mode))
 
-    ;; enable
-    ;; dynamic completion on
-    (eos-call-func 'dynamic-completion-mode 1)))
+(defun eos/complete-at-point-or-indent ()
+  "This smart tab is a `minibuffer' compliant.
+It acts as usual in the `minibuffer'.
+Else, if mark is active, indents region.
+Else if point is at the end of a symbol, expands it.
+Else indents the current line."
+  (interactive)
+  (if (minibufferp)
+      (unless (minibuffer-complete)
+        (complete-symbol nil))
+    (if mark-active
+        (indent-region (region-beginning)
+                       (region-end))
+      (if (looking-at "\\_>")
+          (complete-symbol nil)
+        (indent-according-to-mode)))))
+
+(defun eos/complete-buffer-or-indent ()
+  "Company (complete anything (in-buffer)) or indent."
+  (interactive)
+  (if (looking-at "\\_>")
+      (progn
+        (when (fboundp 'company-complete)
+          (funcall 'company-complete)))
+    (indent-according-to-mode)))
+
+(eos-call-func 'dynamic-completion-mode 1)
+
+;; completion-list-mode-map
+(define-key completion-list-mode-map (kbd "h") 'eos/describe-symbol-at-point)
+(define-key completion-list-mode-map (kbd "?") 'eos/describe-symbol-at-point)
+(define-key completion-list-mode-map (kbd "q") 'delete-completion-window)
+(define-key completion-list-mode-map (kbd "d") 'delete-completion-line)
+(define-key completion-list-mode-map (kbd "TAB") 'next-completion)
+(define-key completion-list-mode-map (kbd "SPC") 'previous-completion)
+(define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
+(define-key completion-list-mode-map (kbd "RET") 'choose-completion)
+(define-key completion-list-mode-map (kbd "C-k") 'eos/kill-line)
+(define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)))
+
+;; global
+
+(require 'icomplete)
+
+;; custom
+;; pending-completions number over which to apply `icomplete-compute-delay
+(customize-set-variable 'icomplete-delay-completions-threshold 0)
+
+;; maximum number of initial chars to apply `icomplete-compute-delay
+(customize-set-variable 'icomplete-max-delay-chars 0)
+
+;; completions-computation stall, used only with large-number completions
+(customize-set-variable 'icomplete-compute-delay 0)
+
+;; when non-nil, show completions when first prompting for input
+(customize-set-variable 'icomplete-show-matches-on-no-input t)
+
+;; when non-nil, hide common prefix from completion candidates
+(customize-set-variable 'icomplete-hide-common-prefix nil)
+
+;; maximum number of lines to use in the minibuffer
+(customize-set-variable 'icomplete-prospects-height 1)
+
+;; string used by Icomplete to separate alternatives in the minibuffer
+(customize-set-variable 'icomplete-separator "  •  ")
+
+;; specialized completion tables with which `icomplete should operate,
+;; if this is t, `icomplete operates on all tables
+(customize-set-variable 'icomplete-with-completion-tables t)
+
+;; if non-nil, also use icomplete when completing in non-mini buffers
+;; TODO: research
+(customize-set-variable 'icomplete-in-buffer nil)
+
+(defun eos/icomplete/kill-ring-save (&optional arg)
+  "Expand and save current icomplete match (ARG) to the kill ring.
+With a prefix argument, insert the match to the point in the
+current buffer"
+  (interactive "*P")
+  (when (and (minibufferp)
+             (bound-and-true-p icomplete-mode))
+    (kill-new (field-string-no-properties))
+    (if current-prefix-arg
+        (progn
+          (select-window (get-mru-window))
+          (insert (car kill-ring)
+                  (abort-recursive-edit))))))
+
+(defun eos/icomplete/kill-ring ()
+  "Insert the selected `kill-ring' item directly at point."
+  (interactive)
+  (let (candidates)
+    ;; set candidates
+    (setq candidates
+          (cl-loop with cands = (delete-dups kill-ring)
+                   for kill in cands
+                   unless (or (< (length kill) 4)
+                              (string-match "\\`[\n[:blank:]]+\\'" kill))
+                   collect kill))
+    ;; if candidates
+    (if candidates
+        (insert
+         (completing-read "Kill-ring: " candidates nil t))
+      (message "Mark ring is empty"))))
+
+(defun eos/icomplete-mark-ring-line-string-at-pos (pos)
+  "Return line string at position POS."
+  (save-excursion
+    (goto-char pos)
+    (forward-line 0)
+    (let ((line (car (split-string (thing-at-point 'line) "[\n\r]"))))
+      (remove-text-properties 0 (length line) '(read-only) line)
+      (if (string= "" line)
+          "<EMPTY LINE>"
+        line))))
+
+(defun eos/icomplete/mark-ring ()
+  "Browse `mark-ring' interactively."
+  (interactive)
+  (let* (candidates)
+    (setq candidates
+          (cl-loop with marks = (if (mark t)
+                                    (cons (mark-marker) mark-ring)
+                                  mark-ring)
+                   for marker in marks
+                   with max-line-number = (line-number-at-pos (point-max))
+                   with width = (length (number-to-string max-line-number))
+                   for m = (format (concat "%" (number-to-string width) "d: %s")
+                                   (line-number-at-pos marker)
+                                   (eos/icomplete-mark-ring-line-string-at-pos marker))
+                   unless (and recip (assoc m recip))
+                   collect (cons m marker) into recip
+                   finally return recip))
+    (if candidates
+        (progn
+          (let (candidate)
+            (setq candidate (completing-read "Mark-ring: " candidates nil t))
+            (goto-char (cdr (assoc candidate candidates))))))
+    (message "Mark ring is empty")))
+
+(defun eos/icomplete/toggle-completion-styles (&optional arg)
+  "Toggle between completion styles.
+With pregix ARG use basic completion instead.
+These styles are described in `completion-styles-alist'."
+  (interactive "*P")
+  (when (and (minibufferp)
+             (bound-and-true-p icomplete-mode))
+    (let* ((completion-styles-original completion-styles)
+           (basic    '(basic emacs22))
+           (initials '(initials substring partial-completion))
+           (prefix   '(partial-completion substring initials)))
+
+      ;; choose basic, initials or prefix
+      (if current-prefix-arg
+          (setq-local completion-styles basic)
+        (progn
+          (if (not (eq (car completion-styles) 'initials))
+              (setq-local completion-styles initials)
+            (setq-local completion-styles prefix))))
+
+      ;; show which current completion style
+      (message "Completion style: %s "
+               (format "%s" (car completion-styles))))))
+
+
+;; (defun eos/icomplete/company ()
+;;   "Insert the selected company candidate directly at point."
+;;   (interactive)
+;;   (if (and
+;;        (boundp 'company-common)
+;;        (boundp 'company-candidates)
+;;        (fboundp 'company-complete))
+;;       (progn
+;;         (unless company-candidates
+;;           (company-complete))
+;;         (unless (= (length company-candidates) 0)
+;;           (let ((candidate (completing-read "ic-company: " company-candidates nil nil)))
+;;             (delete-char (- (length company-common)))
+;;             (insert candidate))))
+;;     nil))
+
+;; (defun eos/icomplete/dash-docs-search ()
+;;   "Provide dash-docs candidates to `icomplete."
+;;   (interactive)
+;;   (dash-docs-create-common-connections)
+;;   (dash-docs-create-buffer-connections)
+
+;;   ;; get candidates
+;;   (let* ((candidates (cl-loop for docset in (dash-docs-maybe-narrow-docsets "")
+;;                               appending (dash-docs-search-docset docset "")))
+;;          (candidate (completing-read "Docs for: " candidates nil nil)))
+;;     ;; parse candidate
+;;     (let* ((i 0)
+;;            (n (catch 'nth-elt
+;;                 (dolist (value candidates)
+;;                   (when (equal candidate (car value))
+;;                     (throw 'nth-elt i))
+;;                   (setq i (+ 1 i)))))
+;;            (search-result (nth n candidates)))
+;;       (pop search-result)
+
+;;       ;; action: open documentation file
+;;       (dash-docs-browse-url search-result))))
+
+(when (boundp 'icomplete-minibuffer-map)
+  (progn
+    (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
+    (define-key icomplete-minibuffer-map (kbd "C-f") 'icomplete-forward-completions)
+    (define-key icomplete-minibuffer-map (kbd "C-b") 'icomplete-backward-completions)
+
+    ;; todo verify if predicate arg is avaiable else icomplete-force-complete-and-exit
+    (define-key icomplete-minibuffer-map (kbd "RET") 'minibuffer-force-complete-and-exit)
+
+    ;; toogle styles
+    (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
+
+    ;; basic
+    (define-key icomplete-minibuffer-map (kbd "C-.")
+      (lambda ()
+        (interactive)
+        (let ((current-prefix-arg t))
+          (funcall 'eos/icomplete/toggle-completion-styles))))))
+
+;; eos-mark-map
+(define-key eos-mark-map (kbd "m") 'eos/icomplete/mark-ring)
+
+;; global-map
+(global-set-key (kbd "M-y") 'eos/icomplete/kill-ring)
+
+;; enable (global)
+(icomplete-mode 1)
 
 ;; coding system to use with system messages
 (customize-set-variable 'locale-coding-system 'utf-8)
@@ -411,275 +880,308 @@
     (customize-set-variable 'eval-expression-print-level nil)
 
     ;; binds
-    (define-key ctl-x-map (kbd "C-g") 'keyboard-quit)
+    ;; (define-key ctl-x-map (kbd "C-g") 'keyboard-quit)
 
-    ;; enable
-    ;; column number display in the mode line
-    (eos-call-func 'column-number-mode 1)
+;; enable
+;; column number display in the mode line
+(eos-call-func 'column-number-mode 1)
 
-    ;; buffer size display in the mode line
-    (eos-call-func 'size-indication-mode 1)))
+;; buffer size display in the mode line
+(eos-call-func 'size-indication-mode 1)))
 
 (require 'prog-mode nil t)
 
+(when (require 'replace nil t)
+  (progn
+
+(defun eos/occur-at-point ()
+  "Occur with `thing-at-point' function."
+  (interactive)
+  (let ((symbol (thing-at-point 'symbol)))
+    (if symbol (occur symbol)
+      (message "Occur-at-point: No candidate."))))
+
+(global-set-key (kbd "M-s M-o") 'eos/occur-at-point)))
+
 (when (require 'server nil t)
   (progn
-    ;; hooks
-    ;; enable emacs server after startup
-    (add-hook 'emacs-startup-hook
-              (lambda ()
-                (eos-call-func 'server-start)))))
+
+;; enable emacs server after startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (eos-call-func 'server-start)))))
 
 (when (require 'help nil t)
   (progn
-    ;; custom
-    ;; always select the help window
-    (customize-set-variable 'help-window-select t)
 
-    ;; maximum height of a window displaying a temporary buffer.
-    (customize-set-variable 'temp-buffer-max-height
-                            (lambda
-                              (buffer)
-                              (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
-                                  (/ (x-display-pixel-height) (frame-char-height) 4)
-                                (/ (- (frame-height) 4) 4))))
+;; always select the help window
+(customize-set-variable 'help-window-select t)
 
-    ;; reference
-    ;; (customize-set-variable 'temp-buffer-max-height 12)
+;; maximum height of a window displaying a temporary buffer.
+(customize-set-variable 'temp-buffer-max-height
+                        (lambda
+                          (buffer)
+                          (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
+                              (/ (x-display-pixel-height) (frame-char-height) 4)
+                            (/ (- (frame-height) 4) 4))))
 
-    ;; enable
-    (temp-buffer-resize-mode 1)))
+;; reference
+;; (customize-set-variable 'temp-buffer-max-height 12)
 
-;; binds
-(when (boundp 'help-map)
+(temp-buffer-resize-mode 1)))
+
+(when (require 'help-mode nil t)
   (progn
-    ;; clean, quality of life
-    (define-key help-map (kbd "<help>") nil)
-    (define-key help-map (kbd "<f1>") nil)
-    (define-key help-map (kbd "C-n") nil)
-    (define-key help-map (kbd "C-h") nil)
-    (define-key help-map (kbd "C-;") nil)
-    (define-key help-map (kbd "K") nil)
-    (define-key help-map (kbd "RET") nil)))
 
-(require 'help-mode nil t)
-
-;; binds
 (when (boundp 'help-mode-map)
+  (define-key help-mode-map (kbd "C-j") 'push-button))))
+
+(when (require 'help-fns nil t)
   (progn
-    (define-key help-mode-map (kbd "C-j") 'push-button)))
+
+(defun eos/describe-symbol-at-point (&optional arg)
+  "Get help (documentation) for the symbol at point as ARG.
+
+With a prefix argument, switch to the *Help* window.  If that is
+already focused, switch to the most recently used window
+instead."
+  (interactive "P")
+  (let ((symbol (symbol-at-point)))
+    (when symbol
+      (describe-symbol symbol)))
+  (when current-prefix-arg
+    (let ((help (get-buffer-window "*Help*")))
+      (when help
+        (if (not (eq (selected-window) help))
+            (select-window help)
+          (select-window (get-mru-window)))))))))
 
 (when (require 'info nil t)
   (progn
-    ;; custom
-    ;; non-nil means don’t record intermediate Info nodes to the history
-    (customize-set-variable 'info-history-skip-intermediate-nodes nil)
 
-    ;; 0 means do not display breadcrumbs
-    ;; (customize-set-variable 'info-breadcrumbs-depth 0)
-    ))
+;; custom
+;; non-nil means don’t record intermediate Info nodes to the history
+(customize-set-variable 'info-history-skip-intermediate-nodes nil)))
+
+;; 0 means do not display breadcrumbs
+;; (customize-set-variable 'info-breadcrumbs-depth 0)
 
 (when (require 'fringe nil t)
   (progn
-    ;; custom
-    ;; 0 -> ("no-fringes" . 0), remove ugly icons to represet new lines
-    ;; ascii is more than enough to represent this information
-    ;; default appearance of fringes on all frame
-    (customize-set-variable 'fringe-mode 0)))
+
+;; custom
+;; 0 -> ("no-fringes" . 0), remove ugly icons to represet new lines
+;; ascii is more than enough to represent this information
+;; default appearance of fringes on all frame
+(customize-set-variable 'fringe-mode 0)))
 
 (when (require 'files nil t)
   (progn
-    ;; custom
-    ;; control use of version numbers for backup files.
-    (customize-set-variable 'version-control t)
 
-    ;; non-nil means always use copying to create backup files
-    (customize-set-variable 'backup-by-copying t)
+;; control use of version numbers for backup files.
+(customize-set-variable 'version-control t)
 
-    ;; number of newest versions to keep when a new numbered backup is made
-    (customize-set-variable 'kept-new-versions 6)
+;; non-nil means always use copying to create backup files
+(customize-set-variable 'backup-by-copying t)
 
-    ;; number of oldest versions to keep when a new numbered backup is made
-    (customize-set-variable 'kept-old-versions 2)
+;; number of newest versions to keep when a new numbered backup is made
+(customize-set-variable 'kept-new-versions 6)
 
-    ;; if t, delete excess backup versions silently
-    (customize-set-variable 'delete-old-versions t)
+;; number of oldest versions to keep when a new numbered backup is made
+(customize-set-variable 'kept-old-versions 2)
 
-    ;; non-nil means make a backup of a file the first time it is saved
-    (customize-set-variable 'make-backup-files nil)
+;; if t, delete excess backup versions silently
+(customize-set-variable 'delete-old-versions t)
 
-    ;; non-nil says by default do auto-saving of every file-visiting buffer
-    (customize-set-variable 'auto-save-default nil)
+;; non-nil means make a backup of a file the first time it is saved
+(customize-set-variable 'make-backup-files nil)
 
-    ;; most *NIX tools work best when files are terminated
-    ;; with a newline
-    (customize-set-variable 'require-final-newline t)
+;; non-nil says by default do auto-saving of every file-visiting buffer
+(customize-set-variable 'auto-save-default nil)
 
-    ;; backup directory list
-    ;; alist of filename patterns and backup directory names
-    (customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))))
+;; most *NIX tools work best when files are terminated
+;; with a newline
+(customize-set-variable 'require-final-newline t)
+
+;; backup directory list
+;; alist of filename patterns and backup directory names
+(customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))))
 
 ;; create cache directory
 (eos-mkdir (concat user-emacs-directory "cache"))
 
-(when (require 'recentf nil t)
-  (progn
-    ;; custom
-    ;; file to save the recent list into.
-    (customize-set-variable
-     'recentf-save-file (concat user-emacs-directory "cache/recentf"))
+(require 'recentf)
 
-    ;; bind (eos-find-map)
-    (define-key eos-find-map (kbd "C-r") 'recentf-open-files)
-    (define-key eos-find-map (kbd "r") 'eos/icomplete/recentf-open-files)))
+;; file to save the recent list into.
+(customize-set-variable
+ 'recentf-save-file (concat user-emacs-directory "cache/recentf"))
+
+(defun eos/icomplete/recentf-open-file ()
+  "Open `recent-list' item in a new buffer.
+The user's $HOME directory is abbreviated as a tilde."
+  (interactive)
+  (let ((files (mapcar 'abbreviate-file-name recentf-list)))
+    (find-file
+     (completing-read "Recentf: " files nil t))))
+
+;; eos-find-map
+(define-key eos-find-map (kbd "C-r") 'recentf-open-files)
+(define-key eos-find-map (kbd "r") 'eos/icomplete/recentf-open-file)
 
 (when (require 'bookmark nil t)
   (progn
-    ;; custom
-    ;; file in which to save bookmarks by default.
-    (customize-set-variable
-     'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))))
+
+;; custom
+;; file in which to save bookmarks by default.
+(customize-set-variable
+ 'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))))
 
 (when (require 'savehist nil t)
   (progn
-    ;; file name where minibuffer history is saved to and loaded from.
-    (customize-set-variable
-     'savehist-file (concat user-emacs-directory "cache/history"))
 
-    ;; if non-nil, save all recorded minibuffer histories.
-    (customize-set-variable 'savehist-save-minibuffer-history t)
+;; file name where minibuffer history is saved to and loaded from.
+(customize-set-variable
+ 'savehist-file (concat user-emacs-directory "cache/history"))
 
-    ;; enable savehist mode
-    (eos-call-func 'savehist-mode 1)))
+;; if non-nil, save all recorded minibuffer histories.
+(customize-set-variable 'savehist-save-minibuffer-history t)
 
-(when (require 'frame nil t)
-  (progn
-    ;; custom
-    ;; with some window managers you may have to set this to non-nil
-    ;; in order to set the size of a frame in pixels, to maximize
-    ;; frames or to make them fullscreen.
-    (customize-set-variable 'frame-resize-pixelwise t)
+;; enable savehist mode
+(eos-call-func 'savehist-mode 1)))
 
-    ;; normalize before maximize
-    (customize-set-variable 'x-frame-normalize-before-maximize t)
+(require 'frame)
 
-    ;; set frame title format
-    (customize-set-variable 'frame-title-format
-                            '((:eval (if (buffer-file-name)
-                                         (abbreviate-file-name (buffer-file-name))
-                                       "%b"))))
+;; with some window managers you may have to set this to non-nil
+;; in order to set the size of a frame in pixels, to maximize
+;; frames or to make them fullscreen.
+(customize-set-variable 'frame-resize-pixelwise t)
 
-    ;; alist of parameters for the initial X window frame
-    (add-to-list 'initial-frame-alist '(fullscreen . fullheight))
+;; normalize before maximize
+(customize-set-variable 'x-frame-normalize-before-maximize t)
 
-    ;; (vertical-scroll-bars)
-    ;; (bottom-divider-width . 0)
-    ;; (right-divider-width . 6)))
+;; set frame title format
+(customize-set-variable 'frame-title-format
+                        '((:eval (if (buffer-file-name)
+                                     (abbreviate-file-name (buffer-file-name))
+                                   "%b"))))
 
-    ;; alist of default values for frame creation
-    (add-to-list 'default-frame-alist '(internal-border-width . 2))
+;; alist of parameters for the initial X window frame
+(add-to-list 'initial-frame-alist '(fullscreen . fullheight))
 
-    ;; set frame font
-    (eos-set-frame-font "Hermit Light:pixelsize=18")
+;; (vertical-scroll-bars)
+;; (bottom-divider-width . 0)
+;; (right-divider-width . 6)))
 
-    ;; hooks
-    ;; enable window divider
-    (add-hook 'after-init-hook
-              (lambda()
-                (eos-call-func 'window-divider-mode)))
+;; alist of default values for frame creation
+(add-to-list 'default-frame-alist '(internal-border-width . 2))
 
-    ;; disable blink cursor
-    (add-hook 'emacs-startup-hook
-              (lambda()
-                (eos-call-func 'blink-cursor-mode 0)))))
+(defun eos-set-frame-font (font)
+  "Set the default font to FONT."
+  (cond ((find-font (font-spec :name font))
+         (set-frame-font font nil t))))
 
-;; binds
-(global-set-key (kbd "C-x C-o") 'other-frame)
+;; enable window divider
+(add-hook 'after-init-hook
+          (lambda()
+            (eos-call-func 'window-divider-mode)))
+
+;; disable blink cursor
+(add-hook 'emacs-startup-hook
+          (lambda()
+            (eos-call-func 'blink-cursor-mode 0)))
 
 ;; set font by face attribute (reference)
 ;; (set-face-attribute 'default nil :height)
 
+;; binds
+(global-set-key (kbd "C-x C-o") 'other-frame)
+
+;; set frame font
+(eos-set-frame-font "Hermit Light:pixelsize=18")
+
 (when (require 'windmove nil t)
   (progn
-    ;; enable
-    ;; window move default keybinds (shift-up/down etc..)
-    (eos-call-func 'windmove-default-keybindings)))
+
+;; window move default keybinds (shift-up/down etc..)
+(eos-call-func 'windmove-default-keybindings)))
 
 (when (require 'page nil t)
   (progn
-    ;; enable narrow functions
-    (put 'narrow-to-page 'disabled nil)
-    (put 'narrow-to-region 'disabled nil)))
+
+;; enable narrow functions
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-region 'disabled nil)))
 
 (when (require 'kmacro nil t)
   (progn
-    ;; binds
-    (define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
 
-(require 'paren nil t)
+(define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
 
-;; enable
+(when (require 'paren nil t)
+  (progn
+
 ;; visualization of matching parens
-(eos-call-func 'show-paren-mode 1)
+(eos-call-func 'show-paren-mode 1)))
 
 (when (require 'hideshow nil t)
   (progn
-    ;; hooks
-    (add-hook 'prog-mode-hook 'hs-minor-mode)
 
-    ;; binds
-    (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
+(add-hook 'prog-mode-hook 'hs-minor-mode)
+
+;; C-x [
+(define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
 
 (when (require 'elec-pair nil t)
   (progn
-    ;; custom
-    ;; alist of pairs that should be used regardless of major mode.
-    (customize-set-variable 'electric-pair-pairs
-                            '((?\{ . ?\})
-                              (?\( . ?\))
-                              (?\[ . ?\])
-                              (?\" . ?\")))
 
-    ;; enable
-    (eos-call-func 'electric-pair-mode 1)))
+;; alist of pairs that should be used regardless of major mode.
+(customize-set-variable 'electric-pair-pairs
+                        '((?\{ . ?\})
+                          (?\( . ?\))
+                          (?\[ . ?\])
+                          (?\" . ?\")))
+
+(eos-call-func 'electric-pair-mode 1)))
 
 (when (require 'newcomment nil t)
   (progn
-    ;; binds
-    (global-set-key (kbd "M-c") 'comment-or-uncomment-region)))
+
+;; global-map
+(global-set-key (kbd "M-c") 'comment-or-uncomment-region)))
 
 (when (require 'time nil t)
   (progn
-    ;; custom
-    ;; seconds between updates of time in the mode line.
-    (customize-set-variable 'display-time-interval 15)
 
-    ;; non-nil indicates time should be displayed as hh:mm, 0 <= hh <= 23
-    (customize-set-variable 'display-time-24hr-format t)
+;; seconds between updates of time in the mode line.
+(customize-set-variable 'display-time-interval 15)
 
-    ;; set format time string
-    (customize-set-variable 'display-time-format "%H:%M")
+;; non-nil indicates time should be displayed as hh:mm, 0 <= hh <= 23
+(customize-set-variable 'display-time-24hr-format t)
 
-    ;; load-average values below this value won’t be shown in the mode line.
-    (customize-set-variable 'display-time-load-average-threshold 1.0)
+;; set format time string
+(customize-set-variable 'display-time-format "%H:%M")
 
-    ;; enable display time
-    (eos-call-func 'display-time-mode 1)))
+;; load-average values below this value won’t be shown in the mode line.
+(customize-set-variable 'display-time-load-average-threshold 1.0)
+
+;; enable display time
+(eos-call-func 'display-time-mode 1)))
 
 (when (require 'tool-bar nil t)
   (progn
-    ;; disable
-    (eos-call-func 'tool-bar-mode 0)))
+
+;; disable
+(eos-call-func 'tool-bar-mode 0)))
 
 (when (require 'tooltip nil t)
   (progn
-    ;; disable tooltip
-    (eos-call-func 'tooltip-mode 0)))
+
+(eos-call-func 'tooltip-mode 0)))
 
 (when (require 'menu-bar nil t)
   (progn
-    ;; disable menu-bar
-    (eos-call-func 'menu-bar-mode 0)))
+
+(eos-call-func 'menu-bar-mode 0)))
 
 (when (require 'scroll-bar nil t)
   (progn
@@ -761,83 +1263,84 @@
 
 (when (require 'package nil t)
   (progn
-    ;; custom
-    (customize-set-variable
-     'package-archives
-     '(("gnu" . "https://elpa.gnu.org/packages/")
-       ("melpa" . "https://melpa.org/packages/")))))
+
+(customize-set-variable
+ 'package-archives
+ '(("gnu" . "https://elpa.gnu.org/packages/")
+   ("melpa" . "https://melpa.org/packages/")))))
 
 ;; enable (manually only)
-;; (package-initialize)))
+;; (package-initialize)
 
-(when (require 'exwm nil t)
-  (progn
-    (require 'exwm-config nil t)
+(require 'exwm)
+(require 'exwm-config)
+(require 'exwm-core)
+(require 'exwm-workspace)
 
-    ;; set exwm workspaces number
-    (customize-set-variable 'exwm-workspace-number 0)
+;; set exwm workspaces number
+(customize-set-variable 'exwm-workspace-number 0)
 
-    ;; show workspaces in all buffers
-    (customize-set-variable 'exwm-workspace-show-all-buffers t)
+;; show workspaces in all buffers
+(customize-set-variable 'exwm-workspace-show-all-buffers t)
 
-    ;; non-nil to allow switching to buffers on other workspaces
-    (customize-set-variable 'exwm-layout-show-all-buffers t)
+;; non-nil to allow switching to buffers on other workspaces
+(customize-set-variable 'exwm-layout-show-all-buffers t)
 
-    ;; non-nil to force managing all X windows in tiling layout.
-    (customize-set-variable 'exwm-manage-force-tiling t)
+;; non-nil to force managing all X windows in tiling layout.
+(customize-set-variable 'exwm-manage-force-tiling t)
 
-    ;; exwn global keybindings
-    (customize-set-variable 'exwm-input-global-keys
-                            `(([?\s-r] . exwm-reset)
-                              ([?\s-q] . exwm-input-toggle-keyboard)
-                              ;; ([?\s-w] . exwm-workspace-switch)
-                              ;; ([?\s-k] . exwm-workspace-delete)
-                              ;; ([?\s-a] . exwm-workspace-swap)
+;; exwn global keybindings
+(customize-set-variable 'exwm-input-global-keys
+                        `(([?\s-r] . exwm-reset)
+                          ([?\s-q] . exwm-input-toggle-keyboard)
+                          ;; ([?\s-w] . exwm-workspace-switch)
+                          ;; ([?\s-k] . exwm-workspace-delete)
+                          ;; ([?\s-a] . exwm-workspace-swap)
 
-                              ;; create and switch to workspaces
-                              ,@(mapcar (lambda (i)
-                                          `(,(kbd (format "s-%d" i)) .
-                                            (lambda ()
-                                              (interactive)
-                                              (exwm-workspace-switch-create ,i))))
-                                        (number-sequence 0))))
+                          ;; create and switch to workspaces
+                          ,@(mapcar (lambda (i)
+                                      `(,(kbd (format "s-%d" i)) .
+                                        (lambda ()
+                                          (interactive)
+                                          (exwm-workspace-switch-create ,i))))
+                                    (number-sequence 0))))
 
-    ;; The following example demonstrates how to use simulation keys to mimic
-    ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
-    ;; list of cons cells (SRC . DEST), where SRC is the key sequence you press
-    ;; and DEST is what EXWM actually sends to application.  Note that both SRC
-    ;; and DEST should be key sequences (vector or string).
-    (customize-set-variable 'exwm-input-simulation-keys
-                            '(
-                              ;; movement
-                              ([?\C-b] . [left])
-                              ([?\M-b] . [C-left])
-                              ([?\C-f] . [right])
-                              ([?\M-f] . [C-right])
-                              ([?\C-p] . [up])
-                              ([?\C-n] . [down])
-                              ([?\C-a] . [home])
-                              ([?\C-e] . [end])
-                              ([?\M-v] . [prior])
-                              ([?\C-v] . [next])
-                              ([?\C-d] . [delete])
-                              ([?\C-k] . [S-end delete])
+;; The following example demonstrates how to use simulation keys to mimic
+;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
+;; list of cons cells (SRC . DEST), where SRC is the key sequence you press
+;; and DEST is what EXWM actually sends to application.  Note that both SRC
+;; and DEST should be key sequences (vector or string).
+(customize-set-variable 'exwm-input-simulation-keys
+                        '(
+                          ;; movement
+                          ([?\C-b] . [left])
+                          ([?\M-b] . [C-left])
+                          ([?\C-f] . [right])
+                          ([?\M-f] . [C-right])
+                          ([?\C-p] . [up])
+                          ([?\C-n] . [down])
+                          ([?\C-a] . [home])
+                          ([?\C-e] . [end])
+                          ([?\M-v] . [prior])
+                          ([?\C-v] . [next])
+                          ([?\C-d] . [delete])
+                          ([?\C-k] . [S-end delete])
 
-                              ;; firefox temporary
-                              ([?\C-o] . [C-prior]) ; change tab mapping
-                              ([?\C-k] . [C-w]) ; close tab mapping
-                              ([?\C-j] . [return]) ; close tab mapping
+                          ;; firefox temporary
+                          ([?\C-o] . [C-prior]) ; change tab mapping
+                          ([?\C-k] . [C-w]) ; close tab mapping
+                          ([?\C-j] . [return]) ; close tab mapping
 
-                              ;; cut/paste.
-                              ([?\C-w] . [?\C-x])
-                              ([?\M-w] . [?\C-c])
-                              ([?\C-y] . [?\C-v])
+                          ;; cut/paste.
+                          ([?\C-w] . [?\C-x])
+                          ([?\M-w] . [?\C-c])
+                          ([?\C-y] . [?\C-v])
 
-                              ;; Escape (cancel)
-                              ([?\C-g] . [escape])
+                          ;; Escape (cancel)
+                          ([?\C-g] . [escape])
 
-                              ;; search
-                              ([?\C-s] . [?\C-f])))))
+                          ;; search
+                          ([?\C-s] . [?\C-f])))
 
 ;; this little bit will make sure that XF86 keys work in exwm buffers as well
 (if (boundp 'exwm-input-prefix-keys)
@@ -857,9 +1360,6 @@
                      print))
         (cl-pushnew key exwm-input-prefix-keys))))
 
-;; enable exwm
-(eos-call-func 'exwm-enable)
-
 ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
 ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
 ;; are run when a new X window class name or title is available.  Here's
@@ -868,15 +1368,14 @@
 ;; + For applications with multiple windows (e.g. GIMP), the class names of
 ;; all windows are probably the same.  Using window titles for them makes
 ;; more sense.
-(require 'exwm-core nil t)
-(require 'exwm-workspace nil t)
 
-;; hooks
 ;; update the buffer name by X11 window title
 (add-hook 'exwm-update-title-hook
           (lambda ()
             (exwm-workspace-rename-buffer
              (concat exwm-class-name "|" exwm-title))))
+
+(eos-call-func 'exwm-enable)
 
 (when (require 'exwm-randr nil t)
   (progn
@@ -903,75 +1402,6 @@
 (add-to-list 'display-buffer-alist
              '("\\*Async Shell Command\\*" display-buffer-no-window))
 
-(when (require 'icomplete nil t)
-  (progn
-    ;; custom
-    ;; pending-completions number over which to apply `icomplete-compute-delay
-    (customize-set-variable 'icomplete-delay-completions-threshold 0)
-
-    ;; maximum number of initial chars to apply `icomplete-compute-delay
-    (customize-set-variable 'icomplete-max-delay-chars 0)
-
-    ;; completions-computation stall, used only with large-number completions
-    (customize-set-variable 'icomplete-compute-delay 0)
-
-    ;; when non-nil, show completions when first prompting for input
-    (customize-set-variable 'icomplete-show-matches-on-no-input t)
-
-    ;; when non-nil, hide common prefix from completion candidates
-    (customize-set-variable 'icomplete-hide-common-prefix nil)
-
-    ;; maximum number of lines to use in the minibuffer
-    (customize-set-variable 'icomplete-prospects-height 1)
-
-    ;; string used by Icomplete to separate alternatives in the minibuffer
-    (customize-set-variable 'icomplete-separator "  •  ")
-
-    ;; specialized completion tables with which `icomplete should operate,
-    ;; if this is t, `icomplete operates on all tables
-    (customize-set-variable 'icomplete-with-completion-tables t)
-
-    ;; if non-nil, also use icomplete when completing in non-mini buffers
-    ;; TODO: research
-    (customize-set-variable 'icomplete-in-buffer nil)
-
-    ;; bind (prefix-maps)
-    (define-key eos-find-map (kbd "r") 'eos/icomplete/recentf-open-file)
-    (define-key eos-mark-map (kbd "m") 'eos/icomplete/mark-ring)
-
-    ;; bind (global)
-    (global-set-key (kbd "M-y") 'eos/icomplete/kill-ring)
-
-    ;; enable (global)
-    (icomplete-mode 1)))
-
-;; binds
-(when (boundp 'icomplete-minibuffer-map)
-  (progn
-    (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-    (define-key icomplete-minibuffer-map (kbd "C-f") 'icomplete-forward-completions)
-    (define-key icomplete-minibuffer-map (kbd "C-b") 'icomplete-backward-completions)
-
-    ;; todo verify if predicate arg is avaiable else icomplete-force-complete-and-exit
-    (define-key icomplete-minibuffer-map (kbd "RET") 'minibuffer-complete-and-exit)
-
-    ;; toogle styles
-    (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
-
-    ;; basic
-    (define-key icomplete-minibuffer-map (kbd "C-.")
-      (lambda ()
-        (interactive)
-        (let ((current-prefix-arg t))
-          (funcall 'eos/icomplete/toggle-completion-styles))))))
-
-;; add eos-theme-dir to theme load path
-(add-to-list 'custom-theme-load-path
-             (concat user-emacs-directory "themes"))
-
-;; load theme
-(load-theme 'mesk-term t)
-
 (when (require 'all-the-icons nil t)
   (progn
     ;; custom
@@ -987,7 +1417,6 @@
 (when (require 'nsm nil t)
   (progn
     ;; custom
-
     ;; how secure the network should be.
     ;; If a potential problem with the security of the network
     ;; connection is found, the user is asked to give input
@@ -996,7 +1425,11 @@
     ;; people would not find useful.
     ;; `paranoid': On this level, the user is queried for
     ;; most new connections
-    (customize-set-variable 'network-security-level 'paranoid)))
+    (customize-set-variable 'network-security-level 'paranoid)
+
+    ;; the file the security manager settings will be stored in.
+    (customize-set-variable 'nsm-setting-file
+                            (expand-file-name "cache/netword-security-data" user-emacs-directory))))
 
 (when (require 'tls nil t)
   (progn
@@ -1073,11 +1506,6 @@
 
     ;; bind (global)
     (global-set-key (kbd "C-;") 'iedit-mode)))
-
-(when (require 'replace nil t)
-  (progn
-    ;; bind (global)
-    (global-set-key (kbd "M-s M-o") 'eos/occur-at-point)))
 
 (when (require 'undo-tree nil t)
   (progn
@@ -1372,58 +1800,62 @@
 
 (when (require 'ispell nil t)
   (progn
-    ;; custom
-    ;; program invoked by M-x ispell-word and M-x ispell-region commands.
-    (customize-set-variable 'ispell-program-name "aspell")
 
-    ;; binds
-    (define-key eos-sc-map (kbd "i") 'ispell-word)
-    (define-key eos-sc-map (kbd "I") 'ispell-buffer)))
+;; program invoked by M-x ispell-word and M-x ispell-region commands.
+(customize-set-variable 'ispell-program-name "aspell")
 
 ;; add display-buffer-alist
 ;; (add-to-list 'display-buffer-alist
 ;;              '("\\*Choices\\*" display-buffer-below-selected))
 
+;; silent compiler
+(defvar ispell-current-dictionary nil nil)
+
+(defun eos/ispell/switch-dictionary ()
+  "Switch dictionaries."
+  (interactive)
+  (let* ((dic ispell-current-dictionary)
+         (change (if (string= dic "english") "brasileiro" "english")))
+    (ispell-change-dictionary change)
+    (message "Dictionary switched from %s to %s" dic change)))
+
+(define-key eos-sc-map (kbd "i") 'ispell-word)
+(define-key eos-sc-map (kbd "I") 'ispell-buffer)))
+
 (when (require 'flyspell nil t)
   (progn
-    ;; custom
-    ;; string that is the name of the default dictionary
-    (customize-set-variable 'flyspell-default-dictionary "english")
 
-    ;; hooks
-    (add-hook 'text-mode-hook 'flyspell-mode)
-    (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
+;; string that is the name of the default dictionary
+(customize-set-variable 'flyspell-default-dictionary "english")
 
-;; function (reference)
-;; (defun eos/ispell/switch-dictionary ()
-;;   "Switch dictionaries."
-;;   (interactive)
-;;   (let* ((dic ispell-current-dictionary)
-;;          (change (if (string= dic "english") "brasileiro" "english")))
-;;     (ispell-change-dictionary change)
-;;     (message "Dictionary switched from %s to %s" dic change)))))
+;; hooks
+(add-hook 'text-mode-hook 'flyspell-mode)
+(add-hook 'prog-mode-hook 'flyspell-prog-mode)))
 
-(when (require 'flycheck nil t)
-  (progn
-    ;; binds
-    (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
-    (define-key eos-sc-map (kbd "e") 'flycheck-list-errors)
-    (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
-    (define-key eos-sc-map (kbd "d") 'flycheck-disable-checker)
-    (define-key eos-sc-map (kbd "m") 'flycheck-mode)
-    (define-key eos-sc-map (kbd "s") 'flycheck-select-checker)
-    (define-key eos-sc-map (kbd "?") 'flycheck-describe-checker)
+(require 'flycheck)
 
-    ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
-    ;; (define-key eos-sc-map
-    ;;   (kbd "v") 'flycheck-verify-setup)
+(defun eos/set-flycheck-checker (checker)
+  "Set flycheck CHECKER variable."
+  (make-local-variable 'flycheck-checker)
+  (when (boundp 'flycheck-checker)
+    (setq flycheck-checker checker)))
 
-    ;; init flycheck mode after some programming mode
-    ;; is activated (c-mode, elisp-mode, etc).
-    (add-hook 'prog-mode-hook 'flycheck-mode)))
+;; init flycheck mode after some programming mode
+;; is activated (c-mode, elisp-mode, etc).
+(add-hook 'prog-mode-hook 'flycheck-mode)
 
-;; bind eos-sc-map prefix to C-x e
-(define-key ctl-x-map (kbd "e") 'eos-sc-map)
+;; binds
+(define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
+(define-key eos-sc-map (kbd "e") 'flycheck-list-errors)
+(define-key eos-sc-map (kbd "b") 'flycheck-buffer)
+(define-key eos-sc-map (kbd "d") 'flycheck-disable-checker)
+(define-key eos-sc-map (kbd "m") 'flycheck-mode)
+(define-key eos-sc-map (kbd "s") 'flycheck-select-checker)
+(define-key eos-sc-map (kbd "?") 'flycheck-describe-checker)
+
+;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
+;; (define-key eos-sc-map
+;;   (kbd "v") 'flycheck-verify-setup)
 
 (when (require 'verb nil t)
   (progn
@@ -1461,7 +1893,7 @@
   (progn
     ;; custom
     ;; string to display in the dmenu prompt
-    (customize-set-variable 'dmenu-prompt-string "exec: ")
+    (customize-set-variable 'dmenu-prompt-string "Dmenu: ")
 
     ;; determines on how many recently executed commands
     ;; dmenu should keep a record
@@ -1471,7 +1903,7 @@
     ;; saved between Emacs sessions
     (customize-set-variable
      'dmenu-save-file
-     (concat (expand-file-name user-emacs-directory) "dmenu-items"))
+     (expand-file-name "cache/dmenu-items" user-emacs-directory))
 
     ;; bind (C-x) prefix map
     (define-key ctl-x-map (kbd "C-l") 'dmenu)))
@@ -1663,6 +2095,9 @@
     (funcall 'emms-all)
     (funcall 'emms-default-players)))
 
+;; We can't tangle without org!
+(require 'org)
+
 ;; custom
 ;; when non-nil, fontify code in code blocks
 (customize-set-variable 'org-src-fontify-natively t)
@@ -1688,6 +2123,25 @@
                         '((emacs-lisp . t)
                           (python . t)))
 
+(defun eos/build ()
+  "If the current buffer is 'init.org' the code-blocks are tangled.
+The tangled file will be compiled."
+  (interactive)
+
+  ;; avoid running hooks when tangling.
+  (let ((prog-mode-hook nil)
+        (buffer (current-buffer)))
+
+    ;; switch or open init.org file
+    (find-file (expand-file-name "init.org" user-emacs-directory))
+
+    ;; tangle and compile
+    (org-babel-tangle)
+    (byte-compile-file (concat user-emacs-directory "init.el"))
+
+    ;; switch to the previous buffer
+    (switch-to-buffer buffer)))
+
 (add-hook 'org-mode-hook
           (lambda ()
             ;; do not truncate lines
@@ -1701,7 +2155,9 @@
                 company-dabbrev-code)
                (company-files)))))
 
-;; binds
+;; silent compiler
+(defvar org-mode-map nil nil)
+
 (define-key org-mode-map (kbd "C-M-i") 'eos/complete-buffer-or-indent)
 
 (require 'tex-mode nil t)
@@ -1807,24 +2263,51 @@
   (progn
     (define-key Man-mode-map (kbd "C-j") 'push-button)))
 
-(when (require 'dash-docs nil t)
-  (progn
-    ;; custom
-    ;; default path for docsets
-    (customize-set-variable
-     'dash-docs-docsets-path
-     (concat (expand-file-name user-emacs-directory) "docsets"))
+(require 'dash-docs)
 
-    ;; minimum length to start searching in docsets
-    (customize-set-variable 'dash-docs-min-length 2)
+;; default path for docsets
+(customize-set-variable
+ 'dash-docs-docsets-path
+ (concat (expand-file-name user-emacs-directory) "docsets"))
 
-    ;; binds
-    (define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)
-    ;; (define-key eos-docs-map (kbd "i") 'dash-docs-async-install-docset)
-    (define-key eos-docs-map (kbd "i") 'dash-docs-install-docset)
-    (define-key eos-docs-map (kbd "l") 'eos/icomplete/dash-docs-search)
-    (define-key eos-docs-map (kbd "a") 'dash-docs-activate-docset)
-    (define-key eos-docs-map (kbd "d") 'dash-docs-deactivate-docset)))
+;; minimum length to start searching in docsets
+(customize-set-variable 'dash-docs-min-length 2)
+
+(defun eos/icomplete/dash-docs-search ()
+  "Provide dash-docs candidates to `icomplete."
+  (interactive)
+  (dash-docs-create-common-connections)
+  (dash-docs-create-buffer-connections)
+
+  ;; get candidates
+  (let* ((candidates (cl-loop for docset in (dash-docs-maybe-narrow-docsets "")
+                              appending (dash-docs-search-docset docset "")))
+         (candidate (completing-read "Docs for: " candidates nil nil)))
+    ;; parse candidate
+    (let* ((i 0)
+           (n (catch 'nth-elt
+                (dolist (value candidates)
+                  (when (equal candidate (car value))
+                    (throw 'nth-elt i))
+                  (setq i (+ 1 i)))))
+           (search-result (nth n candidates)))
+      (pop search-result)
+
+      ;; action: open documentation file
+      (dash-docs-browse-url search-result))))
+
+(defun eos-set-dash-docset (docset)
+  "Activate a DOCSET, if available."
+  (when (fboundp 'dash-docs-activate-docset)
+    (funcall 'dash-docs-activate-docset docset)))
+
+;; eos-docs-map
+(define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)
+;; (define-key eos-docs-map (kbd "i") 'dash-docs-async-install-docset)
+(define-key eos-docs-map (kbd "i") 'dash-docs-install-docset)
+(define-key eos-docs-map (kbd "l") 'eos/icomplete/dash-docs-search)
+(define-key eos-docs-map (kbd "a") 'dash-docs-activate-docset)
+(define-key eos-docs-map (kbd "d") 'dash-docs-deactivate-docset)
 
 (when (require 'rfc-mode nil t)
   (progn
@@ -1837,56 +2320,61 @@
 ;; bind eos-docs-map under ctl-x-map prefix map
 (define-key ctl-x-map (kbd "l") 'eos-docs-map)
 
-(when (require 'company nil t)
-  (progn
-    ;; set echo delay
-    (customize-set-variable 'company-echo-delay .01)
+(require 'company)
 
-    ;; idle delay in seconds until completion starts automatically
-    (customize-set-variable 'company-idle-delay nil)
+;; set echo delay
+(customize-set-variable 'company-echo-delay .01)
 
-    ;; maximum number of candidates in the tooltip
-    (customize-set-variable 'company-tooltip-limit 10)
+;; idle delay in seconds until completion starts automatically
+(customize-set-variable 'company-idle-delay nil)
 
-    ;; set minimum prefix length
-    (customize-set-variable 'company-minimum-length 2)
+;; maximum number of candidates in the tooltip
+(customize-set-variable 'company-tooltip-limit 10)
 
-    ;; if enabled, selecting item before first or after last wraps around
-    (customize-set-variable 'company-selection-wrap-around t)
+;; set minimum prefix length
+(customize-set-variable 'company-minimum-length 2)
 
-    ;; sort by frequency
-    (customize-set-variable 'company-transformers
-                            '(company-sort-by-occurrence))
+;; if enabled, selecting item before first or after last wraps around
+(customize-set-variable 'company-selection-wrap-around t)
 
-    ;; whether to downcase the returned candidates.
-    (customize-set-variable 'company-dabbrev-downcase nil)
+;; sort by frequency
+(customize-set-variable 'company-transformers
+                        '(company-sort-by-occurrence))
 
-    ;; if enabled, disallow non-matching input
-    (customize-set-variable 'company-require-match nil)
+;; whether to downcase the returned candidates.
+(customize-set-variable 'company-dabbrev-downcase nil)
 
-    ;; When non-nil, align annotations to the right tooltip border
-    (customize-set-variable 'company-tooltip-align-annotations nil)
+;; if enabled, disallow non-matching input
+(customize-set-variable 'company-require-match nil)
 
-    ;; show candidates number
-    ;; to select completions use: M-1, M-2, etc..
-    (customize-set-variable 'company-show-numbers t)
+;; When non-nil, align annotations to the right tooltip border
+(customize-set-variable 'company-tooltip-align-annotations nil)
 
-    ;; binds (prefix eos-complete map)
-    (define-key eos-complete-map (kbd "TAB") 'company-ispell)
+;; show candidates number
+;; to select completions use: M-1, M-2, etc..
+(customize-set-variable 'company-show-numbers t)
 
-    (define-key eos-complete-map (kbd "f") 'company-files)
-    (define-key eos-complete-map (kbd "g") 'company-gtags)))
+(defun eos-set-company-backends (backends)
+  "Set company back ends with BACKENDS."
+  (make-local-variable 'company-backends)
+  (when (boundp 'company-backends)
+    (setq company-backends backends)))
 
-;; enable globally
-(eos-call-func 'global-company-mode 1)
-
-;; binds
+;; company-active-map
 (when (boundp 'company-active-map)
   (progn
     (define-key company-active-map (kbd "TAB") 'company-complete-common)
     (define-key company-active-map (kbd "C-j") 'company-complete-selection)
     (define-key company-active-map (kbd "C-n") 'company-select-next)
     (define-key company-active-map (kbd "C-p") 'company-select-previous)))
+
+;;eos-complete map
+(define-key eos-complete-map (kbd "TAB") 'company-ispell)
+(define-key eos-complete-map (kbd "f") 'company-files)
+(define-key eos-complete-map (kbd "g") 'company-gtags)
+
+;; enable globally
+(eos-call-func 'global-company-mode 1)
 
 (when (require 'company-statistics nil t)
   (progn
@@ -2588,4 +3076,4 @@
 (global-unset-key (kbd "<M-drag-mouse-1>"))
 (global-unset-key (kbd "<S-down-mouse-1>"))
 
-(eos-load-file (expand-file-name "adapt.el" user-emacs-directory))
+(eos-load-file (expand-file-name "epilogue.el" user-emacs-directory))

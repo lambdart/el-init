@@ -140,8 +140,6 @@
 
      #+END_SRC
 
-***** Silent
-
 **** Keymaps
 
      Basically we creates new maps prefix maps.
@@ -236,6 +234,8 @@
 
      #+BEGIN_SRC emacs-lisp
 
+     (require 'cl-seq)
+
      (defun eos-update-load-path (&rest _)
        "Update `load-path'."
        (dolist (dir '("site-lisp" "lisp"))
@@ -269,6 +269,23 @@
      #+END_SRC
 
 ** Prelude
+**** Theme
+***** Mesk-term
+
+      Add theme directory to load-path and load the
+      default theme.
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; add eos-theme-dir to theme load path
+      (add-to-list 'custom-theme-load-path
+                   (concat user-emacs-directory "themes"))
+
+      ;; load theme
+      (load-theme 'mesk-term t)
+
+      #+END_SRC
+
 **** Functions
 ***** Call
 
@@ -549,8 +566,9 @@
      (define-key eos-mark-map (kbd "p") 'mark-paragraph)
      (define-key eos-mark-map (kbd "w") 'mark-word)
 
-     ;; bind mark to clt-x-map
+     ;; binds clt-x-map (eos prefix commands)
      (define-key ctl-x-map (kbd "m") 'eos-mark-map)
+     (define-key ctl-x-map (kbd "e") 'eos-sc-map)
 
      #+END_SRC
 
@@ -885,7 +903,7 @@
      ;; minibuffer-local-map
      (define-key minibuffer-local-map (kbd "M-`") 'minibuffer-completion-help)
      (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
-     (define-key minibuffer-local-map (kbd "RET") 'minibuffer-complete-and-exit)
+     ;; (define-key minibuffer-local-map (kbd "RET") 'minibuffer-complete-and-exit)
 
      ;; research (maybe this is not necessary) (C-k: kill line)
      ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
@@ -2535,31 +2553,22 @@
      Adds the ability to call asynchronous functions and process with
      ease. See the documentation for `async-start' and `async-start-process'.
 
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'async nil t)
-     (require 'async-bytecomp nil t)
-
-     ;; to run command without displaying the output in a window
-     (add-to-list 'display-buffer-alist
-                  '("\\*Async Shell Command\\*" display-buffer-no-window))
-
-     #+END_SRC
-
-*** Theme
-***** Mesk-term
-
-      Add theme directory to load-path and load the
-      default theme.
+***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; add eos-theme-dir to theme load path
-      (add-to-list 'custom-theme-load-path
-                   (concat user-emacs-directory "themes"))
+      (require 'async nil t)
+      (require 'async-bytecomp nil t)
 
-      ;; load theme
-      (load-theme 'mesk-term t)
+      #+END_SRC
+
+***** Display
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; to run command without displaying the output in a window
+      (add-to-list 'display-buffer-alist
+                   '("\\*Async Shell Command\\*" display-buffer-no-window))
 
       #+END_SRC
 
@@ -3283,28 +3292,37 @@
 **** Occur
 **** Grep
 *** Checkers
-**** Spell
-***** Ispell
+**** Ispell
 
-      Aspell is a utility program that connects to the Aspell library so that
-      it can function as an ispell -a replacement, as an independent spell
-      checker, as a test utility to test out Aspell library features, and as
-      a utility for managing dictionaries used by the library.
+     Aspell is a utility program that connects to the Aspell library so that
+     it can function as an ispell -a replacement, as an independent spell
+     checker, as a test utility to test out Aspell library features, and as
+     a utility for managing dictionaries used by the library.
 
-      Note : Ispell minor mode configuration requires aspell program.
-      TIP  : On FreeBSD: pkg info aspell
+     Note : Ispell minor mode configuration requires aspell program.
+     TIP  : On FreeBSD: pkg info aspell
+
+***** Require
 
       #+BEGIN_SRC emacs-lisp
 
       (when (require 'ispell nil t)
         (progn
-          ;; custom
-          ;; program invoked by M-x ispell-word and M-x ispell-region commands.
-          (customize-set-variable 'ispell-program-name "aspell")
 
-          ;; binds
-          (define-key eos-sc-map (kbd "i") 'ispell-word)
-          (define-key eos-sc-map (kbd "I") 'ispell-buffer)))
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; program invoked by M-x ispell-word and M-x ispell-region commands.
+      (customize-set-variable 'ispell-program-name "aspell")
+
+      #+END_SRC
+
+***** Display
+
+      #+BEGIN_SRC emacs-lisp
 
       ;; add display-buffer-alist
       ;; (add-to-list 'display-buffer-alist
@@ -3312,79 +3330,117 @@
 
       #+END_SRC
 
-***** Flyspell
+***** Functions
 
-      Flyspell is a minor Emacs mode performing on-the-fly spelling
-      checking.
+      #+BEGIN_SRC emacs-lisp
+
+      ;; silent compiler
+      (defvar ispell-current-dictionary nil nil)
+
+      (defun eos/ispell/switch-dictionary ()
+        "Switch dictionaries."
+        (interactive)
+        (let* ((dic ispell-current-dictionary)
+               (change (if (string= dic "english") "brasileiro" "english")))
+          (ispell-change-dictionary change)
+          (message "Dictionary switched from %s to %s" dic change)))
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key eos-sc-map (kbd "i") 'ispell-word)
+      (define-key eos-sc-map (kbd "I") 'ispell-buffer)))
+
+      #+END_SRC
+
+**** Flyspell
+
+     Flyspell is a minor Emacs mode performing on-the-fly spelling
+     checking.
+
+***** Require
 
       #+BEGIN_SRC emacs-lisp
 
       (when (require 'flyspell nil t)
         (progn
-          ;; custom
-          ;; string that is the name of the default dictionary
-          (customize-set-variable 'flyspell-default-dictionary "english")
-
-          ;; hooks
-          (add-hook 'text-mode-hook 'flyspell-mode)
-          (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
 
       #+END_SRC
 
-***** Utils
+***** Customize
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; function (reference)
-      ;; (defun eos/ispell/switch-dictionary ()
-      ;;   "Switch dictionaries."
-      ;;   (interactive)
-      ;;   (let* ((dic ispell-current-dictionary)
-      ;;          (change (if (string= dic "english") "brasileiro" "english")))
-      ;;     (ispell-change-dictionary change)
-      ;;     (message "Dictionary switched from %s to %s" dic change)))))
+      ;; string that is the name of the default dictionary
+      (customize-set-variable 'flyspell-default-dictionary "english")
 
       #+END_SRC
 
-**** Syntax
-***** Flycheck
-
-      Flycheck is a modern on-the-fly syntax checking extension.
+***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'flycheck nil t)
-        (progn
-          ;; binds
-          (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
-          (define-key eos-sc-map (kbd "e") 'flycheck-list-errors)
-          (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
-          (define-key eos-sc-map (kbd "d") 'flycheck-disable-checker)
-          (define-key eos-sc-map (kbd "m") 'flycheck-mode)
-          (define-key eos-sc-map (kbd "s") 'flycheck-select-checker)
-          (define-key eos-sc-map (kbd "?") 'flycheck-describe-checker)
-
-          ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
-          ;; (define-key eos-sc-map
-          ;;   (kbd "v") 'flycheck-verify-setup)
-
-          ;; init flycheck mode after some programming mode
-          ;; is activated (c-mode, elisp-mode, etc).
-          (add-hook 'prog-mode-hook 'flycheck-mode)))
+      ;; hooks
+      (add-hook 'text-mode-hook 'flyspell-mode)
+      (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
 
       #+END_SRC
 
-**** Binds
+**** Flycheck
 
-     Set syntax check related keybinds on eos-sc-map
-     (C-x e).
+     Flycheck is a modern on-the-fly syntax checking extension.
 
-     #+BEGIN_SRC emacs-lisp
+***** Require
 
-     ;; bind eos-sc-map prefix to C-x e
-     (define-key ctl-x-map (kbd "e") 'eos-sc-map)
+      #+BEGIN_SRC emacs-lisp
 
-     #+END_SRC
+      (require 'flycheck)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/set-flycheck-checker (checker)
+        "Set flycheck CHECKER variable."
+        (make-local-variable 'flycheck-checker)
+        (when (boundp 'flycheck-checker)
+          (setq flycheck-checker checker)))
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; init flycheck mode after some programming mode
+      ;; is activated (c-mode, elisp-mode, etc).
+      (add-hook 'prog-mode-hook 'flycheck-mode)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; binds
+      (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
+      (define-key eos-sc-map (kbd "e") 'flycheck-list-errors)
+      (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
+      (define-key eos-sc-map (kbd "d") 'flycheck-disable-checker)
+      (define-key eos-sc-map (kbd "m") 'flycheck-mode)
+      (define-key eos-sc-map (kbd "s") 'flycheck-select-checker)
+      (define-key eos-sc-map (kbd "?") 'flycheck-describe-checker)
+
+      ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
+      ;; (define-key eos-sc-map
+      ;;   (kbd "v") 'flycheck-verify-setup)
+
+      #+END_SRC
 
 *** Analysis
 **** Verb
@@ -3830,6 +3886,31 @@
 
       #+END_SRC
 
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/build ()
+        "If the current buffer is 'init.org' the code-blocks are tangled.
+      The tangled file will be compiled."
+        (interactive)
+
+        ;; avoid running hooks when tangling.
+        (let ((prog-mode-hook nil)
+              (buffer (current-buffer)))
+
+          ;; switch or open init.org file
+          (find-file (expand-file-name "init.org" user-emacs-directory))
+
+          ;; tangle and compile
+          (org-babel-tangle)
+          (byte-compile-file (concat user-emacs-directory "init.el"))
+
+          ;; switch to the previous buffer
+          (switch-to-buffer buffer)))
+
+      #+END_SRC
+
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -3852,6 +3933,9 @@
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
+
+      ;; silent compiler
+      (defvar org-mode-map nil nil)
 
       (define-key org-mode-map (kbd "C-M-i") 'eos/complete-buffer-or-indent)
 

@@ -102,7 +102,7 @@ The largest value that is representable in a Lisp integer."
           (lambda ()
             (setq file-name-handler-alist eos-file-name-handler-alist)))
 
-(require 'cl-seq)
+(require 'cl-seq nil t)
 
 (defun eos-update-load-path (&rest _)
   "Update `load-path'."
@@ -333,6 +333,189 @@ Keymaps list will be printed on *Messages* buffer."
 ;; load theme
 (load-theme 'mesk-term t)
 
+;; clean esc map
+(define-key esc-map (kbd "ESC") nil)
+(define-key esc-map (kbd "<f10>") nil)
+
+;; unbind
+;; (define-key ctl-x-map (kbd "C-SPC") nil)
+;; (define-key ctl-x-map (kbd "C-=") nil)
+;; (define-key ctl-x-map (kbd "C-0") nil)
+;; (define-key ctl-x-map (kbd "C--") nil)
+;; (define-key ctl-x-map (kbd "ESC") nil)
+;; (define-key ctl-x-map (kbd ".") nil)
+;; (define-key ctl-x-map (kbd "C-l") nil)
+;; (define-key ctl-x-map (kbd "C-x") nil)
+;; (define-key ctl-x-map (kbd "C-<left>") nil)
+;; (define-key ctl-x-map (kbd "C-<right>") nil)
+;; (define-key ctl-x-map (kbd "C-<up>") nil)
+;; (define-key ctl-x-map (kbd "C-<down>") nil)
+(define-key ctl-x-map (kbd "<right>") nil)
+(define-key ctl-x-map (kbd "<left>") nil)
+
+(define-key ctl-x-map (kbd "C-o") nil)
+(define-key ctl-x-map (kbd "C-d") nil)
+(define-key ctl-x-map (kbd "C-c") nil)
+(define-key ctl-x-map (kbd "C-j") nil)
+(define-key ctl-x-map (kbd "C-+") nil)
+(define-key ctl-x-map (kbd "C-a") nil)
+(define-key ctl-x-map (kbd "C-r") nil)
+(define-key ctl-x-map (kbd "C-n") nil)
+(define-key ctl-x-map (kbd "C-z") nil)
+(define-key ctl-x-map (kbd "C-p") nil)
+(define-key ctl-x-map (kbd "C-h") nil)
+(define-key ctl-x-map (kbd "C-u") nil)
+(define-key ctl-x-map (kbd "C-\@") nil)
+(define-key ctl-x-map (kbd "M-:") nil)
+
+(define-key ctl-x-map (kbd "RET") nil)
+(define-key ctl-x-map (kbd "`") nil)
+(define-key ctl-x-map (kbd "]") nil)
+;; (define-key ctl-x-map (kbd "[") nil)
+(define-key ctl-x-map (kbd ")") nil)
+(define-key ctl-x-map (kbd "(") nil)
+(define-key ctl-x-map (kbd "<") nil)
+(define-key ctl-x-map (kbd ">") nil)
+(define-key ctl-x-map (kbd "\@") nil)
+(define-key ctl-x-map (kbd "-") nil)
+(define-key ctl-x-map (kbd ";") nil)
+(define-key ctl-x-map (kbd "#") nil)
+(define-key ctl-x-map (kbd "*") nil)
+(define-key ctl-x-map (kbd "'") nil)
+(define-key ctl-x-map (kbd "$") nil)
+(define-key ctl-x-map (kbd "{") nil)
+(define-key ctl-x-map (kbd "}") nil)
+(define-key ctl-x-map (kbd "^") nil)
+;; (define-key ctl-x-map (kbd "n") nil)
+;; (define-key ctl-x-map (kbd "f") nil)
+(define-key ctl-x-map (kbd "a") nil)
+(define-key ctl-x-map (kbd "h") nil)
+(define-key ctl-x-map (kbd "v") nil)
+(define-key ctl-x-map (kbd "x") nil)
+(define-key ctl-x-map (kbd "X") nil)
+
+;; clean minor-mode-map-alist
+(setq minor-mode-map-alist nil)
+
+;; unset
+(global-unset-key (kbd "C-z"))
+(global-unset-key (kbd "C-@"))
+(global-unset-key (kbd "C-\\"))
+(global-unset-key (kbd "C-_"))
+(global-unset-key (kbd "M-l"))
+(global-unset-key (kbd "M-h"))
+(global-unset-key (kbd "M-\\"))
+(global-unset-key (kbd "M-$"))
+(global-unset-key (kbd "M-("))
+(global-unset-key (kbd "M-)"))
+(global-unset-key (kbd "M-r"))
+(global-unset-key (kbd "M-{"))
+(global-unset-key (kbd "M-}"))
+(global-unset-key (kbd "S-SPC"))
+(global-unset-key (kbd "<backtap>"))
+(global-unset-key (kbd "M-="))
+(global-unset-key (kbd "M-@"))
+(global-unset-key (kbd "M-~"))
+
+;; (global-unset-key (kbd "M-z"))
+;; (global-unset-key (kbd "M-SPC"))
+;; (global-unset-key (kbd "M-m"))
+;; (global-unset-key (kbd "M-k"))
+;; (global-unset-key (kbd "M-t"))
+;; (global-unset-key (kbd "M-q"))
+
+(global-unset-key (kbd "C-M-h"))
+(global-unset-key (kbd "C-M-j"))
+(global-unset-key (kbd "C-M-."))
+(global-unset-key (kbd "C-M-l"))
+(global-unset-key (kbd "C-M-/"))
+(global-unset-key (kbd "C-M-;"))
+(global-unset-key (kbd "C-M-@"))
+(global-unset-key (kbd "C-M-\\"))
+(global-unset-key (kbd "C-M-a"))
+(global-unset-key (kbd "C-M-r"))
+(global-unset-key (kbd "C-M-s"))
+(global-unset-key (kbd "C-M-%"))
+(global-unset-key (kbd "C-M-u"))
+(global-unset-key (kbd "C-M-d"))
+(global-unset-key (kbd "C-M-SPC"))
+(global-unset-key (kbd "C-M-S-v"))
+
+(global-unset-key (kbd "<C-M-end>"))
+(global-unset-key (kbd "<C-M-home>"))
+(global-unset-key (kbd "<C-S-backspace>"))
+(global-unset-key (kbd "<C-backspace>"))
+(global-unset-key (kbd "<C-delete>"))
+(global-unset-key (kbd "<C-down>"))
+(global-unset-key (kbd "<C-next>"))
+(global-unset-key (kbd "<C-end>"))
+(global-unset-key (kbd "<C-f10>"))
+(global-unset-key (kbd "<M-f10>"))
+
+(global-unset-key (kbd "<bottom-divider>"))
+(global-unset-key (kbd "<bottom-edge>"))
+(global-unset-key (kbd "<bottom-left-corner>"))
+(global-unset-key (kbd "<bottom-right-corner>"))
+
+(global-unset-key (kbd "<horizontal-scroll-bar>"))
+(global-unset-key (kbd "<vertical-scroll-bar>"))
+
+(global-unset-key (kbd "<left-edge>"))
+(global-unset-key (kbd "<right-edge>"))
+
+(global-unset-key (kbd "<undo>"))
+(global-unset-key (kbd "<find>"))
+(global-unset-key (kbd "<help>"))
+(global-unset-key (kbd "<open>"))
+(global-unset-key (kbd "<again>"))
+(global-unset-key (kbd "<menu>"))
+(global-unset-key (kbd "<header-line>"))
+(global-unset-key (kbd "<mode-line>"))
+
+(global-unset-key (kbd "<XF86Back>"))
+(global-unset-key (kbd "<XF86Forward>"))
+(global-unset-key (kbd "<XF86WakeUp>"))
+
+(global-unset-key (kbd "<top-edge>"))
+(global-unset-key (kbd "<top-left-corner>"))
+(global-unset-key (kbd "<top-right-corner>"))
+
+(global-unset-key (kbd "<mouse-1>"))
+(global-unset-key (kbd "<mouse-2>"))
+(global-unset-key (kbd "<mouse-3>"))
+(global-unset-key (kbd "<mouse-4>"))
+(global-unset-key (kbd "<mouse-5>"))
+(global-unset-key (kbd "<mouse-6>"))
+(global-unset-key (kbd "<mouse-7>"))
+
+(global-unset-key (kbd "<right-divider>"))
+(global-unset-key (kbd "<vertical-line>"))
+
+(global-unset-key (kbd "<f10>"))
+(global-unset-key (kbd "<f11>"))
+(global-unset-key (kbd "<f16>"))
+(global-unset-key (kbd "<f18>"))
+(global-unset-key (kbd "<f20>"))
+
+(global-unset-key (kbd "<drag-mouse-1>"))
+(global-unset-key (kbd "<C-mouse-4>"))
+(global-unset-key (kbd "<C-mouse-5>"))
+(global-unset-key (kbd "<C-mouse-6>"))
+(global-unset-key (kbd "<C-mouse-7>"))
+(global-unset-key (kbd "<M-mouse-1>"))
+(global-unset-key (kbd "<M-mouse-2>"))
+(global-unset-key (kbd "<M-mouse-3>"))
+(global-unset-key (kbd "<S-mouse-3>"))
+(global-unset-key (kbd "<S-mouse-4>"))
+(global-unset-key (kbd "<S-mouse-5>"))
+(global-unset-key (kbd "<S-mouse-6>"))
+(global-unset-key (kbd "<S-mouse-7>"))
+(global-unset-key (kbd "<C-down-mouse-1>"))
+(global-unset-key (kbd "<C-down-mouse-2>"))
+(global-unset-key (kbd "<M-down-mouse-1>"))
+(global-unset-key (kbd "<M-drag-mouse-1>"))
+(global-unset-key (kbd "<S-down-mouse-1>"))
+
 ;; line movement
 (global-set-key (kbd "C-a") 'eos/move-beginning-of-line)
 (global-set-key (kbd "C-e") 'move-end-of-line)
@@ -351,19 +534,23 @@ Keymaps list will be printed on *Messages* buffer."
 (global-set-key (kbd "M-p") 'eos/edit-move-lines-up)
 (global-set-key (kbd "M-n") 'eos/edit-move-lines-down)
 
-;; bind kill-current-buffer to clt-x-map
+;; kill
 (define-key ctl-x-map (kbd "k") 'eos/kill-current-buffer)
 
-;; bind to eos-mark-map
+;; mark
 (define-key eos-mark-map (kbd "h") 'mark-whole-buffer)
 (define-key eos-mark-map (kbd "s") 'mark-sexp)
 (define-key eos-mark-map (kbd "p") 'mark-paragraph)
 (define-key eos-mark-map (kbd "w") 'mark-word)
 
-;; binds clt-x-map (eos prefix commands)
+;; eos prefixs
+(define-key ctl-x-map (kbd "p") 'eos-pm-map)
+(define-key ctl-x-map (kbd "t") 'eos-tags-map)
 (define-key ctl-x-map (kbd "m") 'eos-mark-map)
 (define-key ctl-x-map (kbd "e") 'eos-sc-map)
 (define-key ctl-x-map (kbd "f") 'eos-find-map)
+(define-key ctl-x-map (kbd "l") 'eos-docs-map)
+(define-key ctl-x-map (kbd "<tab>") 'eos-complete-map)
 
 ;; non-nil means to make the cursor very visible
 (customize-set-variable 'visible-cursor nil)
@@ -480,8 +667,6 @@ Keymaps list will be printed on *Messages* buffer."
 
 (define-key ctl-x-map (kbd "b") 'ibuffer)))
 
-(require 'imenu nil t)
-
 (when (require 'hideshow nil t)
   (progn
 
@@ -506,7 +691,7 @@ Keymaps list will be printed on *Messages* buffer."
 (customize-set-variable 'read-file-name-completion-ignore-case t)
 
 ;; number of completion candidates below which cycling is used
-(customize-set-variable 'completion-cycle-threshold 3)
+(customize-set-variable 'completion-cycle-threshold nil)
 
 ;; treat the SPC or - inserted by `minibuffer-complete-word as delimiters
 (customize-set-variable 'completion-pcm-complete-word-inserts-delimiters t)
@@ -687,9 +872,11 @@ Else indents the current line."
 (define-key completion-list-mode-map (kbd "C-k") 'eos/kill-line)
 (define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)))
 
-;; global
+;; global-map
+(global-set-key (kbd "<M-tab>") 'eos/complete-at-point-or-indent)
+(global-set-key (kbd "TAB") 'eos/complete-buffer-or-indent)
 
-(require 'icomplete)
+(require 'icomplete nil t)
 
 ;; custom
 ;; pending-completions number over which to apply `icomplete-compute-delay
@@ -1012,7 +1199,7 @@ instead."
 
 (global-set-key (kbd "M-s M-o") 'eos/occur-at-point)))
 
-(require 'recentf)
+(require 'recentf nil t)
 
 ;; file to save the recent list into.
 (customize-set-variable
@@ -1051,7 +1238,7 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; enable savehist mode
 (eos-call-func 'savehist-mode 1)))
 
-(require 'frame)
+(require 'frame nil t)
 
 ;; with some window managers you may have to set this to non-nil
 ;; in order to set the size of a frame in pixels, to maximize
@@ -1221,10 +1408,16 @@ The user's $HOME directory is abbreviated as a tilde."
 
 (require 'forms nil t)
 
-(require 'exwm)
-(require 'exwm-config)
-(require 'exwm-core)
-(require 'exwm-workspace)
+(when (require 'conf-mode nil t)
+  (progn
+
+(add-to-list 'auto-mode-alist '("\\.compose\\'" . conf-mode))
+(add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))))
+
+(require 'exwm nil t)
+(require 'exwm-core nil t)
+(require 'exwm-config nil t)
+(require 'exwm-workspace nil t)
 
 ;; set exwm workspaces number
 (customize-set-variable 'exwm-workspace-number 0)
@@ -1829,71 +2022,70 @@ The user's $HOME directory is abbreviated as a tilde."
 
 (when (require 'comint nil t)
   (progn
-    ;; custom
-    ;; if non-nil, assume that the subprocess echoes any input.
-    (customize-set-variable 'comint-process-echoes t)
 
-    ;; if non-nil, use comint-prompt-regexp to recognize prompts.
-    (customize-set-variable 'comint-use-prompt-regexp t)
+;; if non-nil, assume that the subprocess echoes any input.
+(customize-set-variable 'comint-process-echoes t)
 
-    ;; regexp to recognize prompts in the inferior process.
-    ;; (customize-set-variable 'comint-prompt-regexp ".*:.*>.*? ")
+;; if non-nil, use comint-prompt-regexp to recognize prompts.
+(customize-set-variable 'comint-use-prompt-regexp t)
 
-    ;; value to use for TERM when the system uses terminfo.
-    (customize-set-variable 'comint-terminfo-terminal "eterm-color")))
+;; regexp to recognize prompts in the inferior process.
+;; (customize-set-variable 'comint-prompt-regexp ".*:.*>.*? ")
+
+;; value to use for TERM when the system uses terminfo.
+(customize-set-variable 'comint-terminfo-terminal "eterm-color")))
 
 (when (require 'ielm nil t)
   (progn
-    ;; custom
-    ;; if non-nil, after entering the first line of
-    ;; an incomplete sexp, a newline will be inserted after the prompt.
-    (customize-set-variable 'ielm-dynamic-multiline-inputs t)
 
-    ;; if non-nil, IELM will beep on error
-    (customize-set-variable 'ielm-noisy nil)
+;; if non-nil, after entering the first line of
+;; an incomplete sexp, a newline will be inserted after the prompt.
+(customize-set-variable 'ielm-dynamic-multiline-inputs t)
 
-    ;; prompt used in IELM
-    (customize-set-variable 'ielm-prompt "elisp > ")
+;; if non-nil, IELM will beep on error
+(customize-set-variable 'ielm-noisy nil)
 
-    ;; if non-nil, the IELM prompt is read only
-    (customize-set-variable 'ielm-prompt-read-only nil)))
+;; prompt used in IELM
+(customize-set-variable 'ielm-prompt "elisp > ")
+
+;; if non-nil, the IELM prompt is read only
+(customize-set-variable 'ielm-prompt-read-only nil)))
 
 (when (require 'sql nil t)
   (progn
-    ;; custom
-    ;; select the SQL database product used
-    (customize-set-variable 'sql-product "sqlite")))
+
+;; select the SQL database product used
+(customize-set-variable 'sql-product "sqlite")))
 
 (when (require 'diff nil t)
   (progn
-    ;; custom
-    ;; a string or list of strings specifying switches to be passed to diff
-    (customize-set-variable 'diff-switches "-u")))
+
+;; a string or list of strings specifying switches to be passed to diff
+(customize-set-variable 'diff-switches "-u")))
 
 (when (require 'ediff nil t)
   (progn
-    ;; custom
-    ;; options to pass to `ediff-custom-diff-program'.
-    (customize-set-variable 'ediff-custom-diff-options "-U3")
 
-    ;; the function used to split the main window between buffer-A and buffer-B
-    (customize-set-variable 'ediff-split-window-function 'split-window-horizontally)
+;; options to pass to `ediff-custom-diff-program'.
+(customize-set-variable 'ediff-custom-diff-options "-U3")
 
-    ;; function called to set up windows
-    (customize-set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain)
+;; the function used to split the main window between buffer-A and buffer-B
+(customize-set-variable 'ediff-split-window-function 'split-window-horizontally)
 
-    ;; hooks
-    (add-hook 'ediff-startup-hook 'ediff-toggle-wide-display)
-    (add-hook 'ediff-cleanup-hook 'ediff-toggle-wide-display)
-    (add-hook 'ediff-suspend-hook 'ediff-toggle-wide-display)))
+;; function called to set up windows
+(customize-set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain)
+
+(add-hook 'ediff-startup-hook 'ediff-toggle-wide-display)
+(add-hook 'ediff-cleanup-hook 'ediff-toggle-wide-display)
+(add-hook 'ediff-suspend-hook 'ediff-toggle-wide-display)))
 
 (defun eos/compton (args)
   "Call compton compositor utility."
-  (interactive "P")
+  (interactive)
   (eos-call-proc "compton"))
 
 ;; start compton after emacs initialize
-(add-hook 'after-init-hook #'eos/compton)
+(add-hook 'emacs-startup-hook #'eos/compton)
 
 (when (require 'verb nil t)
   (progn
@@ -2027,28 +2219,25 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; init dashboard after emacs initialize
 (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
 
-(when (require 'emms nil t)
+(when (and (require 'emms nil t)
+           (require 'emms-setup nil t))
   (progn
-    ;; the 'emms-setup' feature is provided by the file 'emms-setup.el'
-    (require 'emms-setup nil t)
 
-    ;; custom
-    ;; list of players that emms can use (only mpv)
-    (customize-set-variable 'emms-player-list '(emms-player-mpv))
+;; list of players that emms can use (only mpv)
+(customize-set-variable 'emms-player-list '(emms-player-mpv))
 
-    ;; the default directory to look for media files.
-    (customize-set-variable
-     'emms-source-file-default-directory (expand-file-name "~/media"))
+;; the default directory to look for media files.
+(customize-set-variable
+ 'emms-source-file-default-directory (expand-file-name "~/media"))
 
-    ;; hooks
-    ;; disable emms mode line
-    (add-hook 'emms-playlist-mode-hook
-              (lambda ()
-                (when (and (boundp 'emms-mode-line-active-p)
-                           (fboundp 'emms-mode-line-disable))
-                  (progn
-                    (if emms-mode-line-active-p
-                        (emms-mode-line-disable))))))))
+;; disable emms mode line
+(add-hook 'emms-playlist-mode-hook
+          (lambda ()
+            (when (and (boundp 'emms-mode-line-active-p)
+                       (fboundp 'emms-mode-line-disable))
+              (progn
+                (if emms-mode-line-active-p
+                    (emms-mode-line-disable))))))))
 
 ;; if emms is available, enable it
 (when (and (fboundp 'emms-all)
@@ -2069,8 +2258,7 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; the base Scale Factor for the `height' face property of an icon
 (customize-set-variable 'all-the-icons-scale-factor 1.0)))
 
-;; We can't tangle without org!
-(require 'org)
+(require 'org nil t)
 
 ;; custom
 ;; when non-nil, fontify code in code blocks
@@ -2138,81 +2326,80 @@ The tangled file will be compiled."
 
 (when (require 'text-mode nil t)
   (progn
-    ;; binds
-    (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-    (define-key text-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)
 
-    (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
-    (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
+(define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
+(define-key text-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)
 
-    ;; text mode hook
-    (add-hook 'text-mode-hook
-              (lambda ()
-                ;; turn on auto fill mode
-                (turn-on-auto-fill)
+(define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
+(define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
 
-                ;; set company backends
-                (eos-set-company-backends
-                 '((company-ispell
-                    company-dabbrev)
-                   (company-files)))))))
+(add-hook 'text-mode-hook
+          (lambda ()
+            ;; turn on auto fill mode
+            (turn-on-auto-fill)
+
+            ;; set company backends
+            (eos-set-company-backends
+             '((company-ispell
+                company-dabbrev)
+               (company-files)))))))
 
 (when (require 'markdown-mode nil t)
   (progn
-    ;; custom
-    (customize-set-variable 'markdown-command "multimarkdown")))
 
-;; binds
+(customize-set-variable 'markdown-command "multimarkdown")))
+
 (when (boundp 'markdown-mode-map)
   (progn
     (define-key markdown-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
 
 (when (require 'doc-view nil t)
   (progn
-    ;; custom
-    ;; the base directory, where the PNG images will be saved
-    (customize-set-variable
-     'doc-view-cache-directory
-     (concat (expand-file-name user-emacs-directory) "cache/docview"))
 
-    ;; in continuous mode reaching the page edge advances to next/previous page
-    (customize-set-variable 'doc-view-continuous t)))
+;; the base directory, where the PNG images will be saved
+(customize-set-variable
+ 'doc-view-cache-directory
+ (concat (expand-file-name user-emacs-directory) "cache/docview"))
+
+;; in continuous mode reaching the page edge advances to next/previous page
+(customize-set-variable 'doc-view-continuous t)))
 
 (when (require 'dictionary nil t)
   (progn
-    ;; create some clickable buttons on top of the window if non-nil
-    (customize-set-variable 'dictionary-create-buttons nil)
 
-    ;; should the dictionary command reuse previous dictionary buffers?
-    (customize-set-variable 'dictionary-use-single-buffer t)
+;; create some clickable buttons on top of the window if non-nil
+(customize-set-variable 'dictionary-create-buttons nil)
 
-    ;; binds
-    (define-key eos-docs-map (kbd "d") 'dictionary-search)))
+;; should the dictionary command reuse previous dictionary buffers?
+(customize-set-variable 'dictionary-use-single-buffer t)
+
+;; binds
+(define-key eos-docs-map (kbd "d") 'dictionary-search)))
 
 (when (and (require 'google-translate nil t)
            (require 'google-translate-smooth-ui nil t))
   (progn
-    ;; custom
-    ;; alist of translation directions
-    ;; each of direction could be selected directly in
-    ;; the minibuffer during translation.
-    (customize-set-variable
-     'google-translate-translation-directions-alist
-     '(("pt" . "en") ("en" . "pt")))
 
-    ;; default target language
-    (customize-set-variable
-     'google-translate-default-target-language "pt")
+;; alist of translation directions
+;; each of direction could be selected directly in
+;; the minibuffer during translation.
+(customize-set-variable
+ 'google-translate-translation-directions-alist
+ '(("pt" . "en") ("en" . "pt")))
 
-    ;; default source language
-    ;; "auto" if you want Google Translate to always detect the source language
-    (customize-set-variable 'google-translate-default-source-language
-                            "auto")
+;; default target language
+(customize-set-variable
+ 'google-translate-default-target-language "pt")
 
-    ;; determines where translation output will be displayed, if
-    ;; `nil' the translation output will be displayed in the pop up
-    ;; buffer (default).
-    (customize-set-variable 'google-translate-output-destination nil)))
+;; default source language
+;; "auto" if you want Google Translate to always detect the source language
+(customize-set-variable 'google-translate-default-source-language
+                        "auto")
+
+;; determines where translation output will be displayed, if
+;; `nil' the translation output will be displayed in the pop up
+;; buffer (default).
+(customize-set-variable 'google-translate-output-destination nil)))
 
 (require 'notifications nil t)
 
@@ -2220,21 +2407,20 @@ The tangled file will be compiled."
 
 (when (require 'man nil t)
   (progn
-    ;; binds (eos-docs-map) docs actions prefix map
-    (define-key eos-docs-map (kbd "m") 'man)
 
-    ;; hooks
-    (add-hook 'Man-mode-hook
-              (lambda ()
-                ;; don't truncate lines
-                (setq truncate-lines nil)))))
+(add-hook 'Man-mode-hook
+          (lambda ()
+            ;; don't truncate lines
+            (setq truncate-lines nil)))
 
-;; binds
 (when (boundp 'Man-mode-map)
   (progn
     (define-key Man-mode-map (kbd "C-j") 'push-button)))
 
-(require 'dash-docs)
+;; eos-docs-map docs actions prefix map
+(define-key eos-docs-map (kbd "m") 'man)))
+
+(require 'dash-docs nil t)
 
 ;; default path for docsets
 (customize-set-variable
@@ -2282,25 +2468,22 @@ The tangled file will be compiled."
 
 (when (require 'rfc-mode nil t)
   (progn
-    ;; custom
-    ;; the directory where RFC documents are stored
-    (customize-set-variable
-     'rfc-mode-directory
-     (concat (expand-file-name user-emacs-directory) "rfc/"))))
 
-;; bind eos-docs-map under ctl-x-map prefix map
-(define-key ctl-x-map (kbd "l") 'eos-docs-map)
+;; the directory where RFC documents are stored
+(customize-set-variable
+ 'rfc-mode-directory
+ (concat (expand-file-name user-emacs-directory) "rfc/"))))
 
-(require 'company)
+(require 'company nil t)
 
 ;; set echo delay
-(customize-set-variable 'company-echo-delay .01)
+(customize-set-variable 'company-echo-delay .02)
 
 ;; idle delay in seconds until completion starts automatically
 (customize-set-variable 'company-idle-delay nil)
 
 ;; maximum number of candidates in the tooltip
-(customize-set-variable 'company-tooltip-limit 10)
+(customize-set-variable 'company-tooltip-limit 8)
 
 ;; set minimum prefix length
 (customize-set-variable 'company-minimum-length 2)
@@ -2365,70 +2548,65 @@ The tangled file will be compiled."
 
 (when (require 'company-statistics nil t)
   (progn
-    ;; custom
-    ;; set company-statistics cache location
-    (customize-set-variable
-     'company-statistics-file
-     (concat user-emacs-directory "cache/company-statistics-cache.el"))))
+
+;; set company-statistics cache location
+(customize-set-variable
+ 'company-statistics-file
+ (concat user-emacs-directory "cache/company-statistics-cache.el"))
+
+(add-hook 'company-mode-hook 'company-statistics-mode)))
 
 (when (require 'yasnippet nil t)
   (progn
-    ;; binds
-    (define-key eos-complete-map (kbd "e") 'yas-expand)
-    (define-key eos-complete-map (kbd "i") 'yas-insert-snippet)
-    (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)))
 
-;; binds
+(define-key eos-complete-map (kbd "e") 'yas-expand)
+(define-key eos-complete-map (kbd "i") 'yas-insert-snippet)
+(define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)))
+
 (when (boundp 'yas-keymap)
   (progn
     (define-key yas-keymap (kbd "<tab>") nil)
     (define-key yas-keymap (kbd "M-`") 'yas-next-field)))
 
-;; enable
 (eos-call-func 'yas-global-mode 1)
 
-;; binds (global)
-(global-set-key (kbd "<M-tab>") 'eos/complete-at-point-or-indent)
-(global-set-key (kbd "TAB") 'eos/complete-buffer-or-indent)
-
-;; binds eos-complete-map prefix map
-(define-key ctl-x-map (kbd "<tab>") 'eos-complete-map)
-
 (when (require 'imenu nil t)
-  ;; custom
-  ;; use a popup menu rather than a minibuffer prompt (no)
-  (customize-set-variable 'imenu-use-popup-menu nil)
+  (progn
 
-  ;; bind
-  (define-key eos-tags-map (kbd "i") 'imenu))
+;; use a popup menu rather than a minibuffer prompt (no)
+(customize-set-variable 'imenu-use-popup-menu nil)
 
-;; exit, keyboard quit
-(define-key eos-tags-map (kbd "C-g") 'keyboard-quit)
-
-;; ctl-x-map bind (C-x t)
-(define-key ctl-x-map (kbd "t") 'eos-tags-map)
+(define-key eos-tags-map (kbd "i") 'imenu)))
 
 (require 'gud nil t)
 
 (when (require 'rmsbolt nil t)
   (progn
-    ;; custom
-    ;; which output assembly format to use.
-    (customize-set-variable 'rmsbolt-asm-format "att")
 
-    ;;    whether we should disassemble an output binary
-    (customize-set-variable 'rmsbolt-disassemble t)
+;; which output assembly format to use.
+(customize-set-variable 'rmsbolt-asm-format "att")
 
-    ;; rmsbolt mode lighter
-    (customize-set-variable 'rmsbolt-mode-lighter "RMS")))
+;;    whether we should disassemble an output binary
+(customize-set-variable 'rmsbolt-disassemble t)
+
+;; rmsbolt mode lighter
+(customize-set-variable 'rmsbolt-mode-lighter "RMS")))
 
 (when (require 'cmake-ide nil t)
   (progn
-    ;; hooks
-    (add-hook 'c-mode-hook 'cmake-ide-setup)
-    (add-hook 'c++-mode-hook 'cmake-ide-setup)))
+
+(add-hook 'c-mode-hook 'cmake-ide-setup)
+(add-hook 'c++-mode-hook 'cmake-ide-setup)))
 
 (require 'compile nil t)
+
+(defun eos-compile (dir command)
+  "Compile COMMAND at specific DIR.
+     Just a `compile` function wrapper."
+  (interactive)
+  (if (file-exists-p dir)
+      (let ((default-directory dir))
+        (compile command))))
 
 ;; don't truncate lines
 (add-hook 'compilation-mode-hook
@@ -2444,109 +2622,45 @@ The tangled file will be compiled."
 
 (when (require 'magit nil t)
   (progn
-    ;; binds
-    (define-key ctl-x-map (kbd "j") 'magit-status)))
+
+(define-key ctl-x-map (kbd "j") 'magit-status)))
 
 (require 'ede nil t)
 
 (when (require 'projectile nil t)
   (progn
-    ;; custom
-    ;; enable cache and choose indexing method
-    (customize-set-variable 'projectile-enable-caching t)
-    (customize-set-variable 'projectile-indexing-method 'hybrid)
-    (customize-set-variable 'projectile-completion-system 'default)
 
-    ;; set bookmarks file localtion (cache)
-    (customize-set-variable 'projectile-known-projects-file
-                            (concat user-emacs-directory "cache/projectile-bookmarks.eld"))
+;; enable cache and choose indexing method
+(customize-set-variable 'projectile-enable-caching t)
+(customize-set-variable 'projectile-indexing-method 'hybrid)
+(customize-set-variable 'projectile-completion-system 'default)
 
-    (customize-set-variable 'projectile-cache-file
-                            (concat user-emacs-directory "cache/projectile.cache"))
+;; set bookmarks file localtion (cache)
+(customize-set-variable 'projectile-known-projects-file
+                        (concat user-emacs-directory "cache/projectile-bookmarks.eld"))
 
-    ;; binds
-    (define-key eos-pm-map (kbd "g") 'projectile-grep)
-    (define-key eos-pm-map (kbd "t") 'projectile-find-tag)
-    (define-key eos-pm-map (kbd "f") 'projectile-find-file)
-    (define-key eos-pm-map (kbd "<f5>") 'projectile-compile-project)
-    (define-key eos-pm-map (kbd "&") 'projectile-run-eshell)
-    (define-key eos-pm-map (kbd "o") 'projectile-switch-project)
-    (define-key eos-pm-map (kbd "r") 'projectile-replace-regexp)
-    (define-key eos-pm-map (kbd "R") 'projectile-replace)
-    (define-key eos-pm-map (kbd "s") 'projectile-save-project-buffers)
-    (define-key eos-pm-map (kbd "d") 'projectile-discover-projects-in-directory)
-    (define-key eos-pm-map (kbd "c") 'projectile-cleanup-known-projects)
-    (define-key eos-pm-map (kbd "C") 'projectile-invalidate-cache)
-    (define-key eos-pm-map (kbd "U") 'projectile-purge-dir-from-cache)
-    (define-key eos-pm-map (kbd "u") 'projectile-purge-file-from-cache)
-    (define-key eos-pm-map (kbd ".") 'projectile-edit-dir-locals)
-    (define-key eos-pm-map (kbd "k") 'projectile-kill-buffers)
-    (define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)))
+(customize-set-variable 'projectile-cache-file
+                        (concat user-emacs-directory "cache/projectile.cache"))
 
-;; enable
+(define-key eos-pm-map (kbd "g") 'projectile-grep)
+(define-key eos-pm-map (kbd "t") 'projectile-find-tag)
+(define-key eos-pm-map (kbd "f") 'projectile-find-file)
+(define-key eos-pm-map (kbd "<f5>") 'projectile-compile-project)
+(define-key eos-pm-map (kbd "&") 'projectile-run-eshell)
+(define-key eos-pm-map (kbd "o") 'projectile-switch-project)
+(define-key eos-pm-map (kbd "r") 'projectile-replace-regexp)
+(define-key eos-pm-map (kbd "R") 'projectile-replace)
+(define-key eos-pm-map (kbd "s") 'projectile-save-project-buffers)
+(define-key eos-pm-map (kbd "d") 'projectile-discover-projects-in-directory)
+(define-key eos-pm-map (kbd "c") 'projectile-cleanup-known-projects)
+(define-key eos-pm-map (kbd "C") 'projectile-invalidate-cache)
+(define-key eos-pm-map (kbd "U") 'projectile-purge-dir-from-cache)
+(define-key eos-pm-map (kbd "u") 'projectile-purge-file-from-cache)
+(define-key eos-pm-map (kbd ".") 'projectile-edit-dir-locals)
+(define-key eos-pm-map (kbd "k") 'projectile-kill-buffers)
+(define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)))
+
 (eos-call-func 'projectile-mode)
-
-;; set ctl-x-map prefix (C-x p)
-(define-key ctl-x-map (kbd "p") 'eos-pm-map)
-
-;; c/c++ company backends
-(defun eos/cc/set-company-backends ()
-  "Set C/C++ common company backends."
-  (eos-set-company-backends
-   '((company-c-headers)
-     (company-irony
-      company-yasnippet
-      company-dabbrev-code)
-     (company-files))))
-
-(when (require 'cc-mode nil t)
-  (progn
-    ;; hooks
-    (add-hook 'c-mode-hook
-              (lambda ()
-                ;; set cc common company backends
-                (eos/cc/set-company-backends)
-
-                ;; set dash docset
-                (eos-set-dash-docset '"C")
-
-                ;; set flycheck checker
-                (eos/set-flycheck-checker 'c/c++-clang)
-
-                ;; load rtags
-                (eos/cc/load-rtags)))
-
-    (add-hook 'c++-mode-hook
-              (lambda ()
-                ;; set cc common backends (company and flycheck)
-                (eos/cc/set-company-backends)
-
-                ;; set flycheck checker
-                (eos/set-flycheck-checker 'c++-cppcheck)
-
-                ;; set dash docset
-                (eos-set-dash-docset '"C++")
-
-                ;; load rtags
-                (eos/cc/load-rtags)))))
-
-;; binds (c-mode map)
-(when (boundp 'c-mode-map)
-  (progn
-    ;; set rtags prefix map in c-mode map (C-c r)
-    (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
-
-    ;; complete or indent
-    (define-key c-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
-
-;; binds (c++-mode-map)
-(when (boundp 'c++-mode-map)
-  (progn
-    ;; set rtags prefix map in c-mode map (C-c r)
-    (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
-
-    ;; complete or indent
-    (define-key c++-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
 
 (defun eos/cc/load-rtags ()
   "Load rtags manually."
@@ -2563,29 +2677,7 @@ The tangled file will be compiled."
   ;; behavior for completing-read
   (customize-set-variable 'rtags-completing-read-behavior 'insert-default-marked))
 
-(when (require 'irony nil t)
-  (progn
-    ;; irony hooks
-    (add-hook 'irony-mode-hook 'electric-pair-mode)
-
-    ;; mode hooks (init)
-    (add-hook 'c-mode-hook 'irony-mode)
-    (add-hook 'c++-mode-hook 'irony-mode)
-    (add-hook 'objc-mode-hook 'irony-mode)))
-
-(when (require 'irony-cdb nil t)
-  (progn
-    ;; hooks
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)))
-
-(when (require 'company-irony nil t)
-  (progn
-    ;; hooks
-    (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)))
-
-(require 'company-c-headers nil t)
-
-;; eos rtags prefix map (todo revise)
+;; eos-rtags-map
 (define-key eos-rtags-map (kbd "l") 'rtags-taglist)
 (define-key eos-rtags-map (kbd "I") 'rtags-install)
 (define-key eos-rtags-map (kbd "y") 'rtags-symbol-type)
@@ -2599,144 +2691,219 @@ The tangled file will be compiled."
 (define-key eos-rtags-map (kbd "-") 'rtags-compilation-flags)
 (define-key eos-rtags-map (kbd ".") 'rtags-find-functions-called-by-this-function)
 
-;; (define-key eos-rtags-map (kbd "r") 'rtags-find-references-at-point)
-;; (define-key eos-rtags-map (kbd "p") 'rtags-find-all-references-at-point)
-;; (define-key eos-rtags-map (kbd "i") 'rtags-imenu)
-;; (define-key eos-rtags-map (kbd "t") 'rtags-find-symbol-at-point)
-;; (define-key eos-rtags-map (kbd "s") 'rtags-find-symbol)
+(require 'cc-mode nil t)
+
+;; c/c++ company backends
+(defun eos/cc/set-company-backends ()
+  "Set C/C++ common company backends."
+  (eos-set-company-backends
+   '((company-c-headers)
+     (company-irony
+      company-yasnippet
+      company-dabbrev-code)
+     (company-files))))
+
+(add-hook 'c-mode-hook
+          (lambda ()
+            ;; set cc common company backends
+            (eos/cc/set-company-backends)
+
+            ;; set dash docset
+            (eos-set-dash-docset '"C")
+
+            ;; set flycheck checker
+            (eos/set-flycheck-checker 'c/c++-clang)
+
+            ;; load rtags
+            (eos/cc/load-rtags)))
+
+(add-hook 'c++-mode-hook
+          (lambda ()
+            ;; set cc common backends (company and flycheck)
+            (eos/cc/set-company-backends)
+
+            ;; set flycheck checker
+            (eos/set-flycheck-checker 'c++-cppcheck)
+
+            ;; set dash docset
+            (eos-set-dash-docset '"C++")
+
+            ;; load rtags
+            (eos/cc/load-rtags)))
+
+;; c-mode-map
+(when (boundp 'c-mode-map)
+  (progn
+    ;; set rtags prefix map in c-mode map (C-c r)
+    (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
+
+    ;; complete or indent
+    (define-key c-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
+
+;; c++-mode-map
+(when (boundp 'c++-mode-map)
+  (progn
+    ;; set rtags prefix map in c-mode map (C-c r)
+    (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
+
+    ;; complete or indent
+    (define-key c++-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
+
+(when (require 'irony nil t)
+  (progn
+
+;; irony-mode hooks
+(add-hook 'irony-mode-hook 'electric-pair-mode)
+
+;; cc-mode hooks
+(add-hook 'c-mode-hook 'irony-mode)
+(add-hook 'c++-mode-hook 'irony-mode)
+(add-hook 'objc-mode-hook 'irony-mode)))
+
+(when (require 'irony-cdb nil t)
+  (progn
+
+;; hooks
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)))
+
+(when (require 'company-irony nil t)
+  (progn
+
+(add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)))
+
+(require 'company-c-headers nil t)
 
 (when (require 'lisp-mode nil t)
   (progn
-    ;; custom
-    ;; number of columns to indent the second line of a (def...) form
-    (customize-set-variable 'lisp-body-indent 2)))
+
+;; number of columns to indent the second line of a (def...) form
+(customize-set-variable 'lisp-body-indent 2)))
 
 (when (require 'elisp-mode nil t)
   (progn
-    ;; hooks
-    ;; enable minor modes
-    (add-hook 'emacs-lisp-mode-hook
-              (lambda()
-                (eos-call-func 'eldoc-mode 1)))
 
-    (add-hook 'lisp-interaction-mode-hook
-              (lambda()
-                (eos-call-func 'eldoc-mode 1)))
+;; enable minor modes
+(add-hook 'emacs-lisp-mode-hook
+          (lambda()
+            (eos-call-func 'eldoc-mode 1)))
 
-    ;; set backends
-    (add-hook 'emacs-lisp-mode-hook
-              (lambda ()
-                ;; set company backends
-                (eos-set-company-backends
-                 '((company-elisp
-                    company-yasnippet
-                    company-dabbrev-code)
-                   (company-files)))
+(add-hook 'lisp-interaction-mode-hook
+          (lambda()
+            (eos-call-func 'eldoc-mode 1)))
 
-                ;; set flycheck checker
-                (eos/set-flycheck-checker 'emacs-lisp)
+;; set backends (company, flychecker, dash-docs)
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            ;; set company backends
+            (eos-set-company-backends
+             '((company-elisp
+                company-yasnippet
+                company-dabbrev-code)
+               (company-files)))
 
-                ;; activate dash docset (emacs)
-                (eos-set-dash-docset "Emacs Lisp")))))
+            ;; set flycheck checker
+            (eos/set-flycheck-checker 'emacs-lisp)
 
-;; binds
+            ;; activate dash docset (emacs)
+            (eos-set-dash-docset "Emacs Lisp")))
+
+;; emacs-lisp-mode-map
 (when (boundp 'emacs-lisp-mode-map)
   (progn
-    ;; eval keybinds
+    ;; eval
     (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
     (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
     (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
 
-    ;; complete keybind
+    ;; complete
     (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/complete-buffer-or-indent)
 
-    ;; ubind, qualaty of life
+    ;; quality of life (unbind)
     (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
     (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
     (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
     (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
-    (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)))
+    (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)))))
 
 (require 'company-elisp nil t)
 
 (when (require 'sh-script nil t)
   (progn
-    ;; hooks
-    (add-hook 'sh-mode-hook
-              (lambda ()
-                ;; set company backends
-                (eos-set-company-backends
-                 '((company-shell
-                    company-shell-env
-                    company-yasnippet
-                    company-dabbrev-code)
-                   (company-files)))
 
-                ;; set flycheck backends
-                (eos/set-flycheck-checker 'sh-shellcheck)))))
+(add-hook 'sh-mode-hook
+          (lambda ()
+            ;; set company backends
+            (eos-set-company-backends
+             '((company-shell
+                company-shell-env
+                company-yasnippet
+                company-dabbrev-code)
+               (company-files)))
 
-(require 'company-shell nil t)
+            ;; set flycheck backends
+            (eos/set-flycheck-checker 'sh-shellcheck)))))
 
 (when (require 'fish-mode nil t)
   (progn
-    ;; hooks
-    (add-hook 'fish-mode-hook
-              (lambda ()
-                ;; set company backends
-                (eos-set-company-backends
-                 '((company-fish-shell
-                    company-yasnippet
-                    company-shell
-                    company-shell-env
-                    company-dabbrev-code)
-                   (company-files)))))))
+
+(add-hook 'fish-mode-hook
+          (lambda ()
+            ;; set company backends
+            (eos-set-company-backends
+             '((company-fish-shell
+                company-yasnippet
+                company-shell
+                company-shell-env
+                company-dabbrev-code)
+               (company-files)))))))
+
+(require 'company-shell nil t)
 
 (when (require 'lua-mode nil t)
   (progn
-    ;; custom
-    ;; non-nil means display lua-process-buffer after sending a command.
-    (customize-set-variable 'lua-process-buffer t)
 
-    ;; default application to run in Lua process
-    (customize-set-variable 'lua-default-application "lua")
+;; non-nil means display lua-process-buffer after sending a command.
+(customize-set-variable 'lua-process-buffer t)
 
-    ;; command switches for lua-default-application
-    (customize-set-variable 'lua-default-command-switches "-i")
+;; default application to run in Lua process
+(customize-set-variable 'lua-default-application "lua")
 
-    ;; amount by which Lua subexpressions are indented
-    (customize-set-variable 'lua-indent-level 4)
+;; command switches for lua-default-application
+(customize-set-variable 'lua-default-command-switches "-i")
 
-    ;; if non-nil, contents of multiline string will be indented
-    (customize-set-variable 'lua-indent-string-contents t)
+;; amount by which Lua subexpressions are indented
+(customize-set-variable 'lua-indent-level 4)
 
-    ;; jump to innermost traceback location in *lua* buffer
-    ;; when this variable is non-nil and a traceback occurs
-    ;; when running Lua code in a process, jump immediately
-    ;; to the source code of the innermost traceback location
-    (customize-set-variable 'lua-jump-on-traceback t)
+;; if non-nil, contents of multiline string will be indented
+(customize-set-variable 'lua-indent-string-contents t)
 
-    ;; hooks
-    (add-hook 'lua-mode-hook
-              (lambda ()
-                ;; set company backends
-                (eos-set-company-backends
-                 '((company-yasnippet
-                    company-keywords
-                    company-gtags
-                    company-dabbrev
-                    company-dabbrev-code
-                    company-keywords)
-                   (company-files)))
+;; jump to innermost traceback location in *lua* buffer
+;; when this variable is non-nil and a traceback occurs
+;; when running Lua code in a process, jump immediately
+;; to the source code of the innermost traceback location
+(customize-set-variable 'lua-jump-on-traceback t)
 
-                ;; set flycheck checker
-                (eos/set-flycheck-checker 'lua)
+(add-hook 'lua-mode-hook
+          (lambda ()
+            ;; set company backends
+            (eos-set-company-backends
+             '((company-yasnippet
+                company-keywords
+                company-gtags
+                company-dabbrev
+                company-dabbrev-code
+                company-keywords)
+               (company-files)))
 
-                ;; activate dash docset
-                (eos-set-dash-docset "Lua")))
+            ;; set flycheck checker
+            (eos/set-flycheck-checker 'lua)
 
-    ;; add auto-mode
-    (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
-    (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))))
+            ;; activate dash docset
+            (eos-set-dash-docset "Lua")))
+
+;; add auto-mode
+(add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+(add-to-list 'interpreter-mode-alist '("lua" . lua-mode))))
 
 (require 'tcl nil t)
 
@@ -2744,57 +2911,56 @@ The tangled file will be compiled."
 
 (when (require 'python nil t)
   (progn
-    ;; custom
-    ;; default Python interpreter for shell
-    (customize-set-variable 'python-shell-interpreter "python2.7")
 
-    ;; non-nil means template skeletons will be automagically inserted
-    (customize-set-variable 'python-skeleton-autoinsert t)
+;; default Python interpreter for shell
+(customize-set-variable 'python-shell-interpreter "python")
 
-    ;; hooks
-    ;; enable modes
-    (add-hook 'python-mode-hook
-              (lambda()
-                ;; enable eldoc mode
-                (eos-call-func 'eldoc-mode 1)))
+;; non-nil means template skeletons will be automagically inserted
+(customize-set-variable 'python-skeleton-autoinsert t)
 
-    ;; set backends
-    (add-hook 'python-mode-hook
-              (lambda ()
-                ;; set company backends
-                (eos-set-company-backends
-                 '((company-yasnippet
-                    company-keywords
-                    company-dabbrev-code)
-                   (company-files)))
+;; enable modes
+(add-hook 'python-mode-hook
+          (lambda()
+            ;; enable eldoc mode
+            (eos-call-func 'eldoc-mode 1)))
 
-                ;; set flycheck checker
-                (eos/set-flycheck-checker 'python-pycompile)
+;; set backends
+(add-hook 'python-mode-hook
+          (lambda ()
+            ;; set company backends
+            (eos-set-company-backends
+             '((company-yasnippet
+                company-keywords
+                company-dabbrev-code)
+               (company-files)))
 
-                ;; set dash docsets
-                (eos-set-dash-docset '"Python 3")))))
+            ;; set flycheck checker
+            (eos/set-flycheck-checker 'python-pycompile)
+
+            ;; set dash docsets
+            (eos-set-dash-docset '"Python 3")))))
 
 (when (require 'go-mode nil t)
   (progn
-    ;; add (*.go . go-mode) to auto-mode-alist
-    ;; init go-mode when a file with the extersion .go is opened
-    (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
-    ;; hooks
-    (add-hook 'go-mode-hook
-              (lambda ()
-                ;; set company backends
-                (eos-set-company-backends
-                 '((company-yasnippet
-                    company-keywords
-                    company-dabbrev-code)
-                   (company-files)))
+(add-hook 'go-mode-hook
+          (lambda ()
+            ;; set company backends
+            (eos-set-company-backends
+             '((company-yasnippet
+                company-keywords
+                company-dabbrev-code)
+               (company-files)))
 
-                ;; set flycheck checker (go lint)
-                (eos/set-flycheck-checker 'go-golint)
+            ;; set flycheck checker (go lint)
+            (eos/set-flycheck-checker 'go-golint)
 
-                ;; set dash docsets
-                (eos-set-dash-docset '"Go")))))
+            ;; set dash docsets
+            (eos-set-dash-docset '"Go")))
+
+;; add (*.go . go-mode) to auto-mode-alist
+;; init go-mode when a file with the extersion .go is opened
+(add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))))
 
 (require 'ess-r-mode nil t)
 
@@ -2806,25 +2972,24 @@ The tangled file will be compiled."
 
 (when (require 'elixir-mode nil t)
   (progn
-    ;; custom
-    ;; additional arguments to `mix format`'
-    ;; (customize-set-variable 'elixir-format-arguments nil)
 
-    ;; hooks
-    (add-hook 'elixir-mode-hook
-              (lambda ()
-                ;; set company backends
-                (eos-set-company-backends
-                 '((company-yasnippet
-                    company-keywords
-                    company-dabbrev-code)
-                   (company-files)))
+;; additional arguments to `mix format`'
+;; (customize-set-variable 'elixir-format-arguments nil)
 
-                ;; set syntax checker
-                ;; eos/flycheck/set-cheker '<elixir-checker>)
+(add-hook 'elixir-mode-hook
+          (lambda ()
+            ;; set company backends
+            (eos-set-company-backends
+             '((company-yasnippet
+                company-keywords
+                company-dabbrev-code)
+               (company-files)))
 
-                ;; set dash docsets
-                (eos-set-dash-docset '"Elixir")))))
+            ;; set syntax checker
+            ;; eos/flycheck/set-cheker '<elixir-checker>)
+
+            ;; set dash docsets
+            (eos-set-dash-docset '"Elixir")))))
 
 (require 'vhdl-mode nil t)
 
@@ -2833,234 +2998,41 @@ The tangled file will be compiled."
 (require 'cmake-mode nil t)
 
 (add-to-list 'load-path
-             (concat user-emacs-directory "elpa/mql-mode"))
+             (concat user-emacs-directory "lisp/mql-mode"))
 
 (when (require 'mql-mode nil t)
   (progn
-    ;; hooks
-    (add-hook 'mql-mode-hook
-              (lambda ()
-                ;; set company backends
-                (eos-set-company-backends
-                 '((company-gtags
-                    company-yasnippet
-                    company-dabbrev
-                    company-dabbrev-code)
-                   (company-files)))
 
-                ;; select flycheck checker (use gcc)
-                (eos/set-flycheck-checker 'c/c++-gcc)
+(add-hook 'mql-mode-hook
+          (lambda ()
+            ;; set company backends
+            (eos-set-company-backends
+             '((company-gtags
+                company-yasnippet
+                company-dabbrev
+                company-dabbrev-code)
+               (company-files)))
 
-                ;; activate mql5 docset
-                (eos-set-dash-docset '"mql5")))))
+            ;; select flycheck checker (use gcc)
+            (eos/set-flycheck-checker 'c/c++-gcc)
 
-(when (require 'highlight-doxygen nil t)
-  (progn
-    ;; add doxygen
-    (add-hook 'prog-mode-hook 'highlight-doxygen-global-mode)))
+            ;; activate mql5 docset
+            (eos-set-dash-docset '"mql5")))))
 
 (when (require 'web-mode nil t)
   (progn
-    ;; add files extensions to web-mode
-    (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))))
+
+;; add files extensions to web-mode
+(add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))))
 
 (when (boundp 'web-mode-engines-alist)
   (progn
     (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'")))))
 
-(when (require 'conf-mode nil t)
-  (progn
-    ;; add files extensions to be handled by conf-mode
-    (add-to-list 'auto-mode-alist '("\\.compose\\'" . conf-mode))
-    (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))))
-
-;; clean esc map
-(define-key esc-map (kbd "ESC") nil)
-(define-key esc-map (kbd "<f10>") nil)
-
-;; unbind
-;; (define-key ctl-x-map (kbd "C-SPC") nil)
-;; (define-key ctl-x-map (kbd "C-=") nil)
-;; (define-key ctl-x-map (kbd "C-0") nil)
-;; (define-key ctl-x-map (kbd "C--") nil)
-;; (define-key ctl-x-map (kbd "ESC") nil)
-;; (define-key ctl-x-map (kbd ".") nil)
-;; (define-key ctl-x-map (kbd "C-l") nil)
-;; (define-key ctl-x-map (kbd "C-x") nil)
-;; (define-key ctl-x-map (kbd "C-<left>") nil)
-;; (define-key ctl-x-map (kbd "C-<right>") nil)
-;; (define-key ctl-x-map (kbd "C-<up>") nil)
-;; (define-key ctl-x-map (kbd "C-<down>") nil)
-(define-key ctl-x-map (kbd "<right>") nil)
-(define-key ctl-x-map (kbd "<left>") nil)
-
-(define-key ctl-x-map (kbd "C-o") nil)
-(define-key ctl-x-map (kbd "C-d") nil)
-(define-key ctl-x-map (kbd "C-c") nil)
-(define-key ctl-x-map (kbd "C-j") nil)
-(define-key ctl-x-map (kbd "C-+") nil)
-(define-key ctl-x-map (kbd "C-a") nil)
-(define-key ctl-x-map (kbd "C-r") nil)
-(define-key ctl-x-map (kbd "C-n") nil)
-(define-key ctl-x-map (kbd "C-z") nil)
-(define-key ctl-x-map (kbd "C-p") nil)
-(define-key ctl-x-map (kbd "C-h") nil)
-(define-key ctl-x-map (kbd "C-u") nil)
-(define-key ctl-x-map (kbd "C-\@") nil)
-(define-key ctl-x-map (kbd "M-:") nil)
-
-(define-key ctl-x-map (kbd "RET") nil)
-(define-key ctl-x-map (kbd "`") nil)
-(define-key ctl-x-map (kbd "]") nil)
-;; (define-key ctl-x-map (kbd "[") nil)
-(define-key ctl-x-map (kbd ")") nil)
-(define-key ctl-x-map (kbd "(") nil)
-(define-key ctl-x-map (kbd "<") nil)
-(define-key ctl-x-map (kbd ">") nil)
-(define-key ctl-x-map (kbd "\@") nil)
-(define-key ctl-x-map (kbd "-") nil)
-(define-key ctl-x-map (kbd ";") nil)
-(define-key ctl-x-map (kbd "#") nil)
-(define-key ctl-x-map (kbd "*") nil)
-(define-key ctl-x-map (kbd "'") nil)
-(define-key ctl-x-map (kbd "$") nil)
-(define-key ctl-x-map (kbd "{") nil)
-(define-key ctl-x-map (kbd "}") nil)
-(define-key ctl-x-map (kbd "^") nil)
-;; (define-key ctl-x-map (kbd "n") nil)
-;; (define-key ctl-x-map (kbd "f") nil)
-(define-key ctl-x-map (kbd "a") nil)
-(define-key ctl-x-map (kbd "h") nil)
-(define-key ctl-x-map (kbd "v") nil)
-(define-key ctl-x-map (kbd "x") nil)
-(define-key ctl-x-map (kbd "X") nil)
-
-;; clean minor-mode-map-alist
-(setq minor-mode-map-alist nil)
-
-;; unset
-(global-unset-key (kbd "C-z"))
-(global-unset-key (kbd "C-@"))
-(global-unset-key (kbd "C-\\"))
-(global-unset-key (kbd "C-_"))
-(global-unset-key (kbd "M-l"))
-(global-unset-key (kbd "M-h"))
-(global-unset-key (kbd "M-\\"))
-(global-unset-key (kbd "M-$"))
-(global-unset-key (kbd "M-("))
-(global-unset-key (kbd "M-)"))
-(global-unset-key (kbd "M-r"))
-(global-unset-key (kbd "M-{"))
-(global-unset-key (kbd "M-}"))
-(global-unset-key (kbd "S-SPC"))
-(global-unset-key (kbd "<backtap>"))
-(global-unset-key (kbd "M-="))
-(global-unset-key (kbd "M-@"))
-(global-unset-key (kbd "M-~"))
-
-;; (global-unset-key (kbd "M-z"))
-;; (global-unset-key (kbd "M-SPC"))
-;; (global-unset-key (kbd "M-m"))
-;; (global-unset-key (kbd "M-k"))
-;; (global-unset-key (kbd "M-t"))
-;; (global-unset-key (kbd "M-q"))
-
-(global-unset-key (kbd "C-M-h"))
-(global-unset-key (kbd "C-M-j"))
-(global-unset-key (kbd "C-M-."))
-(global-unset-key (kbd "C-M-l"))
-(global-unset-key (kbd "C-M-/"))
-(global-unset-key (kbd "C-M-;"))
-(global-unset-key (kbd "C-M-@"))
-(global-unset-key (kbd "C-M-\\"))
-(global-unset-key (kbd "C-M-a"))
-(global-unset-key (kbd "C-M-r"))
-(global-unset-key (kbd "C-M-s"))
-(global-unset-key (kbd "C-M-%"))
-(global-unset-key (kbd "C-M-u"))
-(global-unset-key (kbd "C-M-d"))
-(global-unset-key (kbd "C-M-SPC"))
-(global-unset-key (kbd "C-M-S-v"))
-
-(global-unset-key (kbd "<C-M-end>"))
-(global-unset-key (kbd "<C-M-home>"))
-(global-unset-key (kbd "<C-S-backspace>"))
-(global-unset-key (kbd "<C-backspace>"))
-(global-unset-key (kbd "<C-delete>"))
-(global-unset-key (kbd "<C-down>"))
-(global-unset-key (kbd "<C-next>"))
-(global-unset-key (kbd "<C-end>"))
-(global-unset-key (kbd "<C-f10>"))
-(global-unset-key (kbd "<M-f10>"))
-
-(global-unset-key (kbd "<bottom-divider>"))
-(global-unset-key (kbd "<bottom-edge>"))
-(global-unset-key (kbd "<bottom-left-corner>"))
-(global-unset-key (kbd "<bottom-right-corner>"))
-
-(global-unset-key (kbd "<horizontal-scroll-bar>"))
-(global-unset-key (kbd "<vertical-scroll-bar>"))
-
-(global-unset-key (kbd "<left-edge>"))
-(global-unset-key (kbd "<right-edge>"))
-
-(global-unset-key (kbd "<undo>"))
-(global-unset-key (kbd "<find>"))
-(global-unset-key (kbd "<help>"))
-(global-unset-key (kbd "<open>"))
-(global-unset-key (kbd "<again>"))
-(global-unset-key (kbd "<menu>"))
-(global-unset-key (kbd "<header-line>"))
-(global-unset-key (kbd "<mode-line>"))
-
-(global-unset-key (kbd "<XF86Back>"))
-(global-unset-key (kbd "<XF86Forward>"))
-(global-unset-key (kbd "<XF86WakeUp>"))
-
-(global-unset-key (kbd "<top-edge>"))
-(global-unset-key (kbd "<top-left-corner>"))
-(global-unset-key (kbd "<top-right-corner>"))
-
-(global-unset-key (kbd "<mouse-1>"))
-(global-unset-key (kbd "<mouse-2>"))
-(global-unset-key (kbd "<mouse-3>"))
-(global-unset-key (kbd "<mouse-4>"))
-(global-unset-key (kbd "<mouse-5>"))
-(global-unset-key (kbd "<mouse-6>"))
-(global-unset-key (kbd "<mouse-7>"))
-
-(global-unset-key (kbd "<right-divider>"))
-(global-unset-key (kbd "<vertical-line>"))
-
-(global-unset-key (kbd "<f10>"))
-(global-unset-key (kbd "<f11>"))
-(global-unset-key (kbd "<f16>"))
-(global-unset-key (kbd "<f18>"))
-(global-unset-key (kbd "<f20>"))
-
-(global-unset-key (kbd "<drag-mouse-1>"))
-(global-unset-key (kbd "<C-mouse-4>"))
-(global-unset-key (kbd "<C-mouse-5>"))
-(global-unset-key (kbd "<C-mouse-6>"))
-(global-unset-key (kbd "<C-mouse-7>"))
-(global-unset-key (kbd "<M-mouse-1>"))
-(global-unset-key (kbd "<M-mouse-2>"))
-(global-unset-key (kbd "<M-mouse-3>"))
-(global-unset-key (kbd "<S-mouse-3>"))
-(global-unset-key (kbd "<S-mouse-4>"))
-(global-unset-key (kbd "<S-mouse-5>"))
-(global-unset-key (kbd "<S-mouse-6>"))
-(global-unset-key (kbd "<S-mouse-7>"))
-(global-unset-key (kbd "<C-down-mouse-1>"))
-(global-unset-key (kbd "<C-down-mouse-2>"))
-(global-unset-key (kbd "<M-down-mouse-1>"))
-(global-unset-key (kbd "<M-drag-mouse-1>"))
-(global-unset-key (kbd "<S-down-mouse-1>"))
-
-(eos-load-file (expand-file-name "epilogue.el" user-emacs-directory))
+(eos-load-file (expand-file-name "adapt.el" user-emacs-directory))

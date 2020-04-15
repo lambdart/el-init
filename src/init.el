@@ -126,11 +126,13 @@ The largest value that is representable in a Lisp integer."
 (eos-update-load-path)
 (eos-add-subdirs-to-load-path)
 
-(defun eos-call-proc (name)
-  "Call (execute) a process by NAME."
+(defun eos-call-proc (name &optional args)
+  "Call (execute) a process by NAME with ARGS."
   (if (executable-find name)
-      (start-process name nil name)
-    nil))
+      (if args
+          (start-process name nil name args)
+        (start-process name nil name)))
+  nil)
 
 (defun eos-call-func (func &rest args)
   "Call FUNC with ARGS, if it's bounded."
@@ -394,7 +396,6 @@ Keymaps list will be printed on *Messages* buffer."
 (define-key ctl-x-map (kbd "x") nil)
 (define-key ctl-x-map (kbd "X") nil)
 
-;; clean minor-mode-map-alist
 (setq minor-mode-map-alist nil)
 
 ;; unset
@@ -998,6 +999,8 @@ These styles are described in `completion-styles-alist'."
       (message "Completion style: %s "
                (format "%s" (car completion-styles))))))
 
+
+
 (when (boundp 'icomplete-minibuffer-map)
   (progn
     (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
@@ -1269,16 +1272,6 @@ The user's $HOME directory is abbreviated as a tilde."
   (cond ((find-font (font-spec :name font))
          (set-frame-font font nil t))))
 
-;; enable window divider
-(add-hook 'after-init-hook
-          (lambda()
-            (eos-call-func 'window-divider-mode)))
-
-;; disable blink cursor
-(add-hook 'emacs-startup-hook
-          (lambda()
-            (eos-call-func 'blink-cursor-mode 0)))
-
 ;; after a frame is created
 (add-hook 'after-make-frame-functions
           (lambda (frame)
@@ -1293,6 +1286,12 @@ The user's $HOME directory is abbreviated as a tilde."
 
 ;; set frame font
 (eos-set-frame-font "Hermit Light:pixelsize=18")
+
+;; enable window divider
+(window-divider-mode)
+
+;; disable blink cursor
+(blink-cursor-mode 0)
 
 (when (require 'page nil t)
   (progn
@@ -1963,6 +1962,10 @@ The user's $HOME directory is abbreviated as a tilde."
     (ispell-change-dictionary change)
     (message "Dictionary switched from %s to %s" dic change)))
 
+;; enable globally
+(ispell-minor-mode 1)
+
+;; eos-sc-map
 (define-key eos-sc-map (kbd "i") 'ispell-word)
 (define-key eos-sc-map (kbd "I") 'ispell-buffer)))
 
@@ -2079,13 +2082,13 @@ The user's $HOME directory is abbreviated as a tilde."
 (add-hook 'ediff-cleanup-hook 'ediff-toggle-wide-display)
 (add-hook 'ediff-suspend-hook 'ediff-toggle-wide-display)))
 
-(defun eos/compton (args)
+(defun eos/compton ()
   "Call compton compositor utility."
   (interactive)
-  (eos-call-proc "compton"))
+  (eos-call-proc "compton" "-b"))
 
 ;; start compton after emacs initialize
-(add-hook 'emacs-startup-hook #'eos/compton)
+(add-hook 'after-init-hook #'eos/compton)
 
 (when (require 'verb nil t)
   (progn
@@ -2123,7 +2126,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (defun eos/slock ()
   "Call slock utility."
   (interactive)
-  (eos-call-proc "slock"))
+  (eos-call-proc "slock" nil))
 
 (define-key ctl-x-map (kbd "<end>") 'eos/slock)
 
@@ -2131,7 +2134,7 @@ The user's $HOME directory is abbreviated as a tilde."
   "Call scrot utility."
   (interactive)
   (message "Saved in %s directory" (pwd))
-  (eos-call-proc "scrot"))
+  (eos-call-proc "scrot" nil))
 
 ;; global-map
 (global-set-key (kbd "<print>") 'eos/scrot)
@@ -2996,9 +2999,6 @@ The tangled file will be compiled."
 (require 'verilog nil t)
 
 (require 'cmake-mode nil t)
-
-(add-to-list 'load-path
-             (concat user-emacs-directory "lisp/mql-mode"))
 
 (when (require 'mql-mode nil t)
   (progn

@@ -269,16 +269,22 @@
      #+END_SRC
 
 ** Prelude
-**** Functions
+**** Core
+
+     Core functions must be pure (emacs vanilla and C source)
+     and generic.
+
 ***** Call
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos-call-proc (name)
-        "Call (execute) a process by NAME."
+      (defun eos-call-proc (name &optional args)
+        "Call (execute) a process by NAME with ARGS."
         (if (executable-find name)
-            (start-process name nil name)
-          nil))
+            (if args
+                (start-process name nil name args)
+              (start-process name nil name)))
+        nil)
 
       (defun eos-call-func (func &rest args)
         "Call FUNC with ARGS, if it's bounded."
@@ -534,223 +540,224 @@
 
      #+END_SRC
 
-**** Quality of life
+**** Clean
 ***** Esc
 
-     Quality of life.
+      Clean/unbind keys from esc-map.
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     ;; clean esc map
-     (define-key esc-map (kbd "ESC") nil)
-     (define-key esc-map (kbd "<f10>") nil)
+      ;; clean esc map
+      (define-key esc-map (kbd "ESC") nil)
+      (define-key esc-map (kbd "<f10>") nil)
 
-     #+END_SRC
+      #+END_SRC
 
 ***** Ctl-x
 
-     Quality of life.
+      Clean/unbind keys from ctl-x-map.
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     ;; unbind
-     ;; (define-key ctl-x-map (kbd "C-SPC") nil)
-     ;; (define-key ctl-x-map (kbd "C-=") nil)
-     ;; (define-key ctl-x-map (kbd "C-0") nil)
-     ;; (define-key ctl-x-map (kbd "C--") nil)
-     ;; (define-key ctl-x-map (kbd "ESC") nil)
-     ;; (define-key ctl-x-map (kbd ".") nil)
-     ;; (define-key ctl-x-map (kbd "C-l") nil)
-     ;; (define-key ctl-x-map (kbd "C-x") nil)
-     ;; (define-key ctl-x-map (kbd "C-<left>") nil)
-     ;; (define-key ctl-x-map (kbd "C-<right>") nil)
-     ;; (define-key ctl-x-map (kbd "C-<up>") nil)
-     ;; (define-key ctl-x-map (kbd "C-<down>") nil)
-     (define-key ctl-x-map (kbd "<right>") nil)
-     (define-key ctl-x-map (kbd "<left>") nil)
+      ;; unbind
+      ;; (define-key ctl-x-map (kbd "C-SPC") nil)
+      ;; (define-key ctl-x-map (kbd "C-=") nil)
+      ;; (define-key ctl-x-map (kbd "C-0") nil)
+      ;; (define-key ctl-x-map (kbd "C--") nil)
+      ;; (define-key ctl-x-map (kbd "ESC") nil)
+      ;; (define-key ctl-x-map (kbd ".") nil)
+      ;; (define-key ctl-x-map (kbd "C-l") nil)
+      ;; (define-key ctl-x-map (kbd "C-x") nil)
+      ;; (define-key ctl-x-map (kbd "C-<left>") nil)
+      ;; (define-key ctl-x-map (kbd "C-<right>") nil)
+      ;; (define-key ctl-x-map (kbd "C-<up>") nil)
+      ;; (define-key ctl-x-map (kbd "C-<down>") nil)
+      (define-key ctl-x-map (kbd "<right>") nil)
+      (define-key ctl-x-map (kbd "<left>") nil)
 
-     (define-key ctl-x-map (kbd "C-o") nil)
-     (define-key ctl-x-map (kbd "C-d") nil)
-     (define-key ctl-x-map (kbd "C-c") nil)
-     (define-key ctl-x-map (kbd "C-j") nil)
-     (define-key ctl-x-map (kbd "C-+") nil)
-     (define-key ctl-x-map (kbd "C-a") nil)
-     (define-key ctl-x-map (kbd "C-r") nil)
-     (define-key ctl-x-map (kbd "C-n") nil)
-     (define-key ctl-x-map (kbd "C-z") nil)
-     (define-key ctl-x-map (kbd "C-p") nil)
-     (define-key ctl-x-map (kbd "C-h") nil)
-     (define-key ctl-x-map (kbd "C-u") nil)
-     (define-key ctl-x-map (kbd "C-\@") nil)
-     (define-key ctl-x-map (kbd "M-:") nil)
+      (define-key ctl-x-map (kbd "C-o") nil)
+      (define-key ctl-x-map (kbd "C-d") nil)
+      (define-key ctl-x-map (kbd "C-c") nil)
+      (define-key ctl-x-map (kbd "C-j") nil)
+      (define-key ctl-x-map (kbd "C-+") nil)
+      (define-key ctl-x-map (kbd "C-a") nil)
+      (define-key ctl-x-map (kbd "C-r") nil)
+      (define-key ctl-x-map (kbd "C-n") nil)
+      (define-key ctl-x-map (kbd "C-z") nil)
+      (define-key ctl-x-map (kbd "C-p") nil)
+      (define-key ctl-x-map (kbd "C-h") nil)
+      (define-key ctl-x-map (kbd "C-u") nil)
+      (define-key ctl-x-map (kbd "C-\@") nil)
+      (define-key ctl-x-map (kbd "M-:") nil)
 
-     (define-key ctl-x-map (kbd "RET") nil)
-     (define-key ctl-x-map (kbd "`") nil)
-     (define-key ctl-x-map (kbd "]") nil)
-     ;; (define-key ctl-x-map (kbd "[") nil)
-     (define-key ctl-x-map (kbd ")") nil)
-     (define-key ctl-x-map (kbd "(") nil)
-     (define-key ctl-x-map (kbd "<") nil)
-     (define-key ctl-x-map (kbd ">") nil)
-     (define-key ctl-x-map (kbd "\@") nil)
-     (define-key ctl-x-map (kbd "-") nil)
-     (define-key ctl-x-map (kbd ";") nil)
-     (define-key ctl-x-map (kbd "#") nil)
-     (define-key ctl-x-map (kbd "*") nil)
-     (define-key ctl-x-map (kbd "'") nil)
-     (define-key ctl-x-map (kbd "$") nil)
-     (define-key ctl-x-map (kbd "{") nil)
-     (define-key ctl-x-map (kbd "}") nil)
-     (define-key ctl-x-map (kbd "^") nil)
-     ;; (define-key ctl-x-map (kbd "n") nil)
-     ;; (define-key ctl-x-map (kbd "f") nil)
-     (define-key ctl-x-map (kbd "a") nil)
-     (define-key ctl-x-map (kbd "h") nil)
-     (define-key ctl-x-map (kbd "v") nil)
-     (define-key ctl-x-map (kbd "x") nil)
-     (define-key ctl-x-map (kbd "X") nil)
+      (define-key ctl-x-map (kbd "RET") nil)
+      (define-key ctl-x-map (kbd "`") nil)
+      (define-key ctl-x-map (kbd "]") nil)
+      ;; (define-key ctl-x-map (kbd "[") nil)
+      (define-key ctl-x-map (kbd ")") nil)
+      (define-key ctl-x-map (kbd "(") nil)
+      (define-key ctl-x-map (kbd "<") nil)
+      (define-key ctl-x-map (kbd ">") nil)
+      (define-key ctl-x-map (kbd "\@") nil)
+      (define-key ctl-x-map (kbd "-") nil)
+      (define-key ctl-x-map (kbd ";") nil)
+      (define-key ctl-x-map (kbd "#") nil)
+      (define-key ctl-x-map (kbd "*") nil)
+      (define-key ctl-x-map (kbd "'") nil)
+      (define-key ctl-x-map (kbd "$") nil)
+      (define-key ctl-x-map (kbd "{") nil)
+      (define-key ctl-x-map (kbd "}") nil)
+      (define-key ctl-x-map (kbd "^") nil)
+      ;; (define-key ctl-x-map (kbd "n") nil)
+      ;; (define-key ctl-x-map (kbd "f") nil)
+      (define-key ctl-x-map (kbd "a") nil)
+      (define-key ctl-x-map (kbd "h") nil)
+      (define-key ctl-x-map (kbd "v") nil)
+      (define-key ctl-x-map (kbd "x") nil)
+      (define-key ctl-x-map (kbd "X") nil)
 
-     #+END_SRC
+      #+END_SRC
 
 ***** Minor
 
-    Clean minor-mode-map-alist.
+      Clean minor-mode-map-alist.
 
-    #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-    ;; clean minor-mode-map-alist
-    (setq minor-mode-map-alist nil)
+      (setq minor-mode-map-alist nil)
 
-    #+END_SRC
+      #+END_SRC
 
 ***** Global
 
-    Quality of life.
+      Clean/unbind keys from global-map.
 
-    #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-    ;; unset
-    (global-unset-key (kbd "C-z"))
-    (global-unset-key (kbd "C-@"))
-    (global-unset-key (kbd "C-\\"))
-    (global-unset-key (kbd "C-_"))
-    (global-unset-key (kbd "M-l"))
-    (global-unset-key (kbd "M-h"))
-    (global-unset-key (kbd "M-\\"))
-    (global-unset-key (kbd "M-$"))
-    (global-unset-key (kbd "M-("))
-    (global-unset-key (kbd "M-)"))
-    (global-unset-key (kbd "M-r"))
-    (global-unset-key (kbd "M-{"))
-    (global-unset-key (kbd "M-}"))
-    (global-unset-key (kbd "S-SPC"))
-    (global-unset-key (kbd "<backtap>"))
-    (global-unset-key (kbd "M-="))
-    (global-unset-key (kbd "M-@"))
-    (global-unset-key (kbd "M-~"))
+      ;; unset
+      (global-unset-key (kbd "C-z"))
+      (global-unset-key (kbd "C-@"))
+      (global-unset-key (kbd "C-\\"))
+      (global-unset-key (kbd "C-_"))
+      (global-unset-key (kbd "M-l"))
+      (global-unset-key (kbd "M-h"))
+      (global-unset-key (kbd "M-\\"))
+      (global-unset-key (kbd "M-$"))
+      (global-unset-key (kbd "M-("))
+      (global-unset-key (kbd "M-)"))
+      (global-unset-key (kbd "M-r"))
+      (global-unset-key (kbd "M-{"))
+      (global-unset-key (kbd "M-}"))
+      (global-unset-key (kbd "S-SPC"))
+      (global-unset-key (kbd "<backtap>"))
+      (global-unset-key (kbd "M-="))
+      (global-unset-key (kbd "M-@"))
+      (global-unset-key (kbd "M-~"))
 
-    ;; (global-unset-key (kbd "M-z"))
-    ;; (global-unset-key (kbd "M-SPC"))
-    ;; (global-unset-key (kbd "M-m"))
-    ;; (global-unset-key (kbd "M-k"))
-    ;; (global-unset-key (kbd "M-t"))
-    ;; (global-unset-key (kbd "M-q"))
+      ;; (global-unset-key (kbd "M-z"))
+      ;; (global-unset-key (kbd "M-SPC"))
+      ;; (global-unset-key (kbd "M-m"))
+      ;; (global-unset-key (kbd "M-k"))
+      ;; (global-unset-key (kbd "M-t"))
+      ;; (global-unset-key (kbd "M-q"))
 
-    (global-unset-key (kbd "C-M-h"))
-    (global-unset-key (kbd "C-M-j"))
-    (global-unset-key (kbd "C-M-."))
-    (global-unset-key (kbd "C-M-l"))
-    (global-unset-key (kbd "C-M-/"))
-    (global-unset-key (kbd "C-M-;"))
-    (global-unset-key (kbd "C-M-@"))
-    (global-unset-key (kbd "C-M-\\"))
-    (global-unset-key (kbd "C-M-a"))
-    (global-unset-key (kbd "C-M-r"))
-    (global-unset-key (kbd "C-M-s"))
-    (global-unset-key (kbd "C-M-%"))
-    (global-unset-key (kbd "C-M-u"))
-    (global-unset-key (kbd "C-M-d"))
-    (global-unset-key (kbd "C-M-SPC"))
-    (global-unset-key (kbd "C-M-S-v"))
+      (global-unset-key (kbd "C-M-h"))
+      (global-unset-key (kbd "C-M-j"))
+      (global-unset-key (kbd "C-M-."))
+      (global-unset-key (kbd "C-M-l"))
+      (global-unset-key (kbd "C-M-/"))
+      (global-unset-key (kbd "C-M-;"))
+      (global-unset-key (kbd "C-M-@"))
+      (global-unset-key (kbd "C-M-\\"))
+      (global-unset-key (kbd "C-M-a"))
+      (global-unset-key (kbd "C-M-r"))
+      (global-unset-key (kbd "C-M-s"))
+      (global-unset-key (kbd "C-M-%"))
+      (global-unset-key (kbd "C-M-u"))
+      (global-unset-key (kbd "C-M-d"))
+      (global-unset-key (kbd "C-M-SPC"))
+      (global-unset-key (kbd "C-M-S-v"))
 
-    (global-unset-key (kbd "<C-M-end>"))
-    (global-unset-key (kbd "<C-M-home>"))
-    (global-unset-key (kbd "<C-S-backspace>"))
-    (global-unset-key (kbd "<C-backspace>"))
-    (global-unset-key (kbd "<C-delete>"))
-    (global-unset-key (kbd "<C-down>"))
-    (global-unset-key (kbd "<C-next>"))
-    (global-unset-key (kbd "<C-end>"))
-    (global-unset-key (kbd "<C-f10>"))
-    (global-unset-key (kbd "<M-f10>"))
+      (global-unset-key (kbd "<C-M-end>"))
+      (global-unset-key (kbd "<C-M-home>"))
+      (global-unset-key (kbd "<C-S-backspace>"))
+      (global-unset-key (kbd "<C-backspace>"))
+      (global-unset-key (kbd "<C-delete>"))
+      (global-unset-key (kbd "<C-down>"))
+      (global-unset-key (kbd "<C-next>"))
+      (global-unset-key (kbd "<C-end>"))
+      (global-unset-key (kbd "<C-f10>"))
+      (global-unset-key (kbd "<M-f10>"))
 
-    (global-unset-key (kbd "<bottom-divider>"))
-    (global-unset-key (kbd "<bottom-edge>"))
-    (global-unset-key (kbd "<bottom-left-corner>"))
-    (global-unset-key (kbd "<bottom-right-corner>"))
+      (global-unset-key (kbd "<bottom-divider>"))
+      (global-unset-key (kbd "<bottom-edge>"))
+      (global-unset-key (kbd "<bottom-left-corner>"))
+      (global-unset-key (kbd "<bottom-right-corner>"))
 
-    (global-unset-key (kbd "<horizontal-scroll-bar>"))
-    (global-unset-key (kbd "<vertical-scroll-bar>"))
+      (global-unset-key (kbd "<horizontal-scroll-bar>"))
+      (global-unset-key (kbd "<vertical-scroll-bar>"))
 
-    (global-unset-key (kbd "<left-edge>"))
-    (global-unset-key (kbd "<right-edge>"))
+      (global-unset-key (kbd "<left-edge>"))
+      (global-unset-key (kbd "<right-edge>"))
 
-    (global-unset-key (kbd "<undo>"))
-    (global-unset-key (kbd "<find>"))
-    (global-unset-key (kbd "<help>"))
-    (global-unset-key (kbd "<open>"))
-    (global-unset-key (kbd "<again>"))
-    (global-unset-key (kbd "<menu>"))
-    (global-unset-key (kbd "<header-line>"))
-    (global-unset-key (kbd "<mode-line>"))
+      (global-unset-key (kbd "<undo>"))
+      (global-unset-key (kbd "<find>"))
+      (global-unset-key (kbd "<help>"))
+      (global-unset-key (kbd "<open>"))
+      (global-unset-key (kbd "<again>"))
+      (global-unset-key (kbd "<menu>"))
+      (global-unset-key (kbd "<header-line>"))
+      (global-unset-key (kbd "<mode-line>"))
 
-    (global-unset-key (kbd "<XF86Back>"))
-    (global-unset-key (kbd "<XF86Forward>"))
-    (global-unset-key (kbd "<XF86WakeUp>"))
+      (global-unset-key (kbd "<XF86Back>"))
+      (global-unset-key (kbd "<XF86Forward>"))
+      (global-unset-key (kbd "<XF86WakeUp>"))
 
-    (global-unset-key (kbd "<top-edge>"))
-    (global-unset-key (kbd "<top-left-corner>"))
-    (global-unset-key (kbd "<top-right-corner>"))
+      (global-unset-key (kbd "<top-edge>"))
+      (global-unset-key (kbd "<top-left-corner>"))
+      (global-unset-key (kbd "<top-right-corner>"))
 
-    (global-unset-key (kbd "<mouse-1>"))
-    (global-unset-key (kbd "<mouse-2>"))
-    (global-unset-key (kbd "<mouse-3>"))
-    (global-unset-key (kbd "<mouse-4>"))
-    (global-unset-key (kbd "<mouse-5>"))
-    (global-unset-key (kbd "<mouse-6>"))
-    (global-unset-key (kbd "<mouse-7>"))
+      (global-unset-key (kbd "<mouse-1>"))
+      (global-unset-key (kbd "<mouse-2>"))
+      (global-unset-key (kbd "<mouse-3>"))
+      (global-unset-key (kbd "<mouse-4>"))
+      (global-unset-key (kbd "<mouse-5>"))
+      (global-unset-key (kbd "<mouse-6>"))
+      (global-unset-key (kbd "<mouse-7>"))
 
-    (global-unset-key (kbd "<right-divider>"))
-    (global-unset-key (kbd "<vertical-line>"))
+      (global-unset-key (kbd "<right-divider>"))
+      (global-unset-key (kbd "<vertical-line>"))
 
-    (global-unset-key (kbd "<f10>"))
-    (global-unset-key (kbd "<f11>"))
-    (global-unset-key (kbd "<f16>"))
-    (global-unset-key (kbd "<f18>"))
-    (global-unset-key (kbd "<f20>"))
+      (global-unset-key (kbd "<f10>"))
+      (global-unset-key (kbd "<f11>"))
+      (global-unset-key (kbd "<f16>"))
+      (global-unset-key (kbd "<f18>"))
+      (global-unset-key (kbd "<f20>"))
 
-    (global-unset-key (kbd "<drag-mouse-1>"))
-    (global-unset-key (kbd "<C-mouse-4>"))
-    (global-unset-key (kbd "<C-mouse-5>"))
-    (global-unset-key (kbd "<C-mouse-6>"))
-    (global-unset-key (kbd "<C-mouse-7>"))
-    (global-unset-key (kbd "<M-mouse-1>"))
-    (global-unset-key (kbd "<M-mouse-2>"))
-    (global-unset-key (kbd "<M-mouse-3>"))
-    (global-unset-key (kbd "<S-mouse-3>"))
-    (global-unset-key (kbd "<S-mouse-4>"))
-    (global-unset-key (kbd "<S-mouse-5>"))
-    (global-unset-key (kbd "<S-mouse-6>"))
-    (global-unset-key (kbd "<S-mouse-7>"))
-    (global-unset-key (kbd "<C-down-mouse-1>"))
-    (global-unset-key (kbd "<C-down-mouse-2>"))
-    (global-unset-key (kbd "<M-down-mouse-1>"))
-    (global-unset-key (kbd "<M-drag-mouse-1>"))
-    (global-unset-key (kbd "<S-down-mouse-1>"))
+      (global-unset-key (kbd "<drag-mouse-1>"))
+      (global-unset-key (kbd "<C-mouse-4>"))
+      (global-unset-key (kbd "<C-mouse-5>"))
+      (global-unset-key (kbd "<C-mouse-6>"))
+      (global-unset-key (kbd "<C-mouse-7>"))
+      (global-unset-key (kbd "<M-mouse-1>"))
+      (global-unset-key (kbd "<M-mouse-2>"))
+      (global-unset-key (kbd "<M-mouse-3>"))
+      (global-unset-key (kbd "<S-mouse-3>"))
+      (global-unset-key (kbd "<S-mouse-4>"))
+      (global-unset-key (kbd "<S-mouse-5>"))
+      (global-unset-key (kbd "<S-mouse-6>"))
+      (global-unset-key (kbd "<S-mouse-7>"))
+      (global-unset-key (kbd "<C-down-mouse-1>"))
+      (global-unset-key (kbd "<C-down-mouse-2>"))
+      (global-unset-key (kbd "<M-down-mouse-1>"))
+      (global-unset-key (kbd "<M-drag-mouse-1>"))
+      (global-unset-key (kbd "<S-down-mouse-1>"))
 
-    #+END_SRC
+      #+END_SRC
 
 **** Binds
+
+     Fundamental/core binds.
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1376,7 +1383,8 @@
      (customize-set-variable 'icomplete-prospects-height 1)
 
      ;; string used by Icomplete to separate alternatives in the minibuffer
-     (customize-set-variable 'icomplete-separator "  •  ")
+     ;; (customize-set-variable 'icomplete-separator "  •  ")
+     (customize-set-variable 'icomplete-separator "  ¦  ")
 
      ;; specialized completion tables with which `icomplete should operate,
      ;; if this is t, `icomplete operates on all tables
@@ -1496,6 +1504,12 @@
                      (format "%s" (car completion-styles))))))
 
       #+END_SRC
+
+**** Hooks
+
+     #+BEGIN_SRC emacs-lisp
+
+     #+END_SRC
 
 **** Binds
 
@@ -2168,16 +2182,6 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; enable window divider
-     (add-hook 'after-init-hook
-               (lambda()
-                 (eos-call-func 'window-divider-mode)))
-
-     ;; disable blink cursor
-     (add-hook 'emacs-startup-hook
-               (lambda()
-                 (eos-call-func 'blink-cursor-mode 0)))
-
      ;; after a frame is created
      (add-hook 'after-make-frame-functions
                (lambda (frame)
@@ -2204,6 +2208,12 @@
 
      ;; set frame font
      (eos-set-frame-font "Hermit Light:pixelsize=18")
+
+     ;; enable window divider
+     (window-divider-mode)
+
+     ;; disable blink cursor
+     (blink-cursor-mode 0)
 
      #+END_SRC
 
@@ -3969,10 +3979,20 @@
 
       #+END_SRC
 
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable globally
+      (ispell-minor-mode 1)
+
+      #+END_SRC
+
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; eos-sc-map
       (define-key eos-sc-map (kbd "i") 'ispell-word)
       (define-key eos-sc-map (kbd "I") 'ispell-buffer)))
 
@@ -4289,10 +4309,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/compton (args)
+      (defun eos/compton ()
         "Call compton compositor utility."
         (interactive)
-        (eos-call-proc "compton"))
+        (eos-call-proc "compton" "-b"))
 
       #+END_SRC
 
@@ -4301,7 +4321,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; start compton after emacs initialize
-      (add-hook 'emacs-startup-hook #'eos/compton)
+      (add-hook 'after-init-hook #'eos/compton)
 
       #+END_SRC
 
@@ -4390,7 +4410,7 @@
       (defun eos/slock ()
         "Call slock utility."
         (interactive)
-        (eos-call-proc "slock"))
+        (eos-call-proc "slock" nil))
 
       #+END_SRC
 
@@ -4411,7 +4431,7 @@
         "Call scrot utility."
         (interactive)
         (message "Saved in %s directory" (pwd))
-        (eos-call-proc "scrot"))
+        (eos-call-proc "scrot" nil))
 
       #+END_SRC
 
@@ -6343,15 +6363,6 @@
 **** Mql-mode
 
      Major mode for editing Mql files: work in progress!
-
-***** Load
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-to-list 'load-path
-                   (concat user-emacs-directory "lisp/mql-mode"))
-
-      #+END_SRC
 
 ***** Require
 

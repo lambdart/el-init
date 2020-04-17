@@ -656,6 +656,9 @@ Keymaps list will be printed on *Messages* buffer."
 (when (require 'ibuffer nil t)
   (progn
 
+(add-to-list 'display-buffer-alist
+             '("\\*Ibuffer confirmation\\*" display-buffer-below-selected))
+
 (define-key ctl-x-map (kbd "b") 'ibuffer)))
 
 (when (require 'hideshow nil t)
@@ -1188,11 +1191,16 @@ instead."
   (interactive)
   (let* ((bounds (if (use-region-p)
                      (cons (region-beginning) (region-end))
-                   (bounds-of-thing-at-point 'symbol))))
+                   (bounds-of-thing-at-point 'symbol)))
+         (string nil))
+    (unless bounds
+      (setq string (read-string "Occur: ")))
     (if bounds
         (occur (buffer-substring-no-properties
                 (car bounds) (cdr bounds)))
-      (message "Occur-at-point: No candidate."))))
+      (if string
+          (occur string)
+        (message "Missing candidate")))))
 
 (global-set-key (kbd "M-s M-o") 'eos/occur-at-point)))
 
@@ -2000,6 +2008,12 @@ The user's $HOME directory is abbreviated as a tilde."
   (when (boundp 'flycheck-checker)
     (setq flycheck-checker checker)))
 
+
+
+;; dont display this buffer
+(add-to-list 'display-buffer-alist
+             '("\\*Flycheck error messages\\*" display-buffer-no-window))
+
 ;; init flycheck mode after some programming mode
 ;; is activated (c-mode, elisp-mode, etc).
 (add-hook 'prog-mode-hook
@@ -2019,8 +2033,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (define-key eos-sc-map (kbd "?") 'flycheck-describe-checker)
 
 ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
-;; (define-key eos-sc-map
-;;   (kbd "v") 'flycheck-verify-setup)
+;; (define-key eos-sc-map (kbd "v") 'flycheck-verify-setup)
 
 (when (require 'dmenu nil t)
   (progn
@@ -2394,8 +2407,19 @@ The tangled file will be compiled."
 ;; should the dictionary command reuse previous dictionary buffers?
 (customize-set-variable 'dictionary-use-single-buffer t)
 
+(defun eos/dictionary-search-at-point ()
+  "Dictionary with word at point as its arguments."
+  (interactive)
+  (let ((word (thing-at-point 'word)))
+    (unless word
+      (setq word (read-string "Word: ")))
+    (if word
+        (when (fboundp 'dictionary-search)
+          (dictionary-search word))
+      (message "Missing word"))))
+
 ;; binds
-(define-key eos-docs-map (kbd "d") 'dictionary-search)))
+(define-key eos-docs-map (kbd ".") 'eos/dictionary-search-at-point)))
 
 (when (and (require 'google-translate nil t)
            (require 'google-translate-smooth-ui nil t))
@@ -2426,6 +2450,9 @@ The tangled file will be compiled."
 
 (require 'eldoc nil t)
 
+;; number of seconds of idle time to wait before printing.
+(customize-set-variable 'eldoc-idle-delay 0)
+
 (when (require 'man nil t)
   (progn
 
@@ -2440,6 +2467,11 @@ The tangled file will be compiled."
 
 ;; eos-docs-map docs actions prefix map
 (define-key eos-docs-map (kbd "m") 'man)))
+
+(require 'woman nil t)
+
+;; if non-nil then show the *WoMan-Log* buffer if appropriate
+(customize-set-variable woman-show-log nil)
 
 (require 'dash-docs nil t)
 

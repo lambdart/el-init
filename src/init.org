@@ -1018,6 +1018,15 @@
 
      #+END_SRC
 
+**** Display
+
+     #+BEGIN_SRC emacs-lisp
+
+     (add-to-list 'display-buffer-alist
+                  '("\\*Ibuffer confirmation\\*" display-buffer-below-selected))
+
+     #+END_SRC
+
 **** Binds
 
      #+BEGIN_SRC emacs-lisp
@@ -1977,11 +1986,16 @@
        (interactive)
        (let* ((bounds (if (use-region-p)
                           (cons (region-beginning) (region-end))
-                        (bounds-of-thing-at-point 'symbol))))
+                        (bounds-of-thing-at-point 'symbol)))
+              (string nil))
+         (unless bounds
+           (setq string (read-string "Occur: ")))
          (if bounds
              (occur (buffer-substring-no-properties
                      (car bounds) (cdr bounds)))
-           (message "Occur-at-point: No candidate."))))
+           (if string
+               (occur string)
+             (message "Missing candidate")))))
 
      #+END_SRC
 
@@ -4081,6 +4095,22 @@
 
       #+END_SRC
 
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
+***** Display
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; dont display this buffer
+      (add-to-list 'display-buffer-alist
+                   '("\\*Flycheck error messages\\*" display-buffer-no-window))
+
+      #+END_SRC
+
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -4116,8 +4146,7 @@
       (define-key eos-sc-map (kbd "?") 'flycheck-describe-checker)
 
       ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
-      ;; (define-key eos-sc-map
-      ;;   (kbd "v") 'flycheck-verify-setup)
+      ;; (define-key eos-sc-map (kbd "v") 'flycheck-verify-setup)
 
       #+END_SRC
 
@@ -4962,12 +4991,29 @@
 
       #+END_SRC
 
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/dictionary-search-at-point ()
+        "Dictionary with word at point as its arguments."
+        (interactive)
+        (let ((word (thing-at-point 'word)))
+          (unless word
+            (setq word (read-string "Word: ")))
+          (if word
+              (when (fboundp 'dictionary-search)
+                (dictionary-search word))
+            (message "Missing word"))))
+
+      #+END_SRC
+
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
       ;; binds
-      (define-key eos-docs-map (kbd "d") 'dictionary-search)))
+      (define-key eos-docs-map (kbd ".") 'eos/dictionary-search-at-point)))
 
       #+END_SRC
 
@@ -5046,6 +5092,15 @@
 
       #+END_SRC
 
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; number of seconds of idle time to wait before printing.
+      (customize-set-variable 'eldoc-idle-delay 0)
+
+      #+END_SRC
+
 **** Man
 
      This package provides a function, `man', with which you can browse
@@ -5082,6 +5137,29 @@
 
       ;; eos-docs-map docs actions prefix map
       (define-key eos-docs-map (kbd "m") 'man)))
+
+      #+END_SRC
+
+**** Woman
+
+     WoMan implements a subset of the formatting performed by the Emacs
+     `man' (or `manual-entry') command to format a UN*X manual `page'
+     for display, but without calling any external programs.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'woman nil t)
+
+     #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; if non-nil then show the *WoMan-Log* buffer if appropriate
+      (customize-set-variable woman-show-log nil)
 
       #+END_SRC
 

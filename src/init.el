@@ -20,10 +20,9 @@ The largest value that is representable in a Lisp integer."
 
 (defun eos/reset-gc-collection ()
   "Reset garbage collection."
-  (run-at-time
-   1 nil
-   (lambda ()
-     (setq gc-cons-threshold 16777216))))
+  (run-at-time 1 nil
+               (lambda ()
+                 (setq gc-cons-threshold 16777216))))
 
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -97,14 +96,18 @@ The largest value that is representable in a Lisp integer."
 (defun eos-update-load-path (&rest _)
   "Update `load-path'."
   (dolist (dir '("site-lisp" "lisp"))
-    (push (expand-file-name dir user-emacs-directory) load-path)))
+    (add-to-list 'load-path
+                 (expand-file-name dir user-emacs-directory))))
 
 (defun eos-add-subdirs-to-load-path (&rest _)
   "Add sub-directories to `load-path'."
   (interactive)
-  (let ((default-directory (expand-file-name "site-lisp" user-emacs-directory)))
-    (normal-top-level-add-subdirs-to-load-path)
-    (cl-remove-duplicates load-path)))
+  (let ((default-directory
+          (expand-file-name "site-lisp" user-emacs-directory)))
+    (normal-top-level-add-subdirs-to-load-path)))
+
+;; research
+;; (cl-remove-duplicates load-path)
 
 (defun eos-load-file (file)
   "Load FILE if exists."
@@ -892,7 +895,7 @@ Else indents the current line."
 (customize-set-variable 'icomplete-prospects-height 1)
 
 ;; string used by Icomplete to separate alternatives in the minibuffer
-;; (customize-set-variable 'icomplete-separator "  •  ")
+(customize-set-variable 'icomplete-separator "  •  ")
 
 ;; specialized completion tables with which `icomplete should operate,
 ;; if this is t, `icomplete operates on all tables
@@ -991,8 +994,6 @@ These styles are described in `completion-styles-alist'."
       ;; show which current completion style
       (message "Completion style: %s "
                (format "%s" (car completion-styles))))))
-
-
 
 (when (boundp 'icomplete-minibuffer-map)
   (progn
@@ -1312,8 +1313,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (when (require 'kmacro nil t)
   (progn
 
-;; (define-key ctl-x-map (kbd "m") 'kmacro-keymap)
-))
+(define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
 
 (when (require 'paren nil t)
   (progn
@@ -1603,13 +1603,12 @@ The user's $HOME directory is abbreviated as a tilde."
  'epa-file-cache-passphrase-for-symmetric-encryption t)
 
 ;; if t, always asks user to select recipients
-(customize-set-variable 'epa-file-select-keys nil)
+(customize-set-variable 'epa-file-select-keys t)
 
-;; the gpg executable.
-(customize-set-variable 'epg-gpg-program "gpg")
+;; the gpg executable
+(customize-set-variable 'epg-gpg-program "gpg2")
 
-;; the pinentry mode.
-;; In epa commands, a particularly useful mode is ‘loopback’, which
+;; in epa commands, a particularly useful mode is ‘loopback’, which
 ;; redirects all Pinentry queries to the caller, so Emacs can query
 ;; passphrase through the minibuffer, instead of external Pinentry
 ;; program
@@ -1776,6 +1775,88 @@ The user's $HOME directory is abbreviated as a tilde."
   (progn
     (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
     (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))))
+
+(require 'gnus nil t)
+
+;; default method for selecting a newsgroup
+;; nnnil is a Gnus backend that provides no groups or articles.  It's useful
+;; as a primary select method when you want all your real select methods to
+;; be secondary or foreign.
+(customize-set-variable 'gnus-select-method '(nnnil))
+
+;; a list of secondary methods that will be used for reading news
+(customize-set-variable
+ 'gnus-secondary-select-methods '((nntp "news.gwene.org")
+                                  (nnimap "gmail"
+                                          (nnimap-address "imap.gmail.com")
+                                          (nnimap-stream ssl)
+                                          (nnimap-server-port "imaps")
+                                          (nnimap-authinfo-file "~/.auth/auth.gpg"))))
+
+;; if non-nil, automatically mark Gcc articles as read
+(customize-set-variable 'gnus-gcc-mark-as-read t)
+
+;; whether we want to use the Gnus agent or not.
+(customize-set-variable 'gnus-agent t)
+
+;; non-nil means that you are a Usenet novice
+(customize-set-variable 'gnus-novice-user nil)
+
+;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
+(customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
+
+;; non-nil means that Gnus will read the entire active file at startup
+(customize-set-variable 'gnus-read-active-file 'some)
+
+(require 'mm-bodies nil t)
+
+(add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
+
+(require 'nnmail nil t)
+
+;; expirable articles that are older than this will be expired
+(customize-set-variable 'nnmail-expiry-wait 30)
+
+(require 'message nil t)
+
+;; your preference for a mail composition package
+(customize-set-variable 'mail-user-agent 'message-user-agent)
+
+;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
+(customize-set-variable 'compose-mail-user-agent-warnings nil)
+
+                                        ; if it is nil, use Gnus native MUA; else use `mail-user-agent'
+(customize-set-variable 'message-mail-user-agent nil)
+
+;; string to be inserted at the end of the message buffer
+(customize-set-variable 'message-signature "")
+
+;; format of the "Whomever writes:" line
+;; (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
+
+;; function called to insert the "Whomever writes:" line
+(customize-set-variable 'message-citation-line-function
+                        'message-insert-formatted-citation-line)
+;; function that inserts a formatted citation line
+
+;; when non-nil, ask for confirmation when sending a message
+(customize-set-variable 'message-confirm-send nil)
+
+;; non-nil means that the message buffer will be killed after sending a message
+(customize-set-variable 'message-kill-buffer-on-exit t)
+
+;; whether to confirm a wide reply to multiple email recipients
+(customize-set-variable 'message-wide-reply-confirm-recipients t)
+
+;; This variable is obsolete since 26.1;
+;; The default charset comes from the language environment
+;; default charset used in non-MULE Emacsen
+(customize-set-variable 'message-default-charset 'utf-8)
+
+(require 'sendmail nil t)
+
+;; text inserted at end of mail buffer when a message is initialized
+(customize-set-variable 'mail-signature "Att.")
 
 (when (require 'moody nil t)
   (progn
@@ -2471,7 +2552,7 @@ The tangled file will be compiled."
 (require 'woman nil t)
 
 ;; if non-nil then show the *WoMan-Log* buffer if appropriate
-(customize-set-variable woman-show-log nil)
+(customize-set-variable 'woman-show-log nil)
 
 (require 'dash-docs nil t)
 
@@ -2680,8 +2761,7 @@ The tangled file will be compiled."
 
 (require 'ede nil t)
 
-(when (require 'projectile nil t)
-  (progn
+(require 'projectile nil t)
 
 ;; enable cache and choose indexing method
 (customize-set-variable 'projectile-enable-caching t)
@@ -2711,9 +2791,9 @@ The tangled file will be compiled."
 (define-key eos-pm-map (kbd "u") 'projectile-purge-file-from-cache)
 (define-key eos-pm-map (kbd ".") 'projectile-edit-dir-locals)
 (define-key eos-pm-map (kbd "k") 'projectile-kill-buffers)
-(define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)))
+(define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)
 
-(eos-call-func 'projectile-mode)
+(eos-call-func 'projectile-mode 1)
 
 (defun eos/cc/load-rtags ()
   "Load rtags manually."

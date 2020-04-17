@@ -94,10 +94,9 @@
 
      (defun eos/reset-gc-collection ()
        "Reset garbage collection."
-       (run-at-time
-        1 nil
-        (lambda ()
-          (setq gc-cons-threshold 16777216))))
+       (run-at-time 1 nil
+                    (lambda ()
+                      (setq gc-cons-threshold 16777216))))
 
      #+END_SRC
 
@@ -229,14 +228,18 @@
      (defun eos-update-load-path (&rest _)
        "Update `load-path'."
        (dolist (dir '("site-lisp" "lisp"))
-         (push (expand-file-name dir user-emacs-directory) load-path)))
+         (add-to-list 'load-path
+                      (expand-file-name dir user-emacs-directory))))
 
      (defun eos-add-subdirs-to-load-path (&rest _)
        "Add sub-directories to `load-path'."
        (interactive)
-       (let ((default-directory (expand-file-name "site-lisp" user-emacs-directory)))
-         (normal-top-level-add-subdirs-to-load-path)
-         (cl-remove-duplicates load-path)))
+       (let ((default-directory
+               (expand-file-name "site-lisp" user-emacs-directory)))
+         (normal-top-level-add-subdirs-to-load-path)))
+
+     ;; research
+     ;; (cl-remove-duplicates load-path)
 
      (defun eos-load-file (file)
        "Load FILE if exists."
@@ -1382,7 +1385,7 @@
      (customize-set-variable 'icomplete-prospects-height 1)
 
      ;; string used by Icomplete to separate alternatives in the minibuffer
-     ;; (customize-set-variable 'icomplete-separator "  •  ")
+     (customize-set-variable 'icomplete-separator "  •  ")
 
      ;; specialized completion tables with which `icomplete should operate,
      ;; if this is t, `icomplete operates on all tables
@@ -1393,6 +1396,8 @@
      (customize-set-variable 'icomplete-in-buffer nil)
 
      #+END_SRC
+
+     #+RESULTS:
 
 **** Functions
 ***** Kill-ring
@@ -1502,12 +1507,6 @@
                      (format "%s" (car completion-styles))))))
 
       #+END_SRC
-
-**** Hooks
-
-     #+BEGIN_SRC emacs-lisp
-
-     #+END_SRC
 
 **** Binds
 
@@ -2276,8 +2275,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-    ;; (define-key ctl-x-map (kbd "m") 'kmacro-keymap)
-    ))
+     (define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
 
      #+END_SRC
 
@@ -2997,13 +2995,12 @@
        'epa-file-cache-passphrase-for-symmetric-encryption t)
 
       ;; if t, always asks user to select recipients
-      (customize-set-variable 'epa-file-select-keys nil)
+      (customize-set-variable 'epa-file-select-keys t)
 
-      ;; the gpg executable.
-      (customize-set-variable 'epg-gpg-program "gpg")
+      ;; the gpg executable
+      (customize-set-variable 'epg-gpg-program "gpg2")
 
-      ;; the pinentry mode.
-      ;; In epa commands, a particularly useful mode is ‘loopback’, which
+      ;; in epa commands, a particularly useful mode is ‘loopback’, which
       ;; redirects all Pinentry queries to the caller, so Emacs can query
       ;; passphrase through the minibuffer, instead of external Pinentry
       ;; program
@@ -3065,6 +3062,7 @@
 
       #+END_SRC
 
+**** Mml-sec
 *** Session
 **** Desktop
 *** Packages
@@ -3520,11 +3518,189 @@
 
       #+END_SRC
 
-*** Email
-**** Sendmail
-**** Feedmail
-**** Messages
+*** News
+
+    - News: This is what you are supposed to use this thing for—reading news.
+      News is generally fetched from a nearby NNTP server, and is
+      generally publicly available to everybody.
+
+      - Mail: Everything that’s delivered to you personally is mail. Some
+      news/mail readers (like Gnus) blur the distinction between mail
+      and news, but there is a difference.
+      Mail is private. News is public.
+      Mailing is not posting, and replying is not following up.
+
+      - Reply: Send a mail to the person who has written what you are
+        reading.
+
 **** Gnus
+
+     The Gnus Newsreader:
+
+     You can read news (and mail) from within Emacs by using Gnus. The news
+     can be gotten by any nefarious means you can think of—NNTP, local spool
+     or your mbox file.  All at the same time, if you want to push
+     your luck.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'gnus nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; default method for selecting a newsgroup
+      ;; nnnil is a Gnus backend that provides no groups or articles.  It's useful
+      ;; as a primary select method when you want all your real select methods to
+      ;; be secondary or foreign.
+      (customize-set-variable 'gnus-select-method '(nnnil))
+
+      ;; a list of secondary methods that will be used for reading news
+      (customize-set-variable
+       'gnus-secondary-select-methods '((nntp "news.gwene.org")
+                                        (nnimap "gmail"
+                                                (nnimap-address "imap.gmail.com")
+                                                (nnimap-stream ssl)
+                                                (nnimap-server-port "imaps")
+                                                (nnimap-authinfo-file "~/.auth/auth.gpg"))))
+
+      ;; if non-nil, automatically mark Gcc articles as read
+      (customize-set-variable 'gnus-gcc-mark-as-read t)
+
+      ;; whether we want to use the Gnus agent or not.
+      (customize-set-variable 'gnus-agent t)
+
+      ;; non-nil means that you are a Usenet novice
+      (customize-set-variable 'gnus-novice-user nil)
+
+      ;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
+      (customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
+
+      ;; non-nil means that Gnus will read the entire active file at startup
+      (customize-set-variable 'gnus-read-active-file 'some)
+
+      #+END_SRC
+
+*** Mail
+**** Mm-bodies
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'mm-bodies nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
+
+      #+END_SRC
+
+**** Nnmail
+
+     Mail support functions for the Gnus mail backends.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'nnmail nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; expirable articles that are older than this will be expired
+      (customize-set-variable 'nnmail-expiry-wait 30)
+
+      #+END_SRC
+
+**** Messages
+
+     This mode provides mail-sending facilities from within Emacs.  It
+     consists mainly of large chunks of code from the sendmail.el,
+     gnus-msg.el and rnewspost.el files.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'message nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; your preference for a mail composition package
+      (customize-set-variable 'mail-user-agent 'message-user-agent)
+
+      ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
+      (customize-set-variable 'compose-mail-user-agent-warnings nil)
+
+                                              ; if it is nil, use Gnus native MUA; else use `mail-user-agent'
+      (customize-set-variable 'message-mail-user-agent nil)
+
+      ;; string to be inserted at the end of the message buffer
+      (customize-set-variable 'message-signature "")
+
+      ;; format of the "Whomever writes:" line
+      ;; (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
+
+      ;; function called to insert the "Whomever writes:" line
+      (customize-set-variable 'message-citation-line-function
+                              'message-insert-formatted-citation-line)
+      ;; function that inserts a formatted citation line
+
+      ;; when non-nil, ask for confirmation when sending a message
+      (customize-set-variable 'message-confirm-send nil)
+
+      ;; non-nil means that the message buffer will be killed after sending a message
+      (customize-set-variable 'message-kill-buffer-on-exit t)
+
+      ;; whether to confirm a wide reply to multiple email recipients
+      (customize-set-variable 'message-wide-reply-confirm-recipients t)
+
+      ;; This variable is obsolete since 26.1;
+      ;; The default charset comes from the language environment
+      ;; default charset used in non-MULE Emacsen
+      (customize-set-variable 'message-default-charset 'utf-8)
+
+      #+END_SRC
+
+**** Sendmail
+
+     This mode provides mail-sending facilities from within Emacs.  It is
+     documented in the Emacs user's manual.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'sendmail nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; text inserted at end of mail buffer when a message is initialized
+      (customize-set-variable 'mail-signature "Att.")
+
+      #+END_SRC
+
 *** Bar
 **** Moody
 
@@ -4464,9 +4640,9 @@
 
       #+END_SRC
 
-**** Torrent
-***** Mentor
-***** Aria2c
+**** Nnimap
+**** SmtpMail
+**** Mentor
 *** Controllers
 **** Slock
 ***** Functions
@@ -4723,6 +4899,7 @@
       #+END_SRC
 
 *** Office
+**** Remember
 **** Org
 
      Org is a mode for keeping notes, maintaining ToDo lists, and doing
@@ -5148,18 +5325,18 @@
 
 ***** Require
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     (require 'woman nil t)
+      (require 'woman nil t)
 
-     #+END_SRC
+      #+END_SRC
 
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
 
       ;; if non-nil then show the *WoMan-Log* buffer if appropriate
-      (customize-set-variable woman-show-log nil)
+      (customize-set-variable 'woman-show-log nil)
 
       #+END_SRC
 
@@ -5654,8 +5831,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'projectile nil t)
-        (progn
+      (require 'projectile nil t)
 
       #+END_SRC
 
@@ -5697,7 +5873,7 @@
       (define-key eos-pm-map (kbd "u") 'projectile-purge-file-from-cache)
       (define-key eos-pm-map (kbd ".") 'projectile-edit-dir-locals)
       (define-key eos-pm-map (kbd "k") 'projectile-kill-buffers)
-      (define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)))
+      (define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)
 
       #+END_SRC
 
@@ -5705,7 +5881,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eos-call-func 'projectile-mode)
+      (eos-call-func 'projectile-mode 1)
 
       #+END_SRC
 

@@ -73,19 +73,13 @@
     off immediately and then revert back to the default,
     sensible behavior.
 
-**** Enable
+**** Customize
 
      #+BEGIN_SRC emacs-lisp
 
      ;; threshold inital value
      (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
            gc-cons-percentage 0.5)
-
-     ;; defer garbage collection
-     ;; (add-hook 'minibuffer-setup-hook 'eos/gc/defer-gc-collection)
-
-     ;; reset threshold to inital value
-     ;; (add-hook 'minibuffer-exit-hook 'eos/gc/restore-gc-collection)
 
      #+END_SRC
 
@@ -178,10 +172,6 @@
        (make-sparse-keymap)
        "Keymap for utils keybinds.")
 
-     (defvar eos-mark-map
-       (make-sparse-keymap)
-       "Keymap for mark keybinds.")
-
      (defvar eos-rtags-map
        (make-sparse-keymap)
        "Keymap for rtag minor mode keybinds.")
@@ -197,7 +187,7 @@
                            eos-sc-map
                            eos-docs-map
                            eos-find-map
-                           eos-mark-map
+                           eos-utils-map
                            eos-window-map
                            eos-complete-map
                            eos-rtags-map))
@@ -783,15 +773,15 @@
      (define-key ctl-x-map (kbd "k") 'eos/kill-current-buffer)
 
      ;; mark
-     (define-key eos-mark-map (kbd "h") 'mark-whole-buffer)
-     (define-key eos-mark-map (kbd "s") 'mark-sexp)
-     (define-key eos-mark-map (kbd "p") 'mark-paragraph)
-     (define-key eos-mark-map (kbd "w") 'mark-word)
+     (define-key eos-utils-map (kbd "h") 'mark-whole-buffer)
+     (define-key eos-utils-map (kbd "s") 'mark-sexp)
+     (define-key eos-utils-map (kbd "p") 'mark-paragraph)
+     (define-key eos-utils-map (kbd "w") 'mark-word)
 
      ;; eos prefixs
      (define-key ctl-x-map (kbd "p") 'eos-pm-map)
      (define-key ctl-x-map (kbd "t") 'eos-tags-map)
-     (define-key ctl-x-map (kbd "m") 'eos-mark-map)
+     (define-key ctl-x-map (kbd "c") 'eos-utils-map)
      (define-key ctl-x-map (kbd "e") 'eos-sc-map)
      (define-key ctl-x-map (kbd "f") 'eos-find-map)
      (define-key ctl-x-map (kbd "l") 'eos-docs-map)
@@ -1384,7 +1374,6 @@
 
      ;; string used by Icomplete to separate alternatives in the minibuffer
      ;; (customize-set-variable 'icomplete-separator "  •  ")
-     (customize-set-variable 'icomplete-separator "  ¦  ")
 
      ;; specialized completion tables with which `icomplete should operate,
      ;; if this is t, `icomplete operates on all tables
@@ -1531,8 +1520,8 @@
              (let ((current-prefix-arg t))
                (funcall 'eos/icomplete/toggle-completion-styles))))))
 
-     ;; eos-mark-map
-     (define-key eos-mark-map (kbd "m") 'eos/icomplete/mark-ring)
+     ;; eos-utils-map
+     (define-key eos-utils-map (kbd "m") 'eos/icomplete/mark-ring)
 
      ;; global-map
      (global-set-key (kbd "M-y") 'eos/icomplete/kill-ring)
@@ -1762,7 +1751,7 @@
     This file contains those help commands which are complicated, and
     which may not be used in every session. For example
     `describe-function' will probably be heavily used when doing elisp
-    programming, but not if just editing C files
+    programming, but not if just editing C files.
 
 **** Require
 
@@ -1984,10 +1973,14 @@
      #+BEGIN_SRC emacs-lisp
 
      (defun eos/occur-at-point ()
-       "Occur with `thing-at-point' function."
+       "Occur with symbol or region as its arguments."
        (interactive)
-       (let ((symbol (thing-at-point 'symbol)))
-         (if symbol (occur symbol)
+       (let* ((bounds (if (use-region-p)
+                          (cons (region-beginning) (region-end))
+                        (bounds-of-thing-at-point 'symbol))))
+         (if bounds
+             (occur (buffer-substring-no-properties
+                     (car bounds) (cdr bounds)))
            (message "Occur-at-point: No candidate."))))
 
      #+END_SRC
@@ -2160,10 +2153,14 @@
 
      ;; (vertical-scroll-bars)
      ;; (bottom-divider-width . 0)
-     ;; (right-divider-width . 6)))
+     ;; (right-divider-width . 6)
+
+     ;; set font by face attribute (reference)
+     ;; (set-face-attribute 'default nil :height)
 
      ;; alist of default values for frame creation
      (add-to-list 'default-frame-alist '(internal-border-width . 2))
+
 
      #+END_SRC
 
@@ -2182,14 +2179,18 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; after a frame is created
+     ;; set transparency after a frame is created
      (add-hook 'after-make-frame-functions
                (lambda (frame)
                  (interactive)
                  (eos/set-frame-transparency 0.9)))
 
-     ;; set font by face attribute (reference)
-     ;; (set-face-attribute 'default nil :height)
+     ;; fix first frame
+     (add-hook 'emacs-startup-hook
+               (lambda ()
+                 (interactive)
+                 (make-frame)
+                 (delete-other-frames)))
 
      #+END_SRC
 
@@ -2207,7 +2208,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; set frame font
-     (eos-set-frame-font "Hermit Light:pixelsize=18")
+     (eos-set-frame-font "Hermit Light:pixelsize=20")
 
      ;; enable window divider
      (window-divider-mode)
@@ -2261,7 +2262,8 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
+    ;; (define-key ctl-x-map (kbd "m") 'kmacro-keymap)
+    ))
 
      #+END_SRC
 
@@ -2976,11 +2978,11 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; if non-nil, cache passphrase for symmetric encryption.
+      ;; if non-nil, cache passphrase for symmetric encryption
       (customize-set-variable
        'epa-file-cache-passphrase-for-symmetric-encryption t)
 
-      ;; if t, always asks user to select recipients.
+      ;; if t, always asks user to select recipients
       (customize-set-variable 'epa-file-select-keys nil)
 
       ;; the gpg executable.
@@ -2990,7 +2992,7 @@
       ;; In epa commands, a particularly useful mode is ‘loopback’, which
       ;; redirects all Pinentry queries to the caller, so Emacs can query
       ;; passphrase through the minibuffer, instead of external Pinentry
-      ;; program.
+      ;; program
       (customize-set-variable 'epa-pinentry-mode 'loopback)))
 
       #+END_SRC
@@ -3005,8 +3007,24 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'auth-source nil t)
-        (progn
+      (require 'auth-source nil t)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos-auth-search (host user)
+        "Lookup (format HOST USER PORT) password on auth-source default file."
+        (let ((auth (auth-source-search :host host :user user)))
+          (if auth
+              (let ((secretf (plist-get (car auth) :secret)))
+                (if secretf
+                    (funcall secretf)
+                  (message "Auth entry for %s@%s has no secret!"
+                           user host)))
+            (message "No auth entry found for %s@%s" user host))))
 
       #+END_SRC
 
@@ -3020,7 +3038,7 @@
 
       ;; list of authentication sources
       (customize-set-variable
-       'auth-sources '("~/.auth/auth.gpg" "~/.auth/netrc"))))
+       'auth-sources '("~/.auth/auth.gpg" "~/.auth/netrc"))
 
       #+END_SRC
 
@@ -3561,8 +3579,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'rcirc nil t)
-        (progn
+      (require 'rcirc nil t)
 
       #+END_SRC
 
@@ -3584,14 +3601,23 @@
       (customize-set-variable 'rcirc-authinfo nil)
 
       ;; coding system used to decode incoming irc messages
-      (customize-set-variable 'rcirc-decode-coding-system "utf-8")
+      (customize-set-variable 'rcirc-decode-coding-system 'utf-8)
 
       ;; responses which will be hidden when `rcirc-omit-mode is enable
       (customize-set-variable 'rcirc-omit-responses
-                              '("JOIN" "PART" "QUIT" "NICK"))))
+                              '("JOIN" "PART" "QUIT" "NICK"))
 
       #+END_SRC
 
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+
+      #+END_SRC
+
+***** Hooks
+***** Binds
 ***** Enable
 
       #+BEGIN_SRC emacs-lisp
@@ -4039,7 +4065,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'flycheck)
+      (require 'flycheck nil t)
 
       #+END_SRC
 
@@ -4061,7 +4087,18 @@
 
       ;; init flycheck mode after some programming mode
       ;; is activated (c-mode, elisp-mode, etc).
-      (add-hook 'prog-mode-hook 'flycheck-mode)
+      (add-hook 'prog-mode-hook
+                (lambda ()
+                  (interactive)
+                  (flycheck-mode 1)))
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (global-flycheck-mode 1)
 
       #+END_SRC
 
@@ -5172,7 +5209,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; set echo delay
-      (customize-set-variable 'company-echo-delay .02)
+      (customize-set-variable 'company-echo-delay 0)
 
       ;; idle delay in seconds until completion starts automatically
       (customize-set-variable 'company-idle-delay nil)

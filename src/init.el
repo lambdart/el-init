@@ -13,12 +13,6 @@
 (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
       gc-cons-percentage 0.5)
 
-;; defer garbage collection
-;; (add-hook 'minibuffer-setup-hook 'eos/gc/defer-gc-collection)
-
-;; reset threshold to inital value
-;; (add-hook 'minibuffer-exit-hook 'eos/gc/restore-gc-collection)
-
 (defun eos/defer-gc-collection ()
   "Set `gc-cons-threshold' to most positive fix number,
 The largest value that is representable in a Lisp integer."
@@ -75,10 +69,6 @@ The largest value that is representable in a Lisp integer."
   (make-sparse-keymap)
   "Keymap for utils keybinds.")
 
-(defvar eos-mark-map
-  (make-sparse-keymap)
-  "Keymap for mark keybinds.")
-
 (defvar eos-rtags-map
   (make-sparse-keymap)
   "Keymap for rtag minor mode keybinds.")
@@ -88,7 +78,7 @@ The largest value that is representable in a Lisp integer."
                       eos-sc-map
                       eos-docs-map
                       eos-find-map
-                      eos-mark-map
+                      eos-utils-map
                       eos-window-map
                       eos-complete-map
                       eos-rtags-map))
@@ -539,15 +529,15 @@ Keymaps list will be printed on *Messages* buffer."
 (define-key ctl-x-map (kbd "k") 'eos/kill-current-buffer)
 
 ;; mark
-(define-key eos-mark-map (kbd "h") 'mark-whole-buffer)
-(define-key eos-mark-map (kbd "s") 'mark-sexp)
-(define-key eos-mark-map (kbd "p") 'mark-paragraph)
-(define-key eos-mark-map (kbd "w") 'mark-word)
+(define-key eos-utils-map (kbd "h") 'mark-whole-buffer)
+(define-key eos-utils-map (kbd "s") 'mark-sexp)
+(define-key eos-utils-map (kbd "p") 'mark-paragraph)
+(define-key eos-utils-map (kbd "w") 'mark-word)
 
 ;; eos prefixs
 (define-key ctl-x-map (kbd "p") 'eos-pm-map)
 (define-key ctl-x-map (kbd "t") 'eos-tags-map)
-(define-key ctl-x-map (kbd "m") 'eos-mark-map)
+(define-key ctl-x-map (kbd "c") 'eos-utils-map)
 (define-key ctl-x-map (kbd "e") 'eos-sc-map)
 (define-key ctl-x-map (kbd "f") 'eos-find-map)
 (define-key ctl-x-map (kbd "l") 'eos-docs-map)
@@ -899,7 +889,7 @@ Else indents the current line."
 (customize-set-variable 'icomplete-prospects-height 1)
 
 ;; string used by Icomplete to separate alternatives in the minibuffer
-(customize-set-variable 'icomplete-separator "  •  ")
+;; (customize-set-variable 'icomplete-separator "  •  ")
 
 ;; specialized completion tables with which `icomplete should operate,
 ;; if this is t, `icomplete operates on all tables
@@ -1017,8 +1007,8 @@ These styles are described in `completion-styles-alist'."
         (let ((current-prefix-arg t))
           (funcall 'eos/icomplete/toggle-completion-styles))))))
 
-;; eos-mark-map
-(define-key eos-mark-map (kbd "m") 'eos/icomplete/mark-ring)
+;; eos-utils-map
+(define-key eos-utils-map (kbd "m") 'eos/icomplete/mark-ring)
 
 ;; global-map
 (global-set-key (kbd "M-y") 'eos/icomplete/kill-ring)
@@ -1194,10 +1184,14 @@ instead."
   (progn
 
 (defun eos/occur-at-point ()
-  "Occur with `thing-at-point' function."
+  "Occur with symbol or region as its arguments."
   (interactive)
-  (let ((symbol (thing-at-point 'symbol)))
-    (if symbol (occur symbol)
+  (let* ((bounds (if (use-region-p)
+                     (cons (region-beginning) (region-end))
+                   (bounds-of-thing-at-point 'symbol))))
+    (if bounds
+        (occur (buffer-substring-no-properties
+                (car bounds) (cdr bounds)))
       (message "Occur-at-point: No candidate."))))
 
 (global-set-key (kbd "M-s M-o") 'eos/occur-at-point)))
@@ -1262,7 +1256,10 @@ The user's $HOME directory is abbreviated as a tilde."
 
 ;; (vertical-scroll-bars)
 ;; (bottom-divider-width . 0)
-;; (right-divider-width . 6)))
+;; (right-divider-width . 6)
+
+;; set font by face attribute (reference)
+;; (set-face-attribute 'default nil :height)
 
 ;; alist of default values for frame creation
 (add-to-list 'default-frame-alist '(internal-border-width . 2))
@@ -1272,20 +1269,24 @@ The user's $HOME directory is abbreviated as a tilde."
   (cond ((find-font (font-spec :name font))
          (set-frame-font font nil t))))
 
-;; after a frame is created
+;; set transparency after a frame is created
 (add-hook 'after-make-frame-functions
           (lambda (frame)
             (interactive)
             (eos/set-frame-transparency 0.9)))
 
-;; set font by face attribute (reference)
-;; (set-face-attribute 'default nil :height)
+;; fix first frame
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (interactive)
+            (make-frame)
+            (delete-other-frames)))
 
 ;; binds
 (global-set-key (kbd "C-x C-o") 'other-frame)
 
 ;; set frame font
-(eos-set-frame-font "Hermit Light:pixelsize=18")
+(eos-set-frame-font "Hermit Light:pixelsize=20")
 
 ;; enable window divider
 (window-divider-mode)
@@ -1303,7 +1304,8 @@ The user's $HOME directory is abbreviated as a tilde."
 (when (require 'kmacro nil t)
   (progn
 
-(define-key ctl-x-map (kbd "m") 'kmacro-keymap)))
+;; (define-key ctl-x-map (kbd "m") 'kmacro-keymap)
+))
 
 (when (require 'paren nil t)
   (progn
@@ -1588,11 +1590,11 @@ The user's $HOME directory is abbreviated as a tilde."
 (when (require 'epa nil t)
   (progn
 
-;; if non-nil, cache passphrase for symmetric encryption.
+;; if non-nil, cache passphrase for symmetric encryption
 (customize-set-variable
  'epa-file-cache-passphrase-for-symmetric-encryption t)
 
-;; if t, always asks user to select recipients.
+;; if t, always asks user to select recipients
 (customize-set-variable 'epa-file-select-keys nil)
 
 ;; the gpg executable.
@@ -1602,11 +1604,21 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; In epa commands, a particularly useful mode is ‘loopback’, which
 ;; redirects all Pinentry queries to the caller, so Emacs can query
 ;; passphrase through the minibuffer, instead of external Pinentry
-;; program.
+;; program
 (customize-set-variable 'epa-pinentry-mode 'loopback)))
 
-(when (require 'auth-source nil t)
-  (progn
+(require 'auth-source nil t)
+
+(defun eos-auth-search (host user)
+  "Lookup (format HOST USER PORT) password on auth-source default file."
+  (let ((auth (auth-source-search :host host :user user)))
+    (if auth
+        (let ((secretf (plist-get (car auth) :secret)))
+          (if secretf
+              (funcall secretf)
+            (message "Auth entry for %s@%s has no secret!"
+                     user host)))
+      (message "No auth entry found for %s@%s" user host))))
 
 ;; Note: If the auth-sources variable contains ~/.auth.gpg before
 ;; ~/.auth, the auth-source library will try to read the GnuPG
@@ -1614,7 +1626,7 @@ The user's $HOME directory is abbreviated as a tilde."
 
 ;; list of authentication sources
 (customize-set-variable
- 'auth-sources '("~/.auth/auth.gpg" "~/.auth/netrc"))))
+ 'auth-sources '("~/.auth/auth.gpg" "~/.auth/netrc"))
 
 (require 'password-store nil t)
 
@@ -1785,8 +1797,7 @@ The user's $HOME directory is abbreviated as a tilde."
                           " "
                           ))))
 
-(when (require 'rcirc nil t)
-  (progn
+(require 'rcirc nil t)
 
 ;; non-nil means log IRC activity to disk
 ;; logfiles are kept in `rcirc-log-directory
@@ -1802,11 +1813,13 @@ The user's $HOME directory is abbreviated as a tilde."
 (customize-set-variable 'rcirc-authinfo nil)
 
 ;; coding system used to decode incoming irc messages
-(customize-set-variable 'rcirc-decode-coding-system "utf-8")
+(customize-set-variable 'rcirc-decode-coding-system 'utf-8)
 
 ;; responses which will be hidden when `rcirc-omit-mode is enable
 (customize-set-variable 'rcirc-omit-responses
-                        '("JOIN" "PART" "QUIT" "NICK"))))
+                        '("JOIN" "PART" "QUIT" "NICK"))
+
+
 
 ;; (rcirc-omit-mode 1)))
 
@@ -1979,7 +1992,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (add-hook 'text-mode-hook 'flyspell-mode)
 (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
 
-(require 'flycheck)
+(require 'flycheck nil t)
 
 (defun eos/set-flycheck-checker (checker)
   "Set flycheck CHECKER variable."
@@ -1989,7 +2002,12 @@ The user's $HOME directory is abbreviated as a tilde."
 
 ;; init flycheck mode after some programming mode
 ;; is activated (c-mode, elisp-mode, etc).
-(add-hook 'prog-mode-hook 'flycheck-mode)
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (interactive)
+            (flycheck-mode 1)))
+
+;; (global-flycheck-mode 1)
 
 ;; binds
 (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
@@ -2480,7 +2498,7 @@ The tangled file will be compiled."
 (require 'company nil t)
 
 ;; set echo delay
-(customize-set-variable 'company-echo-delay .02)
+(customize-set-variable 'company-echo-delay 0)
 
 ;; idle delay in seconds until completion starts automatically
 (customize-set-variable 'company-idle-delay nil)

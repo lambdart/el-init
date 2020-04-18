@@ -35,9 +35,6 @@
 ;; translate
 (depends-on "google-translate")
 
-;; search
-;; help
-
 ;; documentation
 (depends-on "rfc-mode")
 (depends-on "dash-docs")
@@ -47,8 +44,6 @@
 
 ;; security
 (depends-on "password-store")
-
-;; remote access
 
 ;; apparence
 (depends-on "all-the-icons")
@@ -66,7 +61,6 @@
 
 ;; development
 (depends-on "ess")
-(depends-on "highlight-doxygen")
 (depends-on "go-mode")
 (depends-on "fish-mode")
 (depends-on "web-mode")
@@ -95,13 +89,9 @@
 ;; term & shell
 (depends-on "multi-term")
 
-;; analysis
+;; network
 (depends-on "request")
 (depends-on "verb")
 
 ;; bar
 (depends-on "moody")
-
-;; match engine
-(depends-on "icomplete-vertical"
-            :git "https://github.com/oantolin/icomplete-vertical")

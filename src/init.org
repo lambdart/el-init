@@ -1021,12 +1021,21 @@
 
      #+END_SRC
 
-**** Display
+**** Customize
 
      #+BEGIN_SRC emacs-lisp
 
-     (add-to-list 'display-buffer-alist
-                  '("\\*Ibuffer confirmation\\*" display-buffer-below-selected))
+     ;; the criteria by which to sort the buffers
+     (customize-set-variable 'ibuffer-default-sorting-mode 'filename/process)
+
+     ;; if non-nil, display the current Ibuffer buffer itself
+     (customize-set-variable 'ibuffer-view-ibuffer t)
+
+     #+END_SRC
+
+**** Display
+
+     #+BEGIN_SRC emacs-lisp
 
      #+END_SRC
 
@@ -1633,8 +1642,11 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; don't omit information when lists nest too deep.
+     ;; don't omit information when lists nest too deep
      (customize-set-variable 'eval-expression-print-level nil)
+
+     ;; your preference for a mail composition package
+     (customize-set-variable 'mail-user-agent 'message-user-agent)
 
      #+END_SRC
 
@@ -2547,7 +2559,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; clean whitespace and newlines before buffer save
-     (add-hook 'before-save-hook 'whitespace-cleanup)
+     (add-hook 'before-save-hook #'whitespace-cleanup)
 
      #+END_SRC
 
@@ -2642,7 +2654,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; load custom-file
-     (eos-load-file custom-file)
+     ;; (eos-load-file custom-file)
 
      #+END_SRC
 
@@ -2685,6 +2697,113 @@
      (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))))
 
      #+END_SRC
+
+*** Mm-bodies
+
+    This library handles MIME body (encode/decode).
+
+    MIME is short for "Multipurpose Internet Mail Extensions".
+    This standard is documented in a number of RFCs;
+    mainly RFC2045 (Format of Internet Message Bodies),
+    RFC2046 (Media Types), RFC2047 (Message Header Extensions for
+    Non-ASCII Text),  RFC2048 (Registration Procedures),
+    RFC2049 (Conformance Criteria and Examples).
+
+    It is highly recommended that anyone who intends writing
+    MIME-compliant software read at least RFC2045 and RFC2047.
+
+**** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'mm-bodies nil t)
+
+      #+END_SRC
+
+**** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
+
+      #+END_SRC
+
+*** Network
+**** Imap
+
+     This library provides an interface for talking to
+     IMAP servers.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'imap nil t)
+
+     #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      (customize-set-variable 'imap-read-timeout 2)
+
+      #+END_SRC
+
+**** Nnimap
+
+     Nnimap library provides interfaces Gnus with IMAP servers.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'nnimap nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; limit the number of articles to look for after moving an article
+      (customize-set-variable 'nnimap-request-articles-find-limit nil)
+
+      #+END_SRC
+
+**** Smtpmail
+
+     This library provides functionalities related to send mail
+     through STMP protocol.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'smtpmail nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; specify default SMTP server
+      ;; (customize-set-variable 'smtpmail-default-smtp-server "smtp.gmail.com")
+
+      ;; the name of the host running SMTP server
+      ;; (customize-set-variable 'smtpmail-smtp-server "smtp.gmail.com")
+
+      ;; type of SMTP connections to use
+      (customize-set-variable 'smtpmail-stream-type 'ssl)
+
+      ;; smtp service port number
+      (customize-set-variable 'smtpmail-smtp-service 465)
+
+      ;; non-nil means mail is queued; otherwise it is sent immediately.
+      (customize-set-variable 'smtpmail-queue-mail nil)
+
+      #+END_SRC
 
 ** Applications
 *** Xorg
@@ -3136,7 +3255,9 @@
 
       ;; to run command without displaying the output in a window
       (add-to-list 'display-buffer-alist
-                   '("\\*Async Shell Command\\*" display-buffer-no-window))
+                   '("\\*Async Shell Command\\*"
+                     (display-buffer-no-window)
+                     (allow-no-window . t)))
 
       #+END_SRC
 
@@ -3235,8 +3356,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'iedit nil t)
-        (progn
+      (require 'iedit nil t)
 
       #+END_SRC
 
@@ -3246,7 +3366,7 @@
 
       ;; if no-nil, the key is inserted into global-map,
       ;; isearch-mode-map, esc-map and help-map.
-      (customize-set-variable 'iedit-toggle-key-default nil)
+      (customize-set-variable 'iedit-toggle-key-default t)
 
       #+END_SRC
 
@@ -3261,7 +3381,7 @@
           (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence)))
 
       ;; bind (global)
-      (global-set-key (kbd "C-;") 'iedit-mode)))
+      ;; (global-set-key (kbd "C-;") 'iedit-mode)
 
       #+END_SRC
 
@@ -3567,16 +3687,17 @@
                                                 (nnimap-address "imap.gmail.com")
                                                 (nnimap-stream ssl)
                                                 (nnimap-server-port "imaps")
+                                                (nnimap-fetch-partial-articles t)
                                                 (nnimap-authinfo-file "~/.auth/auth.gpg"))))
 
       ;; if non-nil, automatically mark Gcc articles as read
-      (customize-set-variable 'gnus-gcc-mark-as-read t)
+      (customize-set-variable 'gnus-gcc-mark-as-read nil)
 
-      ;; whether we want to use the Gnus agent or not.
+      ;; whether we want to use the Gnus agent or not
       (customize-set-variable 'gnus-agent t)
 
-      ;; non-nil means that you are a Usenet novice
-      (customize-set-variable 'gnus-novice-user nil)
+      ;; non-nil means that you are a usenet novice
+      (customize-set-variable 'gnus-novice-user t)
 
       ;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
       (customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
@@ -3584,23 +3705,8 @@
       ;; non-nil means that Gnus will read the entire active file at startup
       (customize-set-variable 'gnus-read-active-file 'some)
 
-      #+END_SRC
-
-*** Mail
-**** Mm-bodies
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'mm-bodies nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
+      ;; if non-nil, use the entire emacs screen
+      (customize-set-variable 'gnus-use-full-window nil)
 
       #+END_SRC
 
@@ -3625,6 +3731,7 @@
 
       #+END_SRC
 
+*** Mail
 **** Messages
 
      This mode provides mail-sending facilities from within Emacs.  It
@@ -3649,14 +3756,14 @@
       ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
       (customize-set-variable 'compose-mail-user-agent-warnings nil)
 
-                                              ; if it is nil, use Gnus native MUA; else use `mail-user-agent'
-      (customize-set-variable 'message-mail-user-agent nil)
+      ;; if it is nil, use Gnus; else use `mail-user-agent'
+      (customize-set-variable 'message-mail-user-agent t)
 
       ;; string to be inserted at the end of the message buffer
       (customize-set-variable 'message-signature "")
 
       ;; format of the "Whomever writes:" line
-      ;; (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
+      (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
 
       ;; function called to insert the "Whomever writes:" line
       (customize-set-variable 'message-citation-line-function
@@ -3664,7 +3771,7 @@
       ;; function that inserts a formatted citation line
 
       ;; when non-nil, ask for confirmation when sending a message
-      (customize-set-variable 'message-confirm-send nil)
+      (customize-set-variable 'message-confirm-send t)
 
       ;; non-nil means that the message buffer will be killed after sending a message
       (customize-set-variable 'message-kill-buffer-on-exit t)
@@ -3672,23 +3779,56 @@
       ;; whether to confirm a wide reply to multiple email recipients
       (customize-set-variable 'message-wide-reply-confirm-recipients t)
 
-      ;; This variable is obsolete since 26.1;
-      ;; The default charset comes from the language environment
+      ;; this variable is obsolete since 26.1;
+      ;; the default charset comes from the language environment
       ;; default charset used in non-MULE Emacsen
       (customize-set-variable 'message-default-charset 'utf-8)
 
       #+END_SRC
 
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/message-header-add-gcc ()
+        "While `gnus' is running, add a Gcc header, if missing.
+      The Gcc header places a copy of the outgoing message to the
+      appropriate directory of the IMAP server, as per the contents of
+      `auth-sources'.
+      In the absence of a Gcc header, the outgoing message will not
+      appear in the appropriate IMAP directory, though it will still be
+      sent. Add this function to `message-header-setup-hook'."
+        (if (gnus-alive-p)
+            (progn
+              (when (message-fetch-field "Gcc")
+                (message-remove-header "Gcc")
+                (message-add-header "Gcc: nnimap+pub:Sent")))
+          (message "Gnus is not running. No GCC field inserted.")))
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; hook called narrowed to the headers when setting up a message buffer
+      (add-hook 'message-header-setup-hook #'eos/message-header-add-gcc)
+
+      ;; normal hook, run each time a new outgoing message is initialized
+      (add-hook 'message-setup-hook #'message-sort-headers)
+
+      #+END_SRC
+
 **** Sendmail
 
-     This mode provides mail-sending facilities from within Emacs.  It is
-     documented in the Emacs user's manual.
+     This mode provides mail-sending facilities from within Emacs.
+     It is documented in the Emacs user's manual.
 
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'sendmail nil t)
+      ;; (require 'sendmail nil t)
 
       #+END_SRC
 
@@ -3697,7 +3837,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; text inserted at end of mail buffer when a message is initialized
-      (customize-set-variable 'mail-signature "Att.")
+      ;; (customize-set-variable 'mail-signature "")
 
       #+END_SRC
 
@@ -3723,11 +3863,12 @@
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
+
       ;; remove underline
       (customize-set-variable 'x-underline-at-descent-line t)
 
       ;; change line height
-      (customize-set-variable 'moody-mode-line-height 2)
+      (customize-set-variable 'moody-mode-line-height 1)
 
       ;; mode-line format
       (customize-set-variable 'mode-line-format
@@ -4172,9 +4313,11 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; add display-buffer-alist
       ;; (add-to-list 'display-buffer-alist
-      ;;              '("\\*Choices\\*" display-buffer-below-selected))
+      ;;              '("\\*Choices\\*"
+      ;;                (display-buffer-below-selected display-buffer-at-bottom)
+      ;;                (inhibit-same-window . t)
+      ;;                (window-height . 0.2)))
 
       #+END_SRC
 
@@ -4242,8 +4385,8 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; hooks
-      (add-hook 'text-mode-hook 'flyspell-mode)
-      (add-hook 'prog-mode-hook 'flyspell-prog-mode)))
+      (add-hook 'text-mode-hook #'flyspell-mode)
+      (add-hook 'prog-mode-hook #'flyspell-prog-mode)))
 
       #+END_SRC
 
@@ -4281,9 +4424,11 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; dont display this buffer
-      (add-to-list 'display-buffer-alist
-                   '("\\*Flycheck error messages\\*" display-buffer-no-window))
+     ;; dont display this buffer
+     (add-to-list 'display-buffer-alist
+                  '("\\*Flycheck error messages\\*"
+                    (display-buffer-no-window)
+                    (allow-no-window . t)))
 
       #+END_SRC
 
@@ -4569,7 +4714,7 @@
 
 *** Calculators
 **** Calc
-*** Networking
+*** Clients
 **** Verb
 
      Verb is a package that allows you to organize and send HTTP
@@ -4640,8 +4785,6 @@
 
       #+END_SRC
 
-**** Nnimap
-**** SmtpMail
 **** Mentor
 *** Controllers
 **** Slock
@@ -5464,7 +5607,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; set echo delay
-      (customize-set-variable 'company-echo-delay 0)
+      (customize-set-variable 'company-echo-delay 0.2)
 
       ;; idle delay in seconds until completion starts automatically
       (customize-set-variable 'company-idle-delay nil)
@@ -5483,7 +5626,7 @@
                               '(company-sort-by-occurrence))
 
       ;; whether to downcase the returned candidates.
-      (customize-set-variable 'company-dabbrev-downcase nil)
+      (customize-set-variable 'company-dabbrev-downcase t)
 
       ;; if enabled, disallow non-matching input
       (customize-set-variable 'company-require-match nil)

@@ -659,8 +659,13 @@ Keymaps list will be printed on *Messages* buffer."
 (when (require 'ibuffer nil t)
   (progn
 
-(add-to-list 'display-buffer-alist
-             '("\\*Ibuffer confirmation\\*" display-buffer-below-selected))
+;; the criteria by which to sort the buffers
+(customize-set-variable 'ibuffer-default-sorting-mode 'filename/process)
+
+;; if non-nil, display the current Ibuffer buffer itself
+(customize-set-variable 'ibuffer-view-ibuffer t)
+
+
 
 (define-key ctl-x-map (kbd "b") 'ibuffer)))
 
@@ -1052,8 +1057,11 @@ These styles are described in `completion-styles-alist'."
 (when (require 'simple nil t)
   (progn
 
-;; don't omit information when lists nest too deep.
+;; don't omit information when lists nest too deep
 (customize-set-variable 'eval-expression-print-level nil)
+
+;; your preference for a mail composition package
+(customize-set-variable 'mail-user-agent 'message-user-agent)
 
 ;; column number display in the mode line
 (eos-call-func 'column-number-mode 1)
@@ -1386,7 +1394,7 @@ The user's $HOME directory is abbreviated as a tilde."
   (progn
 
 ;; clean whitespace and newlines before buffer save
-(add-hook 'before-save-hook 'whitespace-cleanup)
+(add-hook 'before-save-hook #'whitespace-cleanup)
 
 ;; binds
 (define-key ctl-x-map (kbd ".") 'whitespace-mode)))
@@ -1413,7 +1421,7 @@ The user's $HOME directory is abbreviated as a tilde."
  'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))))
 
 ;; load custom-file
-(eos-load-file custom-file)
+;; (eos-load-file custom-file)
 
 (require 'forms nil t)
 
@@ -1422,6 +1430,36 @@ The user's $HOME directory is abbreviated as a tilde."
 
 (add-to-list 'auto-mode-alist '("\\.compose\\'" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))))
+
+(require 'mm-bodies nil t)
+
+(add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
+
+(require 'imap nil t)
+
+(customize-set-variable 'imap-read-timeout 2)
+
+(require 'nnimap nil t)
+
+;; limit the number of articles to look for after moving an article
+(customize-set-variable 'nnimap-request-articles-find-limit nil)
+
+(require 'smtpmail nil t)
+
+;; specify default SMTP server
+;; (customize-set-variable 'smtpmail-default-smtp-server "smtp.gmail.com")
+
+;; the name of the host running SMTP server
+;; (customize-set-variable 'smtpmail-smtp-server "smtp.gmail.com")
+
+;; type of SMTP connections to use
+(customize-set-variable 'smtpmail-stream-type 'ssl)
+
+;; smtp service port number
+(customize-set-variable 'smtpmail-smtp-service 465)
+
+;; non-nil means mail is queued; otherwise it is sent immediately.
+(customize-set-variable 'smtpmail-queue-mail nil)
 
 (require 'exwm nil t)
 (require 'exwm-core nil t)
@@ -1653,7 +1691,9 @@ The user's $HOME directory is abbreviated as a tilde."
 
 ;; to run command without displaying the output in a window
 (add-to-list 'display-buffer-alist
-             '("\\*Async Shell Command\\*" display-buffer-no-window))
+             '("\\*Async Shell Command\\*"
+               (display-buffer-no-window)
+               (allow-no-window . t)))
 
 (when (require 'elec-pair nil t)
   (progn
@@ -1679,12 +1719,11 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; delete selection-mode
 (eos-call-func 'delete-selection-mode 1)))
 
-(when (require 'iedit nil t)
-  (progn
+(require 'iedit nil t)
 
 ;; if no-nil, the key is inserted into global-map,
 ;; isearch-mode-map, esc-map and help-map.
-(customize-set-variable 'iedit-toggle-key-default nil)
+(customize-set-variable 'iedit-toggle-key-default t)
 
 ;; bind (iedit-mode-keymap)
 (when (boundp 'iedit-mode-keymap)
@@ -1693,7 +1732,7 @@ The user's $HOME directory is abbreviated as a tilde."
     (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence)))
 
 ;; bind (global)
-(global-set-key (kbd "C-;") 'iedit-mode)))
+;; (global-set-key (kbd "C-;") 'iedit-mode)
 
 (when (require 'undo-tree nil t)
   (progn
@@ -1791,16 +1830,17 @@ The user's $HOME directory is abbreviated as a tilde."
                                           (nnimap-address "imap.gmail.com")
                                           (nnimap-stream ssl)
                                           (nnimap-server-port "imaps")
+                                          (nnimap-fetch-partial-articles t)
                                           (nnimap-authinfo-file "~/.auth/auth.gpg"))))
 
 ;; if non-nil, automatically mark Gcc articles as read
-(customize-set-variable 'gnus-gcc-mark-as-read t)
+(customize-set-variable 'gnus-gcc-mark-as-read nil)
 
-;; whether we want to use the Gnus agent or not.
+;; whether we want to use the Gnus agent or not
 (customize-set-variable 'gnus-agent t)
 
-;; non-nil means that you are a Usenet novice
-(customize-set-variable 'gnus-novice-user nil)
+;; non-nil means that you are a usenet novice
+(customize-set-variable 'gnus-novice-user t)
 
 ;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
 (customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
@@ -1808,9 +1848,8 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; non-nil means that Gnus will read the entire active file at startup
 (customize-set-variable 'gnus-read-active-file 'some)
 
-(require 'mm-bodies nil t)
-
-(add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
+;; if non-nil, use the entire emacs screen
+(customize-set-variable 'gnus-use-full-window nil)
 
 (require 'nnmail nil t)
 
@@ -1825,14 +1864,14 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
 (customize-set-variable 'compose-mail-user-agent-warnings nil)
 
-                                        ; if it is nil, use Gnus native MUA; else use `mail-user-agent'
-(customize-set-variable 'message-mail-user-agent nil)
+;; if it is nil, use Gnus; else use `mail-user-agent'
+(customize-set-variable 'message-mail-user-agent t)
 
 ;; string to be inserted at the end of the message buffer
 (customize-set-variable 'message-signature "")
 
 ;; format of the "Whomever writes:" line
-;; (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
+(customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
 
 ;; function called to insert the "Whomever writes:" line
 (customize-set-variable 'message-citation-line-function
@@ -1840,7 +1879,7 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; function that inserts a formatted citation line
 
 ;; when non-nil, ask for confirmation when sending a message
-(customize-set-variable 'message-confirm-send nil)
+(customize-set-variable 'message-confirm-send t)
 
 ;; non-nil means that the message buffer will be killed after sending a message
 (customize-set-variable 'message-kill-buffer-on-exit t)
@@ -1848,15 +1887,36 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; whether to confirm a wide reply to multiple email recipients
 (customize-set-variable 'message-wide-reply-confirm-recipients t)
 
-;; This variable is obsolete since 26.1;
-;; The default charset comes from the language environment
+;; this variable is obsolete since 26.1;
+;; the default charset comes from the language environment
 ;; default charset used in non-MULE Emacsen
 (customize-set-variable 'message-default-charset 'utf-8)
 
-(require 'sendmail nil t)
+(defun eos/message-header-add-gcc ()
+  "While `gnus' is running, add a Gcc header, if missing.
+The Gcc header places a copy of the outgoing message to the
+appropriate directory of the IMAP server, as per the contents of
+`auth-sources'.
+In the absence of a Gcc header, the outgoing message will not
+appear in the appropriate IMAP directory, though it will still be
+sent. Add this function to `message-header-setup-hook'."
+  (if (gnus-alive-p)
+      (progn
+        (when (message-fetch-field "Gcc")
+          (message-remove-header "Gcc")
+          (message-add-header "Gcc: nnimap+pub:Sent")))
+    (message "Gnus is not running. No GCC field inserted.")))
+
+;; hook called narrowed to the headers when setting up a message buffer
+(add-hook 'message-header-setup-hook #'eos/message-header-add-gcc)
+
+;; normal hook, run each time a new outgoing message is initialized
+(add-hook 'message-setup-hook #'message-sort-headers)
+
+;; (require 'sendmail nil t)
 
 ;; text inserted at end of mail buffer when a message is initialized
-(customize-set-variable 'mail-signature "Att.")
+;; (customize-set-variable 'mail-signature "")
 
 (when (require 'moody nil t)
   (progn
@@ -1865,7 +1925,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (customize-set-variable 'x-underline-at-descent-line t)
 
 ;; change line height
-(customize-set-variable 'moody-mode-line-height 2)
+(customize-set-variable 'moody-mode-line-height 1)
 
 ;; mode-line format
 (customize-set-variable 'mode-line-format
@@ -2049,9 +2109,11 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; program invoked by M-x ispell-word and M-x ispell-region commands.
 (customize-set-variable 'ispell-program-name "aspell")
 
-;; add display-buffer-alist
 ;; (add-to-list 'display-buffer-alist
-;;              '("\\*Choices\\*" display-buffer-below-selected))
+;;              '("\\*Choices\\*"
+;;                (display-buffer-below-selected display-buffer-at-bottom)
+;;                (inhibit-same-window . t)
+;;                (window-height . 0.2)))
 
 ;; silent compiler
 (defvar ispell-current-dictionary nil nil)
@@ -2078,8 +2140,8 @@ The user's $HOME directory is abbreviated as a tilde."
 (customize-set-variable 'flyspell-default-dictionary "english")
 
 ;; hooks
-(add-hook 'text-mode-hook 'flyspell-mode)
-(add-hook 'prog-mode-hook 'flyspell-prog-mode)))
+(add-hook 'text-mode-hook #'flyspell-mode)
+(add-hook 'prog-mode-hook #'flyspell-prog-mode)))
 
 (require 'flycheck nil t)
 
@@ -2093,7 +2155,9 @@ The user's $HOME directory is abbreviated as a tilde."
 
 ;; dont display this buffer
 (add-to-list 'display-buffer-alist
-             '("\\*Flycheck error messages\\*" display-buffer-no-window))
+             '("\\*Flycheck error messages\\*"
+               (display-buffer-no-window)
+               (allow-no-window . t)))
 
 ;; init flycheck mode after some programming mode
 ;; is activated (c-mode, elisp-mode, etc).
@@ -2611,7 +2675,7 @@ The tangled file will be compiled."
 (require 'company nil t)
 
 ;; set echo delay
-(customize-set-variable 'company-echo-delay 0)
+(customize-set-variable 'company-echo-delay 0.2)
 
 ;; idle delay in seconds until completion starts automatically
 (customize-set-variable 'company-idle-delay nil)
@@ -2630,7 +2694,7 @@ The tangled file will be compiled."
                         '(company-sort-by-occurrence))
 
 ;; whether to downcase the returned candidates.
-(customize-set-variable 'company-dabbrev-downcase nil)
+(customize-set-variable 'company-dabbrev-downcase t)
 
 ;; if enabled, disallow non-matching input
 (customize-set-variable 'company-require-match nil)

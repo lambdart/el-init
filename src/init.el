@@ -9,6 +9,16 @@
 
 ;; (require 'org nil t)
 
+;; set term to ecolor
+(setenv "TERM" "eterm-color")
+
+;; the full name of the user logged in
+(customize-set-variable 'user-login-name (getenv "USER"))
+
+;; the email address of the current user
+;; this defaults to either: the value of EMAIL environment variable
+(customize-set-variable 'user-mail-address (getenv "EMAIL"))
+
 ;; threshold inital value
 (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
       gc-cons-percentage 0.5)
@@ -64,6 +74,10 @@ The largest value that is representable in a Lisp integer."
   (make-sparse-keymap)
   "Keymap for find keybinds.")
 
+(defvar eos-filter-map
+  (make-sparse-keymap)
+  "Keymap for filter keybinds.")
+
 (defvar eos-utils-map
   (make-sparse-keymap)
   "Keymap for utils keybinds.")
@@ -77,11 +91,14 @@ The largest value that is representable in a Lisp integer."
                       eos-sc-map
                       eos-docs-map
                       eos-find-map
+                      eos-filter-map
                       eos-utils-map
                       eos-window-map
                       eos-complete-map
                       eos-rtags-map))
   (define-prefix-command prefix-map))
+
+;; (define-prefix-command 'eos-filter-map)
 
 ;; clean file-name-handler-alist
 (setq file-name-handler-alist nil)
@@ -538,6 +555,7 @@ Keymaps list will be printed on *Messages* buffer."
 (define-key eos-utils-map (kbd "w") 'mark-word)
 
 ;; eos prefixs
+(define-key ctl-x-map (kbd "a") 'eos-filter-map)
 (define-key ctl-x-map (kbd "p") 'eos-pm-map)
 (define-key ctl-x-map (kbd "t") 'eos-tags-map)
 (define-key ctl-x-map (kbd "c") 'eos-utils-map)
@@ -783,9 +801,9 @@ buffer and the minibuffer."
 
 ;; if `file-name-shadow-mode' is active, any part of the
 ;; minibuffer text that would be ignored because of this is given the
-;; properties in `file-name-shadow-properties', which may
+;; properties in `file-name-shadow-propertieso', which may
 ;; be used to make the ignored text invisible, dim, etc.
-(file-name-shadow-mode -1)
+;; (file-name-shadow-mode -1)
 
 ;; when active, any recursive use of the minibuffer will show
 ;; the recursion depth in the minibuffer prompt, this is only
@@ -804,7 +822,7 @@ buffer and the minibuffer."
     (customize-set-variable 'completion-search-distance 12000)
 
     ;; if non-nil, the next completion prompt does a cdabbrev search
-    (customize-set-variable 'completion-cdabbrev-prompt-flag nil)
+    (customize-set-variable 'completion-cdabbrev-prompt-flag t)
 
     ;; non-nil means show help message in *Completions* buffer
     (customize-set-variable 'completion-show-help nil)
@@ -860,6 +878,7 @@ Else indents the current line."
           (funcall 'company-complete)))
     (indent-according-to-mode)))
 
+;; enable dynamic completion mode
 (eos-call-func 'dynamic-completion-mode 1)
 
 ;; completion-list-mode-map
@@ -894,7 +913,7 @@ Else indents the current line."
 (customize-set-variable 'icomplete-show-matches-on-no-input t)
 
 ;; when non-nil, hide common prefix from completion candidates
-(customize-set-variable 'icomplete-hide-common-prefix nil)
+(customize-set-variable 'icomplete-hide-common-prefix t)
 
 ;; maximum number of lines to use in the minibuffer
 (customize-set-variable 'icomplete-prospects-height 1)
@@ -1003,8 +1022,8 @@ These styles are described in `completion-styles-alist'."
 (when (boundp 'icomplete-minibuffer-map)
   (progn
     (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-    (define-key icomplete-minibuffer-map (kbd "C-f") 'icomplete-forward-completions)
-    (define-key icomplete-minibuffer-map (kbd "C-b") 'icomplete-backward-completions)
+    (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-forward-completions)
+    (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-backward-completions)
 
     ;; toogle styles
     (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
@@ -1228,8 +1247,8 @@ The user's $HOME directory is abbreviated as a tilde."
      (completing-read "Recentf: " files nil t))))
 
 ;; eos-find-map
-(define-key eos-find-map (kbd "C-r") 'recentf-open-files)
-(define-key eos-find-map (kbd "r") 'eos/icomplete/recentf-open-file)
+(define-key eos-find-map (kbd "r") 'recentf-open-files)
+(define-key eos-find-map (kbd "i") 'eos/icomplete/recentf-open-file)
 
 (when (require 'bookmark nil t)
   (progn
@@ -1437,6 +1456,7 @@ The user's $HOME directory is abbreviated as a tilde."
 
 (require 'imap nil t)
 
+;; how long to wait between checking for the end of output
 (customize-set-variable 'imap-read-timeout 2)
 
 (require 'nnimap nil t)
@@ -1572,8 +1592,7 @@ The user's $HOME directory is abbreviated as a tilde."
 
 (eos-call-func 'exwm-enable)
 
-(when (require 'exwm-randr nil t)
-  (progn
+(require 'exwm-randr nil t)
 
 ;; monitors: check the xrandr(1) output and use the same name/order
 ;; TODO: create a func that retrieves these values from xrandr
@@ -1586,9 +1605,9 @@ The user's $HOME directory is abbreviated as a tilde."
                         (if (boundp 'exwm-randr-workspace-monitor-plist)
                             (progn
                               (/ (safe-length exwm-randr-workspace-monitor-plist) 2))
-                          1))))
+                          1))
 
-;; (exwm-randr-enable)
+;; (eos-call-func 'exwm-randr-enable)
 
 (when (require 'nsm nil t)
   (progn
@@ -1606,22 +1625,27 @@ The user's $HOME directory is abbreviated as a tilde."
 (customize-set-variable 'nsm-setting-file
                         (expand-file-name "cache/netword-security-data" user-emacs-directory))))
 
+(require 'eps-config nil t)
+
+;; the gpg executable
+(customize-set-variable 'epg-gpg-program "gpg2")
+
 (when (require 'tls nil t)
   (progn
 
 ;; indicate if certificates should be checked against trusted root certs
 ;; if this is ‘ask’, the user can decide whether to accept an
 ;; untrusted certificate
-(customize-set-variable 'tls-checktrust t)
+(customize-set-variable 'tls-checktrust nil)
 
 ;; list of strings containing commands to
 ;; start TLS stream to a host
 ;; (customize-set-variable
-;;  'tls-program
-;;  '("openssl s_client -connect %h:%p -CAfile %t"))
+;;  'tls-program '("openssl s_client -connect %h:%p -CAfile %t"))
 (customize-set-variable
  'tls-program
- '("gnutls-cli --x509cafile %t -p %p %h --insecure"))))
+ '("gnutls-cli --x509cafile %t -p %p %h"))))
+;;'("gnutls-cli --x509cafile %t -p %p %h --insecure"))))
 
 (when (require  'gnutls nil t)
   (progn
@@ -1633,8 +1657,7 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; per hostname regex
 (customize-set-variable 'gnutls-verify-error nil)))
 
-(when (require 'epa nil t)
-  (progn
+(require 'epa nil t)
 
 ;; if non-nil, cache passphrase for symmetric encryption
 (customize-set-variable
@@ -1643,14 +1666,11 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; if t, always asks user to select recipients
 (customize-set-variable 'epa-file-select-keys t)
 
-;; the gpg executable
-(customize-set-variable 'epg-gpg-program "gpg2")
-
 ;; in epa commands, a particularly useful mode is ‘loopback’, which
 ;; redirects all Pinentry queries to the caller, so Emacs can query
 ;; passphrase through the minibuffer, instead of external Pinentry
 ;; program
-(customize-set-variable 'epa-pinentry-mode 'loopback)))
+(customize-set-variable 'epa-pinentry-mode 'loopback)
 
 (require 'auth-source nil t)
 
@@ -1757,28 +1777,6 @@ The user's $HOME directory is abbreviated as a tilde."
 (define-key ctl-x-map (kbd "<C-left>") 'buf-move-left)
 (define-key ctl-x-map (kbd "<C-right>")'buf-move-right)))
 
-(when (require 'artist nil t)
-  (progn
-
-;; whether or not to incrementally update display when flood-filling
-(customize-set-variable 'artist-flood-fill-show-incrementally nil)
-
-;; whether or not to remove white-space at end of lines
-(customize-set-variable 'artist-trim-line-endings nil)))
-
-(when (require 'elfeed nil t)
-  (progn
-
-;; directory where elfeed will store its database.
-(customize-set-variable
- 'elfeed-db-directory
- (concat (expand-file-name user-emacs-directory) "elfeed"))
-
-;; default directory for saving enclosures. Hide
-(customize-set-variable
- 'elfeed-enclosure-default-dir
- (concat (expand-file-name user-emacs-directory) "cache/elfeed"))))
-
 (when (require 'dired nil t)
   (progn
 
@@ -1814,6 +1812,28 @@ The user's $HOME directory is abbreviated as a tilde."
   (progn
     (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
     (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))))
+
+(when (require 'artist nil t)
+  (progn
+
+;; whether or not to incrementally update display when flood-filling
+(customize-set-variable 'artist-flood-fill-show-incrementally nil)
+
+;; whether or not to remove white-space at end of lines
+(customize-set-variable 'artist-trim-line-endings nil)))
+
+(when (require 'elfeed nil t)
+  (progn
+
+;; directory where elfeed will store its database.
+(customize-set-variable
+ 'elfeed-db-directory
+ (concat (expand-file-name user-emacs-directory) "elfeed"))
+
+;; default directory for saving enclosures. Hide
+(customize-set-variable
+ 'elfeed-enclosure-default-dir
+ (concat (expand-file-name user-emacs-directory) "cache/elfeed"))))
 
 (require 'gnus nil t)
 
@@ -1859,7 +1879,8 @@ The user's $HOME directory is abbreviated as a tilde."
 (require 'message nil t)
 
 ;; your preference for a mail composition package
-(customize-set-variable 'mail-user-agent 'message-user-agent)
+;; (customize-set-variable 'mail-user-agent 'message-user-agent)
+(customize-set-variable 'mail-user-agent 'gnus-user-agent)
 
 ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
 (customize-set-variable 'compose-mail-user-agent-warnings nil)
@@ -2103,6 +2124,27 @@ sent. Add this function to `message-header-setup-hook'."
 ;; function to display the current buffer in a WWW browser: eww
 (customize-set-variable 'browse-url-browser-function 'eww-browse-url)))
 
+(require 'ag nil t)
+
+;; non-nil means we highlight the current search term in results
+(customize-set-variable 'ag-highlight-search t)
+
+;; projects keymap
+(define-key eos-pm-map (kbd "a") 'ag-project-at-point)
+
+;; filter keymap
+(define-key eos-filter-map (kbd "a") 'ag)
+(define-key eos-filter-map (kbd "d") 'ag-dired)
+(define-key eos-filter-map (kbd "f") 'ag-files)
+
+(require 'grep nil t)
+
+;; the default find command for M-x grep-find or M-x find-grep
+(customize-set-variable 'grep-find-command
+                        '("find ~/ -type f -exec grep --color -nH --null -e  \\{\\} +" . 49))
+
+(define-key eos-filter-map (kbd "r") 'rgrep)
+
 (when (require 'ispell nil t)
   (progn
 
@@ -2159,7 +2201,7 @@ sent. Add this function to `message-header-setup-hook'."
                (display-buffer-no-window)
                (allow-no-window . t)))
 
-;; init flycheck mode after some programming mode
+;; flycheck mode after some programming mode
 ;; is activated (c-mode, elisp-mode, etc).
 (add-hook 'prog-mode-hook
           (lambda ()
@@ -2664,13 +2706,12 @@ The tangled file will be compiled."
 (define-key eos-docs-map (kbd "a") 'dash-docs-activate-docset)
 (define-key eos-docs-map (kbd "d") 'dash-docs-deactivate-docset)
 
-(when (require 'rfc-mode nil t)
-  (progn
+(require 'rfc-mode nil t)
 
 ;; the directory where RFC documents are stored
-(customize-set-variable
- 'rfc-mode-directory
- (concat (expand-file-name user-emacs-directory) "rfc/"))))
+;; (customize-set-variable
+;;  'rfc-mode-directory
+;;  (concat (expand-file-name user-emacs-directory) "rfc/"))))
 
 (require 'company nil t)
 
@@ -2776,6 +2817,40 @@ The tangled file will be compiled."
 
 (define-key eos-tags-map (kbd "i") 'imenu)))
 
+(require 'etags nil t)
+
+;; control whether to add a new tags table to the current list
+;; t means do; nil means don’t (always start a new list)
+(customize-set-variable 'tags-add-tables t)
+
+;; if non-nil, print the name of the tags file in the *Tags List* buffer.
+(customize-set-variable 'tags-apropos-verbose t)
+
+;; whether tags operations should be case-sensitive
+;; a value of t means case-insensitive, a value of nil means case-sensitive
+(customize-set-variable 'tags-case-fold-search t)
+
+(define-key eos-tags-map (kbd "s") 'tags-search)
+(define-key eos-tags-map (kbd "f") 'find-tag)
+(define-key eos-tags-map (kbd "l") 'list-tags)
+(define-key eos-tags-map (kbd "v") 'visit-tags-table)
+(define-key eos-tags-map (kbd "c") 'tags-reset-tags-tables)
+(define-key eos-tags-map (kbd "r") 'tags-query-replace)
+
+(require 'xref nil t)
+
+;; if non-nil, prompt for the identifier to find
+;; when t, always prompt for the identifier name
+;; when nil, prompt only when there’s no value at point we can use,
+;; or when the command has been called with the prefix argument.
+
+;; (not xref-find-definitions
+;;      xref-find-definitions-other-window
+;;      xref-find-definitions-other-frame)
+(customize-set-variable 'xref-prompt-for-identifier t)
+
+(define-key eos-tags-map (kbd "a") 'xref-find-apropos)
+
 (require 'gud nil t)
 
 (when (require 'rmsbolt nil t)
@@ -2800,11 +2875,17 @@ The tangled file will be compiled."
 
 (defun eos-compile (dir command)
   "Compile COMMAND at specific DIR.
-     Just a `compile` function wrapper."
-  (interactive)
+Just a `compile` function wrapper."
   (if (file-exists-p dir)
       (let ((default-directory dir))
         (compile command))))
+
+(defun eos/icomplete/compile ()
+  "Icomplete compile command completitions."
+  (interactive)
+  (let ((candidates compile-history))
+    (compile
+     (completing-read "Compile command: " candidates nil t))))
 
 ;; don't truncate lines
 (add-hook 'compilation-mode-hook
@@ -2817,6 +2898,9 @@ The tangled file will be compiled."
             (when (eq major-mode 'compilation-mode)
               (ansi-color-apply-on-region
                compilation-filter-start (point-max)))))
+
+;; utils map
+(define-key eos-utils-map (kbd "c") 'eos/icomplete/compile)
 
 (when (require 'magit nil t)
   (progn
@@ -2840,6 +2924,7 @@ The tangled file will be compiled."
                         (concat user-emacs-directory "cache/projectile.cache"))
 
 (define-key eos-pm-map (kbd "g") 'projectile-grep)
+(define-key eos-pm-map (kbd "p") 'projectile-ag)
 (define-key eos-pm-map (kbd "t") 'projectile-find-tag)
 (define-key eos-pm-map (kbd "f") 'projectile-find-file)
 (define-key eos-pm-map (kbd "<f5>") 'projectile-compile-project)
@@ -2859,20 +2944,18 @@ The tangled file will be compiled."
 
 (eos-call-func 'projectile-mode 1)
 
-(defun eos/cc/load-rtags ()
-  "Load rtags manually."
-  (eos-load-file (concat user-emacs-directory "rtags/src/rtags.el"))
+(require 'rtags nil t)
 
-  ;; set rtags binary path
-  (customize-set-variable
-   'rtags-path
-   (concat user-emacs-directory "rtags/build/bin/"))
+;; set rtags binary path
+(customize-set-variable
+ 'rtags-path
+ (concat user-emacs-directory "site-lisp/rtags/build/bin/"))
 
-  ;; method to use to display RTags results, like references
-  (customize-set-variable 'rtags-display-result-backend 'default)
+;; method to use to display RTags results, like references
+(customize-set-variable 'rtags-display-result-backend 'default)
 
-  ;; behavior for completing-read
-  (customize-set-variable 'rtags-completing-read-behavior 'insert-default-marked))
+;; behavior for completing-read
+(customize-set-variable 'rtags-completing-read-behavior 'insert-default-marked)
 
 ;; eos-rtags-map
 (define-key eos-rtags-map (kbd "l") 'rtags-taglist)
@@ -2909,10 +2992,7 @@ The tangled file will be compiled."
             (eos-set-dash-docset '"C")
 
             ;; set flycheck checker
-            (eos/set-flycheck-checker 'c/c++-clang)
-
-            ;; load rtags
-            (eos/cc/load-rtags)))
+            (eos/set-flycheck-checker 'c/c++-clang)))
 
 (add-hook 'c++-mode-hook
           (lambda ()
@@ -2923,10 +3003,7 @@ The tangled file will be compiled."
             (eos/set-flycheck-checker 'c++-cppcheck)
 
             ;; set dash docset
-            (eos-set-dash-docset '"C++")
-
-            ;; load rtags
-            (eos/cc/load-rtags)))
+            (eos-set-dash-docset '"C++")))
 
 ;; c-mode-map
 (when (boundp 'c-mode-map)

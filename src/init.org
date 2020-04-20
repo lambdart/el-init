@@ -5,8 +5,8 @@
 
 * EOS
 
-  Using emacs (lisp interpreter) as the only IO bridge
-  between human and machine.
+  Using emacs (lisp interpreter) as the only
+  IO bridge between human and machine.
 
 ** Bootstrap
 *** Header
@@ -64,24 +64,6 @@
     ;; (require 'org nil t)
 
     #+END_SRC
-
-*** Environ
-
-    User environment.
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; set term to ecolor
-     (setenv "TERM" "eterm-color")
-
-     ;; the full name of the user logged in
-     (customize-set-variable 'user-login-name (getenv "USER"))
-
-     ;; the email address of the current user
-     ;; this defaults to either: the value of EMAIL environment variable
-     (customize-set-variable 'user-mail-address (getenv "EMAIL"))
-
-     #+END_SRC
 
 *** Garbage Collector
 
@@ -2232,18 +2214,18 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; set transparency after a frame is created
-     (add-hook 'after-make-frame-functions
-               (lambda (frame)
-                 (interactive)
-                 (eos/set-frame-transparency 0.9)))
+       ;; set transparency after a frame is created
+       (add-hook 'after-make-frame-functions
+                 (lambda (frame)
+                   (interactive)
+                   (eos/set-frame-transparency 0.8)))
 
-     ;; fix first frame
-     (add-hook 'emacs-startup-hook
-               (lambda ()
-                 (interactive)
-                 (make-frame)
-                 (delete-other-frames)))
+       ;; fix first frame
+       ;; (add-hook 'emacs-startup-hook
+       ;;           (lambda ()
+       ;;             (interactive)
+       ;;             (make-frame)
+       ;;             (delete-other-frames)))
 
      #+END_SRC
 
@@ -2659,8 +2641,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'custom nil t)
-       (progn
+     (require 'custom nil t)
 
      #+END_SRC
 
@@ -2673,7 +2654,7 @@
      ;; as specified by ‘user-init-file’.  If the value is not nil,
      ;; it should be an absolute file name.
      (customize-set-variable
-      'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))))
+      'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
 
      #+END_SRC
 
@@ -2725,6 +2706,28 @@
      (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))))
 
      #+END_SRC
+
+*** Mail
+**** Nnmail
+
+     Mail support functions for the Gnus mail backends.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'nnmail nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; expirable articles that are older than this will be expired
+      (customize-set-variable 'nnmail-expiry-wait 30)
+
+      #+END_SRC
 
 *** Mm-bodies
 
@@ -3680,29 +3683,26 @@
 
       #+END_SRC
 
-*** News
+**** Gnus
 
     - News: This is what you are supposed to use this thing for—reading news.
       News is generally fetched from a nearby NNTP server, and is
       generally publicly available to everybody.
 
-      - Mail: Everything that’s delivered to you personally is mail. Some
+    - Mail: Everything that’s delivered to you personally is mail. Some
       news/mail readers (like Gnus) blur the distinction between mail
       and news, but there is a difference.
       Mail is private. News is public.
       Mailing is not posting, and replying is not following up.
 
-      - Reply: Send a mail to the person who has written what you are
-        reading.
+    - Reply: Send a mail to the person who has written what you are
+         reading.
 
-**** Gnus
+    The Gnus Newsreader:
 
-     The Gnus Newsreader:
-
-     You can read news (and mail) from within Emacs by using Gnus. The news
-     can be gotten by any nefarious means you can think of—NNTP, local spool
-     or your mbox file.  All at the same time, if you want to push
-     your luck.
+    You can read news (and mail) from within Emacs by using Gnus.
+    The news can be gotten by any means: NNTP, local spool or
+    your box file.
 
 ***** Require
 
@@ -3713,66 +3713,131 @@
       #+END_SRC
 
 ***** Customize
+****** Gnus
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; default method for selecting a newsgroup
+       ;; nnnil is a Gnus backend that provides no groups or articles.  It's useful
+       ;; as a primary select method when you want all your real select methods to
+       ;; be secondary or foreign.
+       (customize-set-variable 'gnus-select-method '(nnnil))
+
+       ;; a list of secondary methods that will be used for reading news
+       (customize-set-variable
+        'gnus-secondary-select-methods '((nntp "news.gwene.org")
+                                         (nnimap "gmail"
+                                                 (nnimap-address "imap.gmail.com")
+                                                 (nnimap-stream ssl)
+                                                 (nnimap-server-port "imaps")
+                                                 (nnimap-inbox "INBOX")
+                                                 (nnimap-fetch-partial-articles t)
+                                                 (nnimap-authinfo-file "~/.auth/auth.gpg"))))
+
+       ;; if non-nil, automatically mark Gcc articles as read
+       (customize-set-variable 'gnus-gcc-mark-as-read nil)
+
+       ;; whether we want to use the Gnus agent or not
+       (customize-set-variable 'gnus-agent nil)
+
+       ;; non-nil means that you are a usenet novice
+       (customize-set-variable 'gnus-novice-user nil)
+
+       ;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
+       (customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
+
+       ;; non-nil means that Gnus will read the entire active file at startup
+       (customize-set-variable 'gnus-read-active-file 'some)
+
+       ;; if non-nil, use the entire emacs screen
+       (customize-set-variable 'gnus-use-full-window nil)
+
+       ;; if non-nil, require your confirmation when catching up a group
+       (customize-set-variable 'gnus-interactive-catchup nil)
+
+       ;; if non-nil, require your confirmation when exiting gnus
+       (customize-set-variable 'gnus-interactive-exit nil)
+
+       #+END_SRC
+
+****** Groups
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; format of group lines
+       (customize-set-variable 'gnus-group-line-format "%M%S%p%P%-12,12y: %B%(%G%)%l\n")
+
+       ;; non-nil means that Gnus will check and remove bogus newsgroup at startup
+       (customize-set-variable 'gnus-check-bogus-newsgroups t)
+
+       ;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
+       (customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
+
+       #+END_SRC
+
+****** Summary
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; if non-nil, display an arrow highlighting the current article
+       (customize-set-variable 'gnus-summary-display-arrow nil)
+
+       ;; if non-nil, ignore articles with identical Message-ID headers
+       (customize-set-variable 'gnus-summary-ignore-duplicates t)
+
+       ;; the format specification of the lines in the summary buffer.
+       (customize-set-variable
+         'gnus-summary-line-format " %U %R %d %-5,5L %-12,12n %B%-80,80S\n")
+
+       ;; specifies date format depending on age of article
+       (customize-set-variable
+        'gnus-user-date-format-alist '((t . "%Y-%m-%d %H:%M")))
+
+       ;; function used for gathering loose threads.
+       (customize-set-variable
+        'gnus-summary-thread-gathering-function
+        'gnus-gather-threads-by-references)
+
+       ;; list of functions used for sorting threads in the summary buffer
+       ;; by default, threads are sorted by article number
+       (customize-set-variable 'gnus-thread-sort-functions
+                               '(gnus-thread-sort-by-date
+                                 gnus-thread-sort-by-number))
+
+       ;; thread formats
+       (customize-set-variable 'gnus-summary-make-false-root 'dummy)
+       (customize-set-variable 'gnus-sum-thread-tree-false-root      "  ┈─► ")
+       (customize-set-variable 'gnus-sum-thread-tree-single-indent   "  » ")
+       (customize-set-variable 'gnus-sum-thread-tree-root            "  ● ")
+       (customize-set-variable 'gnus-sum-thread-tree-vertical        "  │   ")
+       (customize-set-variable 'gnus-sum-thread-tree-leaf-with-other "  ├─► ")
+       (customize-set-variable 'gnus-sum-thread-tree-single-leaf     "  ╰─► ")
+       (customize-set-variable 'gnus-sum-thread-tree-indent          "  ")
+
+       ;; display smileys/fill long lines/fill article
+       (customize-set-variable 'gnus-treat-display-smileys nil)
+       (customize-set-variable 'gnus-treat-fill-long-lines nil)
+       (customize-set-variable 'gnus-treat-fill-article nil)
+
+       ;; WHAT?
+       ;; (customize-set-variable 'gnus-article-auto-eval-lisp-snippets nil)
+
+       #+END_SRC
+
+****** Articles
+***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; default method for selecting a newsgroup
-      ;; nnnil is a Gnus backend that provides no groups or articles.  It's useful
-      ;; as a primary select method when you want all your real select methods to
-      ;; be secondary or foreign.
-      (customize-set-variable 'gnus-select-method '(nnnil))
+      ;; goto topics
+      (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 
-      ;; a list of secondary methods that will be used for reading news
-      (customize-set-variable
-       'gnus-secondary-select-methods '((nntp "news.gwene.org")
-                                        (nnimap "gmail"
-                                                (nnimap-address "imap.gmail.com")
-                                                (nnimap-stream ssl)
-                                                (nnimap-server-port "imaps")
-                                                (nnimap-fetch-partial-articles t)
-                                                (nnimap-authinfo-file "~/.auth/auth.gpg"))))
-
-      ;; if non-nil, automatically mark Gcc articles as read
-      (customize-set-variable 'gnus-gcc-mark-as-read nil)
-
-      ;; whether we want to use the Gnus agent or not
-      (customize-set-variable 'gnus-agent t)
-
-      ;; non-nil means that you are a usenet novice
-      (customize-set-variable 'gnus-novice-user t)
-
-      ;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
-      (customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
-
-      ;; non-nil means that Gnus will read the entire active file at startup
-      (customize-set-variable 'gnus-read-active-file 'some)
-
-      ;; if non-nil, use the entire emacs screen
-      (customize-set-variable 'gnus-use-full-window nil)
+      ;; set timestamp
+      (add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
 
       #+END_SRC
 
-**** Nnmail
-
-     Mail support functions for the Gnus mail backends.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'nnmail nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; expirable articles that are older than this will be expired
-      (customize-set-variable 'nnmail-expiry-wait 30)
-
-      #+END_SRC
-
+***** Binds
 *** Mail
 **** Messages
 
@@ -3793,8 +3858,8 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; your preference for a mail composition package
-      ;; (customize-set-variable 'mail-user-agent 'message-user-agent)
-      (customize-set-variable 'mail-user-agent 'gnus-user-agent)
+      (customize-set-variable 'mail-user-agent 'message-user-agent)
+      ;; (customize-set-variable 'mail-user-agent 'gnus-user-agent)
 
       ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
       (customize-set-variable 'compose-mail-user-agent-warnings nil)
@@ -3855,10 +3920,10 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; hook called narrowed to the headers when setting up a message buffer
-      (add-hook 'message-header-setup-hook #'eos/message-header-add-gcc)
+      (add-hook 'message-header-setup-hook 'eos/message-header-add-gcc)
 
       ;; normal hook, run each time a new outgoing message is initialized
-      (add-hook 'message-setup-hook #'message-sort-headers)
+      (add-hook 'message-setup-hook 'message-sort-headers)
 
       #+END_SRC
 
@@ -3871,7 +3936,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'sendmail nil t)
+      (require 'sendmail nil t)
 
       #+END_SRC
 
@@ -7075,6 +7140,24 @@
       #+END_SRC
 
 ** Epilogue
+*** Environ
+
+    User environment.
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; set term to ecolor
+    (setenv "TERM" "eterm-color")
+
+    ;; the full name of the user logged in
+    (customize-set-variable 'user-login-name (getenv "USER"))
+
+    ;; the email address of the current user
+    (customize-set-variable 'user-mail-address (getenv "EMAIL"))
+
+    #+END_SRC
+
+*** Adapt
 
    The adapt.el script will be the last think
    loaded after ~init.el~, you can put more =elisp= code

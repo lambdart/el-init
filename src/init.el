@@ -9,16 +9,6 @@
 
 ;; (require 'org nil t)
 
-;; set term to ecolor
-(setenv "TERM" "eterm-color")
-
-;; the full name of the user logged in
-(customize-set-variable 'user-login-name (getenv "USER"))
-
-;; the email address of the current user
-;; this defaults to either: the value of EMAIL environment variable
-(customize-set-variable 'user-mail-address (getenv "EMAIL"))
-
 ;; threshold inital value
 (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
       gc-cons-percentage 0.5)
@@ -801,7 +791,7 @@ buffer and the minibuffer."
 
 ;; if `file-name-shadow-mode' is active, any part of the
 ;; minibuffer text that would be ignored because of this is given the
-;; properties in `file-name-shadow-propertieso', which may
+;; properties in `file-name-shadow-properties', which may
 ;; be used to make the ignored text invisible, dim, etc.
 ;; (file-name-shadow-mode -1)
 
@@ -1309,14 +1299,14 @@ The user's $HOME directory is abbreviated as a tilde."
 (add-hook 'after-make-frame-functions
           (lambda (frame)
             (interactive)
-            (eos/set-frame-transparency 0.9)))
+            (eos/set-frame-transparency 0.8)))
 
 ;; fix first frame
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            (interactive)
-            (make-frame)
-            (delete-other-frames)))
+;; (add-hook 'emacs-startup-hook
+;;           (lambda ()
+;;             (interactive)
+;;             (make-frame)
+;;             (delete-other-frames)))
 
 ;; binds
 (global-set-key (kbd "C-x C-o") 'other-frame)
@@ -1429,15 +1419,14 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; ctl-x-map (C-x)
 (define-key ctl-x-map (kbd "=") 'text-scale-adjust)))
 
-(when (require 'custom nil t)
-  (progn
+(require 'custom nil t)
 
 ;; file used for storing customization information.
 ;; The default is nil, which means to use your init file
 ;; as specified by ‘user-init-file’.  If the value is not nil,
 ;; it should be an absolute file name.
 (customize-set-variable
- 'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))))
+ 'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
 
 ;; load custom-file
 ;; (eos-load-file custom-file)
@@ -1449,6 +1438,11 @@ The user's $HOME directory is abbreviated as a tilde."
 
 (add-to-list 'auto-mode-alist '("\\.compose\\'" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))))
+
+(require 'nnmail nil t)
+
+;; expirable articles that are older than this will be expired
+(customize-set-variable 'nnmail-expiry-wait 30)
 
 (require 'mm-bodies nil t)
 
@@ -1850,6 +1844,7 @@ The user's $HOME directory is abbreviated as a tilde."
                                           (nnimap-address "imap.gmail.com")
                                           (nnimap-stream ssl)
                                           (nnimap-server-port "imaps")
+                                          (nnimap-inbox "INBOX")
                                           (nnimap-fetch-partial-articles t)
                                           (nnimap-authinfo-file "~/.auth/auth.gpg"))))
 
@@ -1857,10 +1852,10 @@ The user's $HOME directory is abbreviated as a tilde."
 (customize-set-variable 'gnus-gcc-mark-as-read nil)
 
 ;; whether we want to use the Gnus agent or not
-(customize-set-variable 'gnus-agent t)
+(customize-set-variable 'gnus-agent nil)
 
 ;; non-nil means that you are a usenet novice
-(customize-set-variable 'gnus-novice-user t)
+(customize-set-variable 'gnus-novice-user nil)
 
 ;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
 (customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
@@ -1871,16 +1866,75 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; if non-nil, use the entire emacs screen
 (customize-set-variable 'gnus-use-full-window nil)
 
-(require 'nnmail nil t)
+;; if non-nil, require your confirmation when catching up a group
+(customize-set-variable 'gnus-interactive-catchup nil)
 
-;; expirable articles that are older than this will be expired
-(customize-set-variable 'nnmail-expiry-wait 30)
+;; if non-nil, require your confirmation when exiting gnus
+(customize-set-variable 'gnus-interactive-exit nil)
+
+;; format of group lines
+(customize-set-variable 'gnus-group-line-format "%M%S%p%P%-12,12y: %B%(%G%)%l\n")
+
+;; non-nil means that Gnus will check and remove bogus newsgroup at startup
+(customize-set-variable 'gnus-check-bogus-newsgroups t)
+
+;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
+(customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
+
+;; if non-nil, display an arrow highlighting the current article
+(customize-set-variable 'gnus-summary-display-arrow nil)
+
+;; if non-nil, ignore articles with identical Message-ID headers
+(customize-set-variable 'gnus-summary-ignore-duplicates t)
+
+;; the format specification of the lines in the summary buffer.
+(customize-set-variable
+  'gnus-summary-line-format " %U %R %d %-5,5L %-12,12n %B%-80,80S\n")
+
+;; specifies date format depending on age of article
+(customize-set-variable
+ 'gnus-user-date-format-alist '((t . "%Y-%m-%d %H:%M")))
+
+;; function used for gathering loose threads.
+(customize-set-variable
+ 'gnus-summary-thread-gathering-function
+ 'gnus-gather-threads-by-references)
+
+;; list of functions used for sorting threads in the summary buffer
+;; by default, threads are sorted by article number
+(customize-set-variable 'gnus-thread-sort-functions
+                        '(gnus-thread-sort-by-date
+                          gnus-thread-sort-by-number))
+
+;; thread formats
+(customize-set-variable 'gnus-summary-make-false-root 'dummy)
+(customize-set-variable 'gnus-sum-thread-tree-false-root      "  ┈─► ")
+(customize-set-variable 'gnus-sum-thread-tree-single-indent   "  » ")
+(customize-set-variable 'gnus-sum-thread-tree-root            "  ● ")
+(customize-set-variable 'gnus-sum-thread-tree-vertical        "  │   ")
+(customize-set-variable 'gnus-sum-thread-tree-leaf-with-other "  ├─► ")
+(customize-set-variable 'gnus-sum-thread-tree-single-leaf     "  ╰─► ")
+(customize-set-variable 'gnus-sum-thread-tree-indent          "  ")
+
+;; display smileys/fill long lines/fill article
+(customize-set-variable 'gnus-treat-display-smileys nil)
+(customize-set-variable 'gnus-treat-fill-long-lines nil)
+(customize-set-variable 'gnus-treat-fill-article nil)
+
+;; WHAT?
+;; (customize-set-variable 'gnus-article-auto-eval-lisp-snippets nil)
+
+;; goto topics
+(add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
+
+;; set timestamp
+(add-hook 'gnus-select-group-hook 'gnus-group-set-timestamp)
 
 (require 'message nil t)
 
 ;; your preference for a mail composition package
-;; (customize-set-variable 'mail-user-agent 'message-user-agent)
-(customize-set-variable 'mail-user-agent 'gnus-user-agent)
+(customize-set-variable 'mail-user-agent 'message-user-agent)
+;; (customize-set-variable 'mail-user-agent 'gnus-user-agent)
 
 ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
 (customize-set-variable 'compose-mail-user-agent-warnings nil)
@@ -1929,12 +1983,12 @@ sent. Add this function to `message-header-setup-hook'."
     (message "Gnus is not running. No GCC field inserted.")))
 
 ;; hook called narrowed to the headers when setting up a message buffer
-(add-hook 'message-header-setup-hook #'eos/message-header-add-gcc)
+(add-hook 'message-header-setup-hook 'eos/message-header-add-gcc)
 
 ;; normal hook, run each time a new outgoing message is initialized
-(add-hook 'message-setup-hook #'message-sort-headers)
+(add-hook 'message-setup-hook 'message-sort-headers)
 
-;; (require 'sendmail nil t)
+(require 'sendmail nil t)
 
 ;; text inserted at end of mail buffer when a message is initialized
 ;; (customize-set-variable 'mail-signature "")
@@ -3305,5 +3359,14 @@ Just a `compile` function wrapper."
 (when (boundp 'web-mode-engines-alist)
   (progn
     (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'")))))
+
+;; set term to ecolor
+(setenv "TERM" "eterm-color")
+
+;; the full name of the user logged in
+(customize-set-variable 'user-login-name (getenv "USER"))
+
+;; the email address of the current user
+(customize-set-variable 'user-mail-address (getenv "EMAIL"))
 
 (eos-load-file (expand-file-name "adapt.el" user-emacs-directory))

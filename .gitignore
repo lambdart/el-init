@@ -127,8 +127,10 @@ dmenu-items
 elfeed
 docsets
 site-lisp
+cedet-git
 todo
 lisp
+backup
 
 # Emacs private/custom elisp files
 custom.el

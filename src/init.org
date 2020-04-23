@@ -61,7 +61,7 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; (require 'org nil t)
+    (require 'org nil t)
 
     #+END_SRC
 
@@ -1043,39 +1043,45 @@
     After you type a few characters, pressing the `complete'
     key inserts the rest of the word you are likely to type.
 
+**** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'completion nil t)
+
+     #+END_SRC
+
 **** Customize
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'completion nil t)
-       (progn
-         ;; custom
-         ;; how far to search in the buffer when looking for completions,
-         ;; if nil, search the whole buffer
-         (customize-set-variable 'completion-search-distance 12000)
+     ;; custom
+     ;; how far to search in the buffer when looking for completions,
+     ;; if nil, search the whole buffer
+     (customize-set-variable 'completion-search-distance 12000)
 
-         ;; if non-nil, the next completion prompt does a cdabbrev search
-         (customize-set-variable 'completion-cdabbrev-prompt-flag t)
+     ;; if non-nil, the next completion prompt does a cdabbrev search
+     (customize-set-variable 'completion-cdabbrev-prompt-flag t)
 
-         ;; non-nil means show help message in *Completions* buffer
-         (customize-set-variable 'completion-show-help nil)
+     ;; non-nil means show help message in *Completions* buffer
+     (customize-set-variable 'completion-show-help nil)
 
-         ;; non-nil means separator characters mark previous word as used
-         (customize-set-variable 'completion-on-separator-characthfer t)
+     ;; non-nil means separator characters mark previous word as used
+     (customize-set-variable 'completion-on-separator-characthfer t)
 
-         ;; the filename to save completions to.
-         (customize-set-variable
-          'save-completions-file-name
-          (expand-file-name "cache/completitions" user-emacs-directory))
+     ;; the filename to save completions to.
+     (customize-set-variable
+      'save-completions-file-name
+      (expand-file-name "cache/completitions" user-emacs-directory))
 
-         ;; non-nil means save most-used completions when exiting emacs
-         (customize-set-variable 'save-completions-flag t)
+     ;; non-nil means save most-used completions when exiting emacs
+     (customize-set-variable 'save-completions-flag t)
 
-         ;; discard a completion if unused for this many hours.
-         ;; (1 day = 24, 1 week = 168)
-         ;; if this is 0, non-permanent completions
-         ;; will not be saved unless these are used
-         (customize-set-variable 'save-completions-retention-time 168)
+     ;; discard a completion if unused for this many hours.
+     ;; (1 day = 24, 1 week = 168)
+     ;; if this is 0, non-permanent completions
+     ;; will not be saved unless these are used
+     (customize-set-variable 'save-completions-retention-time 168)
 
      #+END_SRC
 
@@ -1136,7 +1142,7 @@
      (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
      (define-key completion-list-mode-map (kbd "RET") 'choose-completion)
      (define-key completion-list-mode-map (kbd "C-k") 'eos/kill-line)
-     (define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)))
+     (define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
 
      #+END_SRC
 
@@ -2998,7 +3004,7 @@
 
       #+END_SRC
 
-*** Edition
+*** Edit
 **** Elec-pair
 
      Electric pairing: automatically matches parenthesis pairs,
@@ -4236,8 +4242,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'ispell nil t)
-        (progn
+      (require 'ispell nil t)
 
       #+END_SRC
 
@@ -4294,7 +4299,7 @@
 
       ;; eos-sc-map
       (define-key eos-sc-map (kbd "i") 'ispell-word)
-      (define-key eos-sc-map (kbd "I") 'ispell-buffer)))
+      (define-key eos-sc-map (kbd "I") 'ispell-buffer)
 
       #+END_SRC
 
@@ -4655,7 +4660,7 @@
 
 *** Calculators
 **** Calc
-*** Networking
+*** Network
 **** Verb
 
      Verb is a package that allows you to organize and send HTTP
@@ -4694,8 +4699,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'tramp nil t)
-        (progn
+      (require 'tramp nil t)
 
       #+END_SRC
 
@@ -4722,7 +4726,7 @@
        (concat (expand-file-name user-emacs-directory) "cache/tramp"))
 
       ;; connection timeout in seconds
-      (customize-set-variable 'tramp-connection-timeout 60)))
+      (customize-set-variable 'tramp-connection-timeout 60)
 
       #+END_SRC
 
@@ -6070,8 +6074,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'magit nil t)
-        (progn
+      (require 'magit nil t)
 
       #+END_SRC
 
@@ -6079,7 +6082,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key ctl-x-map (kbd "j") 'magit-status)))
+      (define-key ctl-x-map (kbd "j") 'magit-status)
 
       #+END_SRC
 

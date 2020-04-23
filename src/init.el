@@ -7,7 +7,7 @@
 (when (version< emacs-version "26.3")
   (error "This requires Emacs 26.3 and above!"))
 
-;; (require 'org nil t)
+(require 'org nil t)
 
 ;; threshold inital value
 (setq gc-cons-threshold most-positive-fixnum ; 2^61 bytes
@@ -622,35 +622,35 @@ buffer and the minibuffer."
 ;; the default when it's applicable
 (minibuffer-electric-default-mode 1)
 
-(when (require 'completion nil t)
-  (progn
-    ;; custom
-    ;; how far to search in the buffer when looking for completions,
-    ;; if nil, search the whole buffer
-    (customize-set-variable 'completion-search-distance 12000)
+(require 'completion nil t)
 
-    ;; if non-nil, the next completion prompt does a cdabbrev search
-    (customize-set-variable 'completion-cdabbrev-prompt-flag t)
+;; custom
+;; how far to search in the buffer when looking for completions,
+;; if nil, search the whole buffer
+(customize-set-variable 'completion-search-distance 12000)
 
-    ;; non-nil means show help message in *Completions* buffer
-    (customize-set-variable 'completion-show-help nil)
+;; if non-nil, the next completion prompt does a cdabbrev search
+(customize-set-variable 'completion-cdabbrev-prompt-flag t)
 
-    ;; non-nil means separator characters mark previous word as used
-    (customize-set-variable 'completion-on-separator-characthfer t)
+;; non-nil means show help message in *Completions* buffer
+(customize-set-variable 'completion-show-help nil)
 
-    ;; the filename to save completions to.
-    (customize-set-variable
-     'save-completions-file-name
-     (expand-file-name "cache/completitions" user-emacs-directory))
+;; non-nil means separator characters mark previous word as used
+(customize-set-variable 'completion-on-separator-characthfer t)
 
-    ;; non-nil means save most-used completions when exiting emacs
-    (customize-set-variable 'save-completions-flag t)
+;; the filename to save completions to.
+(customize-set-variable
+ 'save-completions-file-name
+ (expand-file-name "cache/completitions" user-emacs-directory))
 
-    ;; discard a completion if unused for this many hours.
-    ;; (1 day = 24, 1 week = 168)
-    ;; if this is 0, non-permanent completions
-    ;; will not be saved unless these are used
-    (customize-set-variable 'save-completions-retention-time 168)
+;; non-nil means save most-used completions when exiting emacs
+(customize-set-variable 'save-completions-flag t)
+
+;; discard a completion if unused for this many hours.
+;; (1 day = 24, 1 week = 168)
+;; if this is 0, non-permanent completions
+;; will not be saved unless these are used
+(customize-set-variable 'save-completions-retention-time 168)
 
 (defun eos/complete-or-indent ()
   "Complete or indent."
@@ -693,7 +693,7 @@ Else indents the current line."
 (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
 (define-key completion-list-mode-map (kbd "RET") 'choose-completion)
 (define-key completion-list-mode-map (kbd "C-k") 'eos/kill-line)
-(define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)))
+(define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
 
 ;; enable dynamic completion mode
 (eos-call-func 'dynamic-completion-mode 1)
@@ -2026,8 +2026,7 @@ sent. Add this function to `message-header-setup-hook'."
 
 (define-key eos-filter-map (kbd "r") 'rgrep)
 
-(when (require 'ispell nil t)
-  (progn
+(require 'ispell nil t)
 
 ;; program invoked by M-x ispell-word and M-x ispell-region commands.
 (customize-set-variable 'ispell-program-name "aspell")
@@ -2054,7 +2053,7 @@ sent. Add this function to `message-header-setup-hook'."
 
 ;; eos-sc-map
 (define-key eos-sc-map (kbd "i") 'ispell-word)
-(define-key eos-sc-map (kbd "I") 'ispell-buffer)))
+(define-key eos-sc-map (kbd "I") 'ispell-buffer)
 
 (when (require 'flyspell nil t)
   (progn
@@ -2198,8 +2197,7 @@ sent. Add this function to `message-header-setup-hook'."
               (if verb-mode
                   (eos-call-func 'verb-send-request-on-point 'this-window)))))))
 
-(when (require 'tramp nil t)
-  (progn
+(require 'tramp nil t)
 
 ;; set tramp default method
 (customize-set-variable 'tramp-default-method "ssh")
@@ -2220,7 +2218,7 @@ sent. Add this function to `message-header-setup-hook'."
  (concat (expand-file-name user-emacs-directory) "cache/tramp"))
 
 ;; connection timeout in seconds
-(customize-set-variable 'tramp-connection-timeout 60)))
+(customize-set-variable 'tramp-connection-timeout 60)
 
 (defun eos/slock ()
   "Call slock utility."
@@ -2836,10 +2834,9 @@ Just a `compile` function wrapper."
 ;; utils map
 (define-key eos-utils-map (kbd "c") 'eos/icomplete/compile)
 
-(when (require 'magit nil t)
-  (progn
+(require 'magit nil t)
 
-(define-key ctl-x-map (kbd "j") 'magit-status)))
+(define-key ctl-x-map (kbd "j") 'magit-status)
 
 (require 'ede nil t)
 

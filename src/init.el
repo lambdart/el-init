@@ -2399,20 +2399,24 @@ sent. Add this function to `message-header-setup-hook'."
   "If the current buffer is 'init.org' the code-blocks are tangled.
 The tangled file will be compiled."
   (interactive)
-
-  ;; avoid running hooks when tangling.
-  (let ((prog-mode-hook nil)
+  (let ((prog-mode-hook nil) ; avoid running hooks when tangling.
         (buffer (current-buffer)))
+    (find-file (expand-file-name
+                "init.org"
+                user-emacs-directory)) ; switch or open init.org
+    (org-babel-tangle) ; tangle source blocks
+    (byte-compile-file (concat user-emacs-directory "init.el")) ; compile
+    (switch-to-buffer buffer))) ; switch back
 
-    ;; switch or open init.org file
-    (find-file (expand-file-name "init.org" user-emacs-directory))
-
-    ;; tangle and compile
-    (org-babel-tangle)
-    (byte-compile-file (concat user-emacs-directory "init.el"))
-
-    ;; switch to the previous buffer
-    (switch-to-buffer buffer)))
+(defun eos/org/set-company-backends ()
+  "Set `org-mode' company backends."
+  (interactive)
+  (eos-set-company-backends
+   '((company-dabbrev :with
+                      company-yasnippet
+                      company-dabbrev-code)
+     (company-ispell)
+     (company-files))))
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -2420,12 +2424,7 @@ The tangled file will be compiled."
             (setq truncate-lines nil)
 
             ;; set company backends
-            (eos-set-company-backends
-             '((company-dabbrev :with
-                company-yasnippet
-                company-dabbrev-code)
-               (company-ispell)
-               (company-files)))))
+            (eos/org/set-company-backends)))
 
 ;; silent compiler
 (defvar org-mode-map nil nil)
@@ -2434,14 +2433,15 @@ The tangled file will be compiled."
 
 (require 'tex-mode nil t)
 
-(when (require 'text-mode nil t)
-  (progn
+(require 'text-mode nil t)
 
-(define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-(define-key text-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
-
-(define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
-(define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
+(defun eos/text/set-company-backends ()
+  "Set `text-mode' company backends."
+  (interactive)
+  (eos-set-company-backends
+   '((company-ispell :with
+                     company-dabbrev)
+     (company-files))))
 
 (add-hook 'text-mode-hook
           (lambda ()
@@ -2449,10 +2449,13 @@ The tangled file will be compiled."
             (turn-on-auto-fill)
 
             ;; set company backends
-            (eos-set-company-backends
-             '((company-ispell
-                company-dabbrev)
-               (company-files)))))))
+            (eos/text/set-company-backends)))
+
+(define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
+(define-key text-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
+
+(define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
+(define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
 
 (when (require 'markdown-mode nil t)
   (progn

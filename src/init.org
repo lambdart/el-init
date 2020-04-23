@@ -541,221 +541,6 @@
 
      #+END_SRC
 
-**** Clean
-***** Esc
-
-      Clean/unbind keys from esc-map.
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; clean esc map
-      (define-key esc-map (kbd "ESC") nil)
-      (define-key esc-map (kbd "<f10>") nil)
-
-      #+END_SRC
-
-***** Ctl-x
-
-      Clean/unbind keys from ctl-x-map.
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; unbind
-      ;; (define-key ctl-x-map (kbd "C-SPC") nil)
-      ;; (define-key ctl-x-map (kbd "C-=") nil)
-      ;; (define-key ctl-x-map (kbd "C-0") nil)
-      ;; (define-key ctl-x-map (kbd "C--") nil)
-      ;; (define-key ctl-x-map (kbd "ESC") nil)
-      ;; (define-key ctl-x-map (kbd ".") nil)
-      ;; (define-key ctl-x-map (kbd "C-l") nil)
-      ;; (define-key ctl-x-map (kbd "C-x") nil)
-      ;; (define-key ctl-x-map (kbd "C-<left>") nil)
-      ;; (define-key ctl-x-map (kbd "C-<right>") nil)
-      ;; (define-key ctl-x-map (kbd "C-<up>") nil)
-      ;; (define-key ctl-x-map (kbd "C-<down>") nil)
-      (define-key ctl-x-map (kbd "<right>") nil)
-      (define-key ctl-x-map (kbd "<left>") nil)
-
-      (define-key ctl-x-map (kbd "C-o") nil)
-      (define-key ctl-x-map (kbd "C-d") nil)
-      (define-key ctl-x-map (kbd "C-c") nil)
-      (define-key ctl-x-map (kbd "C-j") nil)
-      (define-key ctl-x-map (kbd "C-+") nil)
-      (define-key ctl-x-map (kbd "C-a") nil)
-      (define-key ctl-x-map (kbd "C-r") nil)
-      (define-key ctl-x-map (kbd "C-n") nil)
-      (define-key ctl-x-map (kbd "C-z") nil)
-      (define-key ctl-x-map (kbd "C-p") nil)
-      (define-key ctl-x-map (kbd "C-h") nil)
-      (define-key ctl-x-map (kbd "C-u") nil)
-      (define-key ctl-x-map (kbd "C-\@") nil)
-      (define-key ctl-x-map (kbd "M-:") nil)
-
-      (define-key ctl-x-map (kbd "RET") nil)
-      (define-key ctl-x-map (kbd "`") nil)
-      (define-key ctl-x-map (kbd "]") nil)
-      ;; (define-key ctl-x-map (kbd "[") nil)
-      (define-key ctl-x-map (kbd ")") nil)
-      (define-key ctl-x-map (kbd "(") nil)
-      (define-key ctl-x-map (kbd "<") nil)
-      (define-key ctl-x-map (kbd ">") nil)
-      (define-key ctl-x-map (kbd "\@") nil)
-      (define-key ctl-x-map (kbd "-") nil)
-      (define-key ctl-x-map (kbd ";") nil)
-      (define-key ctl-x-map (kbd "#") nil)
-      (define-key ctl-x-map (kbd "*") nil)
-      (define-key ctl-x-map (kbd "'") nil)
-      (define-key ctl-x-map (kbd "$") nil)
-      (define-key ctl-x-map (kbd "{") nil)
-      (define-key ctl-x-map (kbd "}") nil)
-      (define-key ctl-x-map (kbd "^") nil)
-      ;; (define-key ctl-x-map (kbd "n") nil)
-      ;; (define-key ctl-x-map (kbd "f") nil)
-      (define-key ctl-x-map (kbd "a") nil)
-      (define-key ctl-x-map (kbd "h") nil)
-      (define-key ctl-x-map (kbd "v") nil)
-      (define-key ctl-x-map (kbd "x") nil)
-      (define-key ctl-x-map (kbd "X") nil)
-
-      #+END_SRC
-
-***** Minor
-
-      Clean minor-mode-map-alist.
-
-      #+BEGIN_SRC emacs-lisp
-
-      (setq minor-mode-map-alist nil)
-
-      #+END_SRC
-
-***** Global
-
-      Clean/unbind keys from global-map.
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; unset
-      (global-unset-key (kbd "C-z"))
-      (global-unset-key (kbd "C-@"))
-      (global-unset-key (kbd "C-\\"))
-      (global-unset-key (kbd "C-_"))
-      (global-unset-key (kbd "M-l"))
-      (global-unset-key (kbd "M-h"))
-      (global-unset-key (kbd "M-\\"))
-      (global-unset-key (kbd "M-$"))
-      (global-unset-key (kbd "M-("))
-      (global-unset-key (kbd "M-)"))
-      (global-unset-key (kbd "M-r"))
-      (global-unset-key (kbd "M-{"))
-      (global-unset-key (kbd "M-}"))
-      (global-unset-key (kbd "S-SPC"))
-      (global-unset-key (kbd "<backtap>"))
-      (global-unset-key (kbd "M-="))
-      (global-unset-key (kbd "M-@"))
-      (global-unset-key (kbd "M-~"))
-
-      ;; (global-unset-key (kbd "M-z"))
-      ;; (global-unset-key (kbd "M-SPC"))
-      ;; (global-unset-key (kbd "M-m"))
-      ;; (global-unset-key (kbd "M-k"))
-      ;; (global-unset-key (kbd "M-t"))
-      ;; (global-unset-key (kbd "M-q"))
-
-      (global-unset-key (kbd "C-M-h"))
-      (global-unset-key (kbd "C-M-j"))
-      (global-unset-key (kbd "C-M-."))
-      (global-unset-key (kbd "C-M-l"))
-      (global-unset-key (kbd "C-M-/"))
-      (global-unset-key (kbd "C-M-;"))
-      (global-unset-key (kbd "C-M-@"))
-      (global-unset-key (kbd "C-M-\\"))
-      (global-unset-key (kbd "C-M-a"))
-      (global-unset-key (kbd "C-M-r"))
-      (global-unset-key (kbd "C-M-s"))
-      (global-unset-key (kbd "C-M-%"))
-      (global-unset-key (kbd "C-M-u"))
-      (global-unset-key (kbd "C-M-d"))
-      (global-unset-key (kbd "C-M-SPC"))
-      (global-unset-key (kbd "C-M-S-v"))
-
-      (global-unset-key (kbd "<C-M-end>"))
-      (global-unset-key (kbd "<C-M-home>"))
-      (global-unset-key (kbd "<C-S-backspace>"))
-      (global-unset-key (kbd "<C-backspace>"))
-      (global-unset-key (kbd "<C-delete>"))
-      (global-unset-key (kbd "<C-down>"))
-      (global-unset-key (kbd "<C-next>"))
-      (global-unset-key (kbd "<C-end>"))
-      (global-unset-key (kbd "<C-f10>"))
-      (global-unset-key (kbd "<M-f10>"))
-
-      (global-unset-key (kbd "<bottom-divider>"))
-      (global-unset-key (kbd "<bottom-edge>"))
-      (global-unset-key (kbd "<bottom-left-corner>"))
-      (global-unset-key (kbd "<bottom-right-corner>"))
-
-      (global-unset-key (kbd "<horizontal-scroll-bar>"))
-      (global-unset-key (kbd "<vertical-scroll-bar>"))
-
-      (global-unset-key (kbd "<left-edge>"))
-      (global-unset-key (kbd "<right-edge>"))
-
-      (global-unset-key (kbd "<undo>"))
-      (global-unset-key (kbd "<find>"))
-      (global-unset-key (kbd "<help>"))
-      (global-unset-key (kbd "<open>"))
-      (global-unset-key (kbd "<again>"))
-      (global-unset-key (kbd "<menu>"))
-      (global-unset-key (kbd "<header-line>"))
-      (global-unset-key (kbd "<mode-line>"))
-
-      (global-unset-key (kbd "<XF86Back>"))
-      (global-unset-key (kbd "<XF86Forward>"))
-      (global-unset-key (kbd "<XF86WakeUp>"))
-
-      (global-unset-key (kbd "<top-edge>"))
-      (global-unset-key (kbd "<top-left-corner>"))
-      (global-unset-key (kbd "<top-right-corner>"))
-
-      (global-unset-key (kbd "<mouse-1>"))
-      (global-unset-key (kbd "<mouse-2>"))
-      (global-unset-key (kbd "<mouse-3>"))
-      (global-unset-key (kbd "<mouse-4>"))
-      (global-unset-key (kbd "<mouse-5>"))
-      (global-unset-key (kbd "<mouse-6>"))
-      (global-unset-key (kbd "<mouse-7>"))
-
-      (global-unset-key (kbd "<right-divider>"))
-      (global-unset-key (kbd "<vertical-line>"))
-
-      (global-unset-key (kbd "<f10>"))
-      (global-unset-key (kbd "<f11>"))
-      (global-unset-key (kbd "<f16>"))
-      (global-unset-key (kbd "<f18>"))
-      (global-unset-key (kbd "<f20>"))
-
-      (global-unset-key (kbd "<drag-mouse-1>"))
-      (global-unset-key (kbd "<C-mouse-4>"))
-      (global-unset-key (kbd "<C-mouse-5>"))
-      (global-unset-key (kbd "<C-mouse-6>"))
-      (global-unset-key (kbd "<C-mouse-7>"))
-      (global-unset-key (kbd "<M-mouse-1>"))
-      (global-unset-key (kbd "<M-mouse-2>"))
-      (global-unset-key (kbd "<M-mouse-3>"))
-      (global-unset-key (kbd "<S-mouse-3>"))
-      (global-unset-key (kbd "<S-mouse-4>"))
-      (global-unset-key (kbd "<S-mouse-5>"))
-      (global-unset-key (kbd "<S-mouse-6>"))
-      (global-unset-key (kbd "<S-mouse-7>"))
-      (global-unset-key (kbd "<C-down-mouse-1>"))
-      (global-unset-key (kbd "<C-down-mouse-2>"))
-      (global-unset-key (kbd "<M-down-mouse-1>"))
-      (global-unset-key (kbd "<M-drag-mouse-1>"))
-      (global-unset-key (kbd "<S-down-mouse-1>"))
-
-      #+END_SRC
-
 **** Binds
 
      Fundamental/core binds.
@@ -1228,7 +1013,7 @@
      ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
      ;; global-map
-     (global-set-key (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
+     (global-set-key (kbd "s-m") 'eos/focus-minibuffer-or-completions)
 
      #+END_SRC
 
@@ -1323,23 +1108,17 @@
                (complete-symbol nil)
              (indent-according-to-mode)))))
 
-     (defun eos/complete-buffer-or-indent ()
-       "Company (complete anything (in-buffer)) or indent."
-       (interactive)
-       (if (looking-at "\\_>")
-           (progn
-             (when (fboundp 'company-complete)
-               (funcall 'company-complete)))
-         (indent-according-to-mode)))
-
      #+END_SRC
 
-**** Enable
+**** Display
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; enable dynamic completion mode
-     (eos-call-func 'dynamic-completion-mode 1)
+     (add-to-list 'display-buffer-alist
+                  '("\\*Completions\\*"
+                    (display-buffer-below-selected display-buffer-at-bottom)
+                    (inhibit-same-window . t)
+                    (window-height . fit-window-to-buffer)))
 
      #+END_SRC
 
@@ -1359,9 +1138,14 @@
      (define-key completion-list-mode-map (kbd "C-k") 'eos/kill-line)
      (define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)))
 
-     ;; global-map
-     (global-set-key (kbd "<M-tab>") 'eos/complete-at-point-or-indent)
-     (global-set-key (kbd "TAB") 'eos/complete-buffer-or-indent)
+     #+END_SRC
+
+**** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; enable dynamic completion mode
+     (eos-call-func 'dynamic-completion-mode 1)
 
      #+END_SRC
 
@@ -1534,8 +1318,8 @@
      (when (boundp 'icomplete-minibuffer-map)
        (progn
          (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-         (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-forward-completions)
-         (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-backward-completions)
+         (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
+         (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions)
 
          ;; toogle styles
          (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
@@ -1561,51 +1345,6 @@
 
      ;; enable (global)
      (icomplete-mode 1)
-
-     #+END_SRC
-
-*** Dabbrev
-
-    The purpose with this package is to let you write just a few
-    characters of words you've written earlier to be able to expand
-    them.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'dabbrev nil t)
-       (progn
-
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; non-nil means case sensitive search.
-     (customize-set-variable 'dabbrev-upcase-means-case-search t)
-
-     ;; whether dabbrev treats expansions as the same if they differ in case
-     ;; a value of nil means treat them as different.
-     (customize-set-variable 'dabbrev-case-distinction t)))
-
-     #+END_SRC
-
-*** Hippie-exp
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'hippie-exp nil t)
-
-     #+END_SRC
-
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     (define-key eos-complete-map (kbd "/") 'hippie-expand)
 
      #+END_SRC
 
@@ -2214,18 +1953,18 @@
 
      #+BEGIN_SRC emacs-lisp
 
-       ;; set transparency after a frame is created
-       (add-hook 'after-make-frame-functions
-                 (lambda (frame)
-                   (interactive)
-                   (eos/set-frame-transparency 0.8)))
+     ;; set transparency after a frame is created
+     (add-hook 'after-make-frame-functions
+               (lambda (frame)
+                 (interactive)
+                 (eos/set-frame-transparency 0.8)))
 
-       ;; fix first frame
-       ;; (add-hook 'emacs-startup-hook
-       ;;           (lambda ()
-       ;;             (interactive)
-       ;;             (make-frame)
-       ;;             (delete-other-frames)))
+     ;; fix first frame (research)
+     ;; (add-hook 'emacs-startup-hook
+     ;;           (lambda ()
+     ;;             (interactive)
+     ;;             (make-frame)
+     ;;             (delete-other-frames)))
 
      #+END_SRC
 
@@ -2249,7 +1988,7 @@
      (window-divider-mode)
 
      ;; disable blink cursor
-     (blink-cursor-mode 0)
+     (blink-cursor-mode 1)
 
      #+END_SRC
 
@@ -2413,16 +2152,34 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'tooltip nil t)
-       (progn
+     (require 'tooltip nil t)
 
      #+END_SRC
 
-**** Disable
+**** Customize
 
      #+BEGIN_SRC emacs-lisp
 
-     (eos-call-func 'tooltip-mode 0)))
+     ;; seconds to wait before displaying a tooltip the first time.
+     (customize-set-variable 'tooltip-delay 0.2)
+
+     (customize-set-variable 'x-gtk-use-system-tooltips nil)
+
+     ;; frame parameters used for tooltips
+     ;; if ‘left’ or ‘top’ parameters are included, they specify the absolute
+     (customize-set-variable 'tooltip-frame-parameters
+                             '((name . "tooltip")
+                               (internal-border-width . 0)
+                               (border-width . 0)
+                               (no-special-glyphs . t)))
+
+     #+END_SRC
+
+**** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     (tooltip-mode 1)
 
      #+END_SRC
 
@@ -2707,71 +2464,18 @@
 
      #+END_SRC
 
-*** Mail
-**** Nnmail
+*** Imap
 
-     Mail support functions for the Gnus mail backends.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'nnmail nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; expirable articles that are older than this will be expired
-      (customize-set-variable 'nnmail-expiry-wait 30)
-
-      #+END_SRC
-
-*** Mm-bodies
-
-    This library handles MIME body (encode/decode).
-
-    MIME is short for "Multipurpose Internet Mail Extensions".
-    This standard is documented in a number of RFCs;
-    mainly RFC2045 (Format of Internet Message Bodies),
-    RFC2046 (Media Types), RFC2047 (Message Header Extensions for
-    Non-ASCII Text),  RFC2048 (Registration Procedures),
-    RFC2049 (Conformance Criteria and Examples).
-
-    It is highly recommended that anyone who intends writing
-    MIME-compliant software read at least RFC2045 and RFC2047.
+    This library provides an interface for talking to
+    IMAP servers.
 
 **** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'mm-bodies nil t)
+     (require 'imap nil t)
 
      #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
-
-     #+END_SRC
-
-*** Network
-**** Imap
-
-     This library provides an interface for talking to
-     IMAP servers.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'imap nil t)
-
-      #+END_SRC
 
 ***** Customize
 
@@ -2780,62 +2484,47 @@
       ;; how long to wait between checking for the end of output
       (customize-set-variable 'imap-read-timeout 2)
 
-      #+END_SRC
-
-**** Nnimap
-
-     Nnimap library provides interfaces Gnus with IMAP servers.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'nnimap nil t)
+      ;; if non-nil, store session password without prompting
+      (customize-set-variable 'imap-store-password t)
 
       #+END_SRC
 
-***** Customize
+*** Smtpmail
 
-      #+BEGIN_SRC emacs-lisp
+    This library provides functionalities related to send mail
+    through STMP protocol.
 
-      ;; limit the number of articles to look for after moving an article
-      (customize-set-variable 'nnimap-request-articles-find-limit nil)
+**** Require
 
-      #+END_SRC
+     #+BEGIN_SRC emacs-lisp
 
-**** Smtpmail
+     (require 'smtpmail nil t)
 
-     This library provides functionalities related to send mail
-     through STMP protocol.
+     #+END_SRC
 
-***** Require
+**** Customize
 
-      #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-      (require 'smtpmail nil t)
+     ;; specify default SMTP server
+     ;; (customize-set-variable 'smtpmail-default-smtp-server "smtp.gmail.com")
 
-      #+END_SRC
+     ;; the name of the host running SMTP server
+     ;; (customize-set-variable 'smtpmail-smtp-server "smtp.gmail.com")
 
-***** Customize
+     ;; type of SMTP connections to use
+     (customize-set-variable 'smtpmail-stream-type 'ssl)
 
-      #+BEGIN_SRC emacs-lisp
+     ;; smtp service port number
+     (customize-set-variable 'smtpmail-smtp-service 465)
 
-      ;; specify default SMTP server
-      ;; (customize-set-variable 'smtpmail-default-smtp-server "smtp.gmail.com")
+     ;; non-nil means mail is queued; otherwise it is sent immediately.
+     (customize-set-variable 'smtpmail-queue-mail nil)
 
-      ;; the name of the host running SMTP server
-      ;; (customize-set-variable 'smtpmail-smtp-server "smtp.gmail.com")
+     ;; directory where smtpmail.el stores queued mail.
+     ;; (customize-set-variable 'smtpmail-queue-dir "")
 
-      ;; type of SMTP connections to use
-      (customize-set-variable 'smtpmail-stream-type 'ssl)
-
-      ;; smtp service port number
-      (customize-set-variable 'smtpmail-smtp-service 465)
-
-      ;; non-nil means mail is queued; otherwise it is sent immediately.
-      (customize-set-variable 'smtpmail-queue-mail nil)
-
-      #+END_SRC
+     #+END_SRC
 
 ** Applications
 *** Xorg
@@ -2958,7 +2647,7 @@
       (add-hook 'exwm-init-hook
                 (lambda ()
                   (interactive)
-                  (eos/set-frame-transparency 0.9)))
+                  (eos/set-frame-transparency 0.8)))
 
       ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
       ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
@@ -2972,8 +2661,11 @@
       ;; update the buffer name by X11 window title
       (add-hook 'exwm-update-title-hook
                 (lambda ()
+                  (interactive)
                   (exwm-workspace-rename-buffer
-                   (concat exwm-class-name "|" exwm-title))))
+                   (truncate-string-to-width
+                    (concat exwm-class-name "|" exwm-title)
+                    32))))
 
       #+END_SRC
 
@@ -3022,7 +2714,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (eos-call-func 'exwm-randr-enable)
+      ;; (exwm-randr-enable)
 
       #+END_SRC
 
@@ -3422,7 +3114,7 @@
       ;; bind (iedit-mode-keymap)
       (when (boundp 'iedit-mode-keymap)
         (progn
-          (define-key iedit-mode-keymap (kbd "<tab>") 'eos/complete-buffer-or-indent)
+          (define-key iedit-mode-keymap (kbd "<tab>") 'eos/complete-in-buffer-or-indent)
           (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence)))
 
       ;; bind (global)
@@ -3838,6 +3530,78 @@
       #+END_SRC
 
 ***** Binds
+**** Nnimap
+
+     Nnimap library provides interfaces Gnus with IMAP servers.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'nnimap nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; limit the number of articles to look for after moving an article
+      (customize-set-variable 'nnimap-request-articles-find-limit nil)
+
+      #+END_SRC
+
+**** Nnmail
+
+     Mail support functions for the Gnus mail backends.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'nnmail nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; expirable articles that are older than this will be expired
+      (customize-set-variable 'nnmail-expiry-wait 4)
+
+      #+END_SRC
+
+**** Mm-bodies
+
+    This library handles MIME body (encode/decode).
+
+    MIME is short for "Multipurpose Internet Mail Extensions".
+    This standard is documented in a number of RFCs;
+    mainly RFC2045 (Format of Internet Message Bodies),
+    RFC2046 (Media Types), RFC2047 (Message Header Extensions for
+    Non-ASCII Text),  RFC2048 (Registration Procedures),
+    RFC2049 (Conformance Criteria and Examples).
+
+    It is highly recommended that anyone who intends writing
+    MIME-compliant software read at least RFC2045 and RFC2047.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'mm-bodies nil t)
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
+
+     #+END_SRC
+
 *** Mail
 **** Messages
 
@@ -3870,10 +3634,10 @@
       ;; string to be inserted at the end of the message buffer
       (customize-set-variable 'message-signature "")
 
-      ;; format of the "Whomever writes:" line
+      ;; format of the "whomever writes:" line
       (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
 
-      ;; function called to insert the "Whomever writes:" line
+      ;; function called to insert the "whomever writes:" line
       (customize-set-variable 'message-citation-line-function
                               'message-insert-formatted-citation-line)
       ;; function that inserts a formatted citation line
@@ -3945,7 +3709,11 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; text inserted at end of mail buffer when a message is initialized
-      ;; (customize-set-variable 'mail-signature "")
+      (customize-set-variable 'mail-signature "Att.")
+
+      ;; file containing the text inserted at end of mail buffer
+      ;; default: ~/.signature
+      ;; (customize-set-variable 'mail-signature-file nil)
 
       #+END_SRC
 
@@ -4084,8 +3852,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'shell nil t)
-        (progn
+      (require 'shell nil t)
 
       #+END_SRC
 
@@ -4097,7 +3864,11 @@
       (add-hook 'shell-mode-hook
                 (lambda()
                   ;; do not display continuation lines.
-                  (setq truncate-lines nil)))))
+                  (setq truncate-lines nil)
+
+                  ;; when available remove company-mode
+                  (when (fboundp 'company-mode)
+                    (company-mode -1))))
 
       #+END_SRC
 
@@ -4151,8 +3922,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'term nil t)
-        (progn
+      (require 'term nil t)
 
       #+END_SRC
 
@@ -4195,6 +3965,20 @@
 
       #+END_SRC
 
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; do not display continuation lines.
+      (add-hook 'term-mode-hook
+                (lambda()
+                  (setq truncate-lines nil)
+
+                  (when (fboundp 'company-mode)
+                    (company-mode -1))))
+
+      #+END_SRC
+
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
@@ -4210,17 +3994,6 @@
 
                       ;; term-mode-map
                       (define-key term-mode-map (kbd "s-q") 'term-char-mode)))))
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; do not display continuation lines.
-      (add-hook 'term-mode-hook
-                (lambda()
-                  (setq truncate-lines nil)))))
 
       #+END_SRC
 
@@ -5130,9 +4903,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (and (require 'emms nil t)
-                 (require 'emms-setup nil t))
-        (progn
+      (require 'emms nil t)
+      (require 'emms-setup nil t)
 
       #+END_SRC
 
@@ -5143,9 +4915,18 @@
       ;; list of players that emms can use (only mpv)
       (customize-set-variable 'emms-player-list '(emms-player-mpv))
 
+      ;; string used for displaying the current track in mode-line and titlebar
+      (customize-set-variable 'emms-mode-line-format "")
+
+      ;; list of players that EMMS can use
+      (customize-set-variable 'emms-player-list '(emms-player-mpv))
+
+      ;;  the default name of the EMMS playlist buffer
+      (customize-set-variable 'emms-playlist-buffer-name "EMMS|Playlist")
+
       ;; the default directory to look for media files.
       (customize-set-variable
-       'emms-source-file-default-directory (expand-file-name "~/media"))
+       'emms-source-file-default-directory (expand-file-name "~/media/"))
 
       #+END_SRC
 
@@ -5160,7 +4941,7 @@
                              (fboundp 'emms-mode-line-disable))
                     (progn
                       (if emms-mode-line-active-p
-                          (emms-mode-line-disable))))))))
+                          (emms-mode-line-disable))))))
 
       #+END_SRC
 
@@ -5307,10 +5088,10 @@
 
                   ;; set company backends
                   (eos-set-company-backends
-                   '((company-ispell
+                   '((company-dabbrev :with
                       company-yasnippet
-                      company-dabbrev
                       company-dabbrev-code)
+                     (company-ispell)
                      (company-files)))))
 
       #+END_SRC
@@ -5322,7 +5103,7 @@
       ;; silent compiler
       (defvar org-mode-map nil nil)
 
-      (define-key org-mode-map (kbd "C-M-i") 'eos/complete-buffer-or-indent)
+      (define-key org-mode-map (kbd "C-M-i") 'eos/complete-in-buffer-or-indent)
 
       #+END_SRC
 
@@ -5368,7 +5149,7 @@
       #+BEGIN_SRC emacs-lisp
 
       (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-      (define-key text-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)
+      (define-key text-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
 
       (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
       (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
@@ -5419,7 +5200,7 @@
 
       (when (boundp 'markdown-mode-map)
         (progn
-          (define-key markdown-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
+          (define-key markdown-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)))
 
       #+END_SRC
 
@@ -5754,7 +5535,7 @@
 
       #+END_SRC
 
-*** Completion
+*** Completions
 **** Company
 
      Company is a modular completion framework.
@@ -5774,7 +5555,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; set echo delay
-      (customize-set-variable 'company-echo-delay 0.2)
+      (customize-set-variable 'company-echo-delay 0.1)
 
       ;; idle delay in seconds until completion starts automatically
       (customize-set-variable 'company-idle-delay nil)
@@ -5805,6 +5586,15 @@
       ;; to select completions use: M-1, M-2, etc..
       (customize-set-variable 'company-show-numbers t)
 
+      ;; the list of active backends (completion engines)
+      (customize-set-variable
+       'company-backends
+       '(company-capf
+         company-files
+         company-ispell
+         (company-dabbrev-code company-keywords)
+         company-dabbrev))
+
       #+END_SRC
 
 ***** Functions
@@ -5833,6 +5623,24 @@
         (when (boundp 'company-backends)
           (setq company-backends backends)))
 
+     (defun eos/company-complete-or-indent ()
+       "Company (complete anything (in-buffer)) or indent."
+       (interactive)
+       (if (looking-at "\\_>")
+           (progn
+             (when (fboundp 'company-complete)
+               (funcall 'company-complete)))
+         (indent-according-to-mode)))
+
+      (defun eos/complete-in-buffer-or-indent ()
+        "Company (complete anything (in-buffer)) or indent."
+        (interactive)
+        (if (looking-at "\\_>")
+            (progn
+              (when (fboundp 'company-complete-common)
+                (funcall 'company-complete-common)))
+          (indent-according-to-mode)))
+
       #+END_SRC
 
 ***** Binds
@@ -5847,10 +5655,13 @@
           (define-key company-active-map (kbd "C-n") 'company-select-next)
           (define-key company-active-map (kbd "C-p") 'company-select-previous)))
 
-      ;;eos-complete map
+      ;; eos-complete map
       (define-key eos-complete-map (kbd "TAB") 'company-ispell)
       (define-key eos-complete-map (kbd "f") 'company-files)
       (define-key eos-complete-map (kbd "g") 'company-gtags)
+
+      ;; global
+      (global-set-key (kbd "TAB") 'eos/complete-in-buffer-or-indent)
 
       #+END_SRC
 
@@ -5884,8 +5695,8 @@
 
       ;; set company-statistics cache location
       (customize-set-variable
-       'company-statistics-file
-       (concat user-emacs-directory "cache/company-statistics-cache.el"))
+        'company-statistics-file
+        (concat user-emacs-directory "cache/company-statistics-cache.el"))
 
       #+END_SRC
 
@@ -5908,8 +5719,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'yasnippet nil t)
-        (progn
+      (require 'yasnippet nil t)
 
       #+END_SRC
 
@@ -5919,12 +5729,12 @@
 
       (define-key eos-complete-map (kbd "e") 'yas-expand)
       (define-key eos-complete-map (kbd "i") 'yas-insert-snippet)
-      (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)))
+      (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)
 
       (when (boundp 'yas-keymap)
-        (progn
-          (define-key yas-keymap (kbd "<tab>") nil)
-          (define-key yas-keymap (kbd "M-`") 'yas-next-field)))
+         (progn
+           (define-key yas-keymap (kbd "<tab>") nil)
+           (define-key yas-keymap (kbd "M-`") 'yas-next-field)))
 
       #+END_SRC
 
@@ -5935,6 +5745,52 @@
       (eos-call-func 'yas-global-mode 1)
 
       #+END_SRC
+
+**** Srecode
+**** Autotype
+**** Dabbrev
+
+    The purpose with this package is to let you write just a few
+    characters of words you've written earlier to be able to expand
+    them.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'dabbrev nil t)
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; non-nil means case sensitive search.
+     (customize-set-variable 'dabbrev-upcase-means-case-search t)
+
+     ;; whether dabbrev treats expansions as the same if they differ in case
+     ;; a value of nil means treat them as different.
+     (customize-set-variable 'dabbrev-case-distinction t)
+
+     #+END_SRC
+
+**** Hippie-exp
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'hippie-exp nil t)
+
+     #+END_SRC
+
+***** Binds
+
+     #+BEGIN_SRC emacs-lisp
+
+     (global-set-key (kbd "M-\\") 'hippie-expand)
+
+     #+END_SRC
 
 *** Navigation
 **** Imenu
@@ -6115,8 +5971,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'cmake-ide nil t)
-        (progn
+      ;; (when (require 'cmake-ide nil t)
+      ;;   (progn
 
       #+END_SRC
 
@@ -6124,8 +5980,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-hook 'c-mode-hook 'cmake-ide-setup)
-      (add-hook 'c++-mode-hook 'cmake-ide-setup)))
+      ;; (add-hook 'c-mode-hook 'cmake-ide-setup)
+      ;; (add-hook 'c++-mode-hook 'cmake-ide-setup)))
 
       #+END_SRC
 
@@ -6352,6 +6208,15 @@
 
       #+END_SRC
 
+**** Company-rtags
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'company-rtags nil t)
+
+      #+END_SRC
+
 **** CC-mode
 
      This package provides GNU Emacs major modes for editing C, C++,
@@ -6375,11 +6240,14 @@
       ;; c/c++ company backends
       (defun eos/cc/set-company-backends ()
         "Set C/C++ common company backends."
+        (interactive)
         (eos-set-company-backends
          '((company-c-headers)
-           (company-irony
-            company-yasnippet
-            company-dabbrev-code)
+           (company-keywords :with
+            company-rtags
+           company-yasnippet
+           company-dabbrev-code
+           company-dabbrev)
            (company-files))))
 
       #+END_SRC
@@ -6423,7 +6291,7 @@
           (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
 
           ;; complete or indent
-          (define-key c-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
+          (define-key c-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)))
 
       ;; c++-mode-map
       (when (boundp 'c++-mode-map)
@@ -6432,81 +6300,7 @@
           (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
 
           ;; complete or indent
-          (define-key c++-mode-map (kbd "TAB") 'eos/complete-buffer-or-indent)))
-
-      #+END_SRC
-
-**** Irony
-
-     Irony-mode is an Emacs minor-mode that aims at improving the
-     editing experience for the C, C++ and Objective-C
-     languages. It works by using a combination of an
-     Emacs package and a C++ program (irony-server) exposing libclang.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'irony nil t)
-        (progn
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; irony-mode hooks
-      (add-hook 'irony-mode-hook 'electric-pair-mode)
-
-      ;; cc-mode hooks
-      (add-hook 'c-mode-hook 'irony-mode)
-      (add-hook 'c++-mode-hook 'irony-mode)
-      (add-hook 'objc-mode-hook 'irony-mode)))
-
-      #+END_SRC
-
-**** Irony-cdb
-
-     This package provides a compilation database interface of irony-mode.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'irony-cdb nil t)
-        (progn
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; hooks
-      (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)))
-
-      #+END_SRC
-
-**** Company-irony
-
-     This package provides a company-mode asynchronous
-     completion backend for the C, C++ and Objective-C languages.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'company-irony nil t)
-        (progn
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)))
+          (define-key c++-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)))
 
       #+END_SRC
 
@@ -6557,8 +6351,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'elisp-mode nil t)
-        (progn
+      (require 'elisp-mode nil t)
 
       #+END_SRC
 
@@ -6580,10 +6373,11 @@
                 (lambda ()
                   ;; set company backends
                   (eos-set-company-backends
-                   '((company-elisp
-                      company-yasnippet
-                      company-dabbrev-code)
-                     (company-files)))
+                   '(company-elisp
+                     company-capf
+                     company-dabbrev
+                     company-dabbrev-code
+                    (company-files)))
 
                   ;; set flycheck checker
                   (eos/set-flycheck-checker 'emacs-lisp)
@@ -6606,30 +6400,31 @@
           (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
 
           ;; complete
-          (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/complete-buffer-or-indent)
+          (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/complete-in-buffer-or-indent)
 
           ;; quality of life (unbind)
           (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
           (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
           (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
           (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
-          (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)))))
+          (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)))
 
       #+END_SRC
 
-**** Company-elisp
+*** ShellScript
+**** Company-shell
 
-     Company completion backend for Emacs Lisp.
+     Backend for company mode to complete environment variables, binaries found
+     on your $PATH and fish shell functions.
 
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'company-elisp nil t)
+      (require 'company-shell nil t)
 
       #+END_SRC
 
-*** ShellScript
 **** Sh-script
 
      Major mode for editing shell scripts. Bourne, C and rc shells as well
@@ -6655,9 +6450,10 @@
                 (lambda ()
                   ;; set company backends
                   (eos-set-company-backends
-                   '((company-shell
-                      company-shell-env
-                      company-yasnippet
+                   '((company-shell :with
+                                    company-shell-env
+                                    company-yasnippet)
+                     (company-dabbrev
                       company-dabbrev-code)
                      (company-files)))
 
@@ -6674,8 +6470,23 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'fish-mode nil t)
-        (progn
+      (require 'fish-mode nil t)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/fish/set-company-backends ()
+        "Set fish company backends."
+        (interactive)
+        (eos-set-company-backends
+         '((company-fish-shell :with
+                               company-yasnippet)
+           (company-dabbrev
+            company-dabbrev-code)
+           (company-files))))
 
       #+END_SRC
 
@@ -6686,26 +6497,7 @@
       (add-hook 'fish-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos-set-company-backends
-                   '((company-fish-shell
-                      company-yasnippet
-                      company-shell
-                      company-shell-env
-                      company-dabbrev-code)
-                     (company-files)))))))
-
-      #+END_SRC
-
-**** Company-shell
-
-     Backend for company mode to complete environment variables, binaries found
-     on your $PATH and fish shell functions.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'company-shell nil t)
+                  (eos/fish/set-company-backends)))
 
       #+END_SRC
 
@@ -6718,8 +6510,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'lua-mode nil t)
-        (progn
+      (require 'lua-mode nil t)
 
       #+END_SRC
 
@@ -6750,6 +6541,21 @@
 
       #+END_SRC
 
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/lua/set-company-backends ()
+        "Set lua company backends."
+        (interactive)
+        (eos-set-company-backends
+         '((company-yasnippet :with
+                              company-dabbrev
+                              company-dabbrev-code)
+           (company-files))))
+
+      #+END_SRC
+
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -6757,14 +6563,7 @@
       (add-hook 'lua-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos-set-company-backends
-                   '((company-yasnippet
-                      company-keywords
-                      company-gtags
-                      company-dabbrev
-                      company-dabbrev-code
-                      company-keywords)
-                     (company-files)))
+                  (eos/lua/set-company-backends)
 
                   ;; set flycheck checker
                   (eos/set-flycheck-checker 'lua)
@@ -6780,7 +6579,7 @@
 
       ;; add auto-mode
       (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
-      (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))))
+      (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
 
       #+END_SRC
 
@@ -6826,8 +6625,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'python nil t)
-        (progn
+      (require 'python nil t)
 
       #+END_SRC
 
@@ -6840,6 +6638,23 @@
 
       ;; non-nil means template skeletons will be automagically inserted
       (customize-set-variable 'python-skeleton-autoinsert t)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/python/set-company-backends ()
+        "Set python company backends."
+        (interactive)
+        (eos-set-company-backends
+         '((company-keywords :with
+                             company-yasnippet
+                             company-dabbrev-code
+                             company-dabbrev)
+           (company-dabbrev)
+           (company-files))))
 
       #+END_SRC
 
@@ -6857,17 +6672,13 @@
       (add-hook 'python-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos-set-company-backends
-                   '((company-yasnippet
-                      company-keywords
-                      company-dabbrev-code)
-                     (company-files)))
+                  (eos/python/set-company-backends)
 
                   ;; set flycheck checker
                   (eos/set-flycheck-checker 'python-pycompile)
 
                   ;; set dash docsets
-                  (eos-set-dash-docset '"Python 3")))))
+                  (eos-set-dash-docset '"Python 3")))
 
       #+END_SRC
 
@@ -6880,8 +6691,22 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'go-mode nil t)
-        (progn
+      (require 'go-mode nil t)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/go/set-company-backends ()
+        "Set go company backends."
+        (interactive)
+        (eos-set-company-backends
+         '((company-yasnippet :with
+                              company-dabbrev
+                              company-dabbrev-code)
+           (company-files))))
 
       #+END_SRC
 
@@ -6892,11 +6717,7 @@
       (add-hook 'go-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos-set-company-backends
-                   '((company-yasnippet
-                      company-keywords
-                      company-dabbrev-code)
-                     (company-files)))
+                  (eos/go/set-company-backends)
 
                   ;; set flycheck checker (go lint)
                   (eos/set-flycheck-checker 'go-golint)
@@ -6912,7 +6733,7 @@
 
       ;; add (*.go . go-mode) to auto-mode-alist
       ;; init go-mode when a file with the extersion .go is opened
-      (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))))
+      (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
       #+END_SRC
 
@@ -7008,9 +6829,9 @@
                 (lambda ()
                   ;; set company backends
                   (eos-set-company-backends
-                   '((company-yasnippet
-                      company-keywords
-                      company-dabbrev-code)
+                   '(company-yasnippet
+                     company-dabbrev
+                     company-dabbrev-code
                      (company-files)))
 
                   ;; set syntax checker
@@ -7140,6 +6961,221 @@
       #+END_SRC
 
 ** Epilogue
+*** Clean
+***** Esc
+
+      Clean/unbind keys from esc-map.
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; clean esc map
+      (define-key esc-map (kbd "ESC") nil)
+      (define-key esc-map (kbd "<f10>") nil)
+
+      #+END_SRC
+
+***** Ctl-x
+
+      Clean/unbind keys from ctl-x-map.
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; unbind
+      ;; (define-key ctl-x-map (kbd "C-SPC") nil)
+      ;; (define-key ctl-x-map (kbd "C-=") nil)
+      ;; (define-key ctl-x-map (kbd "C-0") nil)
+      ;; (define-key ctl-x-map (kbd "C--") nil)
+      ;; (define-key ctl-x-map (kbd "ESC") nil)
+      ;; (define-key ctl-x-map (kbd ".") nil)
+      ;; (define-key ctl-x-map (kbd "C-l") nil)
+      ;; (define-key ctl-x-map (kbd "C-x") nil)
+      ;; (define-key ctl-x-map (kbd "C-<left>") nil)
+      ;; (define-key ctl-x-map (kbd "C-<right>") nil)
+      ;; (define-key ctl-x-map (kbd "C-<up>") nil)
+      ;; (define-key ctl-x-map (kbd "C-<down>") nil)
+      (define-key ctl-x-map (kbd "<right>") nil)
+      (define-key ctl-x-map (kbd "<left>") nil)
+
+      (define-key ctl-x-map (kbd "C-o") nil)
+      (define-key ctl-x-map (kbd "C-d") nil)
+      (define-key ctl-x-map (kbd "C-c") nil)
+      (define-key ctl-x-map (kbd "C-j") nil)
+      (define-key ctl-x-map (kbd "C-+") nil)
+      (define-key ctl-x-map (kbd "C-a") nil)
+      (define-key ctl-x-map (kbd "C-r") nil)
+      (define-key ctl-x-map (kbd "C-n") nil)
+      (define-key ctl-x-map (kbd "C-z") nil)
+      (define-key ctl-x-map (kbd "C-p") nil)
+      (define-key ctl-x-map (kbd "C-h") nil)
+      (define-key ctl-x-map (kbd "C-u") nil)
+      (define-key ctl-x-map (kbd "C-\@") nil)
+      (define-key ctl-x-map (kbd "M-:") nil)
+
+      (define-key ctl-x-map (kbd "RET") nil)
+      (define-key ctl-x-map (kbd "`") nil)
+      (define-key ctl-x-map (kbd "]") nil)
+      ;; (define-key ctl-x-map (kbd "[") nil)
+      (define-key ctl-x-map (kbd ")") nil)
+      (define-key ctl-x-map (kbd "(") nil)
+      (define-key ctl-x-map (kbd "<") nil)
+      (define-key ctl-x-map (kbd ">") nil)
+      (define-key ctl-x-map (kbd "\@") nil)
+      (define-key ctl-x-map (kbd "-") nil)
+      (define-key ctl-x-map (kbd ";") nil)
+      (define-key ctl-x-map (kbd "#") nil)
+      (define-key ctl-x-map (kbd "*") nil)
+      (define-key ctl-x-map (kbd "'") nil)
+      (define-key ctl-x-map (kbd "$") nil)
+      (define-key ctl-x-map (kbd "{") nil)
+      (define-key ctl-x-map (kbd "}") nil)
+      (define-key ctl-x-map (kbd "^") nil)
+      ;; (define-key ctl-x-map (kbd "n") nil)
+      ;; (define-key ctl-x-map (kbd "f") nil)
+      (define-key ctl-x-map (kbd "a") nil)
+      (define-key ctl-x-map (kbd "h") nil)
+      (define-key ctl-x-map (kbd "v") nil)
+      (define-key ctl-x-map (kbd "x") nil)
+      (define-key ctl-x-map (kbd "X") nil)
+
+      #+END_SRC
+
+***** Minor
+
+      Clean minor-mode-map-alist.
+
+      #+BEGIN_SRC emacs-lisp
+
+      (setq minor-mode-map-alist nil)
+
+      #+END_SRC
+
+***** Global
+
+      Clean/unbind keys from global-map.
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; unset
+      (global-unset-key (kbd "C-z"))
+      (global-unset-key (kbd "C-@"))
+      (global-unset-key (kbd "C-\\"))
+      (global-unset-key (kbd "C-_"))
+      (global-unset-key (kbd "M-l"))
+      (global-unset-key (kbd "M-h"))
+      ;; (global-unset-key (kbd "M-\\"))
+      (global-unset-key (kbd "M-$"))
+      (global-unset-key (kbd "M-("))
+      (global-unset-key (kbd "M-)"))
+      (global-unset-key (kbd "M-r"))
+      (global-unset-key (kbd "M-{"))
+      (global-unset-key (kbd "M-}"))
+      (global-unset-key (kbd "S-SPC"))
+      (global-unset-key (kbd "<backtap>"))
+      (global-unset-key (kbd "M-="))
+      (global-unset-key (kbd "M-@"))
+      (global-unset-key (kbd "M-~"))
+
+      ;; (global-unset-key (kbd "M-z"))
+      ;; (global-unset-key (kbd "M-SPC"))
+      ;; (global-unset-key (kbd "M-m"))
+      ;; (global-unset-key (kbd "M-k"))
+      ;; (global-unset-key (kbd "M-t"))
+      ;; (global-unset-key (kbd "M-q"))
+
+      (global-unset-key (kbd "C-M-h"))
+      (global-unset-key (kbd "C-M-j"))
+      (global-unset-key (kbd "C-M-."))
+      (global-unset-key (kbd "C-M-l"))
+      (global-unset-key (kbd "C-M-/"))
+      ;; (global-unset-key (kbd "C-M-;"))
+      (global-unset-key (kbd "C-M-@"))
+      (global-unset-key (kbd "C-M-\\"))
+      (global-unset-key (kbd "C-M-a"))
+      (global-unset-key (kbd "C-M-r"))
+      (global-unset-key (kbd "C-M-s"))
+      (global-unset-key (kbd "C-M-%"))
+      (global-unset-key (kbd "C-M-u"))
+      (global-unset-key (kbd "C-M-d"))
+      (global-unset-key (kbd "C-M-SPC"))
+      (global-unset-key (kbd "C-M-S-v"))
+
+      (global-unset-key (kbd "<C-M-end>"))
+      (global-unset-key (kbd "<C-M-home>"))
+      (global-unset-key (kbd "<C-S-backspace>"))
+      (global-unset-key (kbd "<C-backspace>"))
+      (global-unset-key (kbd "<C-delete>"))
+      (global-unset-key (kbd "<C-down>"))
+      (global-unset-key (kbd "<C-next>"))
+      (global-unset-key (kbd "<C-end>"))
+      (global-unset-key (kbd "<C-f10>"))
+      (global-unset-key (kbd "<M-f10>"))
+
+      (global-unset-key (kbd "<bottom-divider>"))
+      (global-unset-key (kbd "<bottom-edge>"))
+      (global-unset-key (kbd "<bottom-left-corner>"))
+      (global-unset-key (kbd "<bottom-right-corner>"))
+
+      (global-unset-key (kbd "<horizontal-scroll-bar>"))
+      (global-unset-key (kbd "<vertical-scroll-bar>"))
+
+      (global-unset-key (kbd "<left-edge>"))
+      (global-unset-key (kbd "<right-edge>"))
+
+      (global-unset-key (kbd "<undo>"))
+      (global-unset-key (kbd "<find>"))
+      (global-unset-key (kbd "<help>"))
+      (global-unset-key (kbd "<open>"))
+      (global-unset-key (kbd "<again>"))
+      (global-unset-key (kbd "<menu>"))
+      (global-unset-key (kbd "<header-line>"))
+      (global-unset-key (kbd "<mode-line>"))
+
+      (global-unset-key (kbd "<XF86Back>"))
+      (global-unset-key (kbd "<XF86Forward>"))
+      (global-unset-key (kbd "<XF86WakeUp>"))
+
+      (global-unset-key (kbd "<top-edge>"))
+      (global-unset-key (kbd "<top-left-corner>"))
+      (global-unset-key (kbd "<top-right-corner>"))
+
+      (global-unset-key (kbd "<mouse-1>"))
+      (global-unset-key (kbd "<mouse-2>"))
+      (global-unset-key (kbd "<mouse-3>"))
+      (global-unset-key (kbd "<mouse-4>"))
+      (global-unset-key (kbd "<mouse-5>"))
+      (global-unset-key (kbd "<mouse-6>"))
+      (global-unset-key (kbd "<mouse-7>"))
+
+      (global-unset-key (kbd "<right-divider>"))
+      (global-unset-key (kbd "<vertical-line>"))
+
+      (global-unset-key (kbd "<f10>"))
+      (global-unset-key (kbd "<f11>"))
+      (global-unset-key (kbd "<f16>"))
+      (global-unset-key (kbd "<f18>"))
+      (global-unset-key (kbd "<f20>"))
+
+      (global-unset-key (kbd "<drag-mouse-1>"))
+      (global-unset-key (kbd "<C-mouse-4>"))
+      (global-unset-key (kbd "<C-mouse-5>"))
+      (global-unset-key (kbd "<C-mouse-6>"))
+      (global-unset-key (kbd "<C-mouse-7>"))
+      (global-unset-key (kbd "<M-mouse-1>"))
+      (global-unset-key (kbd "<M-mouse-2>"))
+      (global-unset-key (kbd "<M-mouse-3>"))
+      (global-unset-key (kbd "<S-mouse-3>"))
+      (global-unset-key (kbd "<S-mouse-4>"))
+      (global-unset-key (kbd "<S-mouse-5>"))
+      (global-unset-key (kbd "<S-mouse-6>"))
+      (global-unset-key (kbd "<S-mouse-7>"))
+      (global-unset-key (kbd "<C-down-mouse-1>"))
+      (global-unset-key (kbd "<C-down-mouse-2>"))
+      (global-unset-key (kbd "<M-down-mouse-1>"))
+      (global-unset-key (kbd "<M-drag-mouse-1>"))
+      (global-unset-key (kbd "<S-down-mouse-1>"))
+
+      #+END_SRC
+
 *** Environ
 
     User environment.

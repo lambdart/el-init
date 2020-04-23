@@ -12,20 +12,20 @@
 ;; version control
 (depends-on "magit")
 
-;; compilation
-(depends-on "cmake-ide")
+;; filter
+(depends-on "ag")
 
 ;; syntax check
 (depends-on "flycheck")
 
 ;; completion
 (depends-on "yasnippet")
-(depends-on "company-shell")
-(depends-on "company-irony")
-(depends-on "company-c-headers")
-(depends-on "company-statistics")
 (depends-on "company")
-(depends-on "irony")
+(depends-on "company-statistics")
+(depends-on "company-shell")
+
+;; fuzzy match
+(depends-on "flx")
 
 ;; office
 (depends-on "dictionary")
@@ -36,7 +36,7 @@
 (depends-on "google-translate")
 
 ;; documentation
-(depends-on "rfc-mode")
+;; (depends-on "rfc-mode")
 (depends-on "dash-docs")
 
 ;; multimedia

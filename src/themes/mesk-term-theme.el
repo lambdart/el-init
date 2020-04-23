@@ -81,7 +81,7 @@
     `(font-lock-type-face ((t (:foreground ,fg-purple))))
     `(font-lock-variable-name-face ((t (:foreground ,fg-yellow))))
     `(font-lock-warning-face ((t (:foreground ,fg-orange :inherit unspecified :weight bold))))
-    ;; `(fringe ((t (:background unspecified :inherit default))))
+    ;;`(fringe ((t (:background unspecified :inherit default))))
     `(fringe ((t nil)))
     `(italic ((t (:slant italic))))
     `(match ((t (:background ,yellow :foreground "#262626"))))
@@ -147,12 +147,18 @@
     `(link ((t (:foreground ,fg-orange :underline t))))
     `(link-visited ((t (:foreground ,fg-magenta :underline t))))
 
+    ;; completion
+    `(completions-common-part ((t (:foreground ,fg-blue))))
+
+    ;; Icomplete
+    `(icomplete-first-match ((t (:foreground "#cd5555" :weight medium))))
+
     ;; Company
     `(company-preview ((t (:background unspecified :foreground ,fg-dim))))
     `(company-preview-common ((t (:inherit nil :background "#262626" :foreground ,blue :weight normal))))
     `(company-echo-common ((t (:background ,red :foreground "#ffd700"))))
-    `(company-scrollbar-bg- ((nil (:background ,bg-gray))))
-    `(company-scrollbar-fg- ((nil (:background ,bg-bright))))
+    `(company-scrollbar-bg ((nil (:background ,bg-gray))))
+    `(company-scrollbar-fg ((nil (:background ,bg-bright))))
     `(company-tooltip ((t (:foreground ,fg-default :background ,bg-gray))))
     `(company-tooltip-common ((t (:foreground ,blue))))
     `(company-tooltip-selection ((t (:background "#262626"))))
@@ -437,6 +443,9 @@
     `(transient-disabled-suffix ((t (:background ,red :foreground "#1c1c1c" :weight bold))))
     `(transient-enabled-suffix ((t (:background ,green :foreground "#444444" :weight bold))))
     `(transient-separator ((t (:background "#262626" :foreground ,white))))
+
+    ;; tooltip
+    `(tooltip ((t (:foreground ,fg-default :background ,bg-gray))))
 
     ;; Org
     `(org-agenda-restriction-lock ((t (:background "#eeeeee" :foreground "#1c1c1c"))))

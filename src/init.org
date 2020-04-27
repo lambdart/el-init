@@ -956,11 +956,9 @@
 
      (defun eos/focus-minibuffer ()
        "Focus the active minibuffer.
-
      Bind this to `completion-list-mode-map' to easily jump
      between the list of candidates present in the \\*Completions\\*
      buffer and the minibuffer."
-
        (interactive)
        (let ((mini (active-minibuffer-window)))
          (when mini
@@ -968,14 +966,12 @@
 
      (defun eos/focus-minibuffer-or-completions ()
        "Focus the active minibuffer or the \\*Completions\\*.
-
-           If both the minibuffer and the Completions are present, this
-           command will first move per invocation to the former, then the
-           latter, and then continue to switch between the two.
-
-           The continuous switch is essentially the same as running
-           `eos/focus-minibuffer' and `switch-to-completions' in
-           succession."
+     If both the minibuffer and the Completions are present, this
+     command will first move per invocation to the former, then the
+     latter, and then continue to switch between the two.
+     The continuous switch is essentially the same as running
+     `eos/focus-minibuffer' and `switch-to-completions' in
+     succession."
        (interactive)
        (let* ((mini (active-minibuffer-window))
               (completions (get-buffer-window "*Completions*")))
@@ -1013,7 +1009,7 @@
      ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
      ;; global-map
-     (global-set-key (kbd "s-m") 'eos/focus-minibuffer-or-completions)
+     (define-key ctl-x-map (kbd "a") 'eos/focus-minibuffer-or-completions)
 
      #+END_SRC
 
@@ -1490,6 +1486,12 @@
 
      #+END_SRC
 
+**** Display
+
+     #+BEGIN_SRC emacs-lisp
+
+     #+END_SRC
+
 **** Enable
 
      #+BEGIN_SRC emacs-lisp
@@ -1818,7 +1820,7 @@
 
      ;; eos-find-map
      (define-key eos-find-map (kbd "r") 'recentf-open-files)
-     (define-key eos-find-map (kbd "i") 'eos/icomplete/recentf-open-file)
+     (define-key eos-find-map (kbd "t") 'eos/icomplete/recentf-open-file)
 
      #+END_SRC
 
@@ -1963,7 +1965,7 @@
      (add-hook 'after-make-frame-functions
                (lambda (frame)
                  (interactive)
-                 (eos/set-frame-transparency 0.8)))
+                 (eos/set-frame-transparency 0.9)))
 
      ;; fix first frame (research)
      ;; (add-hook 'emacs-startup-hook
@@ -1988,7 +1990,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; set frame font
-     (eos-set-frame-font "Hermit Light:pixelsize=20")
+     (eos-set-frame-font "Hermit Light:pixelsize=16")
 
      ;; enable window divider
      (window-divider-mode)
@@ -2653,7 +2655,7 @@
       (add-hook 'exwm-init-hook
                 (lambda ()
                   (interactive)
-                  (eos/set-frame-transparency 0.8)))
+                  (eos/set-frame-transparency 0.9)))
 
       ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
       ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
@@ -2784,8 +2786,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'tls nil t)
-        (progn
+      (require 'tls nil t)
 
       #+END_SRC
 
@@ -2800,12 +2801,11 @@
 
       ;; list of strings containing commands to
       ;; start TLS stream to a host
-      ;; (customize-set-variable
-      ;;  'tls-program '("openssl s_client -connect %h:%p -CAfile %t"))
+      ;; '("openssl s_client -connect %h:%p -CAfile %t")
+      ;; '("gnutls-cli --x509cafile %t -p %p %h --insecure")
       (customize-set-variable
        'tls-program
-       '("gnutls-cli --x509cafile %t -p %p %h"))))
-      ;;'("gnutls-cli --x509cafile %t -p %p %h --insecure"))))
+       '("gnutls-cli --x509cafile /etc/ssl/certs/ca-certificates.crt -p %p %h"))
 
       #+END_SRC
 
@@ -3946,7 +3946,7 @@
 
       ;; regexp to recognize prompts in the inferior process
       ;; (customize-set-variable 'term-prompt-regexp "^\\(>\\|\\(->\\)+\\) *")
-      ;; (customize-set-variable 'term-prompt-regexp ".*:.*>.*? ")
+      (customize-set-variable 'term-prompt-regexp ".*:.*>.*? ")
 
       ;; if non-nil, automatically list possibilities on partial completion.
       (customize-set-variable 'term-completion-autolist t)
@@ -3975,11 +3975,12 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; do not display continuation lines.
       (add-hook 'term-mode-hook
                 (lambda()
+                  ;; do not display continuation lines.
                   (setq truncate-lines nil)
 
+                  ;; disable company mode
                   (when (fboundp 'company-mode)
                     (company-mode -1))))
 
@@ -5299,6 +5300,54 @@
 
       #+END_SRC
 
+*** Blog
+
+    Static blog generators are a dime a dozen.
+    This is one more, which focuses on being simple.
+    All files are simple org-mode files in a directory.
+    The only requirement is that every org file must have a:
+    #+TITLE and a #+DATE, and optionally, #+FILETAGS.
+
+**** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'org-static-blog nil t)
+
+     #+END_SRC
+
+**** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; title of the blog
+     (customize-set-variable 'org-static-blog-publish-title "Hidden Ones")
+
+     ;; url of the blog.
+     (customize-set-variable 'org-static-blog-publish-url "https://esac-io.github.io")
+
+     ;; directory where published HTML files are stored
+     (customize-set-variable 'org-static-blog-publish-directory "~/core/dev/blog/")
+
+     ;; directory where published ORG files are stored
+     (customize-set-variable 'org-static-blog-posts-directory "~/core/dev/blog/posts/")
+
+     ;; directory where unpublished ORG files are stored.
+     (customize-set-variable 'org-static-blog-drafts-directory "~/core/dev/blog/drafts/")
+
+     ;; show tags below posts, and generate tag pages
+     (customize-set-variable 'org-static-blog-enable-tags t)
+
+     ;; non-nil means create a table of contents in exported files
+     (customize-set-variable 'org-export-with-toc nil)
+
+     ;; non-nil means add section numbers to headlines when exporting
+     (customize-set-variable 'org-export-with-section-numbers nil)
+
+     #+END_SRC
+
+**** Binds
+**** Enable
 *** Translators
 **** Google-Translate
 
@@ -5445,6 +5494,14 @@
 
       #+END_SRC
 
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key eos-docs-map (kbd "w") 'woman)
+
+      #+END_SRC
+
 **** Dash-docs
 
      This package exposes functionality to work with and search dash
@@ -5574,7 +5631,7 @@
       (customize-set-variable 'company-idle-delay nil)
 
       ;; maximum number of candidates in the tooltip
-      (customize-set-variable 'company-tooltip-limit 8)
+      (customize-set-variable 'company-tooltip-limit 6)
 
       ;; set minimum prefix length
       (customize-set-variable 'company-minimum-length 2)
@@ -5599,13 +5656,17 @@
       ;; to select completions use: M-1, M-2, etc..
       (customize-set-variable 'company-show-numbers t)
 
+      ;; research
+      ;; (customize-set-variable 'company-tooltip-flip-when-above nil)
+
       ;; the list of active backends (completion engines)
       (customize-set-variable
        'company-backends
        '(company-capf
          company-files
          company-ispell
-         (company-dabbrev-code company-keywords)
+         (company-dabbrev-code
+          company-keywords)
          company-dabbrev))
 
       #+END_SRC
@@ -5614,45 +5675,39 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/icomplete/company ()
-        "Insert the selected company candidate directly at point."
-        (interactive)
-        (if (and
-             (boundp 'company-common)
-             (boundp 'company-candidates)
-             (fboundp 'company-complete))
-            (progn
-              (unless company-candidates
-                (company-complete))
-              (unless (= (length company-candidates) 0)
-                (let ((candidate (completing-read "ic-company: " company-candidates nil nil)))
-                  (delete-char (- (length company-common)))
-                  (insert candidate))))
-          nil))
+       (defun eos/icomplete/company ()
+         "Insert the selected company candidate directly at point."
+         (interactive)
+         (unless company-candidates
+           (company-complete-common))
+         (unless (= (length company-candidates) 0)
+           (let ((candidate (completing-read "Complete: " company-candidates nil nil)))
+             (delete-char (- (length company-common)))
+             (insert candidate))))
 
-      (defun eos-set-company-backends (backends)
-        "Set company back ends with BACKENDS."
-        (make-local-variable 'company-backends)
-        (when (boundp 'company-backends)
-          (setq company-backends backends)))
+       (defun eos-set-company-backends (backends)
+         "Set company back ends with BACKENDS."
+         (make-local-variable 'company-backends)
+         (when (boundp 'company-backends)
+           (setq company-backends backends)))
 
-     (defun eos/company-complete-or-indent ()
-       "Company (complete anything (in-buffer)) or indent."
-       (interactive)
-       (if (looking-at "\\_>")
-           (progn
-             (when (fboundp 'company-complete)
-               (funcall 'company-complete)))
-         (indent-according-to-mode)))
-
-      (defun eos/complete-in-buffer-or-indent ()
+      (defun eos/company-complete-or-indent ()
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (if (looking-at "\\_>")
             (progn
-              (when (fboundp 'company-complete-common)
-                (funcall 'company-complete-common)))
+              (when (fboundp 'company-complete)
+                (funcall 'company-complete)))
           (indent-according-to-mode)))
+
+       (defun eos/complete-in-buffer-or-indent ()
+         "Company (complete anything (in-buffer)) or indent."
+         (interactive)
+         (if (looking-at "\\_>")
+             (progn
+               (when (fboundp 'company-complete-common)
+                 (funcall 'company-complete-common)))
+           (indent-according-to-mode)))
 
       #+END_SRC
 
@@ -5745,9 +5800,8 @@
       (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)
 
       (when (boundp 'yas-keymap)
-         (progn
-           (define-key yas-keymap (kbd "<tab>") nil)
-           (define-key yas-keymap (kbd "M-`") 'yas-next-field)))
+        (define-key yas-keymap (kbd "<tab>") nil)
+        (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))
 
       #+END_SRC
 
@@ -6190,7 +6244,7 @@
       ;; set rtags binary path
       (customize-set-variable
        'rtags-path
-       (concat user-emacs-directory "site-lisp/rtags/build/bin/"))
+       (concat user-emacs-directory "lisp/rtags/build/bin/"))
 
       ;; method to use to display RTags results, like references
       (customize-set-variable 'rtags-display-result-backend 'default)
@@ -6367,6 +6421,23 @@
 
       #+END_SRC
 
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/elisp/set-company-backends ()
+        "Set elisp company backends."
+        (interactive)
+        (eos-set-company-backends
+         '((company-elisp :with
+                          company-capf
+                          company-yasnippet
+                          company-dabbrev-code)
+           (company-dabbrev)
+           (company-files))))
+
+      #+END_SRC
+
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -6384,12 +6455,7 @@
       (add-hook 'emacs-lisp-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos-set-company-backends
-                   '(company-elisp
-                     company-capf
-                     company-dabbrev
-                     company-dabbrev-code
-                    (company-files)))
+                  (eos/elisp/set-company-backends)
 
                   ;; set flycheck checker
                   (eos/set-flycheck-checker 'emacs-lisp)

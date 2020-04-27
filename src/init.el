@@ -560,11 +560,9 @@ Keymaps list will be printed on *Messages* buffer."
 
 (defun eos/focus-minibuffer ()
   "Focus the active minibuffer.
-
 Bind this to `completion-list-mode-map' to easily jump
 between the list of candidates present in the \\*Completions\\*
 buffer and the minibuffer."
-
   (interactive)
   (let ((mini (active-minibuffer-window)))
     (when mini
@@ -572,14 +570,12 @@ buffer and the minibuffer."
 
 (defun eos/focus-minibuffer-or-completions ()
   "Focus the active minibuffer or the \\*Completions\\*.
-
-      If both the minibuffer and the Completions are present, this
-      command will first move per invocation to the former, then the
-      latter, and then continue to switch between the two.
-
-      The continuous switch is essentially the same as running
-      `eos/focus-minibuffer' and `switch-to-completions' in
-      succession."
+If both the minibuffer and the Completions are present, this
+command will first move per invocation to the former, then the
+latter, and then continue to switch between the two.
+The continuous switch is essentially the same as running
+`eos/focus-minibuffer' and `switch-to-completions' in
+succession."
   (interactive)
   (let* ((mini (active-minibuffer-window))
          (completions (get-buffer-window "*Completions*")))
@@ -605,7 +601,7 @@ buffer and the minibuffer."
 ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
 ;; global-map
-(global-set-key (kbd "s-m") 'eos/focus-minibuffer-or-completions)
+(define-key ctl-x-map (kbd "a") 'eos/focus-minibuffer-or-completions)
 
 ;; if `file-name-shadow-mode' is active, any part of the
 ;; minibuffer text that would be ignored because of this is given the
@@ -902,6 +898,8 @@ These styles are described in `completion-styles-alist'."
 ;; reference
 ;; (customize-set-variable 'temp-buffer-max-height 12)
 
+
+
 (temp-buffer-resize-mode 1)))
 
 (when (require 'help-mode nil t)
@@ -1035,7 +1033,7 @@ The user's $HOME directory is abbreviated as a tilde."
 
 ;; eos-find-map
 (define-key eos-find-map (kbd "r") 'recentf-open-files)
-(define-key eos-find-map (kbd "i") 'eos/icomplete/recentf-open-file)
+(define-key eos-find-map (kbd "t") 'eos/icomplete/recentf-open-file)
 
 (when (require 'bookmark nil t)
   (progn
@@ -1096,7 +1094,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (add-hook 'after-make-frame-functions
           (lambda (frame)
             (interactive)
-            (eos/set-frame-transparency 0.8)))
+            (eos/set-frame-transparency 0.9)))
 
 ;; fix first frame (research)
 ;; (add-hook 'emacs-startup-hook
@@ -1109,7 +1107,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (global-set-key (kbd "C-x C-o") 'other-frame)
 
 ;; set frame font
-(eos-set-frame-font "Hermit Light:pixelsize=20")
+(eos-set-frame-font "Hermit Light:pixelsize=16")
 
 ;; enable window divider
 (window-divider-mode)
@@ -1368,7 +1366,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (add-hook 'exwm-init-hook
           (lambda ()
             (interactive)
-            (eos/set-frame-transparency 0.8)))
+            (eos/set-frame-transparency 0.9)))
 
 ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
 ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
@@ -1428,8 +1426,7 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; the gpg executable
 (customize-set-variable 'epg-gpg-program "gpg2")
 
-(when (require 'tls nil t)
-  (progn
+(require 'tls nil t)
 
 ;; indicate if certificates should be checked against trusted root certs
 ;; if this is ‘ask’, the user can decide whether to accept an
@@ -1438,12 +1435,11 @@ The user's $HOME directory is abbreviated as a tilde."
 
 ;; list of strings containing commands to
 ;; start TLS stream to a host
-;; (customize-set-variable
-;;  'tls-program '("openssl s_client -connect %h:%p -CAfile %t"))
+;; '("openssl s_client -connect %h:%p -CAfile %t")
+;; '("gnutls-cli --x509cafile %t -p %p %h --insecure")
 (customize-set-variable
  'tls-program
- '("gnutls-cli --x509cafile %t -p %p %h"))))
-;;'("gnutls-cli --x509cafile %t -p %p %h --insecure"))))
+ '("gnutls-cli --x509cafile /etc/ssl/certs/ca-certificates.crt -p %p %h"))
 
 (when (require  'gnutls nil t)
   (progn
@@ -1898,7 +1894,7 @@ sent. Add this function to `message-header-setup-hook'."
 
 ;; regexp to recognize prompts in the inferior process
 ;; (customize-set-variable 'term-prompt-regexp "^\\(>\\|\\(->\\)+\\) *")
-;; (customize-set-variable 'term-prompt-regexp ".*:.*>.*? ")
+(customize-set-variable 'term-prompt-regexp ".*:.*>.*? ")
 
 ;; if non-nil, automatically list possibilities on partial completion.
 (customize-set-variable 'term-completion-autolist t)
@@ -1915,11 +1911,12 @@ sent. Add this function to `message-header-setup-hook'."
       (kill-line)
       (term-send-raw-string "\C-k"))))
 
-;; do not display continuation lines.
 (add-hook 'term-mode-hook
           (lambda()
+            ;; do not display continuation lines.
             (setq truncate-lines nil)
 
+            ;; disable company mode
             (when (fboundp 'company-mode)
               (company-mode -1))))
 
@@ -2498,6 +2495,32 @@ The tangled file will be compiled."
 ;; binds
 (define-key eos-docs-map (kbd ".") 'eos/dictionary-search-at-point)))
 
+(require 'org-static-blog nil t)
+
+;; title of the blog
+(customize-set-variable 'org-static-blog-publish-title "Hidden Ones")
+
+;; url of the blog.
+(customize-set-variable 'org-static-blog-publish-url "https://esac-io.github.io")
+
+;; directory where published HTML files are stored
+(customize-set-variable 'org-static-blog-publish-directory "~/core/dev/blog/")
+
+;; directory where published ORG files are stored
+(customize-set-variable 'org-static-blog-posts-directory "~/core/dev/blog/posts/")
+
+;; directory where unpublished ORG files are stored.
+(customize-set-variable 'org-static-blog-drafts-directory "~/core/dev/blog/drafts/")
+
+;; show tags below posts, and generate tag pages
+(customize-set-variable 'org-static-blog-enable-tags t)
+
+;; non-nil means create a table of contents in exported files
+(customize-set-variable 'org-export-with-toc nil)
+
+;; non-nil means add section numbers to headlines when exporting
+(customize-set-variable 'org-export-with-section-numbers nil)
+
 (when (and (require 'google-translate nil t)
            (require 'google-translate-smooth-ui nil t))
   (progn
@@ -2549,6 +2572,8 @@ The tangled file will be compiled."
 
 ;; if non-nil then show the *WoMan-Log* buffer if appropriate
 (customize-set-variable 'woman-show-log nil)
+
+(define-key eos-docs-map (kbd "w") 'woman)
 
 (require 'dash-docs nil t)
 
@@ -2612,7 +2637,7 @@ The tangled file will be compiled."
 (customize-set-variable 'company-idle-delay nil)
 
 ;; maximum number of candidates in the tooltip
-(customize-set-variable 'company-tooltip-limit 8)
+(customize-set-variable 'company-tooltip-limit 6)
 
 ;; set minimum prefix length
 (customize-set-variable 'company-minimum-length 2)
@@ -2637,30 +2662,28 @@ The tangled file will be compiled."
 ;; to select completions use: M-1, M-2, etc..
 (customize-set-variable 'company-show-numbers t)
 
+;; research
+;; (customize-set-variable 'company-tooltip-flip-when-above nil)
+
 ;; the list of active backends (completion engines)
 (customize-set-variable
  'company-backends
  '(company-capf
    company-files
    company-ispell
-   (company-dabbrev-code company-keywords)
+   (company-dabbrev-code
+    company-keywords)
    company-dabbrev))
 
 (defun eos/icomplete/company ()
    "Insert the selected company candidate directly at point."
    (interactive)
-   (if (and
-        (boundp 'company-common)
-        (boundp 'company-candidates)
-        (fboundp 'company-complete))
-       (progn
-         (unless company-candidates
-           (company-complete))
-         (unless (= (length company-candidates) 0)
-           (let ((candidate (completing-read "ic-company: " company-candidates nil nil)))
-             (delete-char (- (length company-common)))
-             (insert candidate))))
-     nil))
+   (unless company-candidates
+     (company-complete-common))
+   (unless (= (length company-candidates) 0)
+     (let ((candidate (completing-read "Complete: " company-candidates nil nil)))
+       (delete-char (- (length company-common)))
+       (insert candidate))))
 
  (defun eos-set-company-backends (backends)
    "Set company back ends with BACKENDS."
@@ -2722,9 +2745,8 @@ The tangled file will be compiled."
 (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)
 
 (when (boundp 'yas-keymap)
-   (progn
-     (define-key yas-keymap (kbd "<tab>") nil)
-     (define-key yas-keymap (kbd "M-`") 'yas-next-field)))
+  (define-key yas-keymap (kbd "<tab>") nil)
+  (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))
 
 (eos-call-func 'yas-global-mode 1)
 
@@ -2880,7 +2902,7 @@ Just a `compile` function wrapper."
 ;; set rtags binary path
 (customize-set-variable
  'rtags-path
- (concat user-emacs-directory "site-lisp/rtags/build/bin/"))
+ (concat user-emacs-directory "lisp/rtags/build/bin/"))
 
 ;; method to use to display RTags results, like references
 (customize-set-variable 'rtags-display-result-backend 'default)
@@ -2969,6 +2991,17 @@ Just a `compile` function wrapper."
 
 (require 'elisp-mode nil t)
 
+(defun eos/elisp/set-company-backends ()
+  "Set elisp company backends."
+  (interactive)
+  (eos-set-company-backends
+   '((company-elisp :with
+                    company-capf
+                    company-yasnippet
+                    company-dabbrev-code)
+     (company-dabbrev)
+     (company-files))))
+
 ;; enable minor modes
 (add-hook 'emacs-lisp-mode-hook
           (lambda()
@@ -2982,12 +3015,7 @@ Just a `compile` function wrapper."
 (add-hook 'emacs-lisp-mode-hook
           (lambda ()
             ;; set company backends
-            (eos-set-company-backends
-             '(company-elisp
-               company-capf
-               company-dabbrev
-               company-dabbrev-code
-              (company-files)))
+            (eos/elisp/set-company-backends)
 
             ;; set flycheck checker
             (eos/set-flycheck-checker 'emacs-lisp)

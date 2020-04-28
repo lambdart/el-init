@@ -131,6 +131,7 @@ cedet-git
 todo
 lisp
 backup
+blog
 
 # Emacs private/custom elisp files
 custom.el

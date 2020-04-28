@@ -1106,9 +1106,6 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; binds
 (global-set-key (kbd "C-x C-o") 'other-frame)
 
-;; set frame font
-(eos-set-frame-font "Hermit Light:pixelsize=16")
-
 ;; enable window divider
 (window-divider-mode)
 
@@ -2497,26 +2494,106 @@ The tangled file will be compiled."
 
 (require 'org-static-blog nil t)
 
+(defun eos/blog/insert-html (html-file-path)
+  (with-temp-buffer
+    (insert-file-contents html-file-path)
+    (buffer-string)))
+
+(defun eos/blog/update-html ()
+  "Update pages (header, preamble and postamble) themes."
+  (interactive)
+  ;; update page header
+  (customize-set-variable
+   'org-static-blog-page-header
+   (eos/blog/insert-html
+    (expand-file-name
+     (concat user-emacs-directory "blog/html/header.html"))))
+
+  ;; update preamble
+  (customize-set-variable
+   'org-static-blog-page-preamble
+   (eos/blog/insert-html
+    (expand-file-name
+     (concat user-emacs-directory "blog/html/preamble.html"))))
+
+  ;; update postamble
+  (customize-set-variable
+   'org-static-blog-page-postamble
+   (format
+    (eos/blog/insert-html
+     (expand-file-name
+      (concat user-emacs-directory "blog/html/postamble.html")))
+    (org-version))))
+
+(defun eos/blog/publish ()
+  "Update htmls and call `org-static-blog-publish'."
+  (interactive)
+  (eos/blog/update-html)
+  (eos-call-func 'org-static-blog-publish))
+
 ;; title of the blog
-(customize-set-variable 'org-static-blog-publish-title "Hidden Ones")
+(customize-set-variable
+ 'org-static-blog-publish-title "Hidden Ones")
 
 ;; url of the blog.
-(customize-set-variable 'org-static-blog-publish-url "https://esac-io.github.io")
+(customize-set-variable
+ 'org-static-blog-publish-url "https://esac-io.github.io/")
 
 ;; directory where published HTML files are stored
-(customize-set-variable 'org-static-blog-publish-directory "~/core/dev/blog/")
+(customize-set-variable
+ 'org-static-blog-publish-directory
+ (expand-file-name
+  (concat user-emacs-directory "blog/blog/")))
 
 ;; directory where published ORG files are stored
-(customize-set-variable 'org-static-blog-posts-directory "~/core/dev/blog/posts/")
+(customize-set-variable
+ 'org-static-blog-posts-directory
+ (expand-file-name
+  (concat user-emacs-directory "blog/posts/")))
 
 ;; directory where unpublished ORG files are stored.
-(customize-set-variable 'org-static-blog-drafts-directory "~/core/dev/blog/drafts/")
+(customize-set-variable
+ 'org-static-blog-drafts-directory
+ (expand-file-name
+  (concat user-emacs-directory "blog/drafts/")))
+
+;; html to put in the <head> of each page.
+(customize-set-variable
+ 'org-static-blog-page-header
+ (eos/blog/insert-html
+  (expand-file-name
+   (concat user-emacs-directory "blog/html/header.html"))))
+
+;; html to put before the content of each page.
+(customize-set-variable
+ 'org-static-blog-page-preamble
+ (eos/blog/insert-html
+  (expand-file-name
+   (concat user-emacs-directory "blog/html/preamble.html"))))
+
+;; html to put after the content of each page.
+(customize-set-variable
+ 'org-static-blog-page-postamble
+ (format
+  (eos/blog/insert-html
+   (expand-file-name
+    (concat user-emacs-directory "blog/html/postamble.html")))
+  (org-version)))
+
+;; use preview versions of posts on multipost pages
+(customize-set-variable 'org-static-blog-use-preview t)
+
+;; when preview is enabled, convert <h1> to <h2> for the previews
+(customize-set-variable 'org-static-blog-preview-convert-titles t)
+
+;; the HTML appended to the preview if some part of the post is hidden
+(customize-set-variable 'org-static-blog-preview-ellipsis "(...)")
 
 ;; show tags below posts, and generate tag pages
 (customize-set-variable 'org-static-blog-enable-tags t)
 
 ;; non-nil means create a table of contents in exported files
-(customize-set-variable 'org-export-with-toc nil)
+(customize-set-variable 'org-export-with-toc t)
 
 ;; non-nil means add section numbers to headlines when exporting
 (customize-set-variable 'org-export-with-section-numbers nil)

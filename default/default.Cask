@@ -25,12 +25,16 @@
 (depends-on "company-shell")
 
 ;; fuzzy match
-(depends-on "flx")
+;; (depends-on "flx")
 
 ;; office
 (depends-on "dictionary")
 (depends-on "pdf-tools")
 (depends-on "markdown-mode")
+
+;; blog
+(depends-on "htmlize")
+(depends-on "org-static-blog")
 
 ;; translate
 (depends-on "google-translate")

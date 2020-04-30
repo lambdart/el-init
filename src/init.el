@@ -2494,10 +2494,13 @@ The tangled file will be compiled."
 
 (require 'org-static-blog nil t)
 
-(defun eos/blog/insert-html (html-file-path)
-  (with-temp-buffer
-    (insert-file-contents html-file-path)
-    (buffer-string)))
+(defun eos/blog/insert-html (html-file)
+  "Insert HTML-FILE when file exists."
+  (if (file-exists-p html-file)
+      (with-temp-buffer
+        (insert-file-contents html-file)
+        (buffer-string))
+    ""))
 
 (defun eos/blog/update-html ()
   "Update pages (header, preamble and postamble) themes."

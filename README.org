@@ -4,9 +4,18 @@
 
 * EOS
 
-  Just another emacs configuration,
+  Just another org-mode based Emacs configuration,
   or a elisp interpreter desktop distribution.
   | Wait... What!? |
+
+* Disclaimer
+
+  I don't recommend anyone to install or use this
+  configuration directly as there is no support for it
+  and changes quite often, although this is probably
+  the final structure it's advisable to view this
+  =README= only as a reference/guide for the author
+  himself.
 
 ** Screenshot
 
@@ -20,27 +29,28 @@
 * Introduction
 
   Using Emacs (Elisp interpreter) as the only IO bridge
-  between human and machine. In another words, an emacs configuration
-  well designed and integrated that provides a generic
-  computer environment for everyday use.
+  between human and machine. In another words, an Emacs
+  configuration well designed and integrated that provides
+  a generic computer environment for everyday use.
 
-  Org-mode is used to organize/instantiate elisp resources
-  (scripts and packages) in just one file ~src/init.org~.
-  It contains source code blocks, that will be tangled,
-  generating ~src/init.el~ final file.
+  Org-mode is used to write/organize the Emacs configuration
+  in a literate programming format ~src/init.org~, so it contains
+  documentation plus source code blocks that will be tangled
+  generating the final ~src/init.el~ script.
 
   * Note: Throughout this document the word =application(s)=
     refers to any =elisp packages= or =external programns=.
 
   Its important to understand that all applications with
-  different purposes and classification (made with elisp or
-  not) (in)directly passes through the Elisp interpreter.
+  different purposes (made with elisp or not) (in)directly
+  passes through the elisp interpreter.
 
-  So again, =application(s)= implies =elisp packages= or =external programns=.
+  So again, =application(s)= implies =elisp packages=
+  or =external programns=.
 
 ** Features (overview):
 
-   - Just one major language (Elisp) to conquer them all!
+   - Just one major language =elisp= to conquer them all!
    - Information comes to you as required and not the other way around.
    - Use the same keybinds everywhere (learn once, use forever and ever).
 
@@ -90,30 +100,32 @@
 
   1. Cask
   2. Emacs >= 26.3
-  3. Emacs Packages (Optional):
-     - Will be described and listed in the =Applications= section.
+  3. Packages
+     - Listed on: ~default/default.Cask~
 
 ** Optional
 
-   Some =emacs packages= used in this configuration require
-   external (non-lisp) programs:
+   Some =emacs packages= used external (non-elisp) programs, like:
 
-   1. agrep
-   2. global
-   3. aspell (or ispell)
-   4. compton
-   5. transset
-   6. rtags (server)
-   7. irony (server)
+   1. Agrep
+   2. Global
+   3. Etags
+   4. Aspell/Ispell
+   5. Compton
+   6. Transset
+   7. Rtags Server
 
-* Tested On
+* Tested on
 
   - FreeBSD 12.1 RELEASE
   - Debian GNU/Linux 10
 
 * Installation
 
-  Download and execute the installation script:
+  The installation script was made to speed up
+  the installation process on my new machines.
+
+  Download and execute (curl required):
 
   #+BEGIN_SRC
      sh -c "$(curl -fsSL https://raw.githubusercontent.com/esac-io/eos/master/scripts/install.sh)"
@@ -141,15 +153,10 @@
   - Enjoy your late nights :)
 
   - Note: The main purpose of the Emacs tutorial is teach you
-    the most important standard Emacs commands and the mapped
-    keybinds used to trigger then.
+    the most important standard Emacs commands (or functions)
+    and the mapped keybinds used to trigger then.
 
-  - Key binds -> Functions : (-> means map)
-
-  - Remember everything (literally, `every-fuck-thing) is a function inside
-    the lisp interpreter (elisp).
-
-* Keybinds Strategy
+* Keybinds
 
   Basically, new prefix maps are created for the most commonly
   used minor modes and their functions are mapped within
@@ -157,7 +164,7 @@
 
   After that, the prefix maps will be placed in the Ctl-x-map prefix
   map, resulting in the standardization of commands (functions)
-  access sequences (keybinds/chords).
+  access sequences (keybinds or chords).
 
 ** Basic
 
@@ -171,7 +178,7 @@
      | Alt      | M-             | Meta Key    |
      | Crtl     | C-             | Command Key |
 
-**** Keymaps (data structures)
+**** Keymaps
 
      Keymaps are data structures that holds key sequences (chords) and
      commands (elisp functions).
@@ -242,13 +249,14 @@
 ** Quality of life
 
    For the sake of sanity a lot of keys were unbounded resulting
-   in a more error prone Emacs usage. See the unbind section at
-   ~init.org~ file and comment out your missing chords.
+   in a more error prone usage. See the =Epilogue/Clean= section at
+   ~src/init.org~ file and comment out your missing chords.
 
    Note: The `minor-mode-map-alist' was completely cleaned,
-   this was proven to be a huge gain on productivity and pain relief.
+   this was proven to be a huge gain on productivity and
+   pain relief.
 
-* Package Management
+* Packages
 
   Cask is a project management tool for Emacs that helps automate the
   package development cycle; development, dependencies, testing,
@@ -261,13 +269,11 @@
   provides meta information about the package and
   declares its contents and dependencies.
 
-** Adding Package's Repository
+** Configure
 
    To add more packages just edit the ~/.emacs.d/Cask~ file, generated
-   by installation script.
-
-   To add 'function-args' package, put the code snippet below inside
-   the ~Cask~ file.
+   by installation script, e.g, to add 'function-args' package,
+   put the code snippet below inside the ~Cask~ file.
 
    #+BEGIN_SRC sh
 
@@ -275,8 +281,8 @@
 
    #+END_SRC
 
-   Using different source then Melpa is possible thanks to =`depends-on'=
-   acceptable fetcher keywords:
+   Using different source then Melpa is possible thanks
+   to =`depends-on'= and acceptable fetcher keywords like =:git=:
 
    #+BEGIN_SRC sh
 
@@ -288,13 +294,17 @@
    In the first variant, install the package from a package archive,
    optionally requiring a minimum-version. In the second variant,
    install the package from a VCS repository.
-   Replace fetcher with any of the following: :git, :bzr, :hg,
-   :darcs, :svn or :cvs. The argument is the package's repository URL
+
+   Fetcher keywords:
+
+   - =:git, :bzr, :hg, :darcs, :svn, :cvs=
+
+   The argument is the package's repository URL
    source.
 
-   For more detailed information see [[https://cask.readthedocs.io/en/latest/guide/usage.html][cask's manual]].
+   For more details see [[https://cask.readthedocs.io/en/latest/guide/usage.html][cask's manual]].
 
-** Installing Packages
+** Install
 
    To install all packages listed on the ~Cask~ file, use `cask
    install` inside the same directory the ~Cask~ file resides, e.g:
@@ -310,9 +320,9 @@
      put the dependency code snippet ~(depends-on "missing-dep-package-name")
      above the target package and give `cask install` command another shot.
 
-** Removing Packages
+** Remove
 
-   Manually remove target package directory.
+   You have to manually remove target package directory.
    To find out where the packages were installed, use:
 
    #+BEGIN_SRC sh
@@ -335,53 +345,49 @@
    In this example, dashboard package files will be deleted,
    its configuration will be skipped.
 
-   - TIP: IMPORTANT! Don't forgot to remove both: package's folder and
+   - IMPORTANT: Don't forgot to remove both: package's folder and
      repository entry, otherwise the package will continue to be
-     installed/loaded.
+     installed when =cask install= are executed and
+     loaded/configured/enabled by ~init.el~.
 
 * Adapt
 
   If you want to modify any aspects (or extend) this configuration
-  without touching the ~/src/init.org~, just edit/add your own elisp code
-  at ~/src/adapt.el~, this file is the last thing loaded on
-  the ~/src/init.el~ tangled script.
+  without touching the ~/src/init.org~, just edit/add your own elisp
+  code inside ~/src/adapt.el~.
 
-* Applications
+  Note: ~src/adapt.el~ will be the last script loaded by ~/src/init.el~.
 
-  Well like was said, this configuration is used as a desktop
-  distribution. The application list (organized by its classification)
-  can be found at ~docs/apps.org~ and, of course, its configurations (if any) are
-  written in the ~src/init.org~ file.
+* Advices
 
-* Miscellaneous
-** Advices
+  0. Do one thing and do it well (KISS).
+  1. If something is bothering you, fix it!
+  2. Global behavior aways available and static.
+  3. Few keybinds sets.
 
-   1. Do one thing and do it well.
-   2. If something is bothering you, fix it!
-   3. Global behavior aways available and static.
-   4. Few keybinds sets.
+  4. Repeat keybinds for mode-specific commands
+     according to their logical classification.
 
-   5. Repeat keybinds for mode-specific commands
-      according to their logical classification.
+  5. Use the same action flow logic, for the same
+     class of commands.
 
-   6. Use the same action flow logic, for the same class of commands.
-      Habits die hard (usability - KISS!).
+  6. Use as few modules(packages) as possible and always try to use
+     modules already installed on emacs to meet your needs.
+     If we can withdraw a module, do so! Most of the time it takes little
+     or no effort, and the gain is considerable.
+     So be alert to identify these situations!
 
-   7. Use as few modules(packages) as possible and always try to use
-      modules already installed on emacs to meet your needs.
-      If we can withdraw a module, do so! Most of the time it takes little
-      or no effort, and the gain is considerable.
-      So be alert to identify these situations!
+  7. Prioritize emacs's native packages(builtin) over third-party.
+     If any demand comes to light try to resolve with these packages
+     first, then third-party packages already installed and
+     finally(maybe) the internet. Sometimes a little extension
+     on this blotted-packages sets are everything we need to
+     bring a new feature to live or resolve a issue.
 
-   8. Prioritize emacs's native packages(builtin) over third-party.
-      If any demand comes to light try to resolve with these packages
-      first, then third-party packages already installed and
-      finally(maybe) the internet. Sometimes a little extension
-      on this blotted-packages sets are everything we need to
-      bring a new feature to live or resolve a issue.
+  8. Successive refinements: in constant refactoring!
+     Always improve, do not fear the winds of change!
 
-   9. Successive refinements: in constant refactoring!
-      Always improve, do not fear the winds of change!
+  9. Have fun!
 
 * FAQ
 
@@ -398,22 +404,18 @@
   - Q: And what about helm/ivy/counsel/swiper?
   - A: Well, Icomplete its minimal (works very similar to the beloved
     dmenu), builtin, generic, fast, less intrusive, and fulfill
-    all my needs, thanks Protesilaos, to bring this
-    forgotten package to light!
+    all my needs, thanks Prot, to bring this forgotten package to light!
 
   - Q: Why won't just use Doom/Centaur/Spacemacs or any other
     distribution?
   - A: Because they are bloated with a lot of (useless) packages,
-    its more easy (for me) to adapt Emacs Vanilla and learn Elisp:
-    once for all (in progress)!
-
-    "One language to conquer than all!"
-    | kernel: Oops |
+    its more easy (for me) to adapt Emacs Vanilla and learn
+    Elisp: once for all (in progress)!
 
   - Q: Do you think that everyone who uses Emacs should make their own
     configuration ~init.el~?
   - A: For sure! It's fun like explore mystical dungeons and slay
-    some horrible dragons. The reward? Walk over the rotten and stinky
+    some fearless dragons. The reward? Walk over the rotten and stinky
     carrion of your enemies, who were defeated by your will,
     and contemplate the symphony formed by the cry of despair
     whispered by their widows.

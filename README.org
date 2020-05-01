@@ -348,8 +348,8 @@
 
    - IMPORTANT: Don't forgot to remove both: package's folder and
      repository entry, otherwise the package will continue to be
-     installed when =cask install= are executed and
-     loaded/configured/enabled by ~init.el~.
+     installed when =cask install= is executed and
+     loaded by ~src/init.el~.
 
 * Adapt
 

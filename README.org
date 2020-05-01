@@ -198,11 +198,12 @@
 
    | Prefix Keymap  | Prefix  | Description       |
    |                |         |                   |
+   | eos-find-map   | C-x f   | Find              |
    | eos-window-map | C-x w   | Windows           |
    | eos-pm-map     | C-x p   | Projects          |
-   | eos-sc-map     | C-x e   | Errors (Checkers) |
-   | eos-tags-maps  | C-x t   | Navigation (Tags) |
-   | eos-docs-maps  | C-x l   | Library (Docs)    |
+   | eos-sc-map     | C-x e   | Errors            |
+   | eos-tags-maps  | C-x t   | Tags              |
+   | eos-docs-maps  | C-x l   | Library           |
    | eos-ac-map     | C-x TAB | Completion        |
 
 ** C-c
@@ -236,9 +237,9 @@
 
 ** Getting help
 
-   To verify what keys are mapped use list-keybindings
-   (M-x list-keybindings RET or C-h b), it's possible to restrict
-   the search using C-h (or ?) post-fix for a specific map, e.g:
+   To verify what keys are mapped use =M-x describe-bindings RET=
+   or =C-h b=, it's possible to restrict the search using =C-h= or =?=
+   post-fix for a specific map, e.g:
 
    | Keybind | Description           |
    | C-h C-h | help-map help         |

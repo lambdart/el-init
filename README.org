@@ -14,8 +14,12 @@
   configuration directly as there is no support for it
   and changes quite often, although this is probably
   the final structure it's advisable to view this
-  =README= only as a reference/guide for the author
-  himself.
+  =README= only as a reference/guide for the author himself.
+
+  So, my advise is: read emacs/elisp manual and write
+  your own ~init.el~, but feel free to fork or copy
+  anything from ~/src/init.org~ that attends
+  your needs :)
 
 ** Screenshot
 
@@ -33,20 +37,20 @@
   configuration well designed and integrated that provides
   a generic computer environment for everyday use.
 
-  Org-mode is used to write/organize the Emacs configuration
-  in a literate programming format ~src/init.org~, so it contains
-  documentation plus source code blocks that will be tangled
-  generating the final ~src/init.el~ script.
+  Org-mode is used to write/organize the configuration
+  (~src/init.org~) in a literate programming format,
+  so it contains documentation plus source code blocks
+  that will be tangled generating the ~src/init.el~ script.
 
-  * Note: Throughout this document the word =application(s)=
-    refers to any =elisp packages= or =external programns=.
+  * Note: Throughout this document the word =application=
+    refers to any =elisp package= or =external program=.
 
-  Its important to understand that all applications with
+  It's important to understand that all applications with
   different purposes (made with elisp or not) (in)directly
   passes through the elisp interpreter.
 
   So again, =application(s)= implies =elisp packages=
-  or =external programns=.
+  or =external programs=.
 
 ** Features (overview):
 
@@ -181,20 +185,20 @@
 **** Keymaps
 
      Keymaps are data structures that holds key sequences (chords) and
-     commands (elisp functions).
+     map/trigger commands (elisp functions).
 
-     | Keymap           | Prefix Key | Available         | Description        |
-     |                  |            |                   |                    |
-     | Global-map       | C- and M-  | Always (static)   | Generic Actions    |
-     | Ctl-x-map        | C-x        | Always (static)   | Generic Actions    |
-     | <Minor-mode>-map | C-x <key>  | Always (static)   | Minor Mode Actions |
-     | <Major-mode>-map | C-c        | Current (dynamic) | Major Mode Actions |
+     | Keymap           | Prefix Key | Available | Description        |
+     |                  |            |           |                    |
+     | Global-map       | C- and M-  | Always    | Generic Actions    |
+     | Ctl-x-map        | C-x        | Always    | Generic Actions    |
+     | <Minor-mode>-map | C-x <key>  | Always    | Minor Mode Actions |
+     | <Major-mode>-map | C-c        | Maybe     | Major Mode Actions |
 
 ** C-x
 
-   EOS's keymaps are defined to hold the most
+   New keymaps are defined to hold the most
    common/used commands (elisp functions), they are
-   divided according to their logical behavior:
+   divided according to their behavior classification:
 
    | Prefix Keymap  | Prefix  | Description       |
    |                |         |                   |
@@ -217,9 +221,8 @@
 
 ** Global
 
-   We are not going to list all the keybinds, just the keybinds we
-   have changed from the standard and some additional ones that we
-   think are important.
+   Not all keybinds will be listed here, just the keybinds that
+   have changed from the standard and the most used ones.
 
    Remember that you always can call the functions =C-h k= (describe-key)
    and =C-h b= (describe-bindings) to require this information.
@@ -298,7 +301,7 @@
 
    Fetcher keywords:
 
-   - =:git, :bzr, :hg, :darcs, :svn, :cvs=
+   - =(:git :bzr :hg :darcs :svn :cvs=)
 
    The argument is the package's repository URL
    source.

@@ -272,8 +272,8 @@
 ** Prelude
 **** Core
 
-     Core functions must be pure (emacs vanilla and C source)
-     and generic.
+     Core functions must be generic and pure:
+     only emacs vanilla and C source as dependencies.
 
 ***** Call
 
@@ -1009,7 +1009,7 @@
      ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
      ;; global-map
-     (define-key ctl-x-map (kbd "a") 'eos/focus-minibuffer-or-completions)
+     (define-key ctl-x-map (kbd "C-a") 'eos/focus-minibuffer-or-completions)
 
      #+END_SRC
 
@@ -5077,8 +5077,8 @@
         (eos-set-company-backends
          '((company-dabbrev :with
                             company-yasnippet
-                            company-dabbrev-code)
-           (company-ispell)
+                            company-dabbrev-code
+                            company-ispell)
            (company-files))))
 
       #+END_SRC
@@ -7163,7 +7163,7 @@
       (define-key ctl-x-map (kbd "C-c") nil)
       (define-key ctl-x-map (kbd "C-j") nil)
       (define-key ctl-x-map (kbd "C-+") nil)
-      (define-key ctl-x-map (kbd "C-a") nil)
+      ;; (define-key ctl-x-map (kbd "C-a") nil)
       (define-key ctl-x-map (kbd "C-r") nil)
       (define-key ctl-x-map (kbd "C-n") nil)
       (define-key ctl-x-map (kbd "C-z") nil)

@@ -601,7 +601,7 @@ succession."
 ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
 ;; global-map
-(define-key ctl-x-map (kbd "a") 'eos/focus-minibuffer-or-completions)
+(define-key ctl-x-map (kbd "C-a") 'eos/focus-minibuffer-or-completions)
 
 ;; if `file-name-shadow-mode' is active, any part of the
 ;; minibuffer text that would be ignored because of this is given the
@@ -2406,8 +2406,8 @@ The tangled file will be compiled."
   (eos-set-company-backends
    '((company-dabbrev :with
                       company-yasnippet
-                      company-dabbrev-code)
-     (company-ispell)
+                      company-dabbrev-code
+                      company-ispell)
      (company-files))))
 
 (add-hook 'org-mode-hook
@@ -3366,7 +3366,7 @@ Just a `compile` function wrapper."
 (define-key ctl-x-map (kbd "C-c") nil)
 (define-key ctl-x-map (kbd "C-j") nil)
 (define-key ctl-x-map (kbd "C-+") nil)
-(define-key ctl-x-map (kbd "C-a") nil)
+;; (define-key ctl-x-map (kbd "C-a") nil)
 (define-key ctl-x-map (kbd "C-r") nil)
 (define-key ctl-x-map (kbd "C-n") nil)
 (define-key ctl-x-map (kbd "C-z") nil)

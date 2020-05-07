@@ -523,6 +523,21 @@
               (async-shell-command (format "transset -a %.1f" alpha))
             (error "Transset not found"))))
 
+      (defun eos/open-scratch ()
+        "Open or switch to *scratch* buffer."
+        (interactive)
+        (let (buffer (get-buffer "*scratch*"))
+          (if buffer
+              (switch-to-buffer buffer)
+            (progn
+              (setq buffer (get-buffer-create "*scratch*"))
+              (with-current-buffer "*scratch*"
+                (when (zerop (buffer-size))
+                  (insert (substitute-command-keys initial-scratch-message)))
+                  (if (eq major-mode 'fundamental-mode)
+                      (funcall initial-major-mode)))
+              (switch-to-buffer buffer)))))
+
       #+END_SRC
 
 **** Theme
@@ -603,7 +618,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; non-nil means to make the cursor very visible
-     (customize-set-variable 'visible-cursor nil)
+     (customize-set-variable 'visible-cursor t)
 
      #+END_SRC
 
@@ -1009,7 +1024,10 @@
      ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
      ;; global-map
-     (define-key ctl-x-map (kbd "C-a") 'eos/focus-minibuffer-or-completions)
+     (global-set-key (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
+
+     ;; ctl-x-map
+     (define-key ctl-x-map (kbd "a") 'eos/focus-minibuffer-or-completions)
 
      #+END_SRC
 
@@ -1971,7 +1989,7 @@
      ;; (add-hook 'emacs-startup-hook
      ;;           (lambda ()
      ;;             (interactive)
-     ;;             (make-frame)
+     ;;             (make-frame)))
      ;;             (delete-other-frames)))
 
      #+END_SRC
@@ -2008,7 +2026,6 @@
 
      (when (require 'page nil t)
        (progn
-
 
      #+END_SRC
 
@@ -4716,7 +4733,7 @@
       (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
 
       ;; set tramp verbose level
-      (customize-set-variable 'tramp-verbose 4)
+      (customize-set-variable 'tramp-verbose 0)
 
       ;; file which keeps connection history for tramp connections.
       (customize-set-variable
@@ -7163,7 +7180,7 @@
       (define-key ctl-x-map (kbd "C-c") nil)
       (define-key ctl-x-map (kbd "C-j") nil)
       (define-key ctl-x-map (kbd "C-+") nil)
-      ;; (define-key ctl-x-map (kbd "C-a") nil)
+      (define-key ctl-x-map (kbd "C-a") nil)
       (define-key ctl-x-map (kbd "C-r") nil)
       (define-key ctl-x-map (kbd "C-n") nil)
       (define-key ctl-x-map (kbd "C-z") nil)
@@ -7193,7 +7210,7 @@
       (define-key ctl-x-map (kbd "^") nil)
       ;; (define-key ctl-x-map (kbd "n") nil)
       ;; (define-key ctl-x-map (kbd "f") nil)
-      (define-key ctl-x-map (kbd "a") nil)
+      ;; (define-key ctl-x-map (kbd "a") nil)
       (define-key ctl-x-map (kbd "h") nil)
       (define-key ctl-x-map (kbd "v") nil)
       (define-key ctl-x-map (kbd "x") nil)

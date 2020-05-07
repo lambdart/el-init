@@ -328,6 +328,21 @@ Keymaps list will be printed on *Messages* buffer."
         (async-shell-command (format "transset -a %.1f" alpha))
       (error "Transset not found"))))
 
+(defun eos/open-scratch ()
+  "Open or switch to *scratch* buffer."
+  (interactive)
+  (let (buffer (get-buffer "*scratch*"))
+    (if buffer
+        (switch-to-buffer buffer)
+      (progn
+        (setq buffer (get-buffer-create "*scratch*"))
+        (with-current-buffer "*scratch*"
+          (when (zerop (buffer-size))
+            (insert (substitute-command-keys initial-scratch-message)))
+            (if (eq major-mode 'fundamental-mode)
+                (funcall initial-major-mode)))
+        (switch-to-buffer buffer)))))
+
 ;; add eos-theme-dir to theme load path
 (add-to-list 'custom-theme-load-path
              (concat user-emacs-directory "themes"))
@@ -373,7 +388,7 @@ Keymaps list will be printed on *Messages* buffer."
 (define-key ctl-x-map (kbd "<tab>") 'eos-complete-map)
 
 ;; non-nil means to make the cursor very visible
-(customize-set-variable 'visible-cursor nil)
+(customize-set-variable 'visible-cursor t)
 
 ;; scroll options
 ;; number of lines of margin at the top and bottom of a window
@@ -601,7 +616,10 @@ succession."
 ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
 ;; global-map
-(define-key ctl-x-map (kbd "C-a") 'eos/focus-minibuffer-or-completions)
+(global-set-key (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
+
+;; ctl-x-map
+(define-key ctl-x-map (kbd "a") 'eos/focus-minibuffer-or-completions)
 
 ;; if `file-name-shadow-mode' is active, any part of the
 ;; minibuffer text that would be ignored because of this is given the
@@ -1100,7 +1118,7 @@ The user's $HOME directory is abbreviated as a tilde."
 ;; (add-hook 'emacs-startup-hook
 ;;           (lambda ()
 ;;             (interactive)
-;;             (make-frame)
+;;             (make-frame)))
 ;;             (delete-other-frames)))
 
 ;; binds
@@ -2204,7 +2222,7 @@ sent. Add this function to `message-header-setup-hook'."
 (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
 
 ;; set tramp verbose level
-(customize-set-variable 'tramp-verbose 4)
+(customize-set-variable 'tramp-verbose 0)
 
 ;; file which keeps connection history for tramp connections.
 (customize-set-variable
@@ -3366,7 +3384,7 @@ Just a `compile` function wrapper."
 (define-key ctl-x-map (kbd "C-c") nil)
 (define-key ctl-x-map (kbd "C-j") nil)
 (define-key ctl-x-map (kbd "C-+") nil)
-;; (define-key ctl-x-map (kbd "C-a") nil)
+(define-key ctl-x-map (kbd "C-a") nil)
 (define-key ctl-x-map (kbd "C-r") nil)
 (define-key ctl-x-map (kbd "C-n") nil)
 (define-key ctl-x-map (kbd "C-z") nil)
@@ -3396,7 +3414,7 @@ Just a `compile` function wrapper."
 (define-key ctl-x-map (kbd "^") nil)
 ;; (define-key ctl-x-map (kbd "n") nil)
 ;; (define-key ctl-x-map (kbd "f") nil)
-(define-key ctl-x-map (kbd "a") nil)
+;; (define-key ctl-x-map (kbd "a") nil)
 (define-key ctl-x-map (kbd "h") nil)
 (define-key ctl-x-map (kbd "v") nil)
 (define-key ctl-x-map (kbd "x") nil)

@@ -28,31 +28,30 @@
 (deftheme mesk-term
   "Mesk theme (dark)")
 
-(let
-  (
-    (black    "#000000")
-    (red      "#af5f87")
-    (green    "#65a854")
-    (yellow   "#8d995c")
-    (blue     "#5476a8")
-    (magenta  "#9754a8")
-    (cyan     "#54a8a8")
-    (white    "#bfbfbf")
+(let ((black     "#000000")
+       (red      "#af5f87")
+       (green    "#65a854")
+       (yellow   "#8d995c")
+       (blue     "#5476a8")
+       (magenta  "#483d8b")
+       (cyan     "#54a8a8")
+       (white    "#bfbfbf")
+       (fg-white "#ffffff")
 
-    (bg-dim       "#222222") (fg-dim       "#969696")
-    (bg-orange    "#3f321f") (fg-orange    "#a88654")
-    (bg-default   "#000000") (fg-default   "#bfbfbf")
-    (bg-bright    "#3d3d3d") (fg-bright    "#ededed")
-    (bg-red       "#3f1a1a") (fg-red       "#a85454")
-    (bg-yellow    "#343922") (fg-yellow    "#8d995c")
-    (bg-green     "#263f1f") (fg-green     "#65a854")
-    (bg-turquoise "#1f3f2c") (fg-turquoise "#54a875")
-    (bg-cyan      "#1f3f3f") (fg-cyan      "#54a8a8")
-    (bg-blue      "#005f87") (fg-blue      "#5476a8")
-    (bg-purple    "#2f2a3f") (fg-purple    "#7d71a8")
-    (bg-magenta   "#381f3f") (fg-magenta   "#9754a8")
-    (bg-pink      "#3f1f32") (fg-pink      "#a85487")
-    (bg-gray      "#101010") (fg-gray      "#1d1d1d"))
+       (bg-dim       "#262626") (fg-dim       "#969696")
+       (bg-orange    "#3f321f") (fg-orange    "#a88654")
+       (bg-default   "#000000") (fg-default   "#bfbfbf")
+       (bg-bright    "#3d3d3d") (fg-bright    "#ededed")
+       (bg-red       "#3f1a1a") (fg-red       "#a85454")
+       (bg-yellow    "#343922") (fg-yellow    "#8d995c")
+       (bg-green     "#263f1f") (fg-green     "#65a854")
+       (bg-turquoise "#1f3f2c") (fg-turquoise "#54a875")
+       (bg-cyan      "#1f3f3f") (fg-cyan      "#54a8a8")
+       (bg-blue      "#005f87") (fg-blue      "#5476a8")
+       (bg-purple    "#2f2a3f") (fg-purple    "#7d71a8")
+       (bg-magenta   "#381f3f") (fg-magenta   "#9754a8")
+       (bg-pink      "#3f1f32") (fg-pink      "#a85487")
+       (bg-gray      "#0a0a0a") (fg-gray      "dim gray"))
 
   (custom-theme-set-faces
     'mesk-term
@@ -84,7 +83,7 @@
     ;;`(fringe ((t (:background unspecified :inherit default))))
     `(fringe ((t nil)))
     `(italic ((t (:slant italic))))
-    `(match ((t (:background ,yellow :foreground "#262626"))))
+    `(match ((t (:background ,yellow :foreground ,bg-dim))))
     `(nobreak-hyphen ((t (:foreground ,red))))
     `(minibuffer-prompt ((t (:foreground ,fg-blue))))
     `(warning ((t (:foreground ,fg-orange :weight unspecified))))
@@ -93,9 +92,9 @@
     `(success ((t (:foreground ,fg-green :weight bold))))
     `(trailing-whitespace ((t (:background ,fg-red))))
     `(info-node ((t (:foreground "#878700" :slant italic :weight bold))))
-    `(isearch ((t (:background "#262626" :foreground "#5f87af"))))
-    `(isearch-fail ((t (:background "#af5f5f" :foreground "#262626"))))
-    `(lazy-highlight ((t (:background "cyan" :foreground "#262626"))))
+    `(isearch ((t (:background ,blue :foreground ,white))))
+    `(isearch-fail ((t (:background "#af5f5f" :foreground ,bg-dim))))
+    `(lazy-highlight ((t (:background ,blue :foreground ,white))))
     `(line-number ((t (:inherit (shadow black)))))
     `(line-number-current-line ((t (:inherit line-number))))
     `(link-visited ((t (:foreground ,magenta :underline t))))
@@ -104,11 +103,11 @@
     ;; `(mode-line ((t nil)))))
     ;; `(mode-line-emphasis ((t nil)))
     ;; `(mode-line-inactive ((t nil)))
-    `(mode-line ((t (:background "#262626" :foreground "#bfbfbf" :box (:color "#262626" :line-width 2 :style nil)))))
-    `(mode-line-inactive ((t (:background "#262626" :foreground "dim gray" :box (:line-width 2 :color "gray15" :style nil)))))
+    `(mode-line ((t (:background ,bg-dim :foreground ,fg-bright :box (:color ,bg-dim :line-width 2 :style nil)))))
+    `(mode-line-inactive ((t (:background ,bg-dim :foreground ,fg-gray :box (:line-width 2 :color ,bg-dim :style nil)))))
     `(mode-line-buffer-id ((t (:foreground ,blue :weight normal))))
 
-    ;; `(mode-line ((t (:background "#262626" :foreground "#bfbfbf"))))
+    ;; `(mode-line ((t (:background ,bg-dim :foreground ,white))))
     ;; `(mode-line-inactive ((t (:weight 1 :background ,bg-gray :foreground ,white))))
     ;; `(mode-line-inactive ((t (:weight 1 :background ,bg-gray :foreground ,white))))
 
@@ -128,10 +127,10 @@
     `(hl-indent-block-face-6 ((t (:background ,bg-turquoise))))
     `(hl-indent-face ((t (:inherit unspecified :background ,bg-dim))))
 
-    `(hl-line ((t (:background "#262626"))))
+    `(hl-line ((t (:background ,bg-dim))))
     `(holiday ((t (:background "#af5f5f"))))
     `(homoglyph ((t (:foreground ,red))))
-    `(header-line ((t (:background "#222222" :foreground ,white))))
+    `(header-line ((t (:background ,bg-dim :foreground ,white))))
 
     `(package-status-avail-obso ((t (:foreground ,green))))
     `(popup-isearch-match ((t (:inherit black :background ,blue))))
@@ -155,17 +154,17 @@
 
     ;; Company
     `(company-preview ((t (:background unspecified :foreground ,fg-dim))))
-    `(company-preview-common ((t (:inherit nil :background "#262626" :foreground ,blue :weight normal))))
+    `(company-preview-common ((t (:inherit nil :background ,bg-dim :foreground ,blue :weight normal))))
     `(company-echo-common ((t (:background ,red :foreground "#ffd700"))))
     `(company-scrollbar-bg ((nil (:background ,bg-gray))))
     `(company-scrollbar-fg ((nil (:background ,bg-bright))))
     `(company-tooltip ((t (:foreground ,fg-default :background ,bg-gray))))
     `(company-tooltip-common ((t (:foreground ,blue))))
-    `(company-tooltip-selection ((t (:background "#262626"))))
+    `(company-tooltip-selection ((t (:background ,bg-dim))))
     `(company-tooltip-annotation ((t (:foreground ,fg-blue))))
     `(company-tooltip-search ((t (:background ,bg-yellow :inherit unspecified))))
     `(company-tooltip-search-selection ((t (:background ,bg-yellow :inherit unspecified))))
-    `(company-template-field ((t (:background "#262626" :foreground  ,yellow))))
+    `(company-template-field ((t (:background ,bg-dim :foreground  ,yellow))))
 
     ;; Compilation
     `(compilation-mode-line-exit ((t (:inherit compilation-info :foreground ,green :weight bold))))
@@ -193,9 +192,9 @@
     `(dashboard-text-banner ((t (:foreground "#8a8a8a"))))
 
     ;; Diff
-    `(diff-added ((t (:background ,green :foreground "#ffffff"))))
+    `(diff-added ((t (:background ,green :foreground ,fg-white))))
     `(diff-refine-changed ((t (:background ,yellow :foreground ,black))))
-    `(diff-removed ((t (:background "#af5f5f" :foreground "#ffffff"))))
+    `(diff-removed ((t (:background "#af5f5f" :foreground ,fg-white))))
     `(diff-changed ((t (:background ,bg-orange))))
     `(diff-file-header ((t (:foreground "#eeeeee" :background unspecified))))
     `(diff-function ((t (:inherit unspecified :foreground ,fg-orange))))
@@ -356,7 +355,7 @@
     `(helm-grep-file ((t (:foreground ,magenta :underline t))))
     `(helm-grep-lineno ((t (:foreground  ,yellow))))
     `(helm-grep-match ((t (:foreground ,red))))
-    `(helm-lisp-show-completion ((t (:background "#262626" :foreground "#5fafff"))))
+    `(helm-lisp-show-completion ((t (:background ,bg-dim :foreground "#5fafff"))))
     `(helm-rtags-token-face ((t (:inherit font-lock-warning-face :background "#1c1c1c"))))
     `(helm-visible-mark ((t (:background "#d1f5ea" :foreground ,black))))
     `(helm-selection ((t (:distant-foreground unspecified :background ,bg-dim))))
@@ -404,7 +403,7 @@
     ;; Magit
     `(magit-branch-current ((t (:inherit nil :background ,blue :foreground "#eeeeee"))))
     `(magit-branch-local ((t (:background ,magenta :foreground "#eeeeee"))))
-    `(magit-branch-remote ((t (:background ,green :foreground "#ffffff"))))
+    `(magit-branch-remote ((t (:background ,green :foreground ,fg-white))))
     `(magit-log-author ((t (:foreground ,red :slant normal :weight normal))))
     `(magit-signature-expired ((t (:foreground ,yellow))))
     `(magit-signature-revoked ((t (:foreground ,magenta))))
@@ -442,7 +441,7 @@
     ;; Transient
     `(transient-disabled-suffix ((t (:background ,red :foreground "#1c1c1c" :weight bold))))
     `(transient-enabled-suffix ((t (:background ,green :foreground "#444444" :weight bold))))
-    `(transient-separator ((t (:background "#262626" :foreground ,white))))
+    `(transient-separator ((t (:background ,bg-dim :foreground ,white))))
 
     ;; tooltip
     `(tooltip ((t (:foreground ,fg-default :background ,bg-gray))))
@@ -458,7 +457,7 @@
     `(org-agenda-structure ((t (:foreground ,fg-blue))))
 
     `(org-block ((t (:inherit shadow :background "#121212"))))
-    `(org-block-begin-line ((t (:background "#444444" :foreground "#bfbfbf" :underline nil))))
+    `(org-block-begin-line ((t (:background "#444444" :foreground ,white :underline nil))))
     `(org-block-end-line ((t (:background "#444444" :foreground ,white))))
     `(org-column ((t (:background "#1c1c1c" :strike-through nil :underline nil :slant normal :weight normal))))
     `(org-column-title ((t (:background "#1c1c1c" :underline t :weight bold))))
@@ -622,12 +621,12 @@
     `(rpm-spec-section-face ((t (:foreground ,fg-yellow :underline t))))
 
     ;;; Window dividers
-    `(window-divider ((t (:foreground "#262626"))))
+    `(window-divider ((t (:foreground ,bg-dim))))
     `(window-divider-first-pixel ((t (:foreground unspecified :inherit window-divider))))
     `(window-divider-last-pixel ((t (:foreground unspecified :inherit window-divider))))
 
     ;; vertical-border
-    ;; `(vertical-border ((((type x tty)) (:foreground "#262626"))))
+    ;; `(vertical-border ((((type x tty)) (:foreground ,bg-dim))))
     `(vertical-border ((t nil)))
     ))
 

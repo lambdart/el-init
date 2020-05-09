@@ -54,13 +54,13 @@
        (bg-orange    "#3f321f") (fg-orange    "#a88654")
        (bg-yellow    "#343922") (fg-yellow    "#8d995c")
        (bg-turquoise "#1f3f2c") (fg-turquoise "#54a875")
-       (bg-green     "#263f1f") (fg-green     "#65a854")
+       (bg-green     "#548b54") (fg-green     "#65a854")
        (bg-cyan      "#1f3f3f") (fg-cyan      "#54a8a8")
        (bg-blue      "#005f87") (fg-blue      "#5476a8")
        (bg-purple    "#2f2a3f") (fg-purple    "#7d71a8")
        (bg-magenta   "#8787af") (fg-magenta   "#9754a8")
        (bg-pink      "#3f1f32") (fg-pink      "#a85487")
-       (bg-red       "#3f1a1a") (fg-red       "#a85454"))
+       (bg-red       "#8b6969") (fg-red       "#a85454"))
 
   ;; set faces
   (custom-theme-set-faces
@@ -197,13 +197,14 @@
 
     ;; Company
     `(company-preview ((t (:background nil :foreground ,blue))))
-    `(company-preview-common ((t (:inherit nil :background ,bg-dim :foreground ,blue :weight normal))))
+    `(company-preview-common ((t (:inherit nil :background ,bg-dim
+                                   :foreground ,blue :weight normal))))
     `(company-echo-common ((t (:background ,bg-dim :foreground ,blue))))
     `(company-scrollbar-bg ((nil (:background ,bg-black))))
     `(company-scrollbar-fg ((nil (:background ,bg-dim))))
-    `(company-tooltip ((t (:foreground ,fg-default :background ,bg-black))))
+    `(company-tooltip ((t (:background ,bg-black :foreground ,fg-default))))
     `(company-tooltip-common ((t (:foreground ,blue))))
-    `(company-tooltip-selection ((t (:background ,bg-black))))
+    `(company-tooltip-selection ((t (:background ,bg-dim))))
     `(company-tooltip-annotation ((t (:foreground ,fg-blue))))
     `(company-tooltip-search ((t (:background ,bg-yellow :inherit unspecified))))
     `(company-tooltip-search-selection ((t (:background ,bg-yellow :inherit unspecified))))
@@ -215,9 +216,9 @@
     `(dashboard-text-banner ((t (:foreground ,bg-white))))
 
     ;; Diff
-    `(diff-added ((t (:background ,green :foreground ,fg-white))))
+    `(diff-added ((t (:background ,bg-green :foreground ,fg-white))))
     `(diff-refine-changed ((t (:background ,yellow :foreground ,black))))
-    `(diff-removed ((t (:background ,fg-red :foreground ,fg-white))))
+    `(diff-removed ((t (:background ,bg-red :foreground ,fg-white))))
     `(diff-changed ((t (:background ,bg-orange))))
     `(diff-file-header ((t (:foreground ,bg-white :background unspecified))))
     `(diff-function ((t (:inherit unspecified :foreground ,fg-orange))))
@@ -400,7 +401,7 @@
                                       :box (:color ,bg-blue :line-width 2 :style nil)))))
     `(magit-log-head-label-local ((t (:foreground ,bg-white :background ,bg-magenta
                                        :box (:color ,bg-magenta :line-width 2 :style nil)))))
-    `(magit-log-head-label-remote ((t (:foreground ,fg-default :background ,bg-green
+    `(magit-log-head-label-remote ((t (:foreground ,fg-white :background ,bg-green
                                         :box (:color ,bg-green :line-width 2 :style nil)))))
     `(magit-log-head-label-tags ((t (:foreground ,fg-default :background ,bg-orange
                                       :box (:color ,bg-orange :line-width 2 :style nil)))))

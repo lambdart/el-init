@@ -118,7 +118,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; y or n
+     ;; yes or no
      (defalias 'yes-or-no-p 'y-or-n-p)
 
      #+END_SRC
@@ -539,22 +539,6 @@
               (switch-to-buffer buffer)))))
 
       #+END_SRC
-
-**** Theme
-
-     Add theme directory to load-path and load the
-     default theme.
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; add eos-theme-dir to theme load path
-     (add-to-list 'custom-theme-load-path
-                  (concat user-emacs-directory "themes"))
-
-     ;; load theme
-     (load-theme 'mesk-term t)
-
-     #+END_SRC
 
 **** Binds
 
@@ -1983,14 +1967,7 @@
      (add-hook 'after-make-frame-functions
                (lambda (frame)
                  (interactive)
-                 (eos/set-frame-transparency 0.9)))
-
-     ;; fix first frame (research)
-     ;; (add-hook 'emacs-startup-hook
-     ;;           (lambda ()
-     ;;             (interactive)
-     ;;             (make-frame)))
-     ;;             (delete-other-frames)))
+                 (eos/set-frame-transparency .8)))
 
      #+END_SRC
 
@@ -4976,6 +4953,23 @@
           (funcall 'emms-default-players)))
 
       #+END_SRC
+
+*** Theme
+**** Moebius
+
+     Add theme directory to load-path and load the
+     default theme.
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; add eos-theme-dir to theme load path
+     (add-to-list 'custom-theme-load-path
+                  (concat user-emacs-directory "themes"))
+
+     ;; load theme
+     (load-theme 'moebius t)
+
+     #+END_SRC
 
 *** Icons
 **** All-the-icons

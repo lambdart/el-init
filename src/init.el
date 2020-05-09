@@ -29,7 +29,7 @@ The largest value that is representable in a Lisp integer."
             (setq gc-cons-threshold 16777216 ; 16mb
                   gc-cons-percentage 0.1)))
 
-;; y or n
+;; yes or no
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (defvar eos-file-name-handler-alist
@@ -342,13 +342,6 @@ Keymaps list will be printed on *Messages* buffer."
             (if (eq major-mode 'fundamental-mode)
                 (funcall initial-major-mode)))
         (switch-to-buffer buffer)))))
-
-;; add eos-theme-dir to theme load path
-(add-to-list 'custom-theme-load-path
-             (concat user-emacs-directory "themes"))
-
-;; load theme
-(load-theme 'mesk-term t)
 
 ;; line movement
 (global-set-key (kbd "C-a") 'eos/move-beginning-of-line)
@@ -1112,14 +1105,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (add-hook 'after-make-frame-functions
           (lambda (frame)
             (interactive)
-            (eos/set-frame-transparency 0.9)))
-
-;; fix first frame (research)
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (interactive)
-;;             (make-frame)))
-;;             (delete-other-frames)))
+            (eos/set-frame-transparency .8)))
 
 ;; binds
 (global-set-key (kbd "C-x C-o") 'other-frame)
@@ -2365,6 +2351,13 @@ sent. Add this function to `message-header-setup-hook'."
   (progn
     (funcall 'emms-all)
     (funcall 'emms-default-players)))
+
+;; add eos-theme-dir to theme load path
+(add-to-list 'custom-theme-load-path
+             (concat user-emacs-directory "themes"))
+
+;; load theme
+(load-theme 'moebius t)
 
 (when (require 'all-the-icons nil t)
   (progn

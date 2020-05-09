@@ -1027,11 +1027,11 @@ instead."
     (unless bounds
       (setq string (read-string "Occur: ")))
     (if bounds
-        (occur (buffer-substring-no-properties
-                (car bounds) (cdr bounds)))
-      (if string
-          (occur string)
-        (message "Missing candidate")))))
+        (progn
+          (occur (buffer-substring-no-properties
+                  (car bounds) (cdr bounds)))
+          (deactivate-mark))
+      (occur string))))
 
 (global-set-key (kbd "M-s M-o") 'eos/occur-at-point)))
 
@@ -2242,8 +2242,8 @@ sent. Add this function to `message-header-setup-hook'."
 (defun eos/scrot ()
   "Call scrot utility."
   (interactive)
-  (message "Saved in %s directory" (pwd))
-  (eos-call-proc "scrot" nil))
+  (eos-call-proc "scrot" nil)
+  (message "Saved in %s directory" (pwd)))
 
 ;; global-map
 (global-set-key (kbd "<print>") 'eos/scrot)
@@ -3542,7 +3542,7 @@ Just a `compile` function wrapper."
 (global-unset-key (kbd "<S-down-mouse-1>"))
 
 ;; set term to ecolor
-(setenv "TERM" "eterm-color")
+(setenv "TERM" "xterm")
 
 ;; the full name of the user logged in
 (customize-set-variable 'user-login-name (getenv "USER"))

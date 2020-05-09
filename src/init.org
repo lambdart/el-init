@@ -1777,11 +1777,11 @@
          (unless bounds
            (setq string (read-string "Occur: ")))
          (if bounds
-             (occur (buffer-substring-no-properties
-                     (car bounds) (cdr bounds)))
-           (if string
-               (occur string)
-             (message "Missing candidate")))))
+             (progn
+               (occur (buffer-substring-no-properties
+                       (car bounds) (cdr bounds)))
+               (deactivate-mark))
+           (occur string))))
 
      #+END_SRC
 
@@ -4775,8 +4775,8 @@
       (defun eos/scrot ()
         "Call scrot utility."
         (interactive)
-        (message "Saved in %s directory" (pwd))
-        (eos-call-proc "scrot" nil))
+        (eos-call-proc "scrot" nil)
+        (message "Saved in %s directory" (pwd)))
 
       #+END_SRC
 
@@ -7362,7 +7362,7 @@
     #+BEGIN_SRC emacs-lisp
 
     ;; set term to ecolor
-    (setenv "TERM" "eterm-color")
+    (setenv "TERM" "xterm")
 
     ;; the full name of the user logged in
     (customize-set-variable 'user-login-name (getenv "USER"))

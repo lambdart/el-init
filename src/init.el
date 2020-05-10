@@ -137,7 +137,9 @@ The largest value that is representable in a Lisp integer."
 (defun eos-call-func (func &rest args)
   "Call FUNC with ARGS, if it's bounded."
   (when (fboundp func)
-    (funcall func args)))
+    (if args
+        (funcall func args)
+      (funcall func))))
 
 (defun eos-edit-move-lines (n)
   "Move N lines, up if N is positive, else down."
@@ -339,8 +341,8 @@ Keymaps list will be printed on *Messages* buffer."
         (with-current-buffer "*scratch*"
           (when (zerop (buffer-size))
             (insert (substitute-command-keys initial-scratch-message)))
-            (if (eq major-mode 'fundamental-mode)
-                (funcall initial-major-mode)))
+          (if (eq major-mode 'fundamental-mode)
+              (funcall initial-major-mode)))
         (switch-to-buffer buffer)))))
 
 ;; line movement
@@ -1367,7 +1369,7 @@ The user's $HOME directory is abbreviated as a tilde."
 (add-hook 'exwm-init-hook
           (lambda ()
             (interactive)
-            (eos/set-frame-transparency 0.9)))
+            (eos/set-frame-transparency 0.8)))
 
 ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
 ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
@@ -1607,6 +1609,24 @@ The user's $HOME directory is abbreviated as a tilde."
   (progn
     (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
     (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))))
+
+(require 'all-the-icons nil t)
+
+;; whether or not to include a foreground colour when formatting the icon
+(customize-set-variable 'all-the-icons-color-icons t)
+
+;; the default adjustment to be made to the `raise' display property of an icon
+(customize-set-variable 'all-the-icons-default-adjust -0.2)
+
+;; the base Scale Factor for the `height' face property of an icon
+(customize-set-variable 'all-the-icons-scale-factor 1.0)
+
+;; add eos-theme-dir to theme load path
+(add-to-list 'custom-theme-load-path
+             (concat user-emacs-directory "themes"))
+
+;; load theme
+(load-theme 'moebius t)
 
 (when (require 'artist nil t)
   (progn
@@ -2119,6 +2139,38 @@ sent. Add this function to `message-header-setup-hook'."
 ;; clt-x-map (C-x) prefix
 (define-key ctl-x-map (kbd "C-l") 'dmenu)))
 
+(when (require 'verb nil t)
+  (progn
+
+(add-hook 'org-ctrl-c-ctrl-c-hook
+          (lambda ()
+            (when (boundp 'verb-mode)
+              (if verb-mode
+                  (eos-call-func 'verb-send-request-on-point 'this-window)))))))
+
+(require 'tramp nil t)
+
+;; set tramp default method
+(customize-set-variable 'tramp-default-method "ssh")
+
+;; if non-nil, chunksize for sending input to local process.
+;; (customize-set-variable 'tramp-chunksize 512)
+
+;; a value of t would require an immediate reread during filename completion,
+;; nil means to use always cached values for the directory contents.
+(customize-set-variable 'tramp-completion-reread-directory-timeout nil)
+
+;; set tramp verbose level
+(customize-set-variable 'tramp-verbose 0)
+
+;; file which keeps connection history for tramp connections.
+(customize-set-variable
+ 'tramp-persistency-file-name
+ (concat (expand-file-name user-emacs-directory) "cache/tramp"))
+
+;; connection timeout in seconds
+(customize-set-variable 'tramp-connection-timeout 60)
+
 (when (require 'comint nil t)
   (progn
 
@@ -2186,38 +2238,6 @@ sent. Add this function to `message-header-setup-hook'."
 ;; start compton after emacs initialize
 (add-hook 'after-init-hook #'eos/compton)
 
-(when (require 'verb nil t)
-  (progn
-
-(add-hook 'org-ctrl-c-ctrl-c-hook
-          (lambda ()
-            (when (boundp 'verb-mode)
-              (if verb-mode
-                  (eos-call-func 'verb-send-request-on-point 'this-window)))))))
-
-(require 'tramp nil t)
-
-;; set tramp default method
-(customize-set-variable 'tramp-default-method "ssh")
-
-;; if non-nil, chunksize for sending input to local process.
-;; (customize-set-variable 'tramp-chunksize 512)
-
-;; a value of t would require an immediate reread during filename completion,
-;; nil means to use always cached values for the directory contents.
-(customize-set-variable 'tramp-completion-reread-directory-timeout nil)
-
-;; set tramp verbose level
-(customize-set-variable 'tramp-verbose 0)
-
-;; file which keeps connection history for tramp connections.
-(customize-set-variable
- 'tramp-persistency-file-name
- (concat (expand-file-name user-emacs-directory) "cache/tramp"))
-
-;; connection timeout in seconds
-(customize-set-variable 'tramp-connection-timeout 60)
-
 (defun eos/slock ()
   "Call slock utility."
   (interactive)
@@ -2254,8 +2274,7 @@ sent. Add this function to `message-header-setup-hook'."
 (global-set-key (kbd "s--") 'eos/reduce-volume)
 (global-set-key (kbd "s-=") 'eos/raise-volume)
 
-(when (require 'dashboard nil t)
-  (progn
+(require 'dashboard nil t)
 
 ;; association list of items to show in the startup buffer.
 (customize-set-variable 'dashboard-items
@@ -2280,28 +2299,27 @@ sent. Add this function to `message-header-setup-hook'."
 (customize-set-variable 'dashboard-footer-icon
                         #(" " 0 1 (face dashboard-footer)))
 
-;; a footer with some short message
-(customize-set-variable 'dashboard-footer
-                        "Litany Against Fear
-
- I must not fear.
- Fear is the mind-killer.
- Fear is the little-death that brings total obliteration.
- I will face my fear.
- I will permit it to pass over me and through me.
- And when it has gone past I will turn the inner eye to see its path.
- Where the fear has gone there will be nothing.
- Only I will remain.
- ")
-
 ;; when non nil, a footer will be displayed at the bottom.
-(customize-set-variable 'dashboard-set-footer t)
+(customize-set-variable 'dashboard-set-footer nil)
+
+
+(customize-set-variable
+ 'dashboard-footer "Litany Against Fear
+
+I must not fear.
+Fear is the mind-killer.
+Fear is the little-death that brings total obliteration.
+I will face my fear.
+I will permit it to pass over me and through me.
+And when it has gone past I will turn the inner eye to see its path.
+Where the fear has gone there will be nothing.
+Only I will remain.")
 
 ;; a list of messages, one of which dashboard chooses to display
 (customize-set-variable 'dashboard-footer-messages nil)
 
 ;; when non nil, file lists will have icons
-(customize-set-variable 'dashboard-set-file-icons t)
+(customize-set-variable 'dashboard-set-file-icons nil)
 
 ;; when non nil, heading sections will have icons
 (customize-set-variable 'dashboard-set-heading-icons nil)
@@ -2314,8 +2332,29 @@ sent. Add this function to `message-header-setup-hook'."
                               (setq initial-buffer (get-buffer "*scratch*")))
                             initial-buffer)))
 
+(defun eos/dashboard/open-buffer ()
+  "Opens or switch to *dashboard* buffer."
+  (interactive)
+  (unless (get-buffer "*dashboard*")
+    (generate-new-buffer "*dashboard*"))
+  (eos-call-func 'dashboard-refresh-buffer))
+
+(defun eos-dashboard-insert-footer ()
+  "Insert dashboard-footer message."
+  (read-only-mode 0)
+  (when (boundp 'dashboard-footer)
+    (insert (propertize dashboard-footer 'face 'dashboard-footer)))
+  (insert "\n")
+  (read-only-mode 1))
+
 ;; init dashboard after emacs initialize
-(add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
+(add-hook 'after-init-hook 'dashboard-setup-startup-hook)
+
+;; insert footer
+(add-hook 'dashboard-mode-hook
+          (lambda ()
+            (interactive)
+            (eos-dashboard-insert-footer)))
 
 (require 'emms nil t)
 (require 'emms-setup nil t)
@@ -2351,25 +2390,6 @@ sent. Add this function to `message-header-setup-hook'."
   (progn
     (funcall 'emms-all)
     (funcall 'emms-default-players)))
-
-;; add eos-theme-dir to theme load path
-(add-to-list 'custom-theme-load-path
-             (concat user-emacs-directory "themes"))
-
-;; load theme
-(load-theme 'moebius t)
-
-(when (require 'all-the-icons nil t)
-  (progn
-
-;; whether or not to include a foreground colour when formatting the icon
-(customize-set-variable 'all-the-icons-color-icons nil)
-
-;; the default adjustment to be made to the `raise' display property of an icon
-(customize-set-variable 'all-the-icons-default-adjust -0.0)
-
-;; the base Scale Factor for the `height' face property of an icon
-(customize-set-variable 'all-the-icons-scale-factor 1.0)))
 
 (require 'org nil t)
 
@@ -2715,9 +2735,9 @@ The tangled file will be compiled."
 (require 'rfc-mode nil t)
 
 ;; the directory where RFC documents are stored
-;; (customize-set-variable
-;;  'rfc-mode-directory
-;;  (concat (expand-file-name user-emacs-directory) "rfc/"))))
+(customize-set-variable
+ 'rfc-mode-directory
+ (concat (expand-file-name user-emacs-directory) "rfc/"))
 
 (require 'company nil t)
 

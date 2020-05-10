@@ -290,7 +290,9 @@
       (defun eos-call-func (func &rest args)
         "Call FUNC with ARGS, if it's bounded."
         (when (fboundp func)
-          (funcall func args)))
+          (if args
+              (funcall func args)
+            (funcall func))))
 
       #+END_SRC
 
@@ -534,8 +536,8 @@
               (with-current-buffer "*scratch*"
                 (when (zerop (buffer-size))
                   (insert (substitute-command-keys initial-scratch-message)))
-                  (if (eq major-mode 'fundamental-mode)
-                      (funcall initial-major-mode)))
+                (if (eq major-mode 'fundamental-mode)
+                    (funcall initial-major-mode)))
               (switch-to-buffer buffer)))))
 
       #+END_SRC
@@ -2646,7 +2648,7 @@
       (add-hook 'exwm-init-hook
                 (lambda ()
                   (interactive)
-                  (eos/set-frame-transparency 0.9)))
+                  (eos/set-frame-transparency 0.8)))
 
       ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
       ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
@@ -3313,6 +3315,54 @@
           (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))))
 
       #+END_SRC
+
+*** Icons
+**** All-the-icons
+
+     This package is a utility for using and formatting various Icon
+     fonts within Emacs.  Icon Fonts allow you to propertize and format
+     icons the same way you would normal text. This enables things such
+     as better scaling of and anti aliasing of the icons.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'all-the-icons nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; whether or not to include a foreground colour when formatting the icon
+      (customize-set-variable 'all-the-icons-color-icons t)
+
+      ;; the default adjustment to be made to the `raise' display property of an icon
+      (customize-set-variable 'all-the-icons-default-adjust -0.2)
+
+      ;; the base Scale Factor for the `height' face property of an icon
+      (customize-set-variable 'all-the-icons-scale-factor 1.0)
+
+      #+END_SRC
+
+*** Theme
+**** Moebius
+
+     Add theme directory to load-path and load the
+     default theme.
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; add eos-theme-dir to theme load path
+     (add-to-list 'custom-theme-load-path
+                  (concat user-emacs-directory "themes"))
+
+     ;; load theme
+     (load-theme 'moebius t)
+
+     #+END_SRC
 
 *** Graphics
 **** Artist
@@ -4458,6 +4508,78 @@
 
       #+END_SRC
 
+*** Network
+**** Verb
+
+     Verb is a package that allows you to organize and send HTTP
+     requests from Emacs.  See the project's README.md file for more
+     details.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'verb nil t)
+        (progn
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'org-ctrl-c-ctrl-c-hook
+                (lambda ()
+                  (when (boundp 'verb-mode)
+                    (if verb-mode
+                        (eos-call-func 'verb-send-request-on-point 'this-window)))))))
+
+      #+END_SRC
+
+**** Tramp
+
+     TRAMP is for transparently accessing remote files from within Emacs.
+     TRAMP enables an easy, convenient, and consistent interface to remote
+     files as if they are local files.  TRAMP’s transparency extends to
+     editing, version control, and dired.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'tramp nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; set tramp default method
+      (customize-set-variable 'tramp-default-method "ssh")
+
+      ;; if non-nil, chunksize for sending input to local process.
+      ;; (customize-set-variable 'tramp-chunksize 512)
+
+      ;; a value of t would require an immediate reread during filename completion,
+      ;; nil means to use always cached values for the directory contents.
+      (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
+
+      ;; set tramp verbose level
+      (customize-set-variable 'tramp-verbose 0)
+
+      ;; file which keeps connection history for tramp connections.
+      (customize-set-variable
+       'tramp-persistency-file-name
+       (concat (expand-file-name user-emacs-directory) "cache/tramp"))
+
+      ;; connection timeout in seconds
+      (customize-set-variable 'tramp-connection-timeout 60)
+
+      #+END_SRC
+
+**** Mentor
+
 *** Interpreters
 
     Generic interpreter interface configurations and customization,
@@ -4652,77 +4774,6 @@
 
 *** Calculators
 **** Calc
-*** Network
-**** Verb
-
-     Verb is a package that allows you to organize and send HTTP
-     requests from Emacs.  See the project's README.md file for more
-     details.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'verb nil t)
-        (progn
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'org-ctrl-c-ctrl-c-hook
-                (lambda ()
-                  (when (boundp 'verb-mode)
-                    (if verb-mode
-                        (eos-call-func 'verb-send-request-on-point 'this-window)))))))
-
-      #+END_SRC
-
-**** Tramp
-
-     TRAMP is for transparently accessing remote files from within Emacs.
-     TRAMP enables an easy, convenient, and consistent interface to remote
-     files as if they are local files.  TRAMP’s transparency extends to
-     editing, version control, and dired.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'tramp nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; set tramp default method
-      (customize-set-variable 'tramp-default-method "ssh")
-
-      ;; if non-nil, chunksize for sending input to local process.
-      ;; (customize-set-variable 'tramp-chunksize 512)
-
-      ;; a value of t would require an immediate reread during filename completion,
-      ;; nil means to use always cached values for the directory contents.
-      (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
-
-      ;; set tramp verbose level
-      (customize-set-variable 'tramp-verbose 0)
-
-      ;; file which keeps connection history for tramp connections.
-      (customize-set-variable
-       'tramp-persistency-file-name
-       (concat (expand-file-name user-emacs-directory) "cache/tramp"))
-
-      ;; connection timeout in seconds
-      (customize-set-variable 'tramp-connection-timeout 60)
-
-      #+END_SRC
-
-**** Mentor
 *** Controllers
 **** Slock
 ***** Functions
@@ -4810,8 +4861,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'dashboard nil t)
-        (progn
+      (require 'dashboard nil t)
 
       #+END_SRC
 
@@ -4842,28 +4892,27 @@
       (customize-set-variable 'dashboard-footer-icon
                               #(" " 0 1 (face dashboard-footer)))
 
-      ;; a footer with some short message
-      (customize-set-variable 'dashboard-footer
-                              "Litany Against Fear
-
-       I must not fear.
-       Fear is the mind-killer.
-       Fear is the little-death that brings total obliteration.
-       I will face my fear.
-       I will permit it to pass over me and through me.
-       And when it has gone past I will turn the inner eye to see its path.
-       Where the fear has gone there will be nothing.
-       Only I will remain.
-       ")
-
       ;; when non nil, a footer will be displayed at the bottom.
-      (customize-set-variable 'dashboard-set-footer t)
+      (customize-set-variable 'dashboard-set-footer nil)
+
+
+      (customize-set-variable
+       'dashboard-footer "Litany Against Fear
+
+      I must not fear.
+      Fear is the mind-killer.
+      Fear is the little-death that brings total obliteration.
+      I will face my fear.
+      I will permit it to pass over me and through me.
+      And when it has gone past I will turn the inner eye to see its path.
+      Where the fear has gone there will be nothing.
+      Only I will remain.")
 
       ;; a list of messages, one of which dashboard chooses to display
       (customize-set-variable 'dashboard-footer-messages nil)
 
       ;; when non nil, file lists will have icons
-      (customize-set-variable 'dashboard-set-file-icons t)
+      (customize-set-variable 'dashboard-set-file-icons nil)
 
       ;; when non nil, heading sections will have icons
       (customize-set-variable 'dashboard-set-heading-icons nil)
@@ -4878,12 +4927,39 @@
 
       #+END_SRC
 
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/dashboard/open-buffer ()
+        "Opens or switch to *dashboard* buffer."
+        (interactive)
+        (unless (get-buffer "*dashboard*")
+          (generate-new-buffer "*dashboard*"))
+        (eos-call-func 'dashboard-refresh-buffer))
+
+      (defun eos-dashboard-insert-footer ()
+        "Insert dashboard-footer message."
+        (read-only-mode 0)
+        (when (boundp 'dashboard-footer)
+          (insert (propertize dashboard-footer 'face 'dashboard-footer)))
+        (insert "\n")
+        (read-only-mode 1))
+
+      #+END_SRC
+
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
       ;; init dashboard after emacs initialize
-      (add-hook 'after-init-hook 'dashboard-setup-startup-hook)))
+      (add-hook 'after-init-hook 'dashboard-setup-startup-hook)
+
+      ;; insert footer
+      (add-hook 'dashboard-mode-hook
+                (lambda ()
+                  (interactive)
+                  (eos-dashboard-insert-footer)))
 
       #+END_SRC
 
@@ -4951,55 +5027,6 @@
         (progn
           (funcall 'emms-all)
           (funcall 'emms-default-players)))
-
-      #+END_SRC
-
-*** Theme
-**** Moebius
-
-     Add theme directory to load-path and load the
-     default theme.
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; add eos-theme-dir to theme load path
-     (add-to-list 'custom-theme-load-path
-                  (concat user-emacs-directory "themes"))
-
-     ;; load theme
-     (load-theme 'moebius t)
-
-     #+END_SRC
-
-*** Icons
-**** All-the-icons
-
-     This package is a utility for using and formatting various Icon
-     fonts within Emacs.  Icon Fonts allow you to propertize and format
-     icons the same way you would normal text. This enables things such
-     as better scaling of and anti aliasing of the icons.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'all-the-icons nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; whether or not to include a foreground colour when formatting the icon
-      (customize-set-variable 'all-the-icons-color-icons nil)
-
-      ;; the default adjustment to be made to the `raise' display property of an icon
-      (customize-set-variable 'all-the-icons-default-adjust -0.0)
-
-      ;; the base Scale Factor for the `height' face property of an icon
-      (customize-set-variable 'all-the-icons-scale-factor 1.0)))
 
       #+END_SRC
 
@@ -5692,11 +5719,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-
       ;; the directory where RFC documents are stored
-      ;; (customize-set-variable
-      ;;  'rfc-mode-directory
-      ;;  (concat (expand-file-name user-emacs-directory) "rfc/"))))
+      (customize-set-variable
+       'rfc-mode-directory
+       (concat (expand-file-name user-emacs-directory) "rfc/"))
 
       #+END_SRC
 

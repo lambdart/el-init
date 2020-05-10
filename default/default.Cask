@@ -40,8 +40,9 @@
 (depends-on "google-translate")
 
 ;; documentation
-;; (depends-on "rfc-mode")
 (depends-on "dash-docs")
+(depends-on "rfc-mode"
+            :git "https://github.com/esac-io/rfc-mode")
 
 ;; multimedia
 (depends-on "emms")

@@ -211,9 +211,9 @@
     `(company-template-field ((t (:background ,bg-dim :foreground ,yellow))))
 
     ;; Dashboard
-    `(dashboard-footer ((t (:foreground ,fg-red))))
+    `(dashboard-footer ((t (:foreground ,fg-black))))
     `(dashboard-heading ((t (:foreground ,blue))))
-    `(dashboard-text-banner ((t (:foreground ,bg-white))))
+    `(dashboard-text-banner ((t (:foreground ,fg-black))))
 
     ;; Diff
     `(diff-added ((t (:background ,bg-green :foreground ,fg-white))))
@@ -539,6 +539,7 @@
     `(smerge-lower ((t (:background ,green :foreground ,bg-bright))))
 
     ;; Term
+    `(term-bold ((t (:foreground ,fg-default))))
     `(term-color-black ((t (:background ,bg-default :foreground ,fg-bright))))
     `(term-color-blue ((t (:background ,bg-blue :foreground ,fg-blue))))
     `(term-color-cyan ((t (:background ,bg-cyan :foreground ,fg-cyan))))

@@ -328,7 +328,16 @@ Keymaps list will be printed on *Messages* buffer."
   (let ((alpha (or alpha 1.0)))
     (if (executable-find "transset")
         (async-shell-command (format "transset -a %.1f" alpha))
-      (error "Transset not found"))))
+      (message "transset not found"))))
+
+(defun eos/set-background (&optional file-name)
+  "Set FILE-NAME as background using feh binary."
+  (interactive "P")
+  (setq file-name (or file-name
+                      (read-file-name "Image: ")))
+  (if (executable-find "feh")
+      (async-shell-command (format "feh  --bg-fill %s" file-name))
+    (message "feh not found")))
 
 (defun eos/open-scratch ()
   "Open or switch to *scratch* buffer."
@@ -499,7 +508,7 @@ Keymaps list will be printed on *Messages* buffer."
 (customize-set-variable 'ibuffer-default-sorting-mode 'filename/process)
 
 ;; if non-nil, display the current Ibuffer buffer itself
-(customize-set-variable 'ibuffer-view-ibuffer t)
+(customize-set-variable 'ibuffer-view-ibuffer nil)
 
 
 
@@ -1308,7 +1317,7 @@ The user's $HOME directory is abbreviated as a tilde."
                                         (lambda ()
                                           (interactive)
                                           (exwm-workspace-switch-create ,i))))
-                                    (number-sequence 0))))
+                                    (number-sequence 0 2))))
 
 ;; The following example demonstrates how to use simulation keys to mimic
 ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
@@ -2415,7 +2424,18 @@ Only I will remain.")
 
 ;; languages which can be evaluated in Org buffers.
 (customize-set-variable 'org-babel-load-languages
-                        '((emacs-lisp . t)
+                        '((lisp . t)
+                          (emacs-lisp . t)
+                          (calc . t)
+                          (R . t)
+                          (haskell . t)
+                          (octave . t)
+                          (latex . t)
+                          (sed . t)
+                          (shell . t)
+                          (sqlite . t)
+                          (lua . t)
+                          (perl . t)
                           (python . t)))
 
 (defun eos/build ()

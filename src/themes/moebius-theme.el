@@ -47,9 +47,9 @@
        (bg-bright    "#3d3d3d") (fg-bright    "#ededed")
 
        ;; background and front colors
-       (bg-white     "#f5f5f5") (fg-white     "#ffffff")
+       (bg-white     "#d3d3d3") (fg-white     "#bfbfbf")
        (bg-black     "#0a0a0a") (fg-black     "#666666")
-       (bg-dim       "#242424") (fg-dim       "#969696")
+       (bg-dim       "#171717") (fg-dim       "#969696")
        (bg-gray      "#696969") (fg-gray      "#a9a9a9")
        (bg-orange    "#3f321f") (fg-orange    "#a88654")
        (bg-yellow    "#343922") (fg-yellow    "#8d995c")
@@ -182,9 +182,9 @@
     `(css-selector ((t (:foreground ,fg-blue))))
 
     ;; Custom
-    `(custom-button ((t (:background ,bg-white :foreground ,fg-bright
+    `(custom-button ((t (:background ,bg-white :foreground ,bg-black
                           :box (:line-width 1 :color ,bg-white)
-                          :weight ultra-light :height 1.0 :width ultra-condensed))))
+                          :weight ultra-light :height 1.1 :width ultra-condensed))))
     `(custom-button-pressed-unraised ((t (:inherit custom-button-unraised :foreground ,red))))
     `(custom-changed ((t (:background ,blue :foreground ,white))))
     `(custom-comment-tag ((t (:foreground ,blue))))

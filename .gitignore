@@ -132,12 +132,9 @@ todo
 lisp
 backup
 blog
+nsm
 
 # Emacs private/custom elisp files
 custom.el
 private.el
 adapt.el
-yoshi-theme.el
-
-# docs
-README.txt

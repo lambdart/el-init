@@ -521,18 +521,18 @@
         "Set OPACITY transparency in current frame."
         (interactive "P")
         (let ((opacity (or opacity
-                           (read-number "Opacity:" .8))))
+                           (read-number "Opacity: " 0.8))))
           (if (executable-find "transset")
               (async-shell-command (format "transset -a %.1f" opacity))
             (message "transset not found"))))
 
-      (defun eos/set-background (&optional file-name)
-        "Set FILE-NAME as background using feh binary."
+      (defun eos/set-background-image (&optional image-file)
+        "Set IMAGE-FILE as background using feh binary."
         (interactive "P")
-        (setq file-name (or file-name
+        (setq image-file (or image-file
                             (read-file-name "Image: ")))
         (if (executable-find "feh")
-            (async-shell-command (format "feh  --bg-fill %s" file-name))
+            (async-shell-command (format "feh  --bg-fill %s" image-file))
           (message "feh not found")))
 
       (defun eos/open-scratch ()
@@ -4316,6 +4316,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; todo research (not working)
       ;; (add-to-list 'display-buffer-alist
       ;;              '("\\*Choices\\*"
       ;;                (display-buffer-below-selected display-buffer-at-bottom)
@@ -4345,8 +4346,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; enable globally
-      (ispell-minor-mode 1)
+      ;; enable globally after emacs startup
+      ;; (add-hook 'emacs-startup-hook
+      ;;           (lambda () (ispell-minor-mode 1)))
 
       #+END_SRC
 
@@ -5125,13 +5127,16 @@
       The tangled file will be compiled."
         (interactive)
         (let ((prog-mode-hook nil) ; avoid running hooks when tangling.
-              (buffer (current-buffer)))
-          (find-file (expand-file-name
-                      "init.org"
-                      user-emacs-directory)) ; switch or open init.org
-          (org-babel-tangle) ; tangle source blocks
-          (byte-compile-file (concat user-emacs-directory "init.el")) ; compile
-          (switch-to-buffer buffer))) ; switch back
+              (eos-org-file (expand-file-name "eos.org" user-emacs-directory))
+              (eos-el-file  (expand-file-name "eos.el" user-emacs-directory))
+              (init-file    (expand-file-name "init.el" user-emacs-directory)))
+          ;; read, tangle, copy and byte compile
+          (save-restriction
+            (save-excursion
+              (find-file eos-org-file)
+              (org-babel-tangle)
+              (copy-file eos-el-file init-file t t t)
+              (byte-compile-file init-file nil)))))
 
       (defun eos/org/set-company-backends ()
         "Set `org-mode' company backends."
@@ -5940,13 +5945,18 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; binds eos-complete-map
       (define-key eos-complete-map (kbd "e") 'yas-expand)
       (define-key eos-complete-map (kbd "i") 'yas-insert-snippet)
       (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)
 
-      (when (boundp 'yas-keymap)
-        (define-key yas-keymap (kbd "<tab>") nil)
-        (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))
+      ;; binds yas-keymap
+      (add-hook 'yas-minor-mode-hook
+                (lambda ()
+                  (when (boundp 'yas-keymap)
+                    (define-key yas-keymap (kbd "TAB") nil)
+                    (define-key yas-keymap (kbd "<tab>") nil)
+                    (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))))
 
       #+END_SRC
 
@@ -5954,7 +5964,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eos-call-func 'yas-global-mode 1)
+      ;; enable yasnippet after emacs startup
+      (add-hook 'emacs-startup-hook
+                (lambda ()
+                  (eos-call-func 'yas-global-mode 1)))
 
       #+END_SRC
 

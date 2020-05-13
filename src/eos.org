@@ -7418,8 +7418,8 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; set term to ecolor
-    (setenv "TERM" "xterm")
+    ;; set term to eterm-color
+    ;; (setenv "TERM" "eterm-color")
 
     ;; the full name of the user logged in
     (customize-set-variable 'user-login-name (getenv "USER"))

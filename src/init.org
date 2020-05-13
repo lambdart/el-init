@@ -129,7 +129,7 @@
 
      (defvar eos-file-name-handler-alist
        file-name-handler-alist
-       "Save file-name-handler-alist")
+       "Save `file-name-handler-alist' variable.")
 
      #+END_SRC
 
@@ -517,12 +517,13 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/set-frame-transparency (alpha)
-        "Set transparency level defined by ALPHA in current frame."
-        (interactive "nAlpha: ")
-        (let ((alpha (or alpha 1.0)))
+      (defun eos/set-frame-transparency (&optional opacity)
+        "Set OPACITY transparency in current frame."
+        (interactive "P")
+        (let ((opacity (or opacity
+                           (read-number "Opacity:" .8))))
           (if (executable-find "transset")
-              (async-shell-command (format "transset -a %.1f" alpha))
+              (async-shell-command (format "transset -a %.1f" opacity))
             (message "transset not found"))))
 
       (defun eos/set-background (&optional file-name)
@@ -1986,7 +1987,13 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; binds
+     ;; ctl-x-5-map (frame prefix map)
+     (define-key ctl-x-5-map (kbd "t")
+       ((lambda ()
+          (interactive)
+          (eos/set-frame-transparency 1))))
+
+     ;; global map
      (global-set-key (kbd "C-x C-o") 'other-frame)
 
      #+END_SRC
@@ -2541,7 +2548,7 @@
 **** Exwm
 
      EXWM (Emacs X Window Manager) is a full-featured tiling X window manager
-     for Emacs built on top of [XELB].
+     for Emacs built on top of XELB.
 
 ***** Require
 
@@ -2737,8 +2744,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'nsm nil t)
-        (progn
+      (require 'nsm nil t)
 
       #+END_SRC
 
@@ -2756,8 +2762,8 @@
       (customize-set-variable 'network-security-level 'paranoid)
 
       ;; the file the security manager settings will be stored in.
-      (customize-set-variable 'nsm-setting-file
-                              (expand-file-name "cache/netword-security-data" user-emacs-directory))))
+      (customize-set-variable 'nsm-settings-file
+                              (expand-file-name "nsm/netword-security.data" user-emacs-directory))
 
       #+END_SRC
 
@@ -7424,5 +7430,4 @@
 
 ** EOF
 
-   "See You Space Cowboy.."
-   | Cowboy Bebop |
+   See You Space Cowboy...

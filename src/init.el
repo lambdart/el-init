@@ -34,7 +34,7 @@ The largest value that is representable in a Lisp integer."
 
 (defvar eos-file-name-handler-alist
   file-name-handler-alist
-  "Save file-name-handler-alist")
+  "Save `file-name-handler-alist' variable.")
 
 (defvar eos-tags-map
   (make-sparse-keymap)
@@ -322,12 +322,13 @@ Keymaps list will be printed on *Messages* buffer."
                 (when (functionp (lookup-key (symbol-value ob) key))
                   (message "%s" ob))))))
 
-(defun eos/set-frame-transparency (alpha)
-  "Set transparency level defined by ALPHA in current frame."
-  (interactive "nAlpha: ")
-  (let ((alpha (or alpha 1.0)))
+(defun eos/set-frame-transparency (&optional opacity)
+  "Set OPACITY transparency in current frame."
+  (interactive "P")
+  (let ((opacity (or opacity
+                     (read-number "Opacity:" .8))))
     (if (executable-find "transset")
-        (async-shell-command (format "transset -a %.1f" alpha))
+        (async-shell-command (format "transset -a %.1f" opacity))
       (message "transset not found"))))
 
 (defun eos/set-background (&optional file-name)
@@ -1118,7 +1119,13 @@ The user's $HOME directory is abbreviated as a tilde."
             (interactive)
             (eos/set-frame-transparency .8)))
 
-;; binds
+;; ctl-x-5-map (frame prefix map)
+(define-key ctl-x-5-map (kbd "t")
+  ((lambda ()
+     (interactive)
+     (eos/set-frame-transparency 1))))
+
+;; global map
 (global-set-key (kbd "C-x C-o") 'other-frame)
 
 ;; enable window divider
@@ -1417,8 +1424,7 @@ The user's $HOME directory is abbreviated as a tilde."
 
 ;; (exwm-randr-enable)
 
-(when (require 'nsm nil t)
-  (progn
+(require 'nsm nil t)
 
 ;; if a potential problem with the security of the network
 ;; connection is found, the user is asked to give input
@@ -1430,8 +1436,8 @@ The user's $HOME directory is abbreviated as a tilde."
 (customize-set-variable 'network-security-level 'paranoid)
 
 ;; the file the security manager settings will be stored in.
-(customize-set-variable 'nsm-setting-file
-                        (expand-file-name "cache/netword-security-data" user-emacs-directory))))
+(customize-set-variable 'nsm-settings-file
+                        (expand-file-name "nsm/netword-security.data" user-emacs-directory))
 
 (require 'eps-config nil t)
 

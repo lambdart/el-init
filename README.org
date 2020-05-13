@@ -18,7 +18,7 @@
 
   So, my advise is: read emacs/elisp manual and write
   your own ~init.el~, but feel free to fork or copy
-  anything from ~/src/init.org~ that attends
+  anything from ~/src/eos.org~ that attends
   your needs :)
 
 ** Screenshot
@@ -38,7 +38,7 @@
   a generic computer environment for everyday use.
 
   Org-mode is used to write/organize the configuration
-  (~src/init.org~) in a literate programming format,
+  (~src/eos.org~) in a literate programming format,
   so it contains documentation plus source code blocks
   that will be tangled generating the ~src/init.el~ script.
 
@@ -141,7 +141,7 @@
   2) Clone =cask= and =eos= repositories
   3) Backup ~.emacs.d~ directory
   4) Install third-party packages listed in ~/src/Cask~ file
-  5) Build and compile: ~src/init.org~
+  5) Build and compile: ~src/eos.org~
 
 * Usage
 
@@ -254,7 +254,7 @@
 
    For the sake of sanity a lot of keys were unbounded resulting
    in a more error prone usage. See the =Epilogue/Clean= section at
-   ~src/init.org~ file and comment out your missing chords.
+   ~src/eos.org~ file and comment out your missing chords.
 
    Note: The `minor-mode-map-alist' was completely cleaned,
    this was proven to be a huge gain on productivity and
@@ -357,7 +357,7 @@
 * Adapt
 
   If you want to modify any aspects (or extend) this configuration
-  without touching the ~/src/init.org~, just edit/add your own elisp
+  without touching the ~/src/eos.org~, just edit/add your own elisp
   code inside ~/src/adapt.el~.
 
   Note: ~src/adapt.el~ will be the last script loaded by ~/src/init.el~.

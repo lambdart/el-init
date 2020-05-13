@@ -9,6 +9,9 @@ build
 *.core
 *.data
 
+# Unix backup files
+*.bak
+
 # Precompiled Headers
 *.gch
 *.pch
@@ -138,3 +141,4 @@ nsm
 custom.el
 private.el
 adapt.el
+init.el

@@ -46,7 +46,7 @@
     refers to any =elisp package= or =external program=.
 
   It's important to understand that all applications with
-  different purposes (made with elisp or not) (in)directly
+  different purposes (made in elisp or not) (in)directly
   passes through the elisp interpreter.
 
   So again, =application(s)= implies =elisp packages=
@@ -54,7 +54,7 @@
 
 ** Features (overview):
 
-   - Just one major language =elisp= to conquer them all!
+   - Just one major language (=ELISP=) to conquer them all!
    - Information comes to you as required and not the other way around.
    - Use the same keybinds everywhere (learn once, use forever and ever).
 
@@ -65,19 +65,21 @@
      applications.
 
    - Just one development environment for all languages:
+     - Apparence
      - Editing
+     - Documentation
+     - Communication
      - Navigation
      - Completion
-     - Syntax check
-     - Spell check
-     - Syntax Highlight
-     - Documentation access
-     - Compilation / Interpretation
-     - Testing
+     - Syntax/Spell Check
+     - Interpretation
+     - Compilation
      - Debugging
-     - Versioning
+     - Testing
      - Rationalization
+     - Versioning
      - Measurement
+     - ...
 
    - Understand that data is generic (in computer science we deal
      with idealize components) and can be manipulated (transformed)
@@ -89,16 +91,18 @@
      - No useless/annoying distractions.
      - Just do what was asked and nothing more.
 
-   - Decrease the gap between: =a prof of concept - "final" release!=
+   - Decrease the gap between: =a prof of concept= and the ="final" release=!
 
    - Provide tools to easily investigate any process/procedure of
      interest.
 
-   - Communication between peers are transparent, proving easy
-     integration for any module (streaming of data):
+   - Communication (=pipes/ipcs/streams of data=) between peers are
+     transparent, proving a very easy and convenient integration for
+     all modules:
      - Packages
+     - Applications
      - Buffers/Windows/Frames
-     - External applications
+     - ...
 
 * Dependencies
 
@@ -109,9 +113,9 @@
 
 ** Optional
 
-   Some =emacs packages= used external (non-elisp) programs, like:
+   Some =emacs packages= uses external (non-elisp) programs, like:
 
-   1. Agrep
+   1. Ag - The Silver Searcher
    2. Global
    3. Etags
    4. Aspell/Ispell
@@ -126,8 +130,8 @@
 
 * Installation
 
-  The installation script was made to speed up
-  the installation process on my new machines.
+  NOTE: The installation script was made to speed up
+        the deploy process on my new machines.
 
   Download and execute (curl required):
 
@@ -140,8 +144,9 @@
   1) Check dependencies
   2) Clone =cask= and =eos= repositories
   3) Backup ~.emacs.d~ directory
-  4) Install third-party packages listed in ~/src/Cask~ file
-  5) Build and compile: ~src/eos.org~
+  4) Install third-party packages listed in ~/src/default/default.Cask~ file
+  5) Tangle source code from ~src/eos.org~ to ~init.el~
+  6) Byte compile ~init.el~ script
 
 * Usage
 
@@ -170,6 +175,21 @@
   map, resulting in the standardization of commands (functions)
   access sequences (keybinds or chords).
 
+  For the sake of sanity a lot of keybinds have been cleaned up,
+  it's preferable (in my opinion) a small set of keybinds
+  (only the most used ones) providing that way a more stable (less
+  error prone) overall usability.
+
+  When 'exotic' functions are needed to be called, just use
+  =`execute-extended-command'= binded to =M-x=.
+
+  Note: The =`minor-mode-map-alist'= as completely cleaned, this was
+  proven to be a huge pain relief resulting in a considerable
+  productivity gains.
+
+  For more information checkout the =Epilogue/Clean= section at
+  ~src/eos.org~.
+
 ** Basic
 
    If you do not understand the terminology of the tables below,
@@ -194,21 +214,34 @@
      | <Minor-mode>-map | C-x <key>  | Always    | Minor Mode Actions |
      | <Major-mode>-map | C-c        | Maybe     | Major Mode Actions |
 
+** Help
+
+   To verify what keys are mapped use =M-x describe-bindings RET=
+   or =C-h b=, it's possible to restrict the search using =C-h= or =?=
+   post-fix for a specific map, e.g:
+
+   | Keybind | Description           |
+   | C-h C-h | help-map help         |
+   | C-c C-h | <major>-mode-map help |
+   | C-x C-h | ctl-x-map help        |
+   | C-x l ? | <minor>-mode-map help |
+
 ** C-x
 
    New keymaps are defined to hold the most
    common/used commands (elisp functions), they are
    divided according to their behavior classification:
 
-   | Prefix Keymap  | Prefix  | Description       |
-   |                |         |                   |
-   | eos-find-map   | C-x f   | Find              |
-   | eos-window-map | C-x w   | Windows           |
-   | eos-pm-map     | C-x p   | Projects          |
-   | eos-sc-map     | C-x e   | Errors            |
-   | eos-tags-maps  | C-x t   | Tags              |
-   | eos-docs-maps  | C-x l   | Library           |
-   | eos-ac-map     | C-x TAB | Completion        |
+   | Prefix Keymap  | Prefix  | Description |
+   |                |         |             |
+   | eos-find-map   | C-x f   | Files       |
+   | eos-window-map | C-x w   | Windows     |
+   | eos-pm-map     | C-x p   | Projects    |
+   | eos-sc-map     | C-x e   | Errors      |
+   | eos-tags-maps  | C-x t   | Tags        |
+   | eos-docs-maps  | C-x l   | Library     |
+   | eos-utils-map  | C-x c   | Utils       |
+   | eos-ac-map     | C-x TAB | Completion  |
 
 ** C-c
 
@@ -237,28 +270,6 @@
    | Global | M-n     | eos/edit/move-lines-up                    |
    | Global | M-p     | eos/edit/move-lines-down                  |
    | ...    | ...     | ...                                       |
-
-** Getting help
-
-   To verify what keys are mapped use =M-x describe-bindings RET=
-   or =C-h b=, it's possible to restrict the search using =C-h= or =?=
-   post-fix for a specific map, e.g:
-
-   | Keybind | Description           |
-   | C-h C-h | help-map help         |
-   | C-c C-h | <major>-mode-map help |
-   | C-x C-h | ctl-x-map help        |
-   | C-x l ? | <minor>-mode-map help |
-
-** Quality of life
-
-   For the sake of sanity a lot of keys were unbounded resulting
-   in a more error prone usage. See the =Epilogue/Clean= section at
-   ~src/eos.org~ file and comment out your missing chords.
-
-   Note: The `minor-mode-map-alist' was completely cleaned,
-   this was proven to be a huge gain on productivity and
-   pain relief.
 
 * Packages
 

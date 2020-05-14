@@ -4347,8 +4347,8 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable globally after emacs startup
-      ;; (add-hook 'emacs-startup-hook
-      ;;           (lambda () (ispell-minor-mode 1)))
+      (add-hook 'emacs-startup-hook
+                (lambda () (ispell-minor-mode 1)))
 
       #+END_SRC
 
@@ -4583,12 +4583,17 @@
       (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
 
       ;; set tramp verbose level
-      (customize-set-variable 'tramp-verbose 0)
+      (customize-set-variable 'tramp-verbose 4)
 
       ;; file which keeps connection history for tramp connections.
       (customize-set-variable
        'tramp-persistency-file-name
        (concat (expand-file-name user-emacs-directory) "cache/tramp"))
+
+      ;; when invoking a shell, override the HISTFILE with this value
+      (customize-set-variable
+       'tramp-histfile-override
+       (concat (expand-file-name user-emacs-directory) "cache/.tramp_history"))
 
       ;; connection timeout in seconds
       (customize-set-variable 'tramp-connection-timeout 60)

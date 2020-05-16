@@ -1,7 +1,8 @@
 (source melpa)
 
 ;; launcher
-(depends-on "dmenu")
+(depends-on "cannon"
+            :git "https://github.com/esac-io/cannon")
 
 ;; feeds
 (depends-on "elfeed")
@@ -29,7 +30,6 @@
 
 ;; office
 (depends-on "dictionary")
-(depends-on "pdf-tools")
 (depends-on "markdown-mode")
 
 ;; blog
@@ -41,8 +41,8 @@
 
 ;; documentation
 (depends-on "dash-docs")
-(depends-on "rfc-mode"
-            :git "https://github.com/esac-io/rfc-mode")
+(depends-on "rfc-docs"
+            :git "https://github.com/esac-io/rfc-docs")
 
 ;; multimedia
 (depends-on "emms")
@@ -76,7 +76,7 @@
 
 ;; debuggers
 (depends-on "rmsbolt"
-  git: https://gitlab.com/jgkamat/rmsbolt)
+            git: https://gitlab.com/jgkamat/rmsbolt)
 
 ;; window manager
 ;; depends on xelb

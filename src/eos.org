@@ -1336,6 +1336,7 @@
          (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
          (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
          (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions)
+         (define-key icomplete-minibuffer-map (kbd "SPC") 'nil)
 
          ;; toogle styles
          (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
@@ -4477,7 +4478,7 @@
       #+END_SRC
 
 *** Launcher
-**** Dmenu
+**** Cannon
 
      Dmenu is a fast and lightweight dynamic menu for X.
      It reads arbitrary text from stdin, and creates a
@@ -4485,14 +4486,13 @@
      through the arrow keys or typing a part of the name,
      and the line is printed to stdout.
 
-     Dmenu_run is a wrapper that ships with the dmenu
-     distribution that allows its use as an application launcher.
+     Cannon mimics Dmenu inside Emacs with minibuffer helps.
 
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'dmenu nil t)
+      (when (require 'cannon nil t)
         (progn
 
       #+END_SRC
@@ -4501,18 +4501,11 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; string to display in the dmenu prompt
-      (customize-set-variable 'dmenu-prompt-string "Dmenu: ")
-
-      ;; determines on how many recently executed commands
-      ;; dmenu should keep a record
-      (customize-set-variable 'dmenu-history-size 8)
-
-      ;; file in which the dmenu state is
+      ;; file in which the launcher state is
       ;; saved between Emacs sessions
       (customize-set-variable
-       'dmenu-save-file
-       (expand-file-name "cache/dmenu-items" user-emacs-directory))
+       'cannon-items-file
+       (expand-file-name "cache/cannon-items" user-emacs-directory))
 
       #+END_SRC
 
@@ -4521,7 +4514,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; clt-x-map (C-x) prefix
-      (define-key ctl-x-map (kbd "C-l") 'dmenu)))
+      (define-key ctl-x-map (kbd "C-l") 'cannon)))
 
       #+END_SRC
 
@@ -4825,7 +4818,7 @@
       (defun eos/scrot ()
         "Call scrot utility."
         (interactive)
-        (eos-call-proc "scrot" nil)
+        (eos-call-proc "scrot" "-s")
         (message "Saved in %s directory" (pwd)))
 
       #+END_SRC
@@ -5141,7 +5134,7 @@
               (find-file eos-org-file)
               (org-babel-tangle)
               (copy-file eos-el-file init-file t t t)
-              (byte-compile-file init-file nil)))))
+              (async-byte-compile-file init-file)))))
 
       (defun eos/org/set-company-backends ()
         "Set `org-mode' company backends."
@@ -5317,7 +5310,6 @@
 
       #+END_SRC
 
-**** Pdf-tools
 **** Dictionary
 
      Dictionary allows you to interact with dictionary servers.
@@ -5733,10 +5725,11 @@
 
       #+END_SRC
 
-**** Rfc-mode
+**** Rfc-docs
 
-     Mode so browser local RFC files. To make it work, just download
-     the RFC files and changhe the 'rfc-mode-directory' dir to match
+     Browser/search/read local RFC files.
+     To make it work faster download the RFC files and change
+     the 'rfc-docs-directory' dir to match
      the path where all the RFCs were extracted.
 
      The RFC collection can be downloaded [[https://www.rfc-editor.org/retrieve/bulk][here]].
@@ -5745,7 +5738,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'rfc-mode nil t)
+      (require 'rfc-docs nil t)
 
       #+END_SRC
 
@@ -5755,7 +5748,7 @@
 
       ;; the directory where RFC documents are stored
       (customize-set-variable
-       'rfc-mode-directory
+       'rfc-docs-directory
        (concat (expand-file-name user-emacs-directory) "rfc/"))
 
       #+END_SRC
@@ -6407,7 +6400,7 @@
       ;; set rtags binary path
       (customize-set-variable
        'rtags-path
-       (concat user-emacs-directory "lisp/rtags/build/bin/"))
+       (concat user-emacs-directory "site-lisp/rtags/build/bin/"))
 
       ;; method to use to display RTags results, like references
       (customize-set-variable 'rtags-display-result-backend 'default)

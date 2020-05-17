@@ -31,25 +31,16 @@
 
 ;; Define colours pallets.
 (let ((class '((class color) (min-colors 89)))
-       ;; basic colors
-       (black    "#000000")
-       (red      "#af5f87")
-       (green    "#65a854")
-       (yellow   "#8d995c")
-       (blue     "#5476a8")
-       (magenta  "#483d8b")
-       (cyan     "#54a8a8")
-       (white    "#bfbfbf")
-       (gray     "#1c1c1c")
-
+       ;; all colors has to have a tuple (background . foreground)
        ;; special colors
        (bg-default   "#000000") (fg-default   "#bfbfbf")
        (bg-bright    "#3d3d3d") (fg-bright    "#ededed")
+       (bg-dim       "#262626") (fg-dim       "#969696")
 
-       ;; background and front colors
+       ;; basic colors
+       (bg-black     "#141414") (fg-black     "#666666")
        (bg-white     "#d3d3d3") (fg-white     "#bfbfbf")
-       (bg-black     "#0a0a0a") (fg-black     "#666666")
-       (bg-dim       "#171717") (fg-dim       "#969696")
+       (bg-red       "#8b6969") (fg-red       "#a85454")
        (bg-gray      "#696969") (fg-gray      "#a9a9a9")
        (bg-orange    "#3f321f") (fg-orange    "#a88654")
        (bg-yellow    "#343922") (fg-yellow    "#8d995c")
@@ -59,8 +50,7 @@
        (bg-blue      "#005f87") (fg-blue      "#5476a8")
        (bg-purple    "#2f2a3f") (fg-purple    "#7d71a8")
        (bg-magenta   "#8787af") (fg-magenta   "#9754a8")
-       (bg-pink      "#3f1f32") (fg-pink      "#a85487")
-       (bg-red       "#8b6969") (fg-red       "#a85454"))
+       (bg-pink      "#3f1f32") (fg-pink      "#cd6889"))
 
   ;; set faces
   (custom-theme-set-faces
@@ -71,56 +61,72 @@
     ;; If there is more than one, they won't work right.
 
     ;; Default
-    `(default ((t (:background ,black :foreground ,white))))
-    `(c-nonbreakable-space-face ((t (:background ,bg-magenta :foreground ,white :weight normal))) t)
+    `(default ((t (:background ,bg-default :foreground ,fg-default))))
+    `(c-nonbreakable-space-face ((t (:background ,bg-magenta :foreground ,fg-white :weight normal))) t)
     `(cursor ((t (:background ,fg-dim))))
     `(error ((t (:foreground ,fg-red))))
     `(italic ((t (:slant italic))))
-    `(match ((t (:background ,yellow :foreground ,bg-dim))))
-    `(nobreak-hyphen ((t (:foreground ,red))))
+    `(match ((t (:background ,bg-dim :foreground ,fg-blue))))
+    ;; `(match ((t (:foreground ,fg-blue))))
+    `(nobreak-hyphen ((t (:foreground ,fg-red))))
     `(minibuffer-prompt ((t (:foreground ,fg-blue))))
     `(warning ((t (:foreground ,fg-orange :weight unspecified))))
-    `(region ((t (:background ,blue :foreground ,bg-white))))
+    `(region ((t (:background ,bg-blue :foreground ,bg-white))))
     `(shadow ((t (:foreground ,fg-dim))))
     `(success ((t (:foreground ,fg-green :weight bold))))
     `(trailing-whitespace ((t (:background ,fg-red))))
     `(info-node ((t (:foreground ,fg-orange :slant italic :weight bold))))
-    `(lazy-highlight ((t (:background ,blue :foreground ,bg-white))))
+    `(lazy-highlight ((t (:background ,bg-blue :foreground ,bg-white))))
     `(line-number ((t (:inherit (shadow black) :back))))
     `(line-number-current-line ((t (:inherit line-number))))
-    `(secondary-selection ((t (:background ,yellow :foreground ,black))))
-    `(escape-glyph ((t (:foreground ,red))))
+    `(secondary-selection ((t (:background ,bg-yellow :foreground ,fg-black))))
+    `(escape-glyph ((t (:foreground ,fg-red))))
 
     ;; Font
     `(font-lock-builtin-face ((t (:foreground ,fg-blue))))
     `(font-lock-comment-delimiter-face ((t (:foreground ,fg-dim :inherit unspecified))))
     `(font-lock-comment-face ((t (:foreground ,fg-dim))))
-    `(font-lock-constant-face ((t (:foreground ,red))))
     `(font-lock-constant-face ((t (:foreground ,fg-red))))
-    `(font-lock-doc-face ((t (:foreground ,green :inherit unspecified))))
+    `(font-lock-constant-face ((t (:foreground ,fg-red))))
+    `(font-lock-doc-face ((t (:foreground ,fg-green :inherit unspecified))))
     `(font-lock-function-name-face ((t (:foreground ,fg-blue))))
     `(font-lock-keyword-face ((t (:foreground ,fg-orange))))
     `(font-lock-negation-char-face ((t (:foreground ,fg-red))))
     `(font-lock-regexp-grouping-backslash ((t (:foreground ,fg-red))))
     `(font-lock-regexp-grouping-construct ((t (:foreground ,fg-pink))))
-    `(font-lock-string-face ((t (:foreground ,red))))
+    `(font-lock-string-face ((t (:foreground ,fg-pink))))
     `(font-lock-type-face ((t (:foreground ,fg-purple))))
     `(font-lock-variable-name-face ((t (:foreground ,fg-yellow))))
     `(font-lock-warning-face ((t (:foreground ,fg-orange :inherit unspecified :weight bold))))
+
+    ;; `(font-lock-comment-delimiter-face ((t (:foreground ,fg-gray))))
+    ;; `(font-lock-comment-face ((t (:foreground ,fg-gray))))
+    ;; `(font-lock-doc-face ((t (:foreground ,fg-green))))
+    ;; `(font-lock-type-face ((t (:foreground ,fg-yellow))))
+    ;; `(font-lock-string-face ((t (:foreground ,fg-pink))))
+    ;; `(font-lock-keyword-face ((t (:foreground ,fg-orange))))
+    ;; `(font-lock-builtin-face ((t (:foreground ,fg-blue))))
+    ;; `(font-lock-constant-face ((t (:foreground ,fg-purple))))
+    ;; `(font-lock-function-name-face ((t (:foreground ,fg-blue))))
+    ;; `(font-lock-variable-name-face ((t (:foreground ,fg-yellow))))
+    ;; `(font-lock-negation-char-face ((t (:foreground ,fg-red))))
+    ;; `(font-lock-regexp-grouping-backslash ((t (:foreground ,fg-red))))
+    ;; `(font-lock-regexp-grouping-construct ((t (:foreground ,fg-pink))))
+    ;; `(font-lock-warning-face ((t (:foreground ,fg-red :weight bold))))
 
     ;; Fringe
     `(fringe ((t nil)))
     ;;`(fringe ((t (:background unspecified :inherit default))))
 
     ;; Mode-line
-    `(mode-line ((t (:background ,bg-dim :foreground ,white
+    `(mode-line ((t (:background ,bg-dim :foreground ,fg-white
                       :box (:color ,bg-dim :line-width 2 :style nil)))))
     `(mode-line-inactive ((t (:background ,bg-dim :foreground ,bg-gray
                                :box (:line-width 2 :color ,bg-dim :style nil)))))
     `(mode-line-buffer-id ((t (:foreground ,fg-blue :weight normal))))
 
     ;; Highlight
-    `(highlight ((t (:background ,gray))))
+    `(highlight ((t (:background ,bg-gray))))
     `(highlight-numbers-number ((t (:foreground ,fg-cyan :inherit unspecified))))
     `(highlight-80+ ((t (:underline (:color ,fg-red :style wave) :background unspecified))))
 
@@ -140,28 +146,27 @@
     `(holiday ((t (:background ,fg-red))))
 
     ;; Homoglyph
-    `(homoglyph ((t (:foreground ,red))))
+    `(homoglyph ((t (:foreground ,fg-red))))
 
     ;; Header Line
     `(header-line ((t (:background ,bg-dim :foreground ,fg-gray))))
 
     ;; Popup
-    `(popup-isearch-match ((t (:inherit black :background ,blue))))
+    `(popup-isearch-match ((t (:inherit black :background ,bg-blue))))
 
     ;; Pulse
     `(pulse-highlight-face ((t (:background ,bg-yellow :foreground ,bg-bright))))
     `(pulse-highlight-start-face ((t (:background ,bg-yellow :foreground ,bg-bright))))
 
     ;; Elpa
-    `(epa-string ((t (:foreground ,blue))))
+    `(epa-string ((t (:foreground ,fg-blue))))
 
     ;; Eww
-    `(eww-valid-certificate ((t (:foreground ,green :weight bold))))
+    `(eww-valid-certificate ((t (:foreground ,fg-green :weight bold))))
 
     ;; Links
     `(link ((t (:foreground ,fg-orange :underline t))))
     `(link-visited ((t (:foreground ,fg-magenta :underline t))))
-    ;; `(link-visited ((t (:foreground ,magenta :underline t))))
 
     ;; Completions
     `(completions-common-part ((t (:foreground ,fg-blue))))
@@ -170,11 +175,12 @@
     `(icomplete-first-match ((t (:foreground ,fg-red :weight normal))))
 
     ;; Isearch
-    `(isearch ((t (:background ,blue :foreground ,white))))
+    `(isearch ((t (:background ,bg-blue :foreground ,fg-white))))
     `(isearch-fail ((t (:background ,bg-default :foreground ,fg-red))))
 
     ;; Compilation
-    `(compilation-mode-line-exit ((t (:inherit compilation-info :foreground ,green :weight bold))))
+    `(compilation-info ((t (:foreground ,fg-green :weight normal))))
+    `(compilation-mode-line-exit ((t (:inherit compilation-info :foreground ,fg-green :weight bold))))
 
     ;; CSS
     `(css-property ((t (:foreground ,fg-orange))))
@@ -185,40 +191,40 @@
     `(custom-button ((t (:background ,bg-white :foreground ,bg-black
                           :box (:line-width 1 :color ,bg-white)
                           :weight ultra-light :height 1.1 :width ultra-condensed))))
-    `(custom-button-pressed-unraised ((t (:inherit custom-button-unraised :foreground ,red))))
-    `(custom-changed ((t (:background ,blue :foreground ,white))))
-    `(custom-comment-tag ((t (:foreground ,blue))))
-    `(custom-group-tag ((t (:inherit variable-pitch :foreground ,blue :weight bold :height 1.2))))
-    `(custom-invalid ((t (:background ,red :foreground ,black))))
-    `(custom-modified ((t (:background ,blue :foreground ,white))))
-    `(custom-set ((t (:background ,white :foreground ,blue))))
-    `(custom-themed ((t (:background ,blue :foreground ,white))))
-    `(custom-variable-tag ((t (:foreground ,blue :weight bold))))
+    `(custom-button-pressed-unraised ((t (:inherit custom-button-unraised :foreground ,fg-red))))
+    `(custom-changed ((t (:background ,bg-blue :foreground ,fg-white))))
+    `(custom-comment-tag ((t (:foreground ,fg-blue))))
+    `(custom-group-tag ((t (:inherit variable-pitch :foreground ,fg-blue :weight bold :height 1.2))))
+    `(custom-invalid ((t (:background ,bg-red :foreground ,fg-black))))
+    `(custom-modified ((t (:background ,bg-blue :foreground ,fg-white))))
+    `(custom-set ((t (:background ,bg-white :foreground ,fg-blue))))
+    `(custom-themed ((t (:background ,bg-blue :foreground ,fg-white))))
+    `(custom-variable-tag ((t (:foreground ,fg-blue :weight bold))))
 
     ;; Company
-    `(company-preview ((t (:background nil :foreground ,blue))))
+    `(company-preview ((t (:background nil :foreground ,fg-blue))))
     `(company-preview-common ((t (:inherit nil :background ,bg-dim
-                                   :foreground ,blue :weight normal))))
-    `(company-echo-common ((t (:background ,bg-dim :foreground ,blue))))
+                                   :foreground ,fg-blue :weight normal))))
+    `(company-echo-common ((t (:background ,bg-dim :foreground ,fg-blue))))
     `(company-scrollbar-bg ((nil (:background ,bg-black))))
     `(company-scrollbar-fg ((nil (:background ,bg-dim))))
     `(company-tooltip ((t (:background ,bg-black :foreground ,fg-default))))
-    `(company-tooltip-common ((t (:foreground ,blue))))
+    `(company-tooltip-common ((t (:foreground ,fg-blue))))
     `(company-tooltip-selection ((t (:background ,bg-dim))))
     `(company-tooltip-annotation ((t (:foreground ,fg-blue))))
     `(company-tooltip-search ((t (:background ,bg-yellow :inherit unspecified))))
     `(company-tooltip-search-selection ((t (:background ,bg-yellow :inherit unspecified))))
-    `(company-template-field ((t (:background ,bg-dim :foreground ,yellow))))
+    `(company-template-field ((t (:background ,bg-dim :foreground ,fg-yellow))))
 
     ;; Dashboard
     `(dashboard-footer ((t (:foreground ,fg-black))))
-    `(dashboard-heading ((t (:foreground ,blue))))
+    `(dashboard-heading ((t (:foreground ,fg-blue))))
     `(dashboard-text-banner ((t (:foreground ,fg-black))))
 
     ;; Diff
-    `(diff-added ((t (:background ,bg-green :foreground ,fg-white))))
-    `(diff-refine-changed ((t (:background ,yellow :foreground ,black))))
-    `(diff-removed ((t (:background ,bg-red :foreground ,fg-white))))
+    `(diff-added ((t (:background ,bg-green :foreground ,fg-bright))))
+    `(diff-refine-changed ((t (:background ,bg-yellow :foreground ,fg-bright))))
+    `(diff-removed ((t (:background ,bg-red :foreground ,fg-bright))))
     `(diff-changed ((t (:background ,bg-orange))))
     `(diff-file-header ((t (:foreground ,bg-white :background unspecified))))
     `(diff-function ((t (:inherit unspecified :foreground ,fg-orange))))
@@ -237,7 +243,14 @@
     `(dired-flagged ((t (:inherit region))))
     `(dired-header ((t (:foreground ,fg-turquoise :weight bold :inherit unspecified))))
     `(dired-mark ((t (:foreground ,fg-pink :inherit unspecified))))
-    `(dired-marked ((t (:inherit nil :background ,magenta))))
+    `(dired-marked ((t (:inherit nil :background ,bg-magenta))))
+
+    ;; Dictionary
+    ;; diary                                     yellow
+    ;; dictionary-button-face                    white
+    ;; dictionary-reference-face                 yellow
+    ;; dictionary-word-definition-face           gray (another font) (italic)
+    ;; dictionary-word-entry-face                gray (italic)
 
     ;; Ediff
     `(ediff-current-diff-A ((t (:inherit diff-removed))))
@@ -258,7 +271,7 @@
     `(eshell-ls-backup ((t (:foreground ,fg-orange))))
     `(eshell-ls-clutter ((t (:foreground ,fg-dim :weight unspecified))))
     `(eshell-ls-directory ((t (:foreground ,fg-blue :weight unspecified))))
-    `(eshell-ls-executable ((t (:foreground ,red :weight unspecified))))
+    `(eshell-ls-executable ((t (:foreground ,fg-red :weight unspecified))))
     `(eshell-ls-missing ((t (:foreground ,fg-red :weight bold))))
     `(eshell-ls-product ((t (:foreground ,fg-purple))))
     `(eshell-ls-readonly ((t (:foreground ,fg-magenta))))
@@ -318,18 +331,18 @@
     `(gnus-summary-normal-unread ((t (:foreground ,fg-default))))
     `(gnus-group-mail-1 ((t (:foreground ,fg-red :weight bold))))
     `(gnus-group-mail-1-empty ((t (:foreground ,fg-purple))))
-    `(gnus-group-mail-2 ((t (:foreground ,magenta :weight bold))))
-    `(gnus-group-mail-2-empty ((t (:foreground ,magenta))))
+    `(gnus-group-mail-2 ((t (:foreground ,fg-magenta :weight bold))))
+    `(gnus-group-mail-2-empty ((t (:foreground ,fg-magenta))))
     `(gnus-group-mail-low ((t (:foreground ,fg-magenta :weight bold))))
     `(gnus-group-mail-low-empty ((t (:foreground ,fg-magenta))))
-    `(gnus-summary-selected ((t (:background ,blue :foreground ,white))))
+    `(gnus-summary-selected ((t (:background ,bg-blue :foreground ,fg-white))))
 
     ;; Go-mode
-    `(go-coverage-10 ((t (:foreground ,green))))
-    `(go-coverage-7 ((t (:foreground ,green))))
-    `(go-coverage-8 ((t (:foreground ,green))))
-    `(go-coverage-9 ((t (:foreground ,green))))
-    `(go-coverage-covered ((t (:foreground ,green))))
+    `(go-coverage-10 ((t (:foreground ,fg-green))))
+    `(go-coverage-7 ((t (:foreground ,fg-green))))
+    `(go-coverage-8 ((t (:foreground ,fg-green))))
+    `(go-coverage-9 ((t (:foreground ,fg-green))))
+    `(go-coverage-covered ((t (:foreground ,fg-green))))
 
     ;; Identica
     `(identica-stripe-face ((t (:background ,bg-bright))))
@@ -340,15 +353,15 @@
     `(ibuffer-locked-buffer ((t (:foreground ,bg-red))))
 
     ;; Ido
-    `(ido-only-match ((t (:foreground ,green))))
-    `(ido-indicator ((t (:background ,bg-bright :foreground ,white :width condensed))))
+    `(ido-only-match ((t (:foreground ,fg-green))))
+    `(ido-indicator ((t (:background ,bg-bright :foreground ,fg-white :width condensed))))
 
     ;; Iedit
-    `(iedit-occurrence ((t (:background ,yellow :foreground ,black))))
+    `(iedit-occurrence ((t (:background ,bg-yellow :foreground ,fg-default))))
 
     ;; Man
-    `(Man-overstrike ((t (:foreground ,blue :weight bold))))
-    `(Man-underline ((t (:foreground ,red))))
+    `(Man-overstrike ((t (:foreground ,fg-blue :weight bold))))
+    `(Man-underline ((t (:foreground ,fg-red))))
 
     ;; Message
     `(message-header-cc ((t (:foreground ,fg-dim))))
@@ -362,12 +375,12 @@
     `(message-separator ((t (:foreground ,fg-blue))))
 
     ;; Magit
-    `(magit-branch-current ((t (:inherit nil :background ,blue :foreground ,bg-white))))
+    `(magit-branch-current ((t (:inherit nil :background ,bg-blue :foreground ,bg-white))))
     `(magit-branch-local ((t (:background ,bg-magenta :foreground ,bg-white))))
-    `(magit-branch-remote ((t (:background ,green :foreground ,fg-white))))
-    `(magit-log-author ((t (:foreground ,red :slant normal :weight normal))))
-    `(magit-signature-expired ((t (:foreground ,yellow))))
-    `(magit-signature-revoked ((t (:foreground ,magenta))))
+    `(magit-branch-remote ((t (:background ,bg-green :foreground ,fg-white))))
+    `(magit-log-author ((t (:foreground ,fg-red :slant normal :weight normal))))
+    `(magit-signature-expired ((t (:foreground ,fg-yellow))))
+    `(magit-signature-revoked ((t (:foreground ,fg-magenta))))
     `(magit-bisect-bad ((t (:foreground ,fg-red))))
     `(magit-bisect-good ((t (:foreground ,fg-green))))
     `(magit-bisect-skip ((t (:foreground ,fg-dim))))
@@ -391,7 +404,7 @@
                                :inherit diff-removed))))
     `(magit-diff-removed-highlight ((t (:foreground unspecified :background unspecified
                                          :inherit magit-diff-removed))))
-    `(magit-diffstat-removed ((t (:foreground ,red))))
+    `(magit-diffstat-removed ((t (:foreground ,fg-red))))
     `(magit-item-highlight ((t (:inherit unspecified))))
 
     ;; Magit logs
@@ -412,18 +425,18 @@
     `(magit-process-ok ((t (:foreground ,fg-green :inherit unspecified))))
     `(magit-section-heading ((t (:foreground ,fg-turquoise :weight unspecified))))
     `(magit-section-highlight ((t (:background unspecified))))
-    `(magit-section-title ((t (:foreground ,white :inherit unspecified))))
+    `(magit-section-title ((t (:foreground ,fg-white :inherit unspecified))))
 
     ;; Transient
-    `(transient-disabled-suffix ((t (:background ,red :foreground ,gray :weight bold))))
-    `(transient-enabled-suffix ((t (:background ,green :foreground ,bg-bright :weight bold))))
-    `(transient-separator ((t (:background ,bg-dim :foreground ,white))))
+    `(transient-disabled-suffix ((t (:background ,bg-red :foreground ,fg-gray :weight bold))))
+    `(transient-enabled-suffix ((t (:background ,bg-green :foreground ,bg-bright :weight bold))))
+    `(transient-separator ((t (:background ,bg-dim :foreground ,fg-white))))
 
     ;; Tooltip
     `(tooltip ((t (:foreground ,fg-default :background ,bg-gray))))
 
     ;; Org-agenda
-    `(org-agenda-restriction-lock ((t (:background ,bg-white :foreground ,gray))))
+    `(org-agenda-restriction-lock ((t (:background ,bg-white :foreground ,fg-gray))))
     `(org-agenda-calendar-sexp ((t (:foreground ,fg-yellow))))
     `(org-agenda-current-time ((t (:foreground ,fg-orange :weight bold))))
     `(org-agenda-date ((t (:foreground ,bg-cyan))))
@@ -434,35 +447,35 @@
 
     ;; Org-block
     `(org-block ((t (:background ,bg-black))))
-    `(org-block-begin-line ((t (:background ,bg-bright :foreground ,white :underline nil))))
-    `(org-block-end-line ((t (:background ,bg-bright :foreground ,white))))
+    `(org-block-begin-line ((t (:background ,bg-bright :foreground ,fg-default))))
+    `(org-block-end-line ((t (:background ,bg-bright :foreground ,fg-default))))
 
     ;; Org-column
-    `(org-column ((t (:background ,gray :strike-through nil :underline nil :slant normal :weight normal))))
-    `(org-column-title ((t (:background ,gray :underline t :weight bold))))
+    `(org-column ((t (:background ,bg-gray :strike-through nil :underline nil :slant normal :weight normal))))
+    `(org-column-title ((t (:background ,bg-gray :underline t :weight bold))))
 
     ;; Org-document
-    `(org-document-info ((t (:foreground ,blue))))
-    `(org-document-title ((t (:foreground ,green))))
+    `(org-document-info ((t (:foreground ,fg-blue))))
+    `(org-document-title ((t (:foreground ,fg-green))))
 
     ;; Org
-    `(org-done ((t (:foreground ,green :weight bold))))
-    `(org-drawer ((t (:foreground ,blue))))
-    `(org-footnote ((t (:foreground ,magenta :underline t))))
-    `(org-formula ((t (:foreground ,red))))
-    `(org-level-1 ((t (:foreground ,green))))
-    `(org-sexp-date ((t (:foreground ,magenta))))
-    `(org-table ((t (:foreground ,blue))))
-    `(org-upcoming-deadline ((t (:foreground ,red))))
+    `(org-done ((t (:foreground ,fg-green :weight bold))))
+    `(org-drawer ((t (:foreground ,fg-blue))))
+    `(org-footnote ((t (:foreground ,fg-magenta :underline t))))
+    `(org-formula ((t (:foreground ,fg-red))))
+    `(org-level-1 ((t (:foreground ,fg-green))))
+    `(org-sexp-date ((t (:foreground ,fg-magenta))))
+    `(org-table ((t (:foreground ,fg-blue))))
+    `(org-upcoming-deadline ((t (:foreground ,fg-red))))
     `(org-checkbox-statistics-done ((t (:foreground ,bg-cyan))))
     `(org-checkbox-statistics-todo ((t (:foreground ,fg-cyan))))
     `(org-date ((t (:foreground ,fg-pink :underline unspecified))))
     `(org-headline-done ((t (:foreground ,fg-dim))))
-    `(org-level-1 ((t (:foreground ,green))))
-    `(org-level-2 ((t (:foreground ,cyan))))
-    `(org-level-3 ((t (:foreground ,red))))
-    `(org-level-4 ((t (:foreground ,blue))))
-    `(org-level-5 ((t (:foreground ,yellow))))
+    `(org-level-1 ((t (:foreground ,fg-green))))
+    `(org-level-2 ((t (:foreground ,fg-cyan))))
+    `(org-level-3 ((t (:foreground ,fg-red))))
+    `(org-level-4 ((t (:foreground ,fg-blue))))
+    `(org-level-5 ((t (:foreground ,fg-yellow))))
     `(org-level-6 ((t (:foreground ,fg-purple))))
     `(org-level-7 ((t (:foreground ,fg-turquoise))))
     `(org-level-8 ((t (:foreground ,fg-orange))))
@@ -536,7 +549,7 @@
     `(smerge-refined-added ((t (:inherit diff-refine-added))))
     `(smerge-refined-change ((t (:inherit diff-refine-change))))
     `(smerge-refined-removed ((t (:inherit diff-refine-removed))))
-    `(smerge-lower ((t (:background ,green :foreground ,bg-bright))))
+    `(smerge-lower ((t (:background ,bg-green :foreground ,bg-bright))))
 
     ;; Term
     `(term-bold ((t (:foreground ,fg-default))))
@@ -553,7 +566,7 @@
     `(texinfo-heading ((t (:foreground ,fg-pink :inherit unspecified :height 1.3))))
 
     ;; Tty
-    `(tty-menu-selected-face ((t (:background ,red :foreground ,bg-white))))
+    `(tty-menu-selected-face ((t (:background ,bg-red :foreground ,bg-white))))
 
     ;; Term
     `(term-color-black ((t (:background ,bg-default :foreground ,fg-bright))))
@@ -578,7 +591,7 @@
     `(whitespace-space-before-tab ((t (:background ,bg-orange :foreground unspecified))))
     `(whitespace-tab ((t (:background unspecified :underline ,bg-bright))))
     `(whitespace-trailing ((t (:background ,bg-orange :foreground unspecified))))
-    `(whitespace-big-indent ((t (:background ,red :foreground ,gray))))
+    `(whitespace-big-indent ((t (:background ,bg-red :foreground ,fg-gray))))
     `(whitespace-line ((t (:background ,fg-red :foreground ))))
 
     ;; Widget
@@ -600,8 +613,8 @@
 
     ;; Window dividers
     `(window-divider ((t (:foreground ,bg-dim))))
-    `(window-divider-first-pixel ((t (:foreground unspecified :inherit window-divider))))
-    `(window-divider-last-pixel ((t (:foreground unspecified :inherit window-divider))))
+    `(window-divider-first-pixel ((t (:inherit window-divider))))
+    `(window-divider-last-pixel ((t (:inherit window-divider))))
 
     ;; Vertical-border
     `(vertical-border ((t nil)))))

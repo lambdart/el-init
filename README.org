@@ -91,7 +91,7 @@
      - No useless/annoying distractions.
      - Just do what was asked and nothing more.
 
-   - Decrease the gap between: =a prof of concept= and the ="final" release=!
+   - Decrease the gap between: =a prof of concept= and the ="final"= release=!
 
    - Provide tools to easily investigate any process/procedure of
      interest.

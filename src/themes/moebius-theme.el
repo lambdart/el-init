@@ -243,7 +243,7 @@
     `(dired-flagged ((t (:inherit region))))
     `(dired-header ((t (:foreground ,fg-turquoise :weight bold :inherit unspecified))))
     `(dired-mark ((t (:foreground ,fg-pink :inherit unspecified))))
-    `(dired-marked ((t (:inherit nil :background ,bg-magenta))))
+    `(dired-marked ((t (:inherit nil :background ,bg-magenta :foreground ,fg-bright))))
 
     ;; Dictionary
     ;; diary                                     yellow

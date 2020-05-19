@@ -31,6 +31,7 @@
 ;; office
 (depends-on "dictionary")
 (depends-on "markdown-mode")
+;; (depends-on "nov")
 
 ;; blog
 (depends-on "htmlize")
@@ -55,8 +56,9 @@
 ;; (depends-on "moebius-theme"
 ;;              :git "https://github.com/esac-io/moebius-theme")
 
-;; file
+;; files
 (depends-on "dired-subtree")
+(depends-on "dired-rsync")
 
 ;; edit
 (depends-on "editorconfig")

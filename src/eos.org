@@ -3332,6 +3332,38 @@
 
       #+END_SRC
 
+**** Dired-rsync
+
+     Dired-rsync is a command that can be run from a dired buffer to
+     copy files using rsync rather than tramps in-built mechanism.
+     This is especially useful for copying large files to/from remote
+     locations without locking up tramp.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'dired-rsync nil t)
+
+     #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; the default options for the rsync command
+      (customize-set-variable 'dired-rsync-options "-a -z -v -r --info=progress2")
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key dired-mode-map (kbd "C-c C-r") 'dired-rsync)
+
+      #+END_SRC
+
 *** Icons
 **** All-the-icons
 
@@ -4585,8 +4617,7 @@
 
       ;; when invoking a shell, override the HISTFILE with this value
       (customize-set-variable
-       'tramp-histfile-override
-       (concat (expand-file-name user-emacs-directory) "cache/.tramp_history"))
+       'tramp-histfile-override "~/.tramp_history")
 
       ;; connection timeout in seconds
       (customize-set-variable 'tramp-connection-timeout 60)

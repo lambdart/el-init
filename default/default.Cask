@@ -102,3 +102,7 @@
 
 ;; bar
 (depends-on "moody")
+
+;; compile
+(depends-on "ppcompile"
+            :git "https://github.com/whatacold/ppcompile")

@@ -577,7 +577,7 @@
      (global-set-key (kbd "M-n") 'eos/edit-move-lines-down)
 
      ;; kill
-     (define-key ctl-x-map (kbd "k") 'eos/kill-current-buffer)
+     (define-key ctl-x-map (kbd "k") 'kill-buffer)
 
      ;; mark
      (define-key eos-utils-map (kbd "h") 'mark-whole-buffer)
@@ -6301,6 +6301,30 @@
 
       #+END_SRC
 
+
+**** Ppcompile
+
+     This Emacs package tries to ease the development workflow that
+     consists of coding locally, compiling remotely, and fixing errors
+     with next-error locally, which is the typical development cycle
+     for C/C++ projects.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'ppcompile nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      (customize-set-variable 'ppcompile-rsync-additional-args "-ar")
+
+      #+END_SRC
+
 *** Versioning
 
     Version control packages.
@@ -6538,22 +6562,28 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; c-mode-map
-      (when (boundp 'c-mode-map)
-        (progn
-          ;; set rtags prefix map in c-mode map (C-c r)
-          (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
+      ;; set rtags prefix map in c-mode map (C-c r)
+      (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
 
-          ;; complete or indent
-          (define-key c-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)))
+      ;; complete or indent
+      (define-key c-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
+
+      (define-key c-mode-map (kbd "C-c")
+        (lambda ()
+          (interactive)
+          (compile compile-command)))
 
       ;; c++-mode-map
-      (when (boundp 'c++-mode-map)
-        (progn
-          ;; set rtags prefix map in c-mode map (C-c r)
-          (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
+      ;; set rtags prefix map in c-mode map (C-c r)
+      (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
 
-          ;; complete or indent
-          (define-key c++-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)))
+      ;; complete or indent
+      (define-key c++-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
+
+      (define-key c++-mode-map (kbd "C-c")
+        (lambda ()
+          (interactive)
+          (compile compile-command)))
 
       #+END_SRC
 

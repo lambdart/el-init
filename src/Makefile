@@ -14,6 +14,7 @@ DASH      := ~/.emacs.d/site-lisp/dash-20200119.2310
 DASH-DOCS := ~/.emacs.d/site-lisp/dash-docs-20190516.1702
 COMPANY   := ~/.emacs.d/site-lisp/company-20200324.2145
 FLYCHECK  := ~/.emacs.d/site-lisp/flycheck-20200422.2108
+PPCOMPILE := ~/.emacs.d/site-lisp/ppcompile-20200420.1519
 
 # Additional emacs loadpath
 LOADPATH := -L $(ASYNC) \
@@ -22,7 +23,8 @@ LOADPATH := -L $(ASYNC) \
 	    -L $(EXWM) \
 	    -L $(DASH-DOCS) \
 	    -L $(FLYCHECK) \
-	    -L $(COMPANY)
+	    -L $(COMPANY) \
+	    -L $(PPCOMPILE)
 
 # Scritps to eval
 TANGLE := tangle.el

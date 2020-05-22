@@ -1198,7 +1198,7 @@
      (customize-set-variable 'icomplete-show-matches-on-no-input t)
 
      ;; when non-nil, hide common prefix from completion candidates
-     (customize-set-variable 'icomplete-hide-common-prefix t)
+     (customize-set-variable 'icomplete-hide-common-prefix nil)
 
      ;; maximum number of lines to use in the minibuffer
      (customize-set-variable 'icomplete-prospects-height 1)
@@ -3262,8 +3262,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'dired-async nil t)
-        (progn
+      (require 'dired-async nil t)
 
       #+END_SRC
 
@@ -3279,10 +3278,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (if (boundp 'dired-mode-map)
-          (progn
-            (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
-            (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)))))
+      (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+      (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)
 
       #+END_SRC
 
@@ -6301,7 +6298,6 @@
 
       #+END_SRC
 
-
 **** Ppcompile
 
      This Emacs package tries to ease the development workflow that
@@ -6571,6 +6567,7 @@
       (define-key c-mode-map (kbd "C-c")
         (lambda ()
           (interactive)
+          (ppcompile-ping)
           (compile compile-command)))
 
       ;; c++-mode-map
@@ -6583,6 +6580,7 @@
       (define-key c++-mode-map (kbd "C-c")
         (lambda ()
           (interactive)
+          (ppcompile-ping)
           (compile compile-command)))
 
       #+END_SRC

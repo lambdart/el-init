@@ -898,8 +898,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'minibuffer nil t)
-       (progn
+     (require 'minibuffer nil t)
 
      #+END_SRC
 
@@ -957,7 +956,7 @@
      (customize-set-variable 'minibuffer-eldef-shorten-default t)
 
      ;; non-nil means to delete duplicates in history
-     (customize-set-variable 'history-delete-duplicates t)))
+     (customize-set-variable 'history-delete-duplicates t)
 
      #+END_SRC
 
@@ -1019,11 +1018,17 @@
      ;; research (maybe this is not necessary) (C-k: kill line)
      ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
-     ;; global-map
-     (global-set-key (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
-
      ;; ctl-x-map
      (define-key ctl-x-map (kbd "a") 'eos/focus-minibuffer-or-completions)
+
+     ;; global-map
+     (global-set-key (kbd "ESC ESC")
+                     (lambda ()
+                       (interactive)
+                       (let ((minibuffer (active-minibuffer-window)))
+                         (when minibuffer
+                           (select-window minibuffer)
+                           (eos-call-func 'minibuffer-keyboard-quit)))))
 
      #+END_SRC
 
@@ -4521,8 +4526,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'cannon nil t)
-        (progn
+      (require 'cannon nil t)
 
       #+END_SRC
 
@@ -4533,8 +4537,8 @@
       ;; file in which the launcher state is
       ;; saved between Emacs sessions
       (customize-set-variable
-       'cannon-items-file
-       (expand-file-name "cache/cannon-items" user-emacs-directory))
+       'cannon-cache-file
+       (expand-file-name "cache/cannon" user-emacs-directory))
 
       #+END_SRC
 
@@ -4543,7 +4547,15 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; clt-x-map (C-x) prefix
-      (define-key ctl-x-map (kbd "C-l") 'cannon)))
+      (define-key ctl-x-map (kbd "C-l") 'cannon-launch)
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (eos-call-func 'cannon-mode 1)
 
       #+END_SRC
 

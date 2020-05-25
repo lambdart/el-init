@@ -139,45 +139,49 @@
 
      #+BEGIN_SRC emacs-lisp
 
+     (defvar eos-window-map
+       (make-sparse-keymap)
+       "Window commands keymap.")
+
      (defvar eos-tags-map
        (make-sparse-keymap)
-       "Keymap for tags (navigation) keybinds.")
+       "Tags (navigation) commands keymap.")
 
      (defvar eos-pm-map
        (make-sparse-keymap)
-       "Keymap for project manager keybinds.")
+       "Project management commands keymap.")
 
      (defvar eos-sc-map
        (make-sparse-keymap)
-       "Keymap for syntax check keybinds.")
+       "Syntax check commands keymap.")
 
-     (defvar eos-complete-map
+     (defvar eos-completion-map
        (make-sparse-keymap)
-       "Keymap for (complete) keybinds.")
-
-     (defvar eos-window-map
-       (make-sparse-keymap)
-       "Keymap for window related keybinds.")
+       "Completion commands keymap.")
 
      (defvar eos-docs-map
        (make-sparse-keymap)
-       "Keymap for documentation keybinds.")
+       "Docs commands keymap.")
 
-     (defvar eos-find-map
+     (defvar eos-file-map
        (make-sparse-keymap)
-       "Keymap for find keybinds.")
+       "File commands keymap.")
+
+     (defvar eos-debug-map
+       (make-sparse-keymap)
+       "Debug commands keymap.")
 
      (defvar eos-filter-map
        (make-sparse-keymap)
-       "Keymap for filter keybinds.")
+       "Filter commands keymap.")
 
      (defvar eos-utils-map
        (make-sparse-keymap)
-       "Keymap for utils keybinds.")
+       "Utils commands keymap.")
 
      (defvar eos-rtags-map
        (make-sparse-keymap)
-       "Keymap for rtag minor mode keybinds.")
+       "rtag-minor-mode commands keymap.")
 
      #+END_SRC
 
@@ -189,16 +193,15 @@
                            eos-pm-map
                            eos-sc-map
                            eos-docs-map
-                           eos-find-map
+                           eos-file-map
                            eos-filter-map
                            eos-utils-map
                            eos-window-map
-                           eos-complete-map
+                           eos-completion-map
                            eos-rtags-map))
        (define-prefix-command prefix-map))
 
      ;; (define-prefix-command 'eos-filter-map)
-
 
      #+END_SRC
 
@@ -591,9 +594,9 @@
      (define-key ctl-x-map (kbd "t") 'eos-tags-map)
      (define-key ctl-x-map (kbd "c") 'eos-utils-map)
      (define-key ctl-x-map (kbd "e") 'eos-sc-map)
-     (define-key ctl-x-map (kbd "f") 'eos-find-map)
+     (define-key ctl-x-map (kbd "f") 'eos-file-map)
      (define-key ctl-x-map (kbd "l") 'eos-docs-map)
-     (define-key ctl-x-map (kbd "<tab>") 'eos-complete-map)
+     (define-key ctl-x-map (kbd "<tab>") 'eos-completion-map)
 
      #+END_SRC
 
@@ -1720,10 +1723,10 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; eos-find-map
-     (define-key eos-find-map (kbd "f") 'find-file-at-point)
-     (define-key eos-find-map (kbd "d") 'dired-at-point)
-     (define-key eos-find-map (kbd "C-d") 'ffap-list-directory)))
+     ;; eos-file-map
+     (define-key eos-file-map (kbd "f") 'find-file-at-point)
+     (define-key eos-file-map (kbd "d") 'dired-at-point)
+     (define-key eos-file-map (kbd "C-d") 'ffap-list-directory)))
 
      #+END_SRC
 
@@ -1747,7 +1750,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (define-key eos-find-map (kbd "l") 'locate)))
+     (define-key eos-file-map (kbd "l") 'locate)))
 
      #+END_SRC
 
@@ -1838,9 +1841,9 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; eos-find-map
-     (define-key eos-find-map (kbd "r") 'recentf-open-files)
-     (define-key eos-find-map (kbd "t") 'eos/icomplete/recentf-open-file)
+     ;; eos-file-map
+     (define-key eos-file-map (kbd "r") 'recentf-open-files)
+     (define-key eos-file-map (kbd "t") 'eos/icomplete/recentf-open-file)
 
      #+END_SRC
 
@@ -3410,7 +3413,7 @@
                   (concat user-emacs-directory "themes"))
 
      ;; load theme
-     (load-theme 'moebius t)
+     (load-theme 'moebius-yellow t)
 
      #+END_SRC
 
@@ -4865,7 +4868,7 @@
       (defun eos/scrot ()
         "Call scrot utility."
         (interactive)
-        (eos-call-proc "scrot" "-s")
+        (eos-call-proc "scrot")
         (message "Saved in %s directory" (pwd)))
 
       #+END_SRC
@@ -5919,9 +5922,9 @@
           (define-key company-active-map (kbd "C-p") 'company-select-previous)))
 
       ;; eos-complete map
-      (define-key eos-complete-map (kbd "TAB") 'company-ispell)
-      (define-key eos-complete-map (kbd "f") 'company-files)
-      (define-key eos-complete-map (kbd "g") 'company-gtags)
+      (define-key eos-completion-map (kbd "TAB") 'company-ispell)
+      (define-key eos-completion-map (kbd "f") 'company-files)
+      (define-key eos-completion-map (kbd "g") 'company-gtags)
 
       ;; global
       (global-set-key (kbd "TAB") 'eos/complete-in-buffer-or-indent)
@@ -5990,10 +5993,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; binds eos-complete-map
-      (define-key eos-complete-map (kbd "e") 'yas-expand)
-      (define-key eos-complete-map (kbd "i") 'yas-insert-snippet)
-      (define-key eos-complete-map (kbd "v") 'yas-visit-snippet-file)
+      ;; binds eos-completion-map
+      (define-key eos-completion-map (kbd "e") 'yas-expand)
+      (define-key eos-completion-map (kbd "i") 'yas-insert-snippet)
+      (define-key eos-completion-map (kbd "v") 'yas-visit-snippet-file)
 
       ;; binds yas-keymap
       (add-hook 'yas-minor-mode-hook
@@ -6287,6 +6290,14 @@
         (let ((candidates compile-history))
           (compile
            (completing-read "Compile command: " candidates nil t))))
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      (customize-set-variable 'compilation-always-kill t)
 
       #+END_SRC
 

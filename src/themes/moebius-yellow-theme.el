@@ -18,27 +18,28 @@
 ;; the transparent windows (like on i3) maybe this theme can help.
 ;;
 ;; The name is a humble homage to a great artist called
-;; Jean "moebius" Giraud, thank you for you priceless
+;; Jean "moebius-yellow" Giraud, thank you for you priceless
 ;; work, may you rest in peace...
 ;;
 ;;; Code:
 ;;
 (require 'color nil t)
 
-;; defines moebius theme
-(deftheme moebius
+;; defines moebius-yellow theme
+(deftheme moebius-yellow
   "Simple emacs minimal dark theme.")
 
 ;; Define colours pallets.
 (let ((class '((class color) (min-colors 89)))
        ;; all colors has to have a tuple (background . foreground)
        ;; special colors
-       (bg-default   "#000000") (fg-default   "#bfbfbf")
-       (bg-bright    "#3d3d3d") (fg-bright    "#ededed")
-       (bg-dim       "#262626") (fg-dim       "#969696")
+       (bg-default   "#fffff0") (fg-default   "#696969")
+       (bg-bright    "#cdcdc1") (fg-bright    "#ededed")
+       (bg-dim       "#eeeee0") (fg-dim       "#969696")
+       (bg-shadow    "#dcdcdc") (fg-shadow    "#969696")
 
        ;; basic colors
-       (bg-black     "#141414") (fg-black     "#666666")
+       (bg-black     "#8b8b83") (fg-black     "#000000")
        (bg-white     "#d3d3d3") (fg-white     "#bfbfbf")
        (bg-red       "#8b6969") (fg-red       "#a85454")
        (bg-gray      "#696969") (fg-gray      "#a9a9a9")
@@ -54,7 +55,7 @@
 
   ;; set faces
   (custom-theme-set-faces
-    'moebius
+    'moebius-yellow
     ;; custom-set-faces was added by Custom.
     ;; If you edit it by hand, you could mess it up, so be careful.
     ;; Your init file should contain only one such instance.
@@ -99,31 +100,16 @@
     `(font-lock-variable-name-face ((t (:foreground ,fg-yellow))))
     `(font-lock-warning-face ((t (:foreground ,fg-orange :inherit unspecified :weight bold))))
 
-    ;; `(font-lock-comment-delimiter-face ((t (:foreground ,fg-gray))))
-    ;; `(font-lock-comment-face ((t (:foreground ,fg-gray))))
-    ;; `(font-lock-doc-face ((t (:foreground ,fg-green))))
-    ;; `(font-lock-type-face ((t (:foreground ,fg-yellow))))
-    ;; `(font-lock-string-face ((t (:foreground ,fg-pink))))
-    ;; `(font-lock-keyword-face ((t (:foreground ,fg-orange))))
-    ;; `(font-lock-builtin-face ((t (:foreground ,fg-blue))))
-    ;; `(font-lock-constant-face ((t (:foreground ,fg-purple))))
-    ;; `(font-lock-function-name-face ((t (:foreground ,fg-blue))))
-    ;; `(font-lock-variable-name-face ((t (:foreground ,fg-yellow))))
-    ;; `(font-lock-negation-char-face ((t (:foreground ,fg-red))))
-    ;; `(font-lock-regexp-grouping-backslash ((t (:foreground ,fg-red))))
-    ;; `(font-lock-regexp-grouping-construct ((t (:foreground ,fg-pink))))
-    ;; `(font-lock-warning-face ((t (:foreground ,fg-red :weight bold))))
-
     ;; Fringe
     `(fringe ((t nil)))
     ;;`(fringe ((t (:background unspecified :inherit default))))
 
     ;; Mode-line
-    `(mode-line ((t (:background ,bg-dim :foreground ,fg-white
-                      :box (:color ,bg-dim :line-width 2 :style nil)))))
-    `(mode-line-inactive ((t (:background ,bg-dim :foreground ,bg-gray
-                               :box (:line-width 2 :color ,bg-dim :style nil)))))
-    `(mode-line-buffer-id ((t (:foreground ,fg-blue :weight normal))))
+    `(mode-line ((t (:background ,bg-dim :foreground ,bg-black
+                      :box (:color ,bg-dim :line-width 2)))))
+    `(mode-line-inactive ((t (:background ,bg-dim :foreground ,fg-gray
+                               :box (:line-width 2 :color ,bg-dim)))))
+    `(mode-line-buffer-id ((t (:foreground ,fg-cyan :weight normal))))
 
     ;; Highlight
     `(highlight ((t (:background ,bg-gray))))
@@ -205,12 +191,12 @@
     `(company-preview ((t (:background nil :foreground ,fg-blue))))
     `(company-preview-common ((t (:inherit nil :background ,bg-dim
                                    :foreground ,fg-blue :weight normal))))
-    `(company-echo-common ((t (:background ,bg-dim :foreground ,fg-blue))))
-    `(company-scrollbar-bg ((nil (:background ,bg-black))))
-    `(company-scrollbar-fg ((nil (:background ,bg-dim))))
-    `(company-tooltip ((t (:background ,bg-black :foreground ,fg-default))))
+    `(company-echo-common ((t (:background ,bg-shadow :foreground ,fg-blue))))
+    `(company-scrollbar-bg ((t (:background ,bg-bright))))
+    `(company-scrollbar-fg ((t (:background ,bg-dim))))
+    `(company-tooltip ((t (:background ,bg-dim :foreground ,fg-default))))
     `(company-tooltip-common ((t (:foreground ,fg-blue))))
-    `(company-tooltip-selection ((t (:background ,bg-dim))))
+    `(company-tooltip-selection ((t (:background ,bg-bright))))
     `(company-tooltip-annotation ((t (:foreground ,fg-blue))))
     `(company-tooltip-search ((t (:background ,bg-yellow :inherit unspecified))))
     `(company-tooltip-search-selection ((t (:background ,bg-yellow :inherit unspecified))))
@@ -222,9 +208,9 @@
     `(dashboard-text-banner ((t (:foreground ,fg-black))))
 
     ;; Diff
-    `(diff-added ((t (:background ,bg-green :foreground ,fg-bright))))
-    `(diff-refine-changed ((t (:background ,bg-yellow :foreground ,fg-bright))))
-    `(diff-removed ((t (:background ,bg-red :foreground ,fg-bright))))
+    `(diff-added ((t (:background ,bg-green :foreground ,fg-white))))
+    `(diff-refine-changed ((t (:background ,bg-yellow :foreground ,fg-white))))
+    `(diff-removed ((t (:background ,fg-red :foreground ,fg-white))))
     `(diff-changed ((t (:background ,bg-orange))))
     `(diff-file-header ((t (:foreground ,bg-white :background unspecified))))
     `(diff-function ((t (:inherit unspecified :foreground ,fg-orange))))
@@ -358,7 +344,7 @@
     `(ido-indicator ((t (:background ,bg-bright :foreground ,fg-white :width condensed))))
 
     ;; Iedit
-    `(iedit-occurrence ((t (:background ,bg-yellow :foreground ,fg-default))))
+    `(iedit-occurrence ((t (:background ,bg-blue :foreground ,fg-white))))
 
     ;; Man
     `(Man-overstrike ((t (:foreground ,fg-blue :weight bold))))
@@ -447,9 +433,9 @@
     `(org-agenda-structure ((t (:foreground ,fg-blue))))
 
     ;; Org-block
-    `(org-block ((t (:background ,bg-black))))
-    `(org-block-begin-line ((t (:background ,bg-bright :foreground ,fg-default))))
-    `(org-block-end-line ((t (:background ,bg-bright :foreground ,fg-default))))
+    `(org-block ((t (:background ,bg-shadow))))
+    `(org-block-begin-line ((t (:background ,fg-blue :foreground ,fg-white))))
+    `(org-block-end-line ((t (:background ,fg-blue :foreground ,fg-white))))
 
     ;; Org-column
     `(org-column ((t (:background ,bg-gray :strike-through nil :underline nil :slant normal :weight normal))))
@@ -629,5 +615,5 @@
   (add-to-list 'custom-theme-load-path
     (file-name-as-directory (file-name-directory load-file-name))))
 
-(provide-theme 'moebius)
+(provide-theme 'moebius-yellow)
 ;; moebius-theme.el ends here

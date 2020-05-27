@@ -33,10 +33,10 @@
 (let ((class '((class color) (min-colors 89)))
        ;; all colors has to have a tuple (background . foreground)
        ;; special colors
-       (bg-default   "#fffff0") (fg-default   "#696969")
-       (bg-bright    "#cdcdc1") (fg-bright    "#ededed")
-       (bg-dim       "#eeeee0") (fg-dim       "#969696")
-       (bg-shadow    "#dcdcdc") (fg-shadow    "#969696")
+       (bg-default   "#fffacd") (fg-default   "#696969")
+       (bg-dim       "#eee9bf") (fg-dim       "#969696")
+       (bg-bright    "#ffffe0") (fg-bright    "#ededed")
+       (bg-shadow    "#cdc9a5") (fg-shadow    "#969696")
 
        ;; basic colors
        (bg-black     "#8b8b83") (fg-black     "#000000")
@@ -203,16 +203,16 @@
     `(company-template-field ((t (:background ,bg-dim :foreground ,fg-yellow))))
 
     ;; Dashboard
-    `(dashboard-footer ((t (:foreground ,fg-black))))
+    `(dashboard-footer ((t (:foreground ,fg-dim))))
     `(dashboard-heading ((t (:foreground ,fg-blue))))
-    `(dashboard-text-banner ((t (:foreground ,fg-black))))
+    `(dashboard-text-banner ((t (:foreground ,fg-red))))
 
     ;; Diff
     `(diff-added ((t (:background ,bg-green :foreground ,fg-white))))
-    `(diff-refine-changed ((t (:background ,bg-yellow :foreground ,fg-white))))
-    `(diff-removed ((t (:background ,fg-red :foreground ,fg-white))))
+    `(diff-refine-changed ((t (:background ,bg-yellow :foreground ,fg-black))))
+    `(diff-removed ((t (:background ,bg-red :foreground ,fg-white))))
     `(diff-changed ((t (:background ,bg-orange))))
-    `(diff-file-header ((t (:foreground ,bg-white :background unspecified))))
+    `(diff-file-header ((t (:foreground ,fg-default :background unspecified))))
     `(diff-function ((t (:inherit unspecified :foreground ,fg-orange))))
     `(diff-header ((t (:background ,bg-bright))))
     `(diff-hl-change ((t (:foreground ,bg-yellow :background unspecified :inherit diff-changed))))

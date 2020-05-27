@@ -1258,9 +1258,8 @@
                          collect kill))
           ;; if candidates
           (if candidates
-              (insert
-               (completing-read "Kill-ring: " candidates nil t))
-            (message "Mark ring is empty"))))
+              (insert (completing-read "Kill-ring: " candidates nil t))
+            (message "Kill ring is empty"))))
 
       #+END_SRC
 

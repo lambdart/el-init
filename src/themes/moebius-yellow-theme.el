@@ -39,7 +39,7 @@
        (bg-shadow    "#cdc9a5") (fg-shadow    "#f5f5f5")
 
        ;; basic colors
-       (bg-black     "#8b8b83") (fg-black     "#2c2c2c")
+       (bg-black     "#8b8b83") (fg-black     "#323232")
        (bg-white     "#bfbfbf") (fg-white     "#d3d3d3")
        (bg-red       "#8b6969") (fg-red       "#a85454")
        (bg-gray      "#696969") (fg-gray      "#a9a9a9")
@@ -80,7 +80,7 @@
     `(lazy-highlight ((t (:background ,bg-blue :foreground ,bg-white))))
     `(line-number ((t (:inherit (shadow black) :back))))
     `(line-number-current-line ((t (:inherit line-number))))
-    `(secondary-selection ((t (:background ,bg-yellow :foreground ,fg-black))))
+    `(secondary-selection ((t (:background ,bg-dim :foreground ,fg-default))))
     `(escape-glyph ((t (:foreground ,fg-red))))
 
     ;; Font
@@ -209,9 +209,9 @@
 
     ;; Diff
     `(diff-header ((t (:background ,bg-shadow))))
-    `(diff-added ((t (:background ,bg-green :foreground ,fg-white))))
-    `(diff-removed ((t (:background ,bg-red :foreground ,fg-white))))
-    `(diff-changed ((t (:background ,bg-red :foreground ,fg-white))))
+    `(diff-added ((t (:background ,bg-green :foreground ,fg-black))))
+    `(diff-removed ((t (:background ,bg-red :foreground ,fg-black))))
+    `(diff-changed ((t (:background ,bg-red :foreground ,fg-black))))
     `(diff-function ((t (:inherit unspecified :foreground ,fg-orange))))
     `(diff-file-header ((t (:foreground ,fg-default :background unspecified))))
     `(diff-refine-changed ((t (:background ,bg-yellow :foreground ,fg-white))))
@@ -453,7 +453,8 @@
     `(org-block-end-line ((t (:background ,fg-blue :foreground ,fg-white))))
 
     ;; Org-column
-    `(org-column ((t (:background ,bg-dim :strike-through nil :underline nil :slant normal :weight normal))))
+    `(org-column ((t (:background ,bg-dim :strike-through nil :underline nil
+                       :slant normal :weight normal))))
     `(org-column-title ((t (:background ,bg-dim :underline t :weight bold))))
 
     ;; Org-document
@@ -461,6 +462,7 @@
     `(org-document-title ((t (:foreground ,fg-green))))
 
     ;; Org
+    `(org-todo ((t (:foreground ,fg-red :weight bold))))
     `(org-done ((t (:foreground ,fg-green :weight bold))))
     `(org-drawer ((t (:foreground ,fg-blue))))
     `(org-footnote ((t (:foreground ,fg-magenta :underline t))))
@@ -618,7 +620,7 @@
     `(rpm-spec-dir-face ((t (:foreground ,fg-turquoise))))
     `(rpm-spec-package-face ((t (:foreground ,fg-red))))
     `(rpm-spec-ghost-face ((t (:foreground ,fg-red))))
-    `(rpm-spec-section-face ((t (:foreground ,fg-yellow :underline t))))
+    `(rpm-spec-stion-face ((t (:foreground ,fg-yellow :underline t))))
 
     ;; Window dividers
     `(window-divider ((t (:foreground ,bg-dim))))

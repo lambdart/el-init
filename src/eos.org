@@ -83,23 +83,6 @@
 
      #+END_SRC
 
-**** Functions
-
-     #+BEGIN_SRC emacs-lisp
-
-     (defun eos/defer-gc-collection ()
-       "Set `gc-cons-threshold' to most positive fix number,
-     The largest value that is representable in a Lisp integer."
-       (setq gc-cons-threshold most-positive-fixnum))
-
-     (defun eos/reset-gc-collection ()
-       "Reset garbage collection."
-       (run-at-time 1 nil
-                    (lambda ()
-                      (setq gc-cons-threshold 16777216))))
-
-     #+END_SRC
-
 **** Hooks
 
      #+BEGIN_SRC emacs-lisp
@@ -229,298 +212,41 @@
 
      #+END_SRC
 
-*** Load-path
-**** Functions
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'cl-seq nil t)
-
-     (defun eos-update-load-path (&rest _)
-       "Update `load-path'."
-       (dolist (dir '("site-lisp" "lisp"))
-         (add-to-list 'load-path
-                      (expand-file-name dir user-emacs-directory))))
-
-     (defun eos-add-subdirs-to-load-path (&rest _)
-       "Add sub-directories to `load-path'."
-       (interactive)
-       (let ((default-directory
-               (expand-file-name "site-lisp" user-emacs-directory)))
-         (normal-top-level-add-subdirs-to-load-path)))
-
-     ;; research
-     ;; (cl-remove-duplicates load-path)
-
-     (defun eos-load-file (file)
-       "Load FILE if exists."
-       (if (file-exists-p file)
-           (load (expand-file-name file) t nil nil)
-         (message "file %s not found" file)))
-
-     #+END_SRC
-
-**** Enable
-
-     Update `load-path' variables.
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; update load path
-     (eos-update-load-path)
-     (eos-add-subdirs-to-load-path)
-
-     #+END_SRC
-
 ** Prelude
-**** Core
+**** Load-path
 
-     Core functions must be generic and pure:
-     only emacs vanilla and C source as dependencies.
+     #+BEGIN_SRC emacs-lisp
 
-***** Call
+     ;; update initial `load-path'."
+     (dolist (dir '("site-lisp" "lisp"))
+       (add-to-list 'load-path
+                    (expand-file-name dir user-emacs-directory)))
 
-      #+BEGIN_SRC emacs-lisp
+     ;; add sub-directories to `load-path'."
+     (let ((default-directory
+             (expand-file-name "site-lisp" user-emacs-directory)))
+       (normal-top-level-add-subdirs-to-load-path))
 
-      (defun eos-call-proc (name &optional args)
-        "Call (execute) a process by NAME with ARGS."
-        (if (executable-find name)
-            (if args
-                (start-process name nil name args)
-              (start-process name nil name)))
-        nil)
+     ;; clean load-path list (remove duplicates)
+     (delete-dups load-path)
 
-      (defun eos-call-func (func &rest args)
-        "Call FUNC with ARGS, if it's bounded."
-        (when (fboundp func)
-          (if args
-              (funcall func args)
-            (funcall func))))
+     #+END_SRC
 
-      #+END_SRC
-
-***** Edit
+**** Vex
+***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos-edit-move-lines (n)
-        "Move N lines, up if N is positive, else down."
-        (let* (text-start
-               text-end
-               (region-start (point))
-               (region-end region-start)
-               swap-point-mark
-               delete-latest-newline)
-
-          ;; STEP 1: identifying the text to cut.
-          (when (region-active-p)
-            (if (> (point) (mark))
-                (setq region-start (mark))
-              (exchange-point-and-mark)
-              (setq swap-point-mark t
-                    region-end (point))))
-
-          ;; text-end and region-end
-          (end-of-line)
-
-          (if (< (point) (point-max))
-              (forward-char 1)
-            (setq delete-latest-newline t)
-            (insert-char ?\n))
-          (setq text-end (point)
-                region-end (- region-end text-end))
-
-          ;; text-start and region-start
-          (goto-char region-start)
-          (beginning-of-line)
-          (setq text-start (point)
-                region-start (- region-start text-end))
-
-          ;; STEP 2: cut and paste.
-          (let ((text (delete-and-extract-region text-start text-end)))
-            (forward-line n)
-            ;; If the current-column != 0, I have moved the region at the bottom of a
-            ;; buffer doesn't have the trailing newline.
-            (when (not (= (current-column) 0))
-              (insert-char ?\n)
-              (setq delete-latest-newline t))
-            (insert text))
-
-          ;; STEP 3: Restoring.
-          (forward-char region-end)
-
-          (when delete-latest-newline
-            (save-excursion
-              (goto-char (point-max))
-              (delete-char -1)))
-
-          (when (region-active-p)
-            (setq deactivate-mark nil)
-            (set-mark (+ (point) (- region-start region-end)))
-            (if swap-point-mark
-                (exchange-point-and-mark)))))
-
-      (defun eos/edit-move-lines-up (n)
-        "Move N lines up."
-        (interactive "p")
-        (if (eq n nil)
-            (setq n 1))
-        (eos-edit-move-lines (- n)))
-
-      (defun eos/edit-move-lines-down (n)
-        "Move N lines down."
-        (interactive "p")
-        (if (eq n nil)
-            (setq n 1))
-        (eos-edit-move-lines n))
-
-      (defun eos/edit-move-words-left (n)
-        "Move word N times to the left."
-        (interactive "p")
-        (if (eq n nil)
-            (setq n 1))
-        (transpose-words (- n)))
-
-      (defun eos/edit-indent-buffer ()
-        "Indent the currently visited buffer."
-        (interactive)
-        (indent-region (point-min) (point-max)))
-
-      (defun eos/edit-indent-region-or-buffer ()
-        "Indent a region if selected, otherwise the whole buffer."
-        (interactive)
-        (save-excursion
-          (if (region-active-p)
-              (progn
-                (indent-region (region-beginning) (region-end))
-                (message "Indented selected region."))
-            (progn
-              (eos/edit-indent-buffer)
-              (message "Indented buffer.")))))
-
-      (defun eos/edit-duplicate-current-line-or-region (arg)
-        "Duplicates the current line or region ARG times.
-
-      If there's no region, the current line will be duplicated.
-      However, if there's a region, all lines that region covers will be duplicated."
-
-        (interactive "p")
-        (let (beg end (origin (point)))
-          (if (and mark-active (> (point) (mark)))
-              (exchange-point-and-mark))
-          (setq beg (line-beginning-position))
-          (if mark-active
-              (exchange-point-and-mark))
-          (setq end (line-end-position))
-          (let ((region (buffer-substring-no-properties beg end))
-                (i arg))
-            (while (> i 0)
-              (goto-char end)
-              (newline)
-              (insert region)
-              (setq end (point))
-              (setq i (1- i)))
-            (goto-char (+ origin (* (length region) arg) arg)))))
-
-      #+END_SRC
-
-***** Copy
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos-copy-text-or-symbol-at-point ()
-        "Get the text in region or symbol at point.
-            If region is active, return the text in that region.  Else if the
-            point is on a symbol, return that symbol name.  Else return nil."
-        (cond ((use-region-p)
-               (buffer-substring-no-properties
-                (region-beginning) (region-end)))
-              ((symbol-at-point)
-               (substring-no-properties (thing-at-point 'symbol)))
-              (t
-               nil)))
-
-      (defun eos-copy-line (&optional arg)
-        "Do a kill-line but copy rather than kill. This function directly calls
-      kill-line, so see documentation of kill-line for how to use it including prefix
-      argument and relevant variables. This function works by temporarily making the
-      buffer read-only."
-        (interactive "P")
-        (let ((buffer-read-only t)
-              (kill-read-only-ok t))
-          (kill-line arg))
-        (move-beginning-of-line nil))
-
-      #+END_SRC
-
-***** Move
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/move-beginning-of-line (arg)
-        "Move point back to indentation(ARG) start, or line(ARG) start."
-        (interactive "^p")
-        (setq arg (or arg 1))
-
-        ;; Move lines first
-        (when (/= arg 1)
-          (let ((line-move-visual nil))
-            (forward-line (1- arg))))
-
-        (let ((orig-point (point)))
-          (back-to-indentation)
-          (when (= orig-point (point))
-            (move-beginning-of-line 1))))
-
-      #+END_SRC
-
-***** Kill
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos-kill-buffer (buffer-name)
-        "Kill BUFFER-NAME if exists."
-        (when (get-buffer buffer-name)
-          (kill-buffer buffer-name)))
-
-      (defun eos/kill-current-buffer ()
-        "Kill the current buffer without prompting."
-        (interactive)
-        (kill-buffer (current-buffer)))
-
-      #+END_SRC
-
-***** Files
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos-mkdir (dir)
-        "Create DIR in the file system."
-        (when (and (not (file-exists-p dir))
-                   (make-directory dir :parents))))
-
-      #+END_SRC
-
-***** Search
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/search-keymaps (key)
-        "Search for KEY in all known keymaps.
-      Keymaps list will be printed on *Messages* buffer."
-        (interactive "kPress key: ")
-        (mapatoms (lambda (ob)
-                    (when (and (boundp ob) (keymapp (symbol-value ob)))
-                      (when (functionp (lookup-key (symbol-value ob) key))
-                        (message "%s" ob))))))
+      (require 'vex nil t)
 
       #+END_SRC
 
 ***** Utils
+****** TODO Replace this, with vex-utils.el.
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/set-frame-transparency (&optional opacity)
+      (defun set-frame-transparency (&optional opacity)
         "Set OPACITY transparency in current frame."
         (interactive "P")
         (let ((opacity (or opacity
@@ -529,76 +255,61 @@
               (async-shell-command (format "transset -a %.1f" opacity))
             (message "transset not found"))))
 
-      (defun eos/set-background-image (&optional image-file)
+      (defun set-background-image (&optional image-file)
         "Set IMAGE-FILE as background using feh binary."
         (interactive "P")
         (setq image-file (or image-file
-                            (read-file-name "Image: ")))
+                             (read-file-name "Image: ")))
         (if (executable-find "feh")
             (async-shell-command (format "feh  --bg-fill %s" image-file))
           (message "feh not found")))
 
-      (defun eos/open-scratch ()
-        "Open or switch to *scratch* buffer."
-        (interactive)
-        (let (buffer (get-buffer "*scratch*"))
-          (if buffer
-              (switch-to-buffer buffer)
-            (progn
-              (setq buffer (get-buffer-create "*scratch*"))
-              (with-current-buffer "*scratch*"
-                (when (zerop (buffer-size))
-                  (insert (substitute-command-keys initial-scratch-message)))
-                (if (eq major-mode 'fundamental-mode)
-                    (funcall initial-major-mode)))
-              (switch-to-buffer buffer)))))
-
       #+END_SRC
 
-**** Binds
+***** Binds
 
-     Fundamental/core binds.
+      Fundamental/core binds.
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     ;; line movement
-     (global-set-key (kbd "C-a") 'eos/move-beginning-of-line)
-     (global-set-key (kbd "C-e") 'move-end-of-line)
+      ;; line movement
+      (global-set-key (kbd "C-a") 'back-to-indent-or-line)
+      (global-set-key (kbd "C-e") 'move-end-of-line)
 
-     ;; word movement
-     ;; (global-set-key (kbd "C-<left>") 'backward-word)
-     ;; (global-set-key (kbd "C-<right>") 'forward-whitespace)
+      ;; word movement
+      (global-set-key (kbd "C-<left>") 'backward-word)
+      (global-set-key (kbd "C-<right>") 'forward-whitespace)
 
-     ;; scroll movement
-     (global-set-key (kbd "C-M-v") 'scroll-other-window)
-     (global-set-key (kbd "C-M-y") 'scroll-other-window-down)
+      ;; scroll movement
+      (global-set-key (kbd "C-M-v") 'scroll-other-window)
+      (global-set-key (kbd "C-M-y") 'scroll-other-window-down)
 
-     ;; edit
-     (global-set-key (kbd "M-i") 'eos/edit-indent-region-or-buffer)
-     (global-set-key (kbd "M-j") 'eos/edit-duplicate-current-line-or-region)
-     (global-set-key (kbd "M-p") 'eos/edit-move-lines-up)
-     (global-set-key (kbd "M-n") 'eos/edit-move-lines-down)
+      ;; edit
+      (global-set-key (kbd "M-i") 'indent-region-or-buffer)
+      (global-set-key (kbd "M-j") 'clone-line-or-region)
+      (global-set-key (kbd "M-p") 'transpose-lines-up)
+      (global-set-key (kbd "M-n") 'transpose-lines-down)
 
-     ;; kill
-     (define-key ctl-x-map (kbd "k") 'kill-buffer)
+      ;; kill
+      (define-key ctl-x-map (kbd "k") 'kill-buffer)
 
-     ;; mark
-     (define-key eos-utils-map (kbd "h") 'mark-whole-buffer)
-     (define-key eos-utils-map (kbd "s") 'mark-sexp)
-     (define-key eos-utils-map (kbd "p") 'mark-paragraph)
-     (define-key eos-utils-map (kbd "w") 'mark-word)
+      ;; mark
+      (define-key eos-utils-map (kbd "h") 'mark-whole-buffer)
+      (define-key eos-utils-map (kbd "s") 'mark-sexp)
+      (define-key eos-utils-map (kbd "p") 'mark-paragraph)
+      (define-key eos-utils-map (kbd "w") 'mark-word)
 
-     ;; eos prefixs
-     (define-key ctl-x-map (kbd "a") 'eos-filter-map)
-     (define-key ctl-x-map (kbd "p") 'eos-pm-map)
-     (define-key ctl-x-map (kbd "t") 'eos-tags-map)
-     (define-key ctl-x-map (kbd "c") 'eos-utils-map)
-     (define-key ctl-x-map (kbd "e") 'eos-sc-map)
-     (define-key ctl-x-map (kbd "f") 'eos-file-map)
-     (define-key ctl-x-map (kbd "l") 'eos-docs-map)
-     (define-key ctl-x-map (kbd "<tab>") 'eos-completion-map)
+      ;; eos prefixs
+      (define-key ctl-x-map (kbd "a") 'eos-filter-map)
+      (define-key ctl-x-map (kbd "p") 'eos-pm-map)
+      (define-key ctl-x-map (kbd "t") 'eos-tags-map)
+      (define-key ctl-x-map (kbd "c") 'eos-utils-map)
+      (define-key ctl-x-map (kbd "e") 'eos-sc-map)
+      (define-key ctl-x-map (kbd "f") 'eos-file-map)
+      (define-key ctl-x-map (kbd "l") 'eos-docs-map)
+      (define-key ctl-x-map (kbd "<tab>") 'eos-completion-map)
 
-     #+END_SRC
+      #+END_SRC
 
 ** Vanilla
 *** Cursor
@@ -741,7 +452,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; window move default keybinds (shift-up/down etc..)
-     (eos-call-func 'windmove-default-keybindings)))
+     (safe-funcall 'windmove-default-keybindings)))
 
      #+END_SRC
 
@@ -1003,10 +714,17 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; defer garbage collection
-     (add-hook 'minibuffer-setup-hook 'eos/defer-gc-collection)
+     ;; set `gc-cons-threshold' to most-positive-fixnum
+     ;; the largest lisp integer value representation
+     (add-hook 'minibuffer-setup-hook
+               (lambda ()
+                 (setq gc-cons-threshold most-positive-fixnum)))
 
-     ;; reset threshold to inital value
-     (add-hook 'minibuffer-exit-hook 'eos/reset-gc-collection)
+     ;; reset threshold to inital value (16 megabytes)
+     (add-hook 'minibuffer-exit-hook
+               (lambda () (run-at-time 1 nil
+                                       (lambda ()
+                                         (setq gc-cons-threshold 16777216)))))
 
      #+END_SRC
 
@@ -1031,7 +749,7 @@
                        (let ((minibuffer (active-minibuffer-window)))
                          (when minibuffer
                            (select-window minibuffer)
-                           (eos-call-func 'minibuffer-keyboard-quit)))))
+                           (safe-funcall 'minibuffer-keyboard-quit)))))
 
      #+END_SRC
 
@@ -1169,7 +887,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; enable dynamic completion mode
-     (eos-call-func 'dynamic-completion-mode 1)
+     (safe-funcall 'dynamic-completion-mode 1)
 
      #+END_SRC
 
@@ -1428,10 +1146,10 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; column number display in the mode line
-     (eos-call-func 'column-number-mode 1)
+     (safe-funcall 'column-number-mode 1)
 
      ;; buffer size display in the mode line
-     (eos-call-func 'size-indication-mode 1)))
+     (safe-funcall 'size-indication-mode 1)))
 
      #+END_SRC
 
@@ -1469,7 +1187,7 @@
      ;; enable emacs server after startup
      (add-hook 'emacs-startup-hook
                (lambda ()
-                 (eos-call-func 'server-start)))))
+                 (safe-funcall 'server-start)))))
 
      #+END_SRC
 
@@ -1686,7 +1404,7 @@
      (customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))))
 
      ;; create cache directory
-     (eos-mkdir (concat user-emacs-directory "cache"))
+     (safe-mkdir (concat user-emacs-directory "cache"))
 
      #+END_SRC
 
@@ -1853,7 +1571,6 @@
     the list will be presented in the order it is recorded
     (chronologically), which is actually fairly useful as well.
 
-
 **** Require
 
      #+BEGIN_SRC emacs-lisp
@@ -1910,7 +1627,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; enable savehist mode
-     (eos-call-func 'savehist-mode 1)))
+     (safe-funcall 'savehist-mode 1)))
 
      #+END_SRC
 
@@ -1987,7 +1704,7 @@
      (add-hook 'after-make-frame-functions
                (lambda (frame)
                  (interactive)
-                 (eos/set-frame-transparency .8)))
+                 (set-frame-transparency .8)))
 
      #+END_SRC
 
@@ -1999,7 +1716,7 @@
      (define-key ctl-x-5-map (kbd "t")
        ((lambda ()
           (interactive)
-          (eos/set-frame-transparency 1))))
+          (set-frame-transparency 1))))
 
      ;; global map
      (global-set-key (kbd "C-x C-o") 'other-frame)
@@ -2084,7 +1801,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; visualization of matching parens
-     (eos-call-func 'show-paren-mode 1)))
+     (safe-funcall 'show-paren-mode 1)))
 
      #+END_SRC
 
@@ -2125,7 +1842,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; enable display time
-     (eos-call-func 'display-time-mode 1)))
+     (safe-funcall 'display-time-mode 1)))
 
      #+END_SRC
 
@@ -2163,7 +1880,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; disable
-     (eos-call-func 'tool-bar-mode 0)))
+     (safe-funcall 'tool-bar-mode 0)))
 
      #+END_SRC
 
@@ -2229,7 +1946,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (eos-call-func 'menu-bar-mode 0)))
+     (safe-funcall 'menu-bar-mode 0)))
 
      #+END_SRC
 
@@ -2252,7 +1969,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; disable scroll bar
-     (eos-call-func 'scroll-bar-mode 0)))
+     (safe-funcall 'scroll-bar-mode 0)))
 
      #+END_SRC
 
@@ -2276,7 +1993,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; enable highlight line
-     (eos-call-func 'global-hl-line-mode 1)))
+     (safe-funcall 'global-hl-line-mode 1)))
 
      #+END_SRC
 
@@ -2328,7 +2045,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; (eos-call-func 'global-display-line-numbers-mode 1)))
+     ;; (safe-funcall 'global-display-line-numbers-mode 1)))
 
      #+END_SRC
 
@@ -2384,7 +2101,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (eos-call-func 'global-subword-mode 1)))
+     (safe-funcall 'global-subword-mode 1)))
 
      #+END_SRC
 
@@ -2445,7 +2162,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; load custom-file
-     ;; (eos-load-file custom-file)
+     ;; (safe-load-file custom-file)
 
      #+END_SRC
 
@@ -2672,7 +2389,7 @@
       (add-hook 'exwm-init-hook
                 (lambda ()
                   (interactive)
-                  (eos/set-frame-transparency 0.8)))
+                  (set-frame-transparency 0.8)))
 
       ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
       ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
@@ -2698,7 +2415,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eos-call-func 'exwm-enable)
+      (safe-funcall 'exwm-enable)
 
       #+END_SRC
 
@@ -3052,7 +2769,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eos-call-func 'electric-pair-mode 1)))
+      (safe-funcall 'electric-pair-mode 1)))
 
       #+END_SRC
 
@@ -3099,7 +2816,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; delete selection-mode
-      (eos-call-func 'delete-selection-mode 1)))
+      (safe-funcall 'delete-selection-mode 1)))
 
       #+END_SRC
 
@@ -3184,7 +2901,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable
-      (eos-call-func 'global-undo-tree-mode 1)))
+      (safe-funcall 'global-undo-tree-mode 1)))
 
       #+END_SRC
 
@@ -3205,7 +2922,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eos-call-func 'editorconfig-mode)
+      (safe-funcall 'editorconfig-mode)
 
       #+END_SRC
 
@@ -3277,7 +2994,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eos-call-func 'dired-async-mode 1)
+      (safe-funcall 'dired-async-mode 1)
 
       #+END_SRC
 
@@ -4564,7 +4281,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eos-call-func 'cannon-mode 1)
+      (safe-funcall 'cannon-mode 1)
 
       #+END_SRC
 
@@ -4592,7 +4309,7 @@
                 (lambda ()
                   (when (boundp 'verb-mode)
                     (if verb-mode
-                        (eos-call-func 'verb-send-request-on-point 'this-window)))))))
+                        (safe-funcall 'verb-send-request-on-point 'this-window)))))))
 
       #+END_SRC
 
@@ -4816,23 +4533,14 @@
 
      Start compton after emacs initialize.
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/compton ()
-        "Call compton compositor utility."
-        (interactive)
-        (eos-call-proc "compton" "-b"))
-
-      #+END_SRC
-
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
       ;; start compton after emacs initialize
-      (add-hook 'after-init-hook #'eos/compton)
+      (add-hook 'after-init-hook
+                (lambda ()
+                  (safe-start-process "compton" "compton" "-b")))
 
       #+END_SRC
 
@@ -4840,44 +4548,28 @@
 **** Calc
 *** Controllers
 **** Slock
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/slock ()
-        "Call slock utility."
-        (interactive)
-        (eos-call-proc "slock" nil))
-
-      #+END_SRC
-
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key ctl-x-map (kbd "<end>") 'eos/slock)
+      (define-key ctl-x-map (kbd "<end>")
+        (lambda ()
+          (interactive)
+          (safe-start-process "slock" "slock")))
 
       #+END_SRC
 
 **** Scrot
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/scrot ()
-        "Call scrot utility."
-        (interactive)
-        (eos-call-proc "scrot")
-        (message "Saved in %s directory" (pwd)))
-
-      #+END_SRC
-
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
       ;; global-map
-      (global-set-key (kbd "<print>") 'eos/scrot)
+      (global-set-key (kbd "<print>")
+                      (lambda ()
+                        (interactive)
+                        (safe-start-process "scrot" "scrot")
+                        (message "Image save at %s" default-directory)))
 
       #+END_SRC
 
@@ -4913,7 +4605,6 @@
       (global-set-key (kbd "s-=") 'eos/raise-volume)
 
       #+END_SRC
-
 *** Calendar
 *** Dashboards
 **** Dashboard
@@ -5000,7 +4691,7 @@
         (interactive)
         (unless (get-buffer "*dashboard*")
           (generate-new-buffer "*dashboard*"))
-        (eos-call-func 'dashboard-refresh-buffer))
+        (safe-funcall 'dashboard-refresh-buffer))
 
       (defun eos-dashboard-insert-footer ()
         "Insert dashboard-footer message."
@@ -5468,7 +5159,7 @@
        "Update htmls and call `org-static-blog-publish'."
        (interactive)
        (eos/blog/update-html)
-       (eos-call-func 'org-static-blog-publish))
+       (safe-funcall 'org-static-blog-publish))
 
      #+END_SRC
 
@@ -5935,7 +5626,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable globally
-      (eos-call-func 'global-company-mode 1)
+      (safe-funcall 'global-company-mode 1)
 
       #+END_SRC
 
@@ -6014,7 +5705,7 @@
       ;; enable yasnippet after emacs startup
       (add-hook 'emacs-startup-hook
                 (lambda ()
-                  (eos-call-func 'yas-global-mode 1)))
+                  (safe-funcall 'yas-global-mode 1)))
 
       #+END_SRC
 
@@ -6453,11 +6144,202 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eos-call-func 'projectile-mode 1)
+      (safe-funcall 'projectile-mode 1)
 
       #+END_SRC
 
 ** Programming
+*** Lisp
+**** Lisp-mode
+
+     The base major mode for editing Lisp code (used also for Emacs Lisp).
+     This mode is documented in the Emacs manual.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'lisp-mode nil t)
+        (progn
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; number of columns to indent the second line of a (def...) form
+      (customize-set-variable 'lisp-body-indent 2)))
+
+      #+END_SRC
+
+*** Elisp
+**** Elisp-mode
+
+     The major mode for editing Emacs Lisp code.
+     Tis mode is documented in the Emacs manual.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'elisp-mode nil t)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/elisp/set-company-backends ()
+        "Set elisp company backends."
+        (interactive)
+        (eos-set-company-backends
+         '((company-elisp :with
+                          company-capf
+                          company-yasnippet
+                          company-dabbrev-code)
+           (company-dabbrev)
+           (company-files))))
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable minor modes
+      (add-hook 'emacs-lisp-mode-hook
+                (lambda()
+                  (safe-funcall 'eldoc-mode 1)))
+
+      (add-hook 'lisp-interaction-mode-hook
+                (lambda()
+                  (safe-funcall 'eldoc-mode 1)))
+
+      ;; set backends (company, flychecker, dash-docs)
+      (add-hook 'emacs-lisp-mode-hook
+                (lambda ()
+                  ;; set company backends
+                  (eos/elisp/set-company-backends)
+
+                  ;; set flycheck checker
+                  (eos/set-flycheck-checker 'emacs-lisp)
+
+                  ;; activate dash docset (emacs)
+                  (eos-set-dash-docset "Emacs Lisp")))
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; emacs-lisp-mode-map
+      (when (boundp 'emacs-lisp-mode-map)
+        (progn
+          ;; eval
+          (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
+          (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
+          (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
+
+          ;; complete
+          (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/complete-in-buffer-or-indent)
+
+          ;; quality of life (unbind)
+          (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
+          (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
+          (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
+          (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
+          (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)))
+
+      #+END_SRC
+
+*** Haskell
+**** Haskel-mode
+
+     A major mode for editing Haskell (the functional programming
+     language.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'haskell-mode-autoloads nil t)
+
+     #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      (customize-set-variable 'haskell-completing-read-function 'completing-read)
+
+      #+END_SRC
+
+***** Hooks
+*** Elixir
+**** Elixir-mode
+
+     Provides font-locking, indentation and navigation support
+     for the Elixir programming language.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'elixir-mode nil t)
+        (progn
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; additional arguments to `mix format`'
+      ;; (customize-set-variable 'elixir-format-arguments nil)
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'elixir-mode-hook
+                (lambda ()
+                  ;; set company backends
+                  (eos-set-company-backends
+                   '(company-yasnippet
+                     company-dabbrev
+                     company-dabbrev-code
+                     (company-files)))
+
+                  ;; set syntax checker
+                  ;; eos/flycheck/set-cheker '<elixir-checker>)
+
+                  ;; set dash docsets
+                  (eos-set-dash-docset '"Elixir")))))
+
+      #+END_SRC
+
+**** Alchemist
+*** R
+**** Ess-r-mode
+
+     Major mode for editing R source.
+
+     This package defines all the R customizations for ESS.
+     See ess-s-lang.el for general S language customizations.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'ess-r-mode nil t)
+
+      #+END_SRC
+
 *** C/C++
 **** Rtags
 
@@ -6624,112 +6506,6 @@
       #+BEGIN_SRC emacs-lisp
 
       (require 'company-c-headers nil t)
-
-      #+END_SRC
-
-*** Lisp
-**** Lisp-mode
-
-     The base major mode for editing Lisp code (used also for Emacs Lisp).
-     This mode is documented in the Emacs manual.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'lisp-mode nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; number of columns to indent the second line of a (def...) form
-      (customize-set-variable 'lisp-body-indent 2)))
-
-      #+END_SRC
-
-*** Elisp
-**** Elisp-mode
-
-     The major mode for editing Emacs Lisp code.
-     Tis mode is documented in the Emacs manual.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'elisp-mode nil t)
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/elisp/set-company-backends ()
-        "Set elisp company backends."
-        (interactive)
-        (eos-set-company-backends
-         '((company-elisp :with
-                          company-capf
-                          company-yasnippet
-                          company-dabbrev-code)
-           (company-dabbrev)
-           (company-files))))
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; enable minor modes
-      (add-hook 'emacs-lisp-mode-hook
-                (lambda()
-                  (eos-call-func 'eldoc-mode 1)))
-
-      (add-hook 'lisp-interaction-mode-hook
-                (lambda()
-                  (eos-call-func 'eldoc-mode 1)))
-
-      ;; set backends (company, flychecker, dash-docs)
-      (add-hook 'emacs-lisp-mode-hook
-                (lambda ()
-                  ;; set company backends
-                  (eos/elisp/set-company-backends)
-
-                  ;; set flycheck checker
-                  (eos/set-flycheck-checker 'emacs-lisp)
-
-                  ;; activate dash docset (emacs)
-                  (eos-set-dash-docset "Emacs Lisp")))
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; emacs-lisp-mode-map
-      (when (boundp 'emacs-lisp-mode-map)
-        (progn
-          ;; eval
-          (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
-          (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
-          (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
-
-          ;; complete
-          (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/complete-in-buffer-or-indent)
-
-          ;; quality of life (unbind)
-          (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
-          (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
-          (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
-          (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
-          (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)))
 
       #+END_SRC
 
@@ -6988,7 +6764,7 @@
       (add-hook 'python-mode-hook
                 (lambda()
                   ;; enable eldoc mode
-                  (eos-call-func 'eldoc-mode 1)))
+                  (safe-funcall 'eldoc-mode 1)))
 
       ;; set backends
       (add-hook 'python-mode-hook
@@ -7059,22 +6835,6 @@
 
       #+END_SRC
 
-*** R
-**** Ess-r-mode
-
-     Major mode for editing R source.
-
-     This package defines all the R customizations for ESS.
-     See ess-s-lang.el for general S language customizations.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'ess-r-mode nil t)
-
-      #+END_SRC
-
 *** Julia
 **** Julia-mode
 
@@ -7115,52 +6875,6 @@
       #+BEGIN_SRC emacs-lisp
 
       (require 'csharp-mode nil t)
-
-      #+END_SRC
-
-*** Clojure
-*** Elixir
-**** Elixir-mode
-
-     Provides font-locking, indentation and navigation support
-     for the Elixir programming language.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'elixir-mode nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; additional arguments to `mix format`'
-      ;; (customize-set-variable 'elixir-format-arguments nil)
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'elixir-mode-hook
-                (lambda ()
-                  ;; set company backends
-                  (eos-set-company-backends
-                   '(company-yasnippet
-                     company-dabbrev
-                     company-dabbrev-code
-                     (company-files)))
-
-                  ;; set syntax checker
-                  ;; eos/flycheck/set-cheker '<elixir-checker>)
-
-                  ;; set dash docsets
-                  (eos-set-dash-docset '"Elixir")))))
 
       #+END_SRC
 
@@ -7523,7 +7237,7 @@
 
    #+BEGIN_SRC emacs-lisp
 
-   (eos-load-file (expand-file-name "adapt.el" user-emacs-directory))
+   (safe-load-file (expand-file-name "adapt.el" user-emacs-directory))
 
    #+END_SRC
 

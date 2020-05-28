@@ -7,6 +7,7 @@ EMACS		:= $(EMACS_COMMAND) -Q -q -batch
 EVAL   := $(EMACS) --eval
 SCRIPT := $(EMACS) --script
 
+VEX       := ~/.emacs.d/lisp/vex
 ASYNC     := ~/.emacs.d/site-lisp/async-20200113.1745
 XELB      := ~/.emacs.d/site-lisp/xelb-20190914.0
 EXWM      := ~/.emacs.d/site-lisp/exwm-20200329.0
@@ -17,7 +18,8 @@ FLYCHECK  := ~/.emacs.d/site-lisp/flycheck-20200422.2108
 PPCOMPILE := ~/.emacs.d/site-lisp/ppcompile-20200420.1519
 
 # Additional emacs loadpath
-LOADPATH := -L $(ASYNC) \
+LOADPATH := -L $(VEX) \
+	    -L $(ASYNC) \
 	    -L $(DASH) \
 	    -L $(XELB) \
 	    -L $(EXWM) \

@@ -8,7 +8,7 @@
   Using emacs (lisp interpreter) as the only
   IO bridge between human and machine.
 
-** Bootstrap
+** Boot
 *** Header
 
     Define the package header to avoid warnings.
@@ -192,19 +192,19 @@
 
 **** Binds
 
-    #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-    ;; eos prefixs
-    (define-key ctl-x-map (kbd "a") 'eos-filter-map)
-    (define-key ctl-x-map (kbd "p") 'eos-pm-map)
-    (define-key ctl-x-map (kbd "t") 'eos-tags-map)
-    (define-key ctl-x-map (kbd "c") 'eos-utils-map)
-    (define-key ctl-x-map (kbd "e") 'eos-sc-map)
-    (define-key ctl-x-map (kbd "f") 'eos-file-map)
-    (define-key ctl-x-map (kbd "l") 'eos-docs-map)
-    (define-key ctl-x-map (kbd "<tab>") 'eos-completion-map)
+     ;; eos prefixs
+     (define-key ctl-x-map (kbd "a") 'eos-filter-map)
+     (define-key ctl-x-map (kbd "p") 'eos-pm-map)
+     (define-key ctl-x-map (kbd "t") 'eos-tags-map)
+     (define-key ctl-x-map (kbd "c") 'eos-utils-map)
+     (define-key ctl-x-map (kbd "e") 'eos-sc-map)
+     (define-key ctl-x-map (kbd "f") 'eos-file-map)
+     (define-key ctl-x-map (kbd "l") 'eos-docs-map)
+     (define-key ctl-x-map (kbd "<tab>") 'eos-completion-map)
 
-    #+END_SRC
+     #+END_SRC
 
 *** Defer
 
@@ -254,29 +254,98 @@
     of this variable is a list of directories to search when
     loading files.
 
-     #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
 
-     ;; add sub-directories to `load-path'."
-     (dolist (dir '("site-lisp"))
-       (let ((default-directory
-               (expand-file-name dir user-emacs-directory)))
-         (normal-top-level-add-subdirs-to-load-path)))
+    ;; add sub-directories to `load-path'."
+    (dolist (dir '("site-lisp"))
+      (let ((default-directory
+              (expand-file-name dir user-emacs-directory)))
+        (normal-top-level-add-subdirs-to-load-path)))
 
-     ;; clean load-path list (remove duplicates)
-     (delete-dups load-path)
+    ;; clean load-path list (remove duplicates)
+    (delete-dups load-path)
 
-     #+END_SRC
+    #+END_SRC
+
+*** Environment
+
+    User environment.
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; set term to eterm-color
+    ;; (setenv "TERM" "eterm-color")
+
+    ;; the full name of the user logged in
+    (customize-set-variable 'user-login-name (getenv "USER"))
+
+    ;; the email address of the current user
+    (customize-set-variable 'user-mail-address (getenv "EMAIL"))
+
+    #+END_SRC
 
 ** Libraries
-**** Vex
+*** Fundamental
+**** Simple
+
+     A grab-bag of basic Emacs commands not specifically related to
+     some major mode or to file-handling.
+
 ***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'simple nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; don't omit information when lists nest too deep
+      (customize-set-variable 'eval-expression-print-level nil)
+
+      ;; your preference for a mail composition package
+      (customize-set-variable 'mail-user-agent 'message-user-agent)
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; column number display in the mode line
+      (funcall 'column-number-mode 1)
+
+      ;; buffer size display in the mode line
+      (funcall 'size-indication-mode 1)
+
+      #+END_SRC
+
+**** Vex
+***** Load-path
 
       #+BEGIN_SRC emacs-lisp
 
       (add-to-list 'load-path
                    (expand-file-name "lisp/vex" user-emacs-directory))
 
+      #+END_SRC
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
       (require 'vex nil t)
+
+      #+END_SRC
+
+***** Declare
+
+      #+BEGIN_SRC emacs-lisp
+
+     (declare-function safe-funcall "vex-c" (func &rest args))
 
       #+END_SRC
 
@@ -340,6 +409,512 @@
 
       #+END_SRC
 
+*** Network
+**** Tramp
+
+     TRAMP is for transparently accessing remote files from within Emacs.
+     TRAMP enables an easy, convenient, and consistent interface to remote
+     files as if they are local files.  TRAMP’s transparency extends to
+     editing, version control, and dired.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+     ;;  (require 'tramp nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; set tramp default method
+      (customize-set-variable 'tramp-default-method "ssh")
+
+      ;; if non-nil, chunksize for sending input to local process.
+      ;; (customize-set-variable 'tramp-chunksize 512)
+
+      ;; a value of t would require an immediate reread during filename completion,
+      ;; nil means to use always cached values for the directory contents.
+      (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
+
+      ;; set tramp verbose level
+      (customize-set-variable 'tramp-verbose 4)
+
+      ;; file which keeps connection history for tramp connections.
+      (customize-set-variable
+       'tramp-persistency-file-name
+       (concat (expand-file-name user-emacs-directory) "cache/tramp"))
+
+      ;; when invoking a shell, override the HISTFILE with this value
+      (customize-set-variable
+       'tramp-histfile-override "~/.tramp_history")
+
+      ;; connection timeout in seconds
+      (customize-set-variable 'tramp-connection-timeout 60)
+
+      #+END_SRC
+
+**** Imap
+
+    This library provides an interface for talking to
+    IMAP servers.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'imap nil t)
+
+     #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; how long to wait between checking for the end of output
+      (customize-set-variable 'imap-read-timeout 2)
+
+      ;; if non-nil, store session password without prompting
+      (customize-set-variable 'imap-store-password t)
+
+      #+END_SRC
+
+**** Smtpmail
+
+    This library provides functionalities related to send mail
+    through STMP protocol.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'smtpmail nil t)
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; specify default SMTP server
+     ;; (customize-set-variable 'smtpmail-default-smtp-server "smtp.gmail.com")
+
+     ;; the name of the host running SMTP server
+     ;; (customize-set-variable 'smtpmail-smtp-server "smtp.gmail.com")
+
+     ;; type of SMTP connections to use
+     (customize-set-variable 'smtpmail-stream-type 'ssl)
+
+     ;; smtp service port number
+     (customize-set-variable 'smtpmail-smtp-service 465)
+
+     ;; non-nil means mail is queued; otherwise it is sent immediately.
+     (customize-set-variable 'smtpmail-queue-mail nil)
+
+     ;; directory where smtpmail.el stores queued mail.
+     ;; (customize-set-variable 'smtpmail-queue-dir "")
+
+     #+END_SRC
+
+**** Nnimap
+
+     Nnimap library provides interfaces Gnus with IMAP servers.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'nnimap nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; limit the number of articles to look for after moving an article
+      (customize-set-variable 'nnimap-request-articles-find-limit nil)
+
+      #+END_SRC
+
+**** Sendmail
+
+     This mode provides mail-sending facilities from within Emacs.
+     It is documented in the Emacs user's manual.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'sendmail nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; text inserted at end of mail buffer when a message is initialized
+      (customize-set-variable 'mail-signature "Att.")
+
+      ;; file containing the text inserted at end of mail buffer
+      ;; default: ~/.signature
+      ;; (customize-set-variable 'mail-signature-file nil)
+
+      #+END_SRC
+
+*** Security
+**** Nsm
+
+     Network Security Manager.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'nsm nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; if a potential problem with the security of the network
+      ;; connection is found, the user is asked to give input
+      ;; into how the connection should be handled
+      ;; `high': This warns about additional things that many
+      ;; people would not find useful.
+      ;; `paranoid': On this level, the user is queried for
+      ;; most new connections
+      (customize-set-variable 'network-security-level 'paranoid)
+
+      ;; the file the security manager settings will be stored in.
+      (customize-set-variable 'nsm-settings-file
+                              (expand-file-name "nsm/netword-security.data" user-emacs-directory))
+
+      #+END_SRC
+
+**** Epg-config
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'eps-config nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; the gpg executable
+      (customize-set-variable 'epg-gpg-program "gpg2")
+
+      #+END_SRC
+
+**** Tls
+
+     This package implements a simple wrapper around "gnutls-cli" to
+     make Emacs support TLS/SSL.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'tls nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; indicate if certificates should be checked against trusted root certs
+      ;; if this is ‘ask’, the user can decide whether to accept an
+      ;; untrusted certificate
+      (customize-set-variable 'tls-checktrust nil)
+
+      ;; list of strings containing commands to
+      ;; start TLS stream to a host
+      ;; '("openssl s_client -connect %h:%p -CAfile %t")
+      ;; '("gnutls-cli --x509cafile %t -p %p %h --insecure")
+      (customize-set-variable
+       'tls-program
+       '("gnutls-cli --x509cafile /etc/ssl/certs/ca-certificates.crt -p %p %h"))
+
+      #+END_SRC
+
+**** Gnutls
+
+     This package provides language bindings for the GnuTLS library
+     using the corresponding core functions in gnutls.c
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require  'gnutls nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; if non-nil, this should be a TLS priority string
+      (customize-set-variable 'gnutls-algorithm-priority nil)
+
+      ;; if non-nil, this should be t or a list of checks
+      ;; per hostname regex
+      (customize-set-variable 'gnutls-verify-error nil)
+
+      #+END_SRC
+
+**** Epa
+
+     EasyPG is an all-in-one GnuPG interface for Emacs.
+     It has two aspects: convenient tools which allow to use GnuPG
+     from Emacs (EasyPG Assistant), and a fully
+     functional interface library to GnuPG (EasyPG Library).
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'epa nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; if non-nil, cache passphrase for symmetric encryption
+      (customize-set-variable
+       'epa-file-cache-passphrase-for-symmetric-encryption t)
+
+      ;; if t, always asks user to select recipients
+      (customize-set-variable 'epa-file-select-keys t)
+
+      ;; in epa commands, a particularly useful mode is ‘loopback’, which
+      ;; redirects all Pinentry queries to the caller, so Emacs can query
+      ;; passphrase through the minibuffer, instead of external Pinentry
+      ;; program
+      (customize-set-variable 'epa-pinentry-mode 'loopback)
+
+      #+END_SRC
+
+*** Notify
+**** Notifications
+
+     For proper usage, Emacs must be started in an environment with an
+     active D-Bus session bus.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'notifications nil t)
+
+      #+END_SRC
+
+*** Storage
+**** Forms
+
+    Forms mode means visiting a data file which is supposed to consist
+    of records each containing a number of fields. The records are
+    separated by a newline, the fields are separated by a user-defined
+    field separator (default: TAB). When shown, a record is
+    transferred to an Emacs buffer and presented using a user-defined
+    form. One record is shown at a time.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'forms nil t)
+
+     #+END_SRC
+
+*** Process
+**** Async
+
+     Adds the ability to call asynchronous functions and process with
+     ease. See the documentation for `async-start' and `async-start-process'.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'async nil t)
+      (require 'async-bytecomp nil t)
+
+      #+END_SRC
+
+***** Display
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; to run command without displaying the output in a window
+      (add-to-list 'display-buffer-alist
+                   '("\\*Async Shell Command\\*"
+                     (display-buffer-no-window)
+                     (allow-no-window . t)))
+
+      #+END_SRC
+
+*** Parses
+**** Nnmail
+
+     Mail support functions for the Gnus mail backends.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'nnmail nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; expirable articles that are older than this will be expired
+      (customize-set-variable 'nnmail-expiry-wait 4)
+
+      #+END_SRC
+
+**** Mm-bodies
+
+    This library handles MIME body (encode/decode).
+
+    MIME is short for "Multipurpose Internet Mail Extensions".
+    This standard is documented in a number of RFCs;
+    mainly RFC2045 (Format of Internet Message Bodies),
+    RFC2046 (Media Types), RFC2047 (Message Header Extensions for
+    Non-ASCII Text),  RFC2048 (Registration Procedures),
+    RFC2049 (Conformance Criteria and Examples).
+
+    It is highly recommended that anyone who intends writing
+    MIME-compliant software read at least RFC2045 and RFC2047.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'mm-bodies nil t)
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
+
+     #+END_SRC
+
+**** Shr
+
+     This package takes a HTML parse tree (as provided by
+     libxml-parse-html-region) and renders it in the current buffer.  It
+     does not do CSS, JavaScript or anything advanced: It's geared
+     towards rendering typical short snippets of HTML, like what you'd
+     find in HTML email and the like.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'shr nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; frame width to use for rendering
+      (customize-set-variable 'shr-width 120)
+
+      ;; if non-nil, use proportional fonts for text
+      (customize-set-variable 'shr-use-fonts nil)
+
+      ;; if non-nil, respect color specifications in the HTML
+      (customize-set-variable 'shr-use-colors nil)
+
+      ;; if non-nil, inhibit loading images
+      (customize-set-variable 'shr-inhibit-images nil)
+
+      ;; images that have URLs matching this regexp will be blocked (regexp)
+      (customize-set-variable 'shr-blocked-images nil)
+
+      #+END_SRC
+
+*** Misc
+**** Custom
+
+    Emacs has many settings which you can change. Most settings are
+    customizable variables, which are also called user options.
+    There is a huge number of customizable variables,
+    controlling numerous aspects of Emacs behavior.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'custom nil t)
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; file used for storing customization information.
+     ;; The default is nil, which means to use your init file
+     ;; as specified by ‘user-init-file’.  If the value is not nil,
+     ;; it should be an absolute file name.
+     (customize-set-variable
+      'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
+
+     #+END_SRC
+
+***** Load
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; load custom-file
+     ;; (safe-load-file custom-file)
+
+     #+END_SRC
+
+*** Format
+**** Linum
+
+    Display line numbers format to be display in the current buffer.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'linum nil t)
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; format used to display line numbers.
+     (customize-set-variable 'linum-format " %2d ")
+
+     #+END_SRC
+
 ** Vanilla
 
    Major Structures of Emacs: Files, Buffer, Windows, Frames, Input,
@@ -347,20 +922,23 @@
 
 *** Files
 
+    A computer file is a computer resource for recording data
+    discretely in a computer storage device.
+
+**** Files
     Defines most of Emacs's file- and directory-handling functions,
     including basic file visiting, backup generation, link handling,
     ITS-id version control, load- and write-hook handling, and the like.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'files nil t)
-       (progn
+     (require 'files nil t)
 
      #+END_SRC
 
-**** Customize
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
@@ -391,159 +969,179 @@
 
      ;; backup directory list
      ;; alist of filename patterns and backup directory names
-     (customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))))
+     (customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))
 
      ;; create cache directory
-     (safe-mkdir (concat user-emacs-directory "cache"))
+     (add-hook 'window-setup-hook
+               (lambda ()
+                 (safe-mkdir (concat user-emacs-directory "cache"))))
 
      #+END_SRC
 
-*** Buffers
+**** Ffap
 
-    Configure/customize standard/basic buffer options.
+     Command find-file-at-point.
+     With a prefix, it behaves exactly like find-file.
+     Without a prefix, it first tries to guess a default file or URL
+     from the text around the point.
 
-**** Customize
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'ffap nil t)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; eos-file-map
+      (define-key eos-file-map (kbd "f") 'find-file-at-point)
+      (define-key eos-file-map (kbd "d") 'dired-at-point)
+      (define-key eos-file-map (kbd "C-d") 'ffap-list-directory)
+
+      #+END_SRC
+
+**** Locate
+
+    Locate.el provides an interface to a program which searches a
+    database of file names. By default, this program is the GNU locate
+    command, but it could also be the BSD-style find command, or even a
+    user specified command.
+
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; custom
-     ;; non-nil means do not display continuation lines.
-     (customize-set-variable 'truncate-lines nil)
+     (when (require 'locate nil t)
+       (progn
 
-     ;; sentences should be separated by a single space,
-     ;; so treat two sentences as two when filling
-     (customize-set-variable 'sentence-end-double-space nil)
+     #+END_SRC
 
-     ;; default indent
-     ;; distance between tab stops (for display of tab characters), in columns.
-     (customize-set-variable 'tab-width 4)
+***** Binds
 
-     ;; indentation can insert tabs if this is non-nil.
-     (customize-set-variable 'indent-tabs-mode nil)
+     #+BEGIN_SRC emacs-lisp
 
-     ;; kill process not confirmation required
-     ;; list of functions called with no args to query before killing a buffer.
-     ;; The buffer being killed will be current while the functions are running.
+     (define-key eos-file-map (kbd "l") 'locate)))
+
+     #+END_SRC
+
+**** Recentf
+
+    The recent files list is automatically saved across Emacs
+    sessions. You can customize the number of recent files displayed,
+    the location of the menu and others options
+    (see the source code for details).
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'recentf nil t)
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; file to save the recent list into.
      (customize-set-variable
-      'kill-buffer-query-functions
-      (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
-
-     ;; non-nil means load prefers the newest version of a file.
-     (customize-set-variable 'load-prefer-newer t)
+      'recentf-save-file (concat user-emacs-directory "cache/recentf"))
 
      #+END_SRC
 
-**** Hooks
+***** Functions
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; (add-hook 'buffer-list-update-hook
-     ;;           (lambda ()
-     ;;             (when (boundp 'eos/big-file-p)
-     ;;               (if (eos/big-file-p)
-     ;;                   (or display-line-numbers
-     ;;                       (setq display-line-numbers 0))))))
+     (defun eos/icomplete/recentf-open-file ()
+       "Open `recent-list' item in a new buffer.
+     The user's $HOME directory is abbreviated as a tilde."
+       (interactive)
+       (let ((files (mapcar 'abbreviate-file-name recentf-list)))
+         (find-file
+          (completing-read "Recentf: " files nil t))))
 
      #+END_SRC
 
-*** Windows
-
-    Emacs windows system.
-
-    Characteristics:
-
-    - Each Emacs window displays one Emacs buffer at any time.
-    - A single buffer may appear in more than one window.
-    - Emacs can split a frame into two or many windows.
-    - Multiple frames always imply multiple windows, because each
-      frame has its own set of windows.
-    - Each window belongs to one and only one frame.
-
-    Configure/customize windows standard/basic options,
-    the description of each one can be found on the
-    commentaries.
-
-**** Customize
+***** Binds
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; scroll options
-     ;; number of lines of margin at the top and bottom of a window
-     (customize-set-variable 'scroll-margin 0)
-
-     ;; scroll up to this many lines, to bring point back on screen
-     (customize-set-variable 'scroll-conservatively 100)
-
-     ;; t means point keeps its screen position
-     (customize-set-variable 'scroll-preserve-screen-position t)
-
-     ;; non-nil means mouse commands use dialog boxes to ask questions
-     (customize-set-variable 'use-dialog-box nil)
-
-     ;; set window margins
-     ;; width in columns of left marginal area for display of a buffer
-     (customize-set-variable 'left-margin-width 1)
-
-     ;; width in columns of right marginal area for display of a buffer.
-     (customize-set-variable 'right-margin-width 1)
-
-     ;; if t, resize window combinations proportionally
-     (customize-set-variable 'window-combination-resize t)
-
-     ;; if non-nil ‘display-buffer’ will try to even window sizes
-     (customize-set-variable 'even-window-sizes t)
-
-     ;; if non-nil, left and right side windows occupy full frame height
-     (customize-set-variable 'window-sides-vertical nil)
+     ;; eos-file-map
+     (define-key eos-file-map (kbd "r") 'recentf-open-files)
+     (define-key eos-file-map (kbd "t") 'eos/icomplete/recentf-open-file)
 
      #+END_SRC
 
-**** Binds
+**** Diff
 
-     #+BEGIN_SRC emacs-lisp
+     This package helps you explore differences between files, using the
+     UNIX command diff(1). The commands are `diff' and `diff-backup'.
+     You can specify options with `diff-switches'.
 
-     ;; binds (global)
-     (global-set-key (kbd "s-l") 'shrink-window-horizontally)
-     (global-set-key (kbd "s-h") 'enlarge-window-horizontally)
-     (global-set-key (kbd "s-j") 'shrink-window)
-     (global-set-key (kbd "s-k") 'enlarge-window)
+***** Require
 
-     ;; next and previous buffer (on current window)
-     (define-key ctl-x-map (kbd "C-,") 'previous-buffer)
-     (define-key ctl-x-map (kbd "C-.") 'next-buffer)
+      #+BEGIN_SRC emacs-lisp
 
-     ;; binds (eos-window prefix map)
-     (define-key eos-window-map (kbd "1") 'maximize-window)
-     (define-key eos-window-map (kbd "q") 'minimize-window)
-     (define-key eos-window-map (kbd "w") 'balance-windows)
+      (when (require 'diff nil t)
+        (progn
 
-     ;; binds ctl-x-map (C-x w)
-     (define-key ctl-x-map (kbd "w") 'eos-window-map)
+      #+END_SRC
 
-     ;; switch to buffer
-     (define-key ctl-x-map (kbd "C-b") 'switch-to-buffer)
+***** Customize
 
-     ;; kill buffer and window
-     (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
+      #+BEGIN_SRC emacs-lisp
 
-     #+END_SRC
+      ;; a string or list of strings specifying switches to be passed to diff
+      (customize-set-variable 'diff-switches "-u")))
 
-**** Display
+      #+END_SRC
 
-     In its most simplistic form, a frame accommodates always
-     one single window that can be used for displaying a buffer.
-     As a consequence, it is always the latest call of display-buffer
-     that will have succeeded in placing its buffer there.
+**** Ediff
 
-     #+BEGIN_SRC emacs-lisp
+     This package provides a convenient way of simultaneous browsing through
+     the differences between a pair (or a triple) of files or buffers.
+     The files being compared, file-A, file-B, and file-C (if applicable) are
+     shown in separate windows (side by side, one above the another, or in
+     separate frames), and the differences are highlighted as you step
+     through them.
 
-     ;; (add-to-list 'display-buffer-alist
-     ;;              '(("\\*Choices\\*"
-     ;;                 (display-buffer-below-selected display-buffer-at-bottom)
-     ;;                 (inhibit-same-window . t)
-     ;;                 (window-height . fit-window-to-buffer))))
+***** Require
 
-     #+END_SRC
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'ediff nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; options to pass to `ediff-custom-diff-program'.
+      (customize-set-variable 'ediff-custom-diff-options "-U3")
+
+      ;; the function used to split the main window between buffer-A and buffer-B
+      (customize-set-variable 'ediff-split-window-function 'split-window-horizontally)
+
+      ;; function called to set up windows
+      (customize-set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain)
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'ediff-startup-hook 'ediff-toggle-wide-display)
+      (add-hook 'ediff-cleanup-hook 'ediff-toggle-wide-display)
+      (add-hook 'ediff-suspend-hook 'ediff-toggle-wide-display)
+
+      #+END_SRC
 
 *** Frames
 
@@ -603,10 +1201,10 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (defun eos-set-frame-font (font)
-       "Set the default font to FONT."
-       (cond ((find-font (font-spec :name font))
-              (set-frame-font font nil t))))
+          (defun safe-set-frame-font (font)
+            "Set the default font to FONT."
+            (cond ((find-font (font-spec :name font))
+                   (set-frame-font font nil t))))
 
      #+END_SRC
 
@@ -616,9 +1214,9 @@
 
      ;; set transparency after a frame is created
      ;; (add-hook 'after-make-frame-functions
-     ;;           (lambda (frame)
-     ;;             (interactive)
-     ;;             (set-frame-transparency .8)))
+     ;;            (lambda (frame)
+     ;;              (interactive)
+     ;;              (set-frame-transparency .8)))
 
      #+END_SRC
 
@@ -641,6 +1239,9 @@
 
      #+BEGIN_SRC emacs-lisp
 
+     ;; set font
+     (safe-set-frame-font "Hermit Light:pixelsize=16")
+
      ;; enable window divider
      (window-divider-mode)
 
@@ -649,7 +1250,282 @@
 
      #+END_SRC
 
-*** International
+*** Windows
+**** Window
+
+    Emacs windows system.
+
+    Characteristics:
+
+    - Each Emacs window displays one Emacs buffer at any time.
+    - A single buffer may appear in more than one window.
+    - Emacs can split a frame into two or many windows.
+    - Multiple frames always imply multiple windows, because each
+      frame has its own set of windows.
+    - Each window belongs to one and only one frame.
+
+    Configure/customize windows standard/basic options,
+    the description of each one can be found on the
+    commentaries.
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; scroll options
+     ;; number of lines of margin at the top and bottom of a window
+     (customize-set-variable 'scroll-margin 0)
+
+     ;; scroll up to this many lines, to bring point back on screen
+     (customize-set-variable 'scroll-conservatively 100)
+
+     ;; t means point keeps its screen position
+     (customize-set-variable 'scroll-preserve-screen-position t)
+
+     ;; non-nil means mouse commands use dialog boxes to ask questions
+     (customize-set-variable 'use-dialog-box nil)
+
+     ;; set window margins
+     ;; width in columns of left marginal area for display of a buffer
+     (customize-set-variable 'left-margin-width 1)
+
+     ;; width in columns of right marginal area for display of a buffer.
+     (customize-set-variable 'right-margin-width 1)
+
+     ;; if t, resize window combinations proportionally
+     (customize-set-variable 'window-combination-resize t)
+
+     ;; if non-nil ‘display-buffer’ will try to even window sizes
+     (customize-set-variable 'even-window-sizes t)
+
+     ;; if non-nil, left and right side windows occupy full frame height
+     (customize-set-variable 'window-sides-vertical nil)
+
+     #+END_SRC
+
+***** Binds
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; binds (global)
+     (global-set-key (kbd "s-l") 'shrink-window-horizontally)
+     (global-set-key (kbd "s-h") 'enlarge-window-horizontally)
+     (global-set-key (kbd "s-j") 'shrink-window)
+     (global-set-key (kbd "s-k") 'enlarge-window)
+
+     ;; next and previous buffer (on current window)
+     (define-key ctl-x-map (kbd "C-,") 'previous-buffer)
+     (define-key ctl-x-map (kbd "C-.") 'next-buffer)
+
+     ;; binds (eos-window prefix map)
+     (define-key eos-window-map (kbd "1") 'maximize-window)
+     (define-key eos-window-map (kbd "q") 'minimize-window)
+     (define-key eos-window-map (kbd "w") 'balance-windows)
+
+     ;; binds ctl-x-map (C-x w)
+     (define-key ctl-x-map (kbd "w") 'eos-window-map)
+
+     ;; switch to buffer
+     (define-key ctl-x-map (kbd "C-b") 'switch-to-buffer)
+
+     ;; kill buffer and window
+     (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
+
+     #+END_SRC
+
+***** Display
+
+     In its most simplistic form, a frame accommodates always
+     one single window that can be used for displaying a buffer.
+     As a consequence, it is always the latest call of display-buffer
+     that will have succeeded in placing its buffer there.
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (add-to-list 'display-buffer-alist
+     ;;              '(("\\*Choices\\*"
+     ;;                 (display-buffer-below-selected display-buffer-at-bottom)
+     ;;                 (inhibit-same-window . t)
+     ;;                 (window-height . fit-window-to-buffer))))
+
+     #+END_SRC
+
+**** Windmove
+
+    This package defines a set of routines, windmove-{left,up,right,
+    down}, for selection of windows in a frame geometrically.
+    For example, `windmove-right' selects the window immediately to the
+    right of the currently-selected one.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'windmove nil t)
+
+     #+END_SRC
+
+***** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; window move default keybinds (shift-up/down etc..)
+     (add-hook 'window-setup-hook
+               (lambda ()
+                 (safe-funcall 'windmove-default-keybindings)))
+
+     #+END_SRC
+
+**** Page
+
+    This package provides the page-oriented movement and
+    selection commands documented in the Emacs manual.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'page nil t)
+
+     #+END_SRC
+
+***** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; enable narrow functions
+     (put 'narrow-to-page 'disabled nil)
+     (put 'narrow-to-region 'disabled nil)
+
+     #+END_SRC
+
+*** Buffers
+**** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; custom
+     ;; non-nil means do not display continuation lines.
+     (customize-set-variable 'truncate-lines nil)
+
+     ;; sentences should be separated by a single space,
+     ;; so treat two sentences as two when filling
+     (customize-set-variable 'sentence-end-double-space nil)
+
+     ;; default indent
+     ;; distance between tab stops (for display of tab characters), in columns.
+     (customize-set-variable 'tab-width 4)
+
+     ;; indentation can insert tabs if this is non-nil.
+     (customize-set-variable 'indent-tabs-mode nil)
+
+     ;; kill process not confirmation required
+     ;; list of functions called with no args to query before killing a buffer.
+     ;; The buffer being killed will be current while the functions are running.
+     (customize-set-variable
+      'kill-buffer-query-functions
+      (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
+
+     ;; non-nil means load prefers the newest version of a file.
+     (customize-set-variable 'load-prefer-newer t)
+
+     #+END_SRC
+
+**** Display
+***** Hl-line
+
+    Provides a local minor mode (toggled by M-x hl-line-mode) and
+    a global minor mode (toggled by M-x global-hl-line-mode) to
+    highlight, on a suitable terminal, the line on which point is.
+
+****** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'hl-line nil t)
+
+     #+END_SRC
+
+****** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; enable highlight line
+     (safe-funcall 'global-hl-line-mode 1)
+
+     #+END_SRC
+
+***** Display-linum
+
+    Display line numbers in the buffer.
+    Provides a minor mode interface for `display-line-numbers'.
+
+****** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'display-line-numbers nil t)
+
+     #+END_SRC
+
+****** Hooks
+
+     #+BEGIN_SRC emacs-lisp
+
+     (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+     #+END_SRC
+
+****** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (safe-funcall 'global-display-line-numbers-mode 1)))
+
+     #+END_SRC
+
+***** Cursor
+
+     On a text terminal, the cursor's appearance is controlled by the
+     terminal, largely out of the control of Emacs.
+     Some terminals offer two different cursors: a visible static
+     cursor, and a very visible blinking cursor.
+     By default, Emacs uses the very visible cursor, and switches
+     to it when you start or resume Emacs. If the variable
+     visible-cursor is nil when Emacs starts or resumes, it uses
+     the normal cursor.
+
+****** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; non-nil means to make the cursor very visible
+      (customize-set-variable 'visible-cursor t)
+
+      #+END_SRC
+
+****** Hooks
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (add-hook 'buffer-list-update-hook
+     ;;           (lambda ()
+     ;;             (when (boundp 'eos/big-file-p)
+     ;;               (if (eos/big-file-p)
+     ;;                   (or display-line-numbers
+     ;;                       (setq display-line-numbers 0))))))
+
+     #+END_SRC
+
+*** Conding-System
+
+    Emacs supports a wide variety of international character sets, including
+    European and Vietnamese variants of the Latin alphabet, as well as
+    Arabic scripts, Brahmic scripts (for languages such as Bengali, Hindi,
+    and Thai), Cyrillic, Ethiopic, Georgian, Greek, Han (for Chinese and
+    Japanese), Hangul (for Korean), Hebrew and IPA.  Emacs also supports
+    various encodings of these characters that are used by other
+    internationalized software, such as word processors and mailers.
 
     Configure/set coding-system (UTF8), everywhere!
 
@@ -674,66 +1550,183 @@
 
      #+END_SRC
 
-*** Cursor
+*** Help
+**** Help
 
-    On a text terminal, the cursor's appearance is controlled by the
-    terminal, largely out of the control of Emacs.
-    Some terminals offer two different cursors: a visible static
-    cursor, and a very visible blinking cursor.
-    By default, Emacs uses the very visible cursor, and switches
-    to it when you start or resume Emacs. If the variable
-    visible-cursor is nil when Emacs starts or resumes, it uses
-    the normal cursor.
+     GNU Emacs's built-in help system, the one invoked by
+     M-x help-for-help.
 
-**** Customize
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'help nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; always select the help window
+      (customize-set-variable 'help-window-select t)
+
+      ;; maximum height of a window displaying a temporary buffer.
+      (customize-set-variable 'temp-buffer-max-height
+                              (lambda
+                                (buffer)
+                                (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
+                                    (/ (x-display-pixel-height) (frame-char-height) 4)
+                                  (/ (- (frame-height) 4) 4))))
+
+      ;; reference
+      ;; (customize-set-variable 'temp-buffer-max-height 12)
+
+      #+END_SRC
+
+***** Display
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (safe-funcall 'temp-buffer-resize-mode 1)))
+
+      #+END_SRC
+
+**** Help-fns
+
+     This file contains those help commands which are complicated, and
+     which may not be used in every session. For example
+     `describe-function' will probably be heavily used when doing elisp
+     programming, but not if just editing C files.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'help-fns nil t)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/describe-symbol-at-point (&optional arg)
+        "Get help (documentation) for the symbol at point as ARG.
+
+      With a prefix argument, switch to the *Help* window.  If that is
+      already focused, switch to the most recently used window
+      instead."
+        (interactive "P")
+        (let ((symbol (symbol-at-point)))
+          (when symbol
+            (describe-symbol symbol)))
+        (when current-prefix-arg
+          (let ((help (get-buffer-window "*Help*")))
+            (when help
+              (if (not (eq (selected-window) help))
+                  (select-window help)
+                (select-window (get-mru-window)))))))
+
+      #+END_SRC
+
+**** Help-mode
+
+     Help-mode, which is the mode used by *Help* buffers, and
+     associated support machinery, such as adding hyperlinks, etc...
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'help-mode nil t)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (boundp 'help-mode-map)
+        (define-key help-mode-map (kbd "C-j") 'push-button))
+
+      #+END_SRC
+
+*** Docs
+**** Info
+
+    The GNU Project distributes most of its manuals in the Info format,
+    which you read using an Info reader.
+
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; non-nil means to make the cursor very visible
-     (customize-set-variable 'visible-cursor t)
+     (require 'info nil t)
 
      #+END_SRC
 
-*** Windmove
-
-    This package defines a set of routines, windmove-{left,up,right,
-    down}, for selection of windows in a frame geometrically.
-    For example, `windmove-right' selects the window immediately to the
-    right of the currently-selected one.
-
-**** Require
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'windmove nil t)
+     ;; non-nil means don’t record intermediate Info nodes to the history
+     (customize-set-variable 'info-history-skip-intermediate-nodes nil)
+
+     ;; 0 -> means do not display breadcrumbs
+     ;; (customize-set-variable 'info-breadcrumbs-depth 0)
 
      #+END_SRC
 
-**** Enable
+**** Eldoc
 
-     #+BEGIN_SRC emacs-lisp
+     As you type a function's symbol name as part of a sexp,
+     it will print the argument list for that function.
+     Behavior is not identical; for example, you need not actually
+     type the function name, you need only move point around in a sexp that
+     calls it.  Also, if point is over a documented variable, it will print
+     the one-line documentation for that variable instead, to remind you of
+     that variable's meaning.
 
-     ;; window move default keybinds (shift-up/down etc..)
-     (add-hook 'window-setup-hook
-               (lambda ()
-                 (safe-funcall 'windmove-default-keybindings)))
+***** Require
 
-     #+END_SRC
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'eldoc nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; number of seconds of idle time to wait before printing.
+      (customize-set-variable 'eldoc-idle-delay 0)
+
+      #+END_SRC
 
 *** Input
-*** Minibuffer
+**** Minibuffer
 
     The “minibuffer” is where Emacs commands read complicated arguments,
     such as file names, buffer names, Emacs command names, or Lisp
-    expressions.  We call it the “minibuffer” because it’s a special-purpose
-    buffer with a small amount of screen space.  You can use the usual Emacs
+    expressions. We call it the `minibuffer' because it’s a special-purpose
+    buffer with a small amount of screen space. You can use the usual Emacs
     editing commands in the minibuffer to edit the argument text.
 
     When the minibuffer is in use, it appears in the echo area, with a
-    cursor. The minibuffer starts with a “prompt”, usually ending with
+    cursor. The minibuffer starts with a `prompt', usually ending with
     a colon.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
@@ -741,7 +1734,7 @@
 
      #+END_SRC
 
-**** Customize
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
@@ -799,42 +1792,7 @@
 
      #+END_SRC
 
-**** Functions
-
-     #+BEGIN_SRC emacs-lisp
-
-     (defun eos/focus-minibuffer ()
-       "Focus the active minibuffer.
-     Bind this to `completion-list-mode-map' to easily jump
-     between the list of candidates present in the \\*Completions\\*
-     buffer and the minibuffer."
-       (interactive)
-       (let ((mini (active-minibuffer-window)))
-         (when mini
-           (select-window mini))))
-
-     (defun eos/focus-minibuffer-or-completions ()
-       "Focus the active minibuffer or the \\*Completions\\*.
-     If both the minibuffer and the Completions are present, this
-     command will first move per invocation to the former, then the
-     latter, and then continue to switch between the two.
-     The continuous switch is essentially the same as running
-     `eos/focus-minibuffer' and `switch-to-completions' in
-     succession."
-       (interactive)
-       (let* ((mini (active-minibuffer-window))
-              (completions (get-buffer-window "*Completions*")))
-         (cond ((and mini
-                     (not (minibufferp)))
-                (select-window mini nil))
-               ((and completions
-                     (not (eq (selected-window)
-                              completions)))
-                (select-window completions nil)))))
-
-     #+END_SRC
-
-**** Hooks
+***** Hooks
 
      #+BEGIN_SRC emacs-lisp
 
@@ -853,7 +1811,7 @@
 
      #+END_SRC
 
-**** Binds
+***** Binds
 
      #+BEGIN_SRC emacs-lisp
 
@@ -878,7 +1836,7 @@
 
      #+END_SRC
 
-**** Enable
+***** Enable
 
      #+BEGIN_SRC emacs-lisp
 
@@ -886,7 +1844,7 @@
      ;; minibuffer text that would be ignored because of this is given the
      ;; properties in `file-name-shadow-properties', which may
      ;; be used to make the ignored text invisible, dim, etc.
-     ;; (file-name-shadow-mode -1)
+     (file-name-shadow-mode -1)
 
      ;; when active, any recursive use of the minibuffer will show
      ;; the recursion depth in the minibuffer prompt, this is only
@@ -899,77 +1857,12 @@
 
      #+END_SRC
 
-*** Ibuffer
-
-    A major mode for viewing a list of buffers.
-    In Ibuffer, you can conveniently perform many operations on the
-    currently open buffers, in addition to filtering your view to a
-    particular subset of them, and sorting by various criteria.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'ibuffer nil t)
-       (progn
-
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; the criteria by which to sort the buffers
-     (customize-set-variable 'ibuffer-default-sorting-mode 'filename/process)
-
-     ;; if non-nil, display the current Ibuffer buffer itself
-     (customize-set-variable 'ibuffer-view-ibuffer nil)
-
-     #+END_SRC
-
-**** Display
-
-     #+BEGIN_SRC emacs-lisp
-
-     #+END_SRC
-
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     (define-key ctl-x-map (kbd "b") 'ibuffer)))
-
-     #+END_SRC
-
-*** Delsel
-
-    This package makes the active region be pending delete, meaning that
-    text inserted while the region is active will replace the region contents.
-    This is a popular behavior of personal computers text editors.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'delsel nil t)
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; delete selection-mode
-      (safe-funcall 'delete-selection-mode 1)
-
-      #+END_SRC
-
-*** Completion
+**** Completion
 
     After you type a few characters, pressing the `complete'
     key inserts the rest of the word you are likely to type.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
@@ -977,7 +1870,7 @@
 
      #+END_SRC
 
-**** Customize
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1011,7 +1904,7 @@
 
      #+END_SRC
 
-**** Functions
+***** Functions
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1042,7 +1935,7 @@
 
      #+END_SRC
 
-**** Display
+***** Display
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1054,7 +1947,7 @@
 
      #+END_SRC
 
-**** Binds
+***** Binds
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1072,7 +1965,7 @@
 
      #+END_SRC
 
-**** Enable
+***** Enable
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1081,14 +1974,14 @@
 
      #+END_SRC
 
-*** Icomplete
+**** Icomplete
 
     This package implements a more fine-grained minibuffer
     completion feedback scheme. Prospective completions are concisely
     indicated within the minibuffer itself, with each successive
     keystroke.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1096,7 +1989,7 @@
 
      #+END_SRC
 
-**** Customize
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1134,7 +2027,6 @@
 
      #+RESULTS:
 
-**** Functions
 ***** Kill-ring
 
       #+BEGIN_SRC emacs-lisp
@@ -1242,7 +2134,7 @@
 
       #+END_SRC
 
-**** Binds
+***** Binds
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1271,7 +2163,7 @@
 
      #+END_SRC
 
-**** Enable
+***** Enable
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1280,235 +2172,142 @@
 
      #+END_SRC
 
-*** Simple
+*** Screen
 
-    A grab-bag of basic Emacs commands not specifically related to
-    some major mode or to file-handling.
+    On a graphical display, such as on GNU/Linux using the X Window System,
+    Emacs occupies a graphical window.  On a text terminal, Emacs occupies
+    the entire terminal screen. We will use the term `frame' to mean a
+    graphical window or terminal screen occupied by Emacs. Emacs behaves
+    very similarly on both kinds of frames. It normally starts out with
+    just one frame, but you can create additional frames if you wish.
 
-**** Require
+**** Tool-bar
 
-     #+BEGIN_SRC emacs-lisp
+    Provides `tool-bar-mode' to control display of the tool-bar and
+    bindings for the global tool bar with convenience functions
+    `tool-bar-add-item' and `tool-bar-add-item-from-menu'.
 
-     (when (require 'simple nil t)
-       (progn
+    Tool bar in all graphical frames disabled by default.
 
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; don't omit information when lists nest too deep
-     (customize-set-variable 'eval-expression-print-level nil)
-
-     ;; your preference for a mail composition package
-     (customize-set-variable 'mail-user-agent 'message-user-agent)
-
-     #+END_SRC
-
-**** Enable
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; column number display in the mode line
-     (safe-funcall 'column-number-mode 1)
-
-     ;; buffer size display in the mode line
-     (safe-funcall 'size-indication-mode 1)))
+     (require 'tool-bar nil t)
 
      #+END_SRC
 
-*** Prog-mode
-
-    Generic programming mode, from which others derive.
-
-    #+BEGIN_SRC emacs-lisp
-
-    (require 'prog-mode nil t)
-
-    #+END_SRC
-
-*** Server
-
-    Allow this Emacs process to be a server for client processes.
-    This starts a server communications subprocess through which
-    client "editors" can send your editing commands to this
-    Emacs job. To use the server, set up the program emacsclient
-    in the Emacs distribution as your standard "editor".
-
-**** Require
+***** Disable
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'server nil t)
-       (progn
+     ;; disable
+     (safe-funcall 'tool-bar-mode 0)
 
      #+END_SRC
 
-**** Hooks
+**** Tooltip
+
+    When this global minor mode is enabled, Emacs displays help
+    text (e.g. for buttons and menu items that you put the mouse on)
+    in a pop-up window.
+
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; enable emacs server after startup
-     (add-hook 'emacs-startup-hook
-               (lambda ()
-                 (safe-funcall 'server-start)))))
+     (require 'tooltip nil t)
 
      #+END_SRC
 
-*** Help
-
-    GNU Emacs's built-in help system, the one invoked by
-    M-x help-for-help.
-
-**** Require
-
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'help nil t)
-       (progn
+     ;; seconds to wait before displaying a tooltip the first time.
+     (customize-set-variable 'tooltip-delay 0.2)
+
+     (customize-set-variable 'x-gtk-use-system-tooltips nil)
+
+     ;; frame parameters used for tooltips
+     ;; if ‘left’ or ‘top’ parameters are included, they specify the absolute
+     (customize-set-variable 'tooltip-frame-parameters
+                             '((name . "tooltip")
+                               (internal-border-width . 0)
+                               (border-width . 0)
+                               (no-special-glyphs . t)))
 
      #+END_SRC
 
-**** Customize
+***** Enable
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; always select the help window
-     (customize-set-variable 'help-window-select t)
-
-     ;; maximum height of a window displaying a temporary buffer.
-     (customize-set-variable 'temp-buffer-max-height
-                             (lambda
-                               (buffer)
-                               (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
-                                   (/ (x-display-pixel-height) (frame-char-height) 4)
-                                 (/ (- (frame-height) 4) 4))))
-
-     ;; reference
-     ;; (customize-set-variable 'temp-buffer-max-height 12)
+     (tooltip-mode 1)
 
      #+END_SRC
 
-**** Display
+**** Menu-bar
+
+    Each Emacs frame normally has a "menu bar" at the top which you can use
+    to perform common operations. There's no need to list them here, as you
+    can more easily see them yourself.
+
+    Disabled by default.
+
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
+     (require 'menu-bar nil t)
+
      #+END_SRC
 
-**** Enable
+***** Disable
 
      #+BEGIN_SRC emacs-lisp
 
-     (temp-buffer-resize-mode 1)))
+     (safe-funcall 'menu-bar-mode 0)
 
      #+END_SRC
 
-*** Help-mode
+**** Scroll-bar
 
-    Help-mode, which is the mode used by *Help* buffers, and
-    associated support machinery, such as adding hyperlinks, etc...
+    Specify whether to have vertical scroll bars, and on which side.
+    Disabled by default.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'help-mode nil t)
-       (progn
+     (require 'scroll-bar nil t)
 
      #+END_SRC
 
-**** Binds
+***** Binds
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (boundp 'help-mode-map)
-       (define-key help-mode-map (kbd "C-j") 'push-button))))
+     ;; disable scroll bar
+     (safe-funcall 'scroll-bar-mode 0)
 
      #+END_SRC
 
-*** Help-fns
-
-    This file contains those help commands which are complicated, and
-    which may not be used in every session. For example
-    `describe-function' will probably be heavily used when doing elisp
-    programming, but not if just editing C files.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'help-fns nil t)
-       (progn
-
-     #+END_SRC
-
-**** Functions
-
-     #+BEGIN_SRC emacs-lisp
-
-     (defun eos/describe-symbol-at-point (&optional arg)
-       "Get help (documentation) for the symbol at point as ARG.
-
-     With a prefix argument, switch to the *Help* window.  If that is
-     already focused, switch to the most recently used window
-     instead."
-       (interactive "P")
-       (let ((symbol (symbol-at-point)))
-         (when symbol
-           (describe-symbol symbol)))
-       (when current-prefix-arg
-         (let ((help (get-buffer-window "*Help*")))
-           (when help
-             (if (not (eq (selected-window) help))
-                 (select-window help)
-               (select-window (get-mru-window)))))))))
-
-     #+END_SRC
-
-*** Info
-
-    The GNU Project distributes most of its manuals in the Info format,
-    which you read using an Info reader.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'info nil t)
-       (progn
-
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; non-nil means don’t record intermediate Info nodes to the history
-     (customize-set-variable 'info-history-skip-intermediate-nodes nil)))
-
-     ;; 0 -> means do not display breadcrumbs
-     ;; (customize-set-variable 'info-breadcrumbs-depth 0)
-
-     #+END_SRC
-
-*** Fringe
+**** Fringe
 
     Contains code to initialize the built-in fringe bitmaps
     as well as helpful functions for customizing the appearance of the
     fringe.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'fringe nil t)
-       (progn
+     (require 'fringe nil t)
 
      #+END_SRC
 
-**** Customize
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1516,15 +2315,118 @@
      ;; 0 -> ("no-fringes" . 0), remove ugly icons to represet new lines
      ;; ascii is more than enough to represent this information
      ;; default appearance of fringes on all frame
-     (customize-set-variable 'fringe-mode 0)))
+     (customize-set-variable 'fringe-mode 0)
 
      #+END_SRC
 
-*** Isearch
+*** Editing
+**** Kmacro
+
+    The kmacro package provides the user interface to emacs' basic
+    keyboard macro functionality.  With kmacro, two function keys are
+    dedicated to keyboard macros, by default F3 and F4.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'kmacro nil t)
+
+     #+END_SRC
+
+***** Binds
+
+     #+BEGIN_SRC emacs-lisp
+
+     (define-key ctl-x-map (kbd "m") 'kmacro-keymap)
+
+     #+END_SRC
+
+**** Elec-pair
+
+     Electric pairing: automatically matches parenthesis pairs,
+     should be enabled regardless the current major mode.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'elec-pair nil t)
+        (progn
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; alist of pairs that should be used regardless of major mode.
+      (customize-set-variable 'electric-pair-pairs
+                              '((?\{ . ?\})
+                                (?\( . ?\))
+                                (?\[ . ?\])
+                                (?\" . ?\")))
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (safe-funcall 'electric-pair-mode 1)))
+
+      #+END_SRC
+
+**** Newcomment
+
+     This library contains functions and variables for commenting and
+     uncommenting source code.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'newcomment nil t)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; global-map
+      (global-set-key (kbd "M-c") 'comment-or-uncomment-region)
+
+      #+END_SRC
+
+**** Face-remap
+
+    This package defines some simple operations that can be used for
+    maintaining the `face-remapping-alist' in a cooperative way.
+    This is especially important for the `default' face.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'face-remap nil t)
+
+     #+END_SRC
+
+***** Binds
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; ctl-x-map (C-x)
+     (define-key ctl-x-map (kbd "=") 'text-scale-adjust)
+
+     #+END_SRC
+
+**** Isearch
 
     Incremental search minor mode.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1532,72 +2434,43 @@
 
      #+END_SRC
 
-*** Ffap
+**** Delsel
 
-    Command find-file-at-point.
-    With a prefix, it behaves exactly like find-file.
-    Without a prefix, it first tries to guess a default file or URL
-    from the text around the point.
+    This package makes the active region be pending delete, meaning that
+    text inserted while the region is active will replace the region contents.
+    This is a popular behavior of personal computers text editors.
 
-**** Require
+***** Require
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'ffap nil t)
-       (progn
+      (require 'delsel nil t)
 
-     #+END_SRC
+      #+END_SRC
 
-**** Binds
+***** Enable
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     ;; eos-file-map
-     (define-key eos-file-map (kbd "f") 'find-file-at-point)
-     (define-key eos-file-map (kbd "d") 'dired-at-point)
-     (define-key eos-file-map (kbd "C-d") 'ffap-list-directory)))
+      ;; delete selection-mode
+      (safe-funcall 'delete-selection-mode 1)
 
-     #+END_SRC
+      #+END_SRC
 
-*** Locate
-
-    Locate.el provides an interface to a program which searches a
-    database of file names. By default, this program is the GNU locate
-    command, but it could also be the BSD-style find command, or even a
-    user specified command.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'locate nil t)
-       (progn
-
-     #+END_SRC
-
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     (define-key eos-file-map (kbd "l") 'locate)))
-
-     #+END_SRC
-
-*** Replace
+**** Replace
 
     This package supplies the string and regular-expression replace functions
     documented in the Emacs user's manual.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'replace nil t)
-       (progn
+     (require 'replace nil t)
 
      #+END_SRC
 
-**** Functions
+***** Functions
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1619,91 +2492,47 @@
 
      #+END_SRC
 
-**** Binds
+***** Binds
 
      #+BEGIN_SRC emacs-lisp
 
-     (global-set-key (kbd "M-s M-o") 'eos/occur-at-point)))
+     (global-set-key (kbd "M-s M-o") 'eos/occur-at-point)
 
      #+END_SRC
 
-*** Recentf
+**** Whitespace
 
-    The recent files list is automatically saved across Emacs
-    sessions. You can customize the number of recent files displayed,
-    the location of the menu and others options
-    (see the source code for details).
+    This package is a minor mode to visualize and clean
+    blanks (TAB, (HARD) SPACE and NEWLINE).
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'recentf nil t)
+     (require 'whitespace nil t)
 
      #+END_SRC
 
-**** Customize
+***** Hooks
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; file to save the recent list into.
-     (customize-set-variable
-      'recentf-save-file (concat user-emacs-directory "cache/recentf"))
+     ;; clean whitespace and newlines before buffer save
+     (add-hook 'before-save-hook #'whitespace-cleanup)
 
      #+END_SRC
 
-**** Functions
+***** Binds
 
      #+BEGIN_SRC emacs-lisp
 
-     (defun eos/icomplete/recentf-open-file ()
-       "Open `recent-list' item in a new buffer.
-     The user's $HOME directory is abbreviated as a tilde."
-       (interactive)
-       (let ((files (mapcar 'abbreviate-file-name recentf-list)))
-         (find-file
-          (completing-read "Recentf: " files nil t))))
+     ;; binds
+     (define-key ctl-x-map (kbd ".") 'whitespace-mode)
 
      #+END_SRC
 
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; eos-file-map
-     (define-key eos-file-map (kbd "r") 'recentf-open-files)
-     (define-key eos-file-map (kbd "t") 'eos/icomplete/recentf-open-file)
-
-     #+END_SRC
-
-*** Bookmark
-
-    The bookmark list is sorted lexically by default, but you can turn
-    this off by setting bookmark-sort-flag to nil. If it is nil, then
-    the list will be presented in the order it is recorded
-    (chronologically), which is actually fairly useful as well.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'bookmark nil t)
-       (progn
-
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; custom
-     ;; file in which to save bookmarks by default.
-     (customize-set-variable
-      'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))))
-
-     #+END_SRC
-
-*** Savehist
+*** History
+**** Savehist
 
     Many editors (e.g. Vim) have the feature of saving minibuffer
     history to an external file after exit.  This package provides the
@@ -1712,16 +2541,15 @@
     variables may be specified by customizing
     `savehist-additional-variables'.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'savehist nil t)
-       (progn
+     (require 'savehist nil t)
 
      #+END_SRC
 
-**** Customize
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1734,127 +2562,21 @@
 
      #+END_SRC
 
-**** Enable
+***** Enable
 
      #+BEGIN_SRC emacs-lisp
 
      ;; enable savehist mode
-     (safe-funcall 'savehist-mode 1)))
+     (safe-funcall 'savehist-mode 1)
 
      #+END_SRC
 
-*** Page
-
-    This package provides the page-oriented movement and
-    selection commands documented in the Emacs manual.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'page nil t)
-
-     #+END_SRC
-
-**** Enable
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; enable narrow functions
-     (put 'narrow-to-page 'disabled nil)
-     (put 'narrow-to-region 'disabled nil)
-
-     #+END_SRC
-
-*** Kmacro
-
-    The kmacro package provides the user interface to emacs' basic
-    keyboard macro functionality.  With kmacro, two function keys are
-    dedicated to keyboard macros, by default F3 and F4.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'kmacro nil t)
-
-     #+END_SRC
-
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     (define-key ctl-x-map (kbd "m") 'kmacro-keymap)
-
-     #+END_SRC
-
-*** Paren
-
-    It will display highlighting on whatever paren matches the one
-    before or after point.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'paren nil t)
-
-     #+END_SRC
-
-**** Enable
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; visualization of matching parens
-     (safe-funcall 'show-paren-mode 1)
-
-     #+END_SRC
-
-*** Time
-
-    Facilities to display current time/date and a new-mail indicator
-    in the Emacs mode line.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'time nil t)
-
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; seconds between updates of time in the mode line.
-     (customize-set-variable 'display-time-interval 15)
-
-     ;; non-nil indicates time should be displayed as hh:mm, 0 <= hh <= 23
-     (customize-set-variable 'display-time-24hr-format t)
-
-     ;; set format time string
-     (customize-set-variable 'display-time-format "%H:%M")
-
-     ;; load-average values below this value won’t be shown in the mode line.
-     (customize-set-variable 'display-time-load-average-threshold 1.0)
-
-     #+END_SRC
-
-**** Enable
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; enable display time
-     (safe-funcall 'display-time-mode 1)
-
-     #+END_SRC
-
-*** Tmm
+*** Menus
+**** Tmm
 
     This package provides text mode access to the menu bar.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
@@ -1862,172 +2584,19 @@
 
      #+END_SRC
 
-*** Tool-bar
+*** Server
 
-    Provides `tool-bar-mode' to control display of the tool-bar and
-    bindings for the global tool bar with convenience functions
-    `tool-bar-add-item' and `tool-bar-add-item-from-menu'.
-
-    Tool bar in all graphical frames disabled by default.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'tool-bar nil t)
-
-     #+END_SRC
-
-**** Disable
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; disable
-     (safe-funcall 'tool-bar-mode 0)
-
-     #+END_SRC
-
-*** Tooltip
-
-    When this global minor mode is enabled, Emacs displays help
-    text (e.g. for buttons and menu items that you put the mouse on)
-    in a pop-up window.
+    Allow this Emacs process to be a server for client processes.
+    This starts a server communications subprocess through which
+    client "editors" can send your editing commands to this
+    Emacs job. To use the server, set up the program emacsclient
+    in the Emacs distribution as your standard "editor".
 
 **** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'tooltip nil t)
-
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; seconds to wait before displaying a tooltip the first time.
-     (customize-set-variable 'tooltip-delay 0.2)
-
-     (customize-set-variable 'x-gtk-use-system-tooltips nil)
-
-     ;; frame parameters used for tooltips
-     ;; if ‘left’ or ‘top’ parameters are included, they specify the absolute
-     (customize-set-variable 'tooltip-frame-parameters
-                             '((name . "tooltip")
-                               (internal-border-width . 0)
-                               (border-width . 0)
-                               (no-special-glyphs . t)))
-
-     #+END_SRC
-
-**** Enable
-
-     #+BEGIN_SRC emacs-lisp
-
-     (tooltip-mode 1)
-
-     #+END_SRC
-
-*** Menu-bar
-
-    Each Emacs frame normally has a "menu bar" at the top which you can use
-    to perform common operations. There's no need to list them here, as you
-    can more easily see them yourself.
-
-    Disabled by default.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'menu-bar nil t)
-
-     #+END_SRC
-
-**** Disable
-
-     #+BEGIN_SRC emacs-lisp
-
-     (safe-funcall 'menu-bar-mode 0)
-
-     #+END_SRC
-
-*** Scroll-bar
-
-    Specify whether to have vertical scroll bars, and on which side.
-    Disabled by default.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'scroll-bar nil t)
-
-     #+END_SRC
-
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; disable scroll bar
-     (safe-funcall 'scroll-bar-mode 0)
-
-     #+END_SRC
-
-*** Hl-line
-
-    Provides a local minor mode (toggled by M-x hl-line-mode) and
-    a global minor mode (toggled by M-x global-hl-line-mode) to
-    highlight, on a suitable terminal, the line on which point is.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'hl-line nil t)
-
-     #+END_SRC
-
-**** Enable
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; enable highlight line
-     (safe-funcall 'global-hl-line-mode 1)
-
-     #+END_SRC
-
-*** Linum
-
-    Display line numbers for the current buffer.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'linum nil t)
-
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; format used to display line numbers.
-     (customize-set-variable 'linum-format " %2d ")
-
-     #+END_SRC
-
-*** Display-linum
-
-    Display line numbers in the buffer.
-    Provides a minor mode interface for `display-line-numbers'.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'display-line-numbers nil t)
+     (require 'server nil t)
 
      #+END_SRC
 
@@ -2035,271 +2604,114 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (add-hook 'prog-mode-hook 'display-line-numbers-mode)
-
-     #+END_SRC
-
-**** Enable
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; (safe-funcall 'global-display-line-numbers-mode 1)))
-
-     #+END_SRC
-
-*** Whitespace
-
-    This package is a minor mode to visualize and clean
-    blanks (TAB, (HARD) SPACE and NEWLINE).
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'whitespace nil t)
-
-     #+END_SRC
-
-**** Hooks
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; clean whitespace and newlines before buffer save
-     (add-hook 'before-save-hook #'whitespace-cleanup)
-
-     #+END_SRC
-
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; binds
-     (define-key ctl-x-map (kbd ".") 'whitespace-mode)
-
-     #+END_SRC
-
-*** Subword
-
-    This package provides the `subword' minor mode, which merges the
-    old remap-based subword.el (derived from cc-mode code) and
-    cap-words.el, which takes advantage of core Emacs
-    word-motion-customization functionality.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'subword nil t)
-
-     #+END_SRC
-
-**** Enable
-
-     #+BEGIN_SRC emacs-lisp
-
-     (safe-funcall 'global-subword-mode 1)
-
-     #+END_SRC
-
-*** Face-remap
-
-    This package defines some simple operations that can be used for
-    maintaining the `face-remapping-alist' in a cooperative way.
-    This is especially important for the `default' face.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'face-remap nil t)
-
-     #+END_SRC
-
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; ctl-x-map (C-x)
-     (define-key ctl-x-map (kbd "=") 'text-scale-adjust)
-
-     #+END_SRC
-
-*** Custom
-
-    Emacs has many settings which you can change. Most settings are
-    customizable variables, which are also called user options.
-    There is a huge number of customizable variables,
-    controlling numerous aspects of Emacs behavior.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'custom nil t)
-
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; file used for storing customization information.
-     ;; The default is nil, which means to use your init file
-     ;; as specified by ‘user-init-file’.  If the value is not nil,
-     ;; it should be an absolute file name.
-     (customize-set-variable
-      'custom-file (concat (expand-file-name user-emacs-directory) "custom.el"))
-
-     #+END_SRC
-
-**** Load
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; load custom-file
-     ;; (safe-load-file custom-file)
-
-     #+END_SRC
-
-*** Forms
-
-    Forms mode means visiting a data file which is supposed to consist
-    of records each containing a number of fields. The records are
-    separated by a newline, the fields are separated by a user-defined
-    field separator (default: TAB). When shown, a record is
-    transferred to an Emacs buffer and presented using a user-defined
-    form. One record is shown at a time.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'forms nil t)
-
-     #+END_SRC
-
-*** Conf
-
-    This package is designed to edit many similar varieties of
-    Configuration and initialization files.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'conf-mode nil t)
-
-     #+END_SRC
-
-**** Enable
-
-     #+BEGIN_SRC emacs-lisp
-
-     (add-to-list 'auto-mode-alist '("\\.compose\\'" . conf-mode))
-     (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))
-
-     #+END_SRC
-
-*** Imap
-
-    This library provides an interface for talking to
-    IMAP servers.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'imap nil t)
-
-     #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; how long to wait between checking for the end of output
-      (customize-set-variable 'imap-read-timeout 2)
-
-      ;; if non-nil, store session password without prompting
-      (customize-set-variable 'imap-store-password t)
-
-      #+END_SRC
-
-*** Smtpmail
-
-    This library provides functionalities related to send mail
-    through STMP protocol.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'smtpmail nil t)
-
-     #+END_SRC
-
-**** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; specify default SMTP server
-     ;; (customize-set-variable 'smtpmail-default-smtp-server "smtp.gmail.com")
-
-     ;; the name of the host running SMTP server
-     ;; (customize-set-variable 'smtpmail-smtp-server "smtp.gmail.com")
-
-     ;; type of SMTP connections to use
-     (customize-set-variable 'smtpmail-stream-type 'ssl)
-
-     ;; smtp service port number
-     (customize-set-variable 'smtpmail-smtp-service 465)
-
-     ;; non-nil means mail is queued; otherwise it is sent immediately.
-     (customize-set-variable 'smtpmail-queue-mail nil)
-
-     ;; directory where smtpmail.el stores queued mail.
-     ;; (customize-set-variable 'smtpmail-queue-dir "")
-
-     #+END_SRC
-
-*** Hideshow
-
-    Minor mode to hide and show code and comment blocks.
-
-**** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (when (require 'hideshow nil t)
-       (progn
-
-     #+END_SRC
-
-**** Hooks
-
-     #+BEGIN_SRC emacs-lisp
-
-     (add-hook 'prog-mode-hook 'hs-minor-mode)
-
-     #+END_SRC
-
-**** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; ctl-x-map
-     (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)))
+     ;; enable emacs server after startup
+     (add-hook 'window-setup-hook
+               (lambda ()
+                 (safe-funcall 'server-start)))
 
      #+END_SRC
 
 ** Applications
-*** Xorg
-**** Exwm
+*** CLI
+
+    Command line interface (CLI) is a text-based interface that is
+    used to operate software and operating systems while allowing the
+    user to respond to visual prompts by typing single commands into
+    the interface and receiving a reply in the same way.
+
+**** Shell
+
+     In computing, a shell is a user interface for access to an
+     operating system's services.
+
+     This package defines a shell-in-a-buffer (shell mode) built on
+     top of comint mode.  This is actually cmushell with things renamed
+     to replace its counterpart in Emacs 18.  cmushell is more
+     featureful, robust, and uniform than the Emacs 18 version.
+
+     Since this mode is built on top of the general command-interpreter-in-
+     a-buffer mode (comint mode), it shares a common base functionality,
+     and a common set of bindings, with all modes derived from comint mode.
+     This makes these modes easier to use.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'shell nil t)
+
+      #+END_SRC
+
+****** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; hook
+      (add-hook 'shell-mode-hook
+                (lambda()
+                  ;; do not display continuation lines.
+                  (setq truncate-lines nil)
+
+                  ;; when available remove company-mode
+                  (when (fboundp 'company-mode)
+                    (company-mode -1))))
+
+      #+END_SRC
+
+**** Eshell
+
+     Despite the sheer fact that running an Emacs shell can be fun, here
+     are a few of the unique features offered by Eshell:
+
+     - Integration with the Emacs Lisp programming environment
+     - A high degree of configurability.
+
+     - The ability to have the same shell on every system Emacs has been
+       ported to. Since Eshell imposes no external requirements, and
+       relies upon only the Lisp functions exposed by Emacs, it is quite
+       operating system independent. Several of the common UNIX
+       commands, such as ls, mv, rm, ln, etc., have been implemented in
+       Lisp in order to provide a more consistent work environment.
+
+       - If there is a command on disk, it will be executed
+         as in a normal shell.  If there is no command by that name on disk,
+         but a Lisp function with that name is defined, the Lisp function
+         will be called, using the arguments passed on the command line.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'eshell nil t)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; ctl-x-map (C-x)
+      (define-key ctl-x-map (kbd "&") 'eshell)
+
+      #+END_SRC
+
+*** Managers
+**** X Windows
+
+    A window manager is system software that controls the placement
+    and appearance of windows within a windowing system in a graphical
+    user interface. Most window managers are designed to help provide
+    a desktop environment.
+
+    Finally a Emacs window means X WINDOW as well :D! Thanks to EXWM! (great
+    package).
+
+***** Exwm
 
      EXWM (Emacs X Window Manager) is a full-featured tiling X window manager
      for Emacs built on top of XELB.
 
-***** Require
+****** Require
 
       #+BEGIN_SRC emacs-lisp
 
@@ -2310,7 +2722,7 @@
 
       #+END_SRC
 
-***** Customize
+****** Customize
 
       #+BEGIN_SRC emacs-lisp
 
@@ -2381,7 +2793,7 @@
 
       #+END_SRC
 
-***** Binds
+****** Binds
 
       #+BEGIN_SRC emacs-lisp
 
@@ -2405,7 +2817,7 @@
 
       #+END_SRC
 
-***** Hooks
+****** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
@@ -2435,7 +2847,7 @@
 
       #+END_SRC
 
-***** Enable
+****** Enable
 
       #+BEGIN_SRC emacs-lisp
 
@@ -2443,13 +2855,13 @@
 
       #+END_SRC
 
-**** Exwm-randr
+***** Exwm-randr
 
      This module adds Randr support for EXWM.
      Currently it requires external tools such as xrandr(1)
      to properly configure Randr first.
 
-***** Require
+****** Require
 
       #+BEGIN_SRC emacs-lisp
 
@@ -2457,7 +2869,7 @@
 
       #+END_SRC
 
-***** Customize
+****** Customize
 
       #+BEGIN_SRC emacs-lisp
 
@@ -2476,7 +2888,7 @@
 
       #+END_SRC
 
-***** Enable
+****** Enable
 
       #+BEGIN_SRC emacs-lisp
 
@@ -2484,149 +2896,379 @@
 
       #+END_SRC
 
-*** Security
-**** Nsm
+**** Packages
 
-     Network Security Manager.
+     A package manager or package-management system is a collection of
+     software tools that automates the process of installing,
+     upgrading, configuring, and removing computer programs for a
+     computer's system environment (like EMACS) in a consistent manner.
 
-***** Require
+***** Cask
+
+     Cask is a project management tool fo Emacs that helps
+     automate the package development cycle; development,
+     dependencies, testing, building, packaging and more.
+
+     Cask can also be used to manage dependencies for your local
+     Emacs configuration.
+
+     I do prefer cask over packages.el, because the management
+     of third party packages can be done outside of emacs,
+     provinding more control and flexibility.
+
+***** Packages
+
+     The idea behind package.el is to be able to download packages
+     and install them. Packages are versioned and have versioned
+     dependencies.
+
+****** Require
+
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'nsm nil t)
+      ;; (require 'package nil t)
 
       #+END_SRC
 
-***** Customize
+****** Customize
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; if a potential problem with the security of the network
-      ;; connection is found, the user is asked to give input
-      ;; into how the connection should be handled
-      ;; `high': This warns about additional things that many
-      ;; people would not find useful.
-      ;; `paranoid': On this level, the user is queried for
-      ;; most new connections
-      (customize-set-variable 'network-security-level 'paranoid)
-
-      ;; the file the security manager settings will be stored in.
-      (customize-set-variable 'nsm-settings-file
-                              (expand-file-name "nsm/netword-security.data" user-emacs-directory))
-
-      #+END_SRC
-
-**** Epg-config
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'eps-config nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; the gpg executable
-      (customize-set-variable 'epg-gpg-program "gpg2")
-
-      #+END_SRC
-
-**** Tls
-
-     This package implements a simple wrapper around "gnutls-cli" to
-     make Emacs support TLS/SSL.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'tls nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; indicate if certificates should be checked against trusted root certs
-      ;; if this is ‘ask’, the user can decide whether to accept an
-      ;; untrusted certificate
-      (customize-set-variable 'tls-checktrust nil)
-
-      ;; list of strings containing commands to
-      ;; start TLS stream to a host
-      ;; '("openssl s_client -connect %h:%p -CAfile %t")
-      ;; '("gnutls-cli --x509cafile %t -p %p %h --insecure")
       (customize-set-variable
-       'tls-program
-       '("gnutls-cli --x509cafile /etc/ssl/certs/ca-certificates.crt -p %p %h"))
+        'package-archives
+        '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("melpa" . "https://melpa.org/packages/")))
 
       #+END_SRC
 
-**** Gnutls
-
-     This package provides language bindings for the GnuTLS library
-     using the corresponding core functions in gnutls.c
-
-***** Require
+****** Enable
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require  'gnutls nil t)
+      ;; enable (manually only)
+      ;; (package-initialize)
+
+      #+END_SRC
+
+**** Files
+
+    A file manager or file browser is a computer program that provides
+    a user interface to manage files and folders.
+
+***** Dired
+
+     This is a major mode for file management operations.
+
+     The most common operations performed on files or groups of files
+     include creating, opening (e.g. viewing, playing, editing or
+     printing), renaming, moving or copying, deleting and searching
+     for files, as well as modifying file attributes, properties and
+     file permissions.
+
+****** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'dired nil t)
+
+      #+END_SRC
+
+****** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable dired-find-alternate-file
+      (put 'dired-find-alternate-file 'disabled nil)
+
+      #+END_SRC
+
+***** Dired-async
+
+     This package provides a redefinition of `dired-create-file' function,
+     performs copies, moves and all what is handled by `dired-create-file'
+     in the background using a slave Emacs process, by means of
+     the async.el module.
+
+****** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'dired-async nil t)
+
+      #+END_SRC
+
+****** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (safe-funcall 'dired-async-mode 1)
+
+      #+END_SRC
+
+****** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+      (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)
+
+      #+END_SRC
+
+***** Dired-subtree
+
+     This package defines function `dired-subtree-insert' which instead
+     inserts the subdirectory directly below its line in the original
+     listing, and indent the listing of subdirectory to resemble a
+     tree-like structure (somewhat similar to tree(1) except the pretty
+     graphics).
+
+****** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'dired-subtree nil t)
         (progn
 
       #+END_SRC
 
-***** Customize
+****** Customize
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; if non-nil, this should be a TLS priority string
-      (customize-set-variable 'gnutls-algorithm-priority nil)
+      ;; default depth expanded by `dired-subtree-cycle'
+      (customize-set-variable 'dired-subtree-cycle-depth 2)
 
-      ;; if non-nil, this should be t or a list of checks
-      ;; per hostname regex
-      (customize-set-variable 'gnutls-verify-error nil)))
+      ;; a prefix put into each nested subtree
+      (customize-set-variable 'dired-subtree-line-prefix "  ")
+
+      ;; specifies how the prefix is fontified, subtree
+      (customize-set-variable 'dired-subtree-line-prefix-face 'subtree)
+
+      ;; when non-nil, add a background face to a subtree listing.
+      (customize-set-variable 'dired-subtree-use-backgrounds nil)
 
       #+END_SRC
 
-**** Epa
+****** Binds
 
-     EasyPG is an all-in-one GnuPG interface for Emacs.
-     It has two aspects: convenient tools which allow to use GnuPG
-     from Emacs (EasyPG Assistant), and a fully
-     functional interface library to GnuPG (EasyPG Library).
+      #+BEGIN_SRC emacs-lisp
+
+      (when (boundp 'dired-mode-map)
+        (progn
+          (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
+          (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))))
+
+      #+END_SRC
+
+***** Dired-rsync
+
+     Dired-rsync is a command that can be run from a dired buffer to
+     copy files using rsync rather than tramps in-built mechanism.
+     This is especially useful for copying large files to/from remote
+     locations without locking up tramp.
+
+****** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'dired-rsync nil t)
+
+     #+END_SRC
+
+****** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; the default options for the rsync command
+      (customize-set-variable 'dired-rsync-options "-a -z -v -r --info=progress2")
+
+      #+END_SRC
+
+****** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key dired-mode-map (kbd "C-c C-r") 'dired-rsync)
+
+      #+END_SRC
+
+**** Bookmark
+
+    The bookmark list is sorted lexically by default, but you can turn
+    this off by setting bookmark-sort-flag to nil. If it is nil, then
+    the list will be presented in the order it is recorded
+    (chronologically), which is actually fairly useful as well.
 
 ***** Require
 
-      #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-      (require 'epa nil t)
+     (require 'bookmark nil t)
 
-      #+END_SRC
+     #+END_SRC
 
 ***** Customize
 
+     #+BEGIN_SRC emacs-lisp
+
+     ;; custom
+     ;; file in which to save bookmarks by default.
+     (customize-set-variable
+      'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))
+
+     #+END_SRC
+
+*** Emulators
+
+    An emulator is hardware or software that enables one
+    computer system (called the host) to behave like another computer
+    system (called the guest).
+
+    An emulator typically enables the host system to run software
+    or use peripheral devices designed for the guest system.
+
+**** Terminal
+
+     A terminal emulator, terminal application, or term
+     is a computer program that emulates a video terminal within
+     some other display architecture.
+
+***** Term
+
+     Command-interpreter-in-a-buffer package (term mode).
+     The idea is that you can build specific process-in-a-buffer
+     modes on top of term mode -- e.g., lisp, shell, scheme, T, soar, ...
+
+     It seems that ~sh~ shell works better with term.
+
+****** Require
+
       #+BEGIN_SRC emacs-lisp
 
-      ;; if non-nil, cache passphrase for symmetric encryption
-      (customize-set-variable
-       'epa-file-cache-passphrase-for-symmetric-encryption t)
-
-      ;; if t, always asks user to select recipients
-      (customize-set-variable 'epa-file-select-keys t)
-
-      ;; in epa commands, a particularly useful mode is ‘loopback’, which
-      ;; redirects all Pinentry queries to the caller, so Emacs can query
-      ;; passphrase through the minibuffer, instead of external Pinentry
-      ;; program
-      (customize-set-variable 'epa-pinentry-mode 'loopback)
+      (require 'term nil t)
 
       #+END_SRC
 
+****** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; if non-nil, is file name to use for explicitly
+      ;; requested inferior shell
+      (customize-set-variable
+       'explicit-shell-file-name (getenv "SHELL"))
+
+      ;; if non-nil, add a ‘/’ to completed directories
+      (customize-set-variable 'term-completion-addsuffix t)
+
+      ;; regexp to recognize prompts in the inferior process
+      ;; (customize-set-variable 'term-prompt-regexp "^\\(>\\|\\(->\\)+\\) *")
+      (customize-set-variable 'term-prompt-regexp ".*:.*>.*? ")
+
+      ;; if non-nil, automatically list possibilities on partial completion.
+      (customize-set-variable 'term-completion-autolist t)
+
+      ;; if true, buffer name equals process name
+      (customize-set-variable 'term-ansi-buffer-base-name t)
+
+      #+END_SRC
+
+****** Functions
+
+      #+BEGIN_SRC emacs-lisp
+      ;; functions
+      (defun eos/term-send-kill-line ()
+        "Kill line in multi-term mode with the possibility to paste it like in a normal shell."
+        (interactive)
+        (when (fboundp 'term-send-raw-string)
+            (kill-line)
+            (term-send-raw-string "\C-k")))
+
+      (defun eos/run-term ()
+        "Exec \\[term] but asks for the `term-mode' buffer name."
+        (interactive)
+        (unless (fboundp 'term)
+          (error "Term not available"))
+        (funcall 'term (getenv "SHELL"))
+        (rename-buffer
+         (read-string "Term name: " nil nil "Term") t))
+
+      #+END_SRC
+
+****** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'term-mode-hook
+                (lambda()
+                  ;; do not display continuation lines.
+                  (setq truncate-lines nil)
+
+                  ;; disable company mode
+                  (when (fboundp 'company-mode)
+                    (company-mode -1))))
+
+      #+END_SRC
+
+****** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; bind term-raw-map/term-mode-map with hook
+      (add-hook 'term-mode-hook
+                (lambda ()
+                  (when (and (boundp 'term-raw-map)
+                             (boundp 'term-mode-map))
+                    (progn
+                      ;; term-raw-map
+                      (define-key term-raw-map (kbd "s-q") 'term-line-mode)
+
+                      ;; term-mode-map
+                      (define-key term-mode-map (kbd "s-q") 'term-char-mode)))))
+
+      #+END_SRC
+
+***** Multi-term
+
+     This package is for creating and managing multiple
+     terminal buffers in Emacs.
+
+****** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (require 'multi-term nil t)
+        (progn
+
+      #+END_SRC
+
+****** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; if this is nil, setup to environment variable of `SHELL'"
+      (customize-set-variable 'multi-term-program nil)
+
+      ;; focus terminal window after you open dedicated window
+      (customize-set-variable 'multi-term-dedicated-select-after-open-p t)
+
+      ;; the buffer name of term buffer.
+      (customize-set-variable 'multi-term-buffer-name "Term")
+
+      #+END_SRC
+
+****** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; clt-x-map (C-x) prefix
+      (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
+      (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
+
+      #+END_SRC
+
+*** Security
 **** Auth-source
 
      It lets users tell Gnus how to authenticate in a single place.
@@ -2652,8 +3294,7 @@
               (let ((secretf (plist-get (car auth) :secret)))
                 (if secretf
                     (funcall secretf)
-                  (message "Auth entry for %s@%s has no secret!"
-                           user host)))
+                  (message "Auth entry for %s@%s has no secret!" user host)))
             (message "No auth entry found for %s@%s" user host))))
 
       #+END_SRC
@@ -2681,132 +3322,108 @@
 
       #+END_SRC
 
-**** Mml-sec
 *** Session
 **** Desktop
-*** Packages
-**** Cask
+*** Clocks
+**** Time
 
-     Cask is a project management tool fo Emacs that helps
-     automate the package development cycle; development,
-     dependencies, testing, building, packaging and more.
-
-     Cask can also be used to manage dependencies for your local
-     Emacs configuration.
-
-     I do prefer cask over packages.el, because the management
-     of third party packages can be done outside of emacs,
-     provinding more control and flexibility.
-
-**** Packages
-
-     The idea behind package.el is to be able to download packages
-     and install them. Packages are versioned and have versioned
-     dependencies.
+    Facilities to display current time/date and a new-mail indicator
+    in the Emacs mode line.
 
 ***** Require
 
+     #+BEGIN_SRC emacs-lisp
 
-      #+BEGIN_SRC emacs-lisp
+     (require 'time nil t)
 
-      ;; (require 'package nil t)
-
-      #+END_SRC
+     #+END_SRC
 
 ***** Customize
 
-      #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-      (customize-set-variable
-        'package-archives
-        '(("gnu" . "https://elpa.gnu.org/packages/")
-          ("melpa" . "https://melpa.org/packages/")))
+     ;; seconds between updates of time in the mode line.
+     (customize-set-variable 'display-time-interval 15)
 
-      #+END_SRC
+     ;; non-nil indicates time should be displayed as hh:mm, 0 <= hh <= 23
+     (customize-set-variable 'display-time-24hr-format t)
 
-***** Enable
+     ;; set format time string
+     (customize-set-variable 'display-time-format "%H:%M")
 
-      #+BEGIN_SRC emacs-lisp
+     ;; load-average values below this value won’t be shown in the mode line.
+     (customize-set-variable 'display-time-load-average-threshold 1.0)
 
-      ;; enable (manually only)
-      ;; (package-initialize)
-
-      #+END_SRC
-
-*** Process
-**** Async
-
-     Adds the ability to call asynchronous functions and process with
-     ease. See the documentation for `async-start' and `async-start-process'.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'async nil t)
-      (require 'async-bytecomp nil t)
-
-      #+END_SRC
-
-***** Display
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; to run command without displaying the output in a window
-      (add-to-list 'display-buffer-alist
-                   '("\\*Async Shell Command\\*"
-                     (display-buffer-no-window)
-                     (allow-no-window . t)))
-
-      #+END_SRC
-
-*** Edit
-**** Elec-pair
-
-     Electric pairing: automatically matches parenthesis pairs,
-     should be enabled regardless the current major mode.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'elec-pair nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; alist of pairs that should be used regardless of major mode.
-      (customize-set-variable 'electric-pair-pairs
-                              '((?\{ . ?\})
-                                (?\( . ?\))
-                                (?\[ . ?\])
-                                (?\" . ?\")))
-
-      #+END_SRC
+     #+END_SRC
 
 ***** Enable
 
+     #+BEGIN_SRC emacs-lisp
+
+     ;; enable display time
+     (safe-funcall 'display-time-mode 1)
+
+     #+END_SRC
+
+*** Apparence
+**** Icons
+***** All-the-icons
+
+     This package is a utility for using and formatting various Icon
+     fonts within Emacs.  Icon Fonts allow you to propertize and format
+     icons the same way you would normal text. This enables things such
+     as better scaling of and anti aliasing of the icons.
+
+****** Require
+
       #+BEGIN_SRC emacs-lisp
 
-      (safe-funcall 'electric-pair-mode 1)))
+      (require 'all-the-icons nil t)
 
       #+END_SRC
 
-**** Newcomment
+****** Customize
 
-     This library contains functions and variables for commenting and
-     uncommenting source code.
+      #+BEGIN_SRC emacs-lisp
+
+      ;; whether or not to include a foreground colour when formatting the icon
+      (customize-set-variable 'all-the-icons-color-icons t)
+
+      ;; the default adjustment to be made to the `raise' display property of an icon
+      (customize-set-variable 'all-the-icons-default-adjust -0.2)
+
+      ;; the base Scale Factor for the `height' face property of an icon
+      (customize-set-variable 'all-the-icons-scale-factor 1.0)
+
+      #+END_SRC
+
+**** Themes
+***** Moebius
+
+     Add theme directory to load-path and load the
+     default theme.
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; add eos-theme-dir to theme load path
+     (add-to-list 'custom-theme-load-path
+                  (concat user-emacs-directory "themes"))
+
+     ;; load theme
+     (load-theme 'moebius-yellow t)
+
+     #+END_SRC
+
+*** Buffers
+**** Buffer-move
+
+     Swap windows/buffer position (layout).
 
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'newcomment nil t)
-        (progn
+      ;; (require 'buffer-move nil t)
 
       #+END_SRC
 
@@ -2814,11 +3431,56 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; global-map
-      (global-set-key (kbd "M-c") 'comment-or-uncomment-region)))
+      ;; (define-key ctl-x-map (kbd "<C-up>") 'buf-move-up)
+      ;; (define-key ctl-x-map (kbd "<C-down>") 'buf-move-down)
+      ;; (define-key ctl-x-map (kbd "<C-left>") 'buf-move-left)
+      ;; (define-key ctl-x-map (kbd "<C-right>")'buf-move-right)
 
       #+END_SRC
 
+**** Ibuffer
+
+    A major mode for viewing a list of buffers.
+    In Ibuffer, you can conveniently perform many operations on the
+    currently open buffers, in addition to filtering your view to a
+    particular subset of them, and sorting by various criteria.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (when (require 'ibuffer nil t)
+       (progn
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; the criteria by which to sort the buffers
+     (customize-set-variable 'ibuffer-default-sorting-mode 'filename/process)
+
+     ;; if non-nil, display the current Ibuffer buffer itself
+     (customize-set-variable 'ibuffer-view-ibuffer nil)
+
+     #+END_SRC
+
+***** Display
+
+     #+BEGIN_SRC emacs-lisp
+
+     #+END_SRC
+
+***** Binds
+
+     #+BEGIN_SRC emacs-lisp
+
+     (define-key ctl-x-map (kbd "b") 'ibuffer)))
+
+     #+END_SRC
+
+*** Editing
 **** Iedit
 
      This package includes Emacs minor modes (iedit-mode and
@@ -2924,213 +3586,6 @@
       (safe-funcall 'editorconfig-mode)
 
       #+END_SRC
-
-*** Buffers
-**** Buffer-move
-
-     Swap windows/buffer position (layout).
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'buffer-move nil t)
-        (progn
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      (define-key ctl-x-map (kbd "<C-up>") 'buf-move-up)
-      (define-key ctl-x-map (kbd "<C-down>") 'buf-move-down)
-      (define-key ctl-x-map (kbd "<C-left>") 'buf-move-left)
-      (define-key ctl-x-map (kbd "<C-right>")'buf-move-right)))
-
-      #+END_SRC
-
-*** Files
-**** Dired
-
-     This is a major mode for directory
-     browsing and editing.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'dired nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; enable dired-find-alternate-file
-      (put 'dired-find-alternate-file 'disabled nil)))
-
-      #+END_SRC
-
-**** Dired-async
-
-     This package provides a redefinition of `dired-create-file' function,
-     performs copies, moves and all what is handled by `dired-create-file'
-     in the background using a slave Emacs process, by means of
-     the async.el module.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'dired-async nil t)
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      (safe-funcall 'dired-async-mode 1)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
-      (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)
-
-      #+END_SRC
-
-**** Dired-subtree
-
-     This package defines function `dired-subtree-insert' which instead
-     inserts the subdirectory directly below its line in the original
-     listing, and indent the listing of subdirectory to resemble a
-     tree-like structure (somewhat similar to tree(1) except the pretty
-     graphics).
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'dired-subtree nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; default depth expanded by `dired-subtree-cycle'
-      (customize-set-variable 'dired-subtree-cycle-depth 2)
-
-      ;; a prefix put into each nested subtree
-      (customize-set-variable 'dired-subtree-line-prefix "  ")
-
-      ;; specifies how the prefix is fontified, subtree
-      (customize-set-variable 'dired-subtree-line-prefix-face 'subtree)
-
-      ;; when non-nil, add a background face to a subtree listing.
-      (customize-set-variable 'dired-subtree-use-backgrounds nil)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (boundp 'dired-mode-map)
-        (progn
-          (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
-          (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))))
-
-      #+END_SRC
-
-**** Dired-rsync
-
-     Dired-rsync is a command that can be run from a dired buffer to
-     copy files using rsync rather than tramps in-built mechanism.
-     This is especially useful for copying large files to/from remote
-     locations without locking up tramp.
-
-***** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'dired-rsync nil t)
-
-     #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; the default options for the rsync command
-      (customize-set-variable 'dired-rsync-options "-a -z -v -r --info=progress2")
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      (define-key dired-mode-map (kbd "C-c C-r") 'dired-rsync)
-
-      #+END_SRC
-
-*** Icons
-**** All-the-icons
-
-     This package is a utility for using and formatting various Icon
-     fonts within Emacs.  Icon Fonts allow you to propertize and format
-     icons the same way you would normal text. This enables things such
-     as better scaling of and anti aliasing of the icons.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'all-the-icons nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; whether or not to include a foreground colour when formatting the icon
-      (customize-set-variable 'all-the-icons-color-icons t)
-
-      ;; the default adjustment to be made to the `raise' display property of an icon
-      (customize-set-variable 'all-the-icons-default-adjust -0.2)
-
-      ;; the base Scale Factor for the `height' face property of an icon
-      (customize-set-variable 'all-the-icons-scale-factor 1.0)
-
-      #+END_SRC
-
-*** Theme
-**** Moebius
-
-     Add theme directory to load-path and load the
-     default theme.
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; add eos-theme-dir to theme load path
-     (add-to-list 'custom-theme-load-path
-                  (concat user-emacs-directory "themes"))
-
-     ;; load theme
-     (load-theme 'moebius-yellow t)
-
-     #+END_SRC
 
 *** Graphics
 **** Artist
@@ -3342,15 +3797,20 @@
       #+END_SRC
 
 ***** Binds
-**** Nnimap
+*** Media
+**** Emms
 
-     Nnimap library provides interfaces Gnus with IMAP servers.
+     Emms is the Emacs Multi-Media System. It tries to be a clean and small
+     application to play multimedia files from Emacs using external
+     players. The basic functionality of Emms consists of three parts:
+     The core, the sources, and the players.
 
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'nnimap nil t)
+      (require 'emms nil t)
+      (require 'emms-setup nil t)
 
       #+END_SRC
 
@@ -3358,136 +3818,21 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; limit the number of articles to look for after moving an article
-      (customize-set-variable 'nnimap-request-articles-find-limit nil)
+      ;; list of players that emms can use (only mpv)
+      (customize-set-variable 'emms-player-list '(emms-player-mpv))
 
-      #+END_SRC
+      ;; string used for displaying the current track in mode-line and titlebar
+      (customize-set-variable 'emms-mode-line-format "")
 
-**** Nnmail
+      ;; list of players that EMMS can use
+      (customize-set-variable 'emms-player-list '(emms-player-mpv))
 
-     Mail support functions for the Gnus mail backends.
+      ;;  the default name of the EMMS playlist buffer
+      (customize-set-variable 'emms-playlist-buffer-name "EMMS|Playlist")
 
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'nnmail nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; expirable articles that are older than this will be expired
-      (customize-set-variable 'nnmail-expiry-wait 4)
-
-      #+END_SRC
-
-**** Mm-bodies
-
-    This library handles MIME body (encode/decode).
-
-    MIME is short for "Multipurpose Internet Mail Extensions".
-    This standard is documented in a number of RFCs;
-    mainly RFC2045 (Format of Internet Message Bodies),
-    RFC2046 (Media Types), RFC2047 (Message Header Extensions for
-    Non-ASCII Text),  RFC2048 (Registration Procedures),
-    RFC2049 (Conformance Criteria and Examples).
-
-    It is highly recommended that anyone who intends writing
-    MIME-compliant software read at least RFC2045 and RFC2047.
-
-***** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'mm-bodies nil t)
-
-     #+END_SRC
-
-***** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
-
-     #+END_SRC
-
-*** Mail
-**** Messages
-
-     This mode provides mail-sending facilities from within Emacs.  It
-     consists mainly of large chunks of code from the sendmail.el,
-     gnus-msg.el and rnewspost.el files.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'message nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; your preference for a mail composition package
-      (customize-set-variable 'mail-user-agent 'message-user-agent)
-      ;; (customize-set-variable 'mail-user-agent 'gnus-user-agent)
-
-      ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
-      (customize-set-variable 'compose-mail-user-agent-warnings nil)
-
-      ;; if it is nil, use Gnus; else use `mail-user-agent'
-      (customize-set-variable 'message-mail-user-agent t)
-
-      ;; string to be inserted at the end of the message buffer
-      (customize-set-variable 'message-signature "")
-
-      ;; format of the "whomever writes:" line
-      (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
-
-      ;; function called to insert the "whomever writes:" line
-      (customize-set-variable 'message-citation-line-function
-                              'message-insert-formatted-citation-line)
-      ;; function that inserts a formatted citation line
-
-      ;; when non-nil, ask for confirmation when sending a message
-      (customize-set-variable 'message-confirm-send t)
-
-      ;; non-nil means that the message buffer will be killed after sending a message
-      (customize-set-variable 'message-kill-buffer-on-exit t)
-
-      ;; whether to confirm a wide reply to multiple email recipients
-      (customize-set-variable 'message-wide-reply-confirm-recipients t)
-
-      ;; this variable is obsolete since 26.1;
-      ;; the default charset comes from the language environment
-      ;; default charset used in non-MULE Emacsen
-      (customize-set-variable 'message-default-charset 'utf-8)
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/message-header-add-gcc ()
-        "While `gnus' is running, add a Gcc header, if missing.
-      The Gcc header places a copy of the outgoing message to the
-      appropriate directory of the IMAP server, as per the contents of
-      `auth-sources'.
-      In the absence of a Gcc header, the outgoing message will not
-      appear in the appropriate IMAP directory, though it will still be
-      sent. Add this function to `message-header-setup-hook'."
-        (if (gnus-alive-p)
-            (progn
-              (when (message-fetch-field "Gcc")
-                (message-remove-header "Gcc")
-                (message-add-header "Gcc: nnimap+pub:Sent")))
-          (message "Gnus is not running. No GCC field inserted.")))
+      ;; the default directory to look for media files.
+      (customize-set-variable
+       'emms-source-file-default-directory (expand-file-name "~/media/"))
 
       #+END_SRC
 
@@ -3495,37 +3840,26 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; hook called narrowed to the headers when setting up a message buffer
-      (add-hook 'message-header-setup-hook 'eos/message-header-add-gcc)
-
-      ;; normal hook, run each time a new outgoing message is initialized
-      (add-hook 'message-setup-hook 'message-sort-headers)
-
-      #+END_SRC
-
-**** Sendmail
-
-     This mode provides mail-sending facilities from within Emacs.
-     It is documented in the Emacs user's manual.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'sendmail nil t)
+      ;; disable emms mode line
+      ;; (add-hook 'emms-playlist-mode-hook
+      ;;           (lambda ()
+      ;;             (when (and (boundp 'emms-mode-line-active-p)
+      ;;                        (fboundp 'emms-mode-line-disable))
+      ;;               (progn
+      ;;                 (if emms-mode-line-active-p
+      ;;                     (emms-mode-line-disable))))))
 
       #+END_SRC
 
-***** Customize
+***** Enable
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; text inserted at end of mail buffer when a message is initialized
-      (customize-set-variable 'mail-signature "Att.")
-
-      ;; file containing the text inserted at end of mail buffer
-      ;; default: ~/.signature
-      ;; (customize-set-variable 'mail-signature-file nil)
+      ;; if emms is available, enable it
+      ;; (add-hook 'window-setup-hook
+      ;;           (lambda ()
+      ;;             (safe-funcall 'emms-all)
+      ;;             (safe-funcall 'emms-default-players)))
 
       #+END_SRC
 
@@ -3647,254 +3981,7 @@
 
 **** Jabber
 **** Slack
-*** Shell
-**** Shell
-
-     This package defines a shell-in-a-buffer (shell mode) built on
-     top of comint mode.  This is actually cmushell with things renamed
-     to replace its counterpart in Emacs 18.  cmushell is more
-     featureful, robust, and uniform than the Emacs 18 version.
-
-     Since this mode is built on top of the general command-interpreter-in-
-     a-buffer mode (comint mode), it shares a common base functionality,
-     and a common set of bindings, with all modes derived from comint mode.
-     This makes these modes easier to use.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'shell nil t)
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; hook
-      (add-hook 'shell-mode-hook
-                (lambda()
-                  ;; do not display continuation lines.
-                  (setq truncate-lines nil)
-
-                  ;; when available remove company-mode
-                  (when (fboundp 'company-mode)
-                    (company-mode -1))))
-
-      #+END_SRC
-
-**** Eshell
-
-     Despite the sheer fact that running an Emacs shell can be fun, here
-     are a few of the unique features offered by Eshell:
-
-     - Integration with the Emacs Lisp programming environment
-     - A high degree of configurability.
-
-     - The ability to have the same shell on every system Emacs has been
-       ported to. Since Eshell imposes no external requirements, and
-       relies upon only the Lisp functions exposed by Emacs, it is quite
-       operating system independent. Several of the common UNIX
-       commands, such as ls, mv, rm, ln, etc., have been implemented in
-       Lisp in order to provide a more consistent work environment.
-
-       - If there is a command on disk, it will be executed
-         as in a normal shell.  If there is no command by that name on disk,
-         but a Lisp function with that name is defined, the Lisp function
-         will be called, using the arguments passed on the command line.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'eshell nil t)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; ctl-x-map (C-x)
-      (define-key ctl-x-map (kbd "&") 'eshell)
-
-      #+END_SRC
-
-*** Terminal
-**** Term
-
-     Command-interpreter-in-a-buffer package (term mode).
-     The idea is that you can build specific process-in-a-buffer
-     modes on top of term mode -- e.g., lisp, shell, scheme, T, soar, ...
-
-     It seems that ~sh~ shell works better with term.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'term nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; if non-nil, is file name to use for explicitly
-      ;; requested inferior shell
-      (customize-set-variable
-       'explicit-shell-file-name (getenv "SHELL"))
-
-      ;; if non-nil, add a ‘/’ to completed directories
-      (customize-set-variable 'term-completion-addsuffix t)
-
-      ;; regexp to recognize prompts in the inferior process
-      ;; (customize-set-variable 'term-prompt-regexp "^\\(>\\|\\(->\\)+\\) *")
-      (customize-set-variable 'term-prompt-regexp ".*:.*>.*? ")
-
-      ;; if non-nil, automatically list possibilities on partial completion.
-      (customize-set-variable 'term-completion-autolist t)
-
-      ;; if true, buffer name equals process name
-      (customize-set-variable 'term-ansi-buffer-base-name t)
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-      ;; functions
-      (defun eos/term-send-kill-line ()
-        "Kill line in multi-term mode with the possibility to paste it like in a normal shell."
-        (interactive)
-        (when (fboundp 'term-send-raw-string)
-            (kill-line)
-            (term-send-raw-string "\C-k")))
-
-      (defun eos/run-term ()
-        "Exec \\[term] but asks for the `term-mode' buffer name."
-        (interactive)
-        (unless (fboundp 'term)
-          (error "Term not available"))
-        (funcall 'term (getenv "SHELL"))
-        (rename-buffer
-         (read-string "Term name: " nil nil "Term") t))
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'term-mode-hook
-                (lambda()
-                  ;; do not display continuation lines.
-                  (setq truncate-lines nil)
-
-                  ;; disable company mode
-                  (when (fboundp 'company-mode)
-                    (company-mode -1))))
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; bind term-raw-map/term-mode-map with hook
-      (add-hook 'term-mode-hook
-                (lambda ()
-                  (when (and (boundp 'term-raw-map)
-                             (boundp 'term-mode-map))
-                    (progn
-                      ;; term-raw-map
-                      (define-key term-raw-map (kbd "s-q") 'term-line-mode)
-
-                      ;; term-mode-map
-                      (define-key term-mode-map (kbd "s-q") 'term-char-mode)))))
-
-      #+END_SRC
-
-**** Multi-term
-
-     This package is for creating and managing multiple
-     terminal buffers in Emacs.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'multi-term nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; if this is nil, setup to environment variable of `SHELL'"
-      (customize-set-variable 'multi-term-program nil)
-
-      ;; focus terminal window after you open dedicated window
-      (customize-set-variable 'multi-term-dedicated-select-after-open-p t)
-
-      ;; the buffer name of term buffer.
-      (customize-set-variable 'multi-term-buffer-name "Term")
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; clt-x-map (C-x) prefix
-      (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
-      (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
-
-      #+END_SRC
-
 *** Browser
-**** Shr
-
-     This package takes a HTML parse tree (as provided by
-     libxml-parse-html-region) and renders it in the current buffer.  It
-     does not do CSS, JavaScript or anything advanced: It's geared
-     towards rendering typical short snippets of HTML, like what you'd
-     find in HTML email and the like.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'shr nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; frame width to use for rendering
-      (customize-set-variable 'shr-width 120)
-
-      ;; if non-nil, use proportional fonts for text
-      (customize-set-variable 'shr-use-fonts nil)
-
-      ;; if non-nil, respect color specifications in the HTML
-      (customize-set-variable 'shr-use-colors nil)
-
-      ;; if non-nil, inhibit loading images
-      (customize-set-variable 'shr-inhibit-images nil)
-
-      ;; images that have URLs matching this regexp will be blocked (regexp)
-      (customize-set-variable 'shr-blocked-images nil)))
-
-      #+END_SRC
-
 **** Eww
 
      Elisp www browser configuration.
@@ -3960,8 +4047,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'browse-url nil t)
-        (progn
+      (require 'browse-url nil t)
 
       #+END_SRC
 
@@ -3973,7 +4059,7 @@
       (customize-set-variable 'browse-url-generic-program "eww")
 
       ;; function to display the current buffer in a WWW browser: eww
-      (customize-set-variable 'browse-url-browser-function 'eww-browse-url)))
+      (customize-set-variable 'browse-url-browser-function 'eww-browse-url)
 
       #+END_SRC
 
@@ -4236,7 +4322,11 @@
 
       #+END_SRC
 
-*** Launcher
+*** Launchers
+
+    An application launcher is a computer program that helps a user
+    to locate and start other computer programs.
+
 **** Cannon
 
      Dmenu is a fast and lightweight dynamic menu for X.
@@ -4284,11 +4374,105 @@
 
       #+END_SRC
 
-*** Network
+*** Clients
+
+    Network Client is a software that runs on a client computer
+    and allows it to establish connectivity with services
+    running on server computers.
+
+**** Email
+***** Messages
+
+     This mode provides mail-sending facilities from within Emacs.  It
+     consists mainly of large chunks of code from the sendmail.el,
+     gnus-msg.el and rnewspost.el files.
+
+****** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'message nil t)
+
+      #+END_SRC
+
+****** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; your preference for a mail composition package
+      (customize-set-variable 'mail-user-agent 'message-user-agent)
+      ;; (customize-set-variable 'mail-user-agent 'gnus-user-agent)
+
+      ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
+      (customize-set-variable 'compose-mail-user-agent-warnings nil)
+
+      ;; if it is nil, use Gnus; else use `mail-user-agent'
+      (customize-set-variable 'message-mail-user-agent t)
+
+      ;; string to be inserted at the end of the message buffer
+      (customize-set-variable 'message-signature "")
+
+      ;; format of the "whomever writes:" line
+      (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
+
+      ;; function called to insert the "whomever writes:" line
+      (customize-set-variable 'message-citation-line-function
+                              'message-insert-formatted-citation-line)
+      ;; function that inserts a formatted citation line
+
+      ;; when non-nil, ask for confirmation when sending a message
+      (customize-set-variable 'message-confirm-send t)
+
+      ;; non-nil means that the message buffer will be killed after sending a message
+      (customize-set-variable 'message-kill-buffer-on-exit t)
+
+      ;; whether to confirm a wide reply to multiple email recipients
+      (customize-set-variable 'message-wide-reply-confirm-recipients t)
+
+      ;; this variable is obsolete since 26.1;
+      ;; the default charset comes from the language environment
+      ;; default charset used in non-MULE Emacsen
+      (customize-set-variable 'message-default-charset 'utf-8)
+
+      #+END_SRC
+
+****** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/message-header-add-gcc ()
+        "While `gnus' is running, add a Gcc header, if missing.
+      The Gcc header places a copy of the outgoing message to the
+      appropriate directory of the IMAP server, as per the contents of
+      `auth-sources'.
+      In the absence of a Gcc header, the outgoing message will not
+      appear in the appropriate IMAP directory, though it will still be
+      sent. Add this function to `message-header-setup-hook'."
+        (if (gnus-alive-p)
+            (progn
+              (when (message-fetch-field "Gcc")
+                (message-remove-header "Gcc")
+                (message-add-header "Gcc: nnimap+pub:Sent")))
+          (message "Gnus is not running. No GCC field inserted.")))
+
+      #+END_SRC
+
+****** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; hook called narrowed to the headers when setting up a message buffer
+      (add-hook 'message-header-setup-hook 'eos/message-header-add-gcc)
+
+      ;; normal hook, run each time a new outgoing message is initialized
+      (add-hook 'message-setup-hook 'message-sort-headers)
+
+      #+END_SRC
+
 **** Verb
 
      Verb is a package that allows you to organize and send HTTP
-     requests from Emacs.  See the project's README.md file for more
+     requests from Emacs. See the project's README.md file for more
      details.
 
 ***** Require
@@ -4309,52 +4493,6 @@
                   (when (boundp 'verb-mode)
                     (if verb-mode
                         (safe-funcall 'verb-send-request-on-point 'this-window)))))))
-
-      #+END_SRC
-
-**** Tramp
-
-     TRAMP is for transparently accessing remote files from within Emacs.
-     TRAMP enables an easy, convenient, and consistent interface to remote
-     files as if they are local files.  TRAMP’s transparency extends to
-     editing, version control, and dired.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-     ;;  (require 'tramp nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; set tramp default method
-      (customize-set-variable 'tramp-default-method "ssh")
-
-      ;; if non-nil, chunksize for sending input to local process.
-      ;; (customize-set-variable 'tramp-chunksize 512)
-
-      ;; a value of t would require an immediate reread during filename completion,
-      ;; nil means to use always cached values for the directory contents.
-      (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
-
-      ;; set tramp verbose level
-      (customize-set-variable 'tramp-verbose 4)
-
-      ;; file which keeps connection history for tramp connections.
-      (customize-set-variable
-       'tramp-persistency-file-name
-       (concat (expand-file-name user-emacs-directory) "cache/tramp"))
-
-      ;; when invoking a shell, override the HISTFILE with this value
-      (customize-set-variable
-       'tramp-histfile-override "~/.tramp_history")
-
-      ;; connection timeout in seconds
-      (customize-set-variable 'tramp-connection-timeout 60)
 
       #+END_SRC
 
@@ -4451,73 +4589,6 @@
 
       #+END_SRC
 
-*** Comparators
-**** Diff
-
-     This package helps you explore differences between files, using the
-     UNIX command diff(1). The commands are `diff' and `diff-backup'.
-     You can specify options with `diff-switches'.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'diff nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; a string or list of strings specifying switches to be passed to diff
-      (customize-set-variable 'diff-switches "-u")))
-
-      #+END_SRC
-
-**** Ediff
-
-     This package provides a convenient way of simultaneous browsing through
-     the differences between a pair (or a triple) of files or buffers.
-     The files being compared, file-A, file-B, and file-C (if applicable) are
-     shown in separate windows (side by side, one above the another, or in
-     separate frames), and the differences are highlighted as you step
-     through them.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'ediff nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; options to pass to `ediff-custom-diff-program'.
-      (customize-set-variable 'ediff-custom-diff-options "-U3")
-
-      ;; the function used to split the main window between buffer-A and buffer-B
-      (customize-set-variable 'ediff-split-window-function 'split-window-horizontally)
-
-      ;; function called to set up windows
-      (customize-set-variable 'ediff-window-setup-function 'ediff-setup-windows-plain)
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'ediff-startup-hook 'ediff-toggle-wide-display)
-      (add-hook 'ediff-cleanup-hook 'ediff-toggle-wide-display)
-      (add-hook 'ediff-suspend-hook 'ediff-toggle-wide-display)
-
-      #+END_SRC
-
 *** Compositor
 **** Compton
 
@@ -4600,8 +4671,15 @@
       (global-set-key (kbd "s-=") 'eos/raise-volume)
 
       #+END_SRC
-*** Calendar
+
+*** Calendars
 *** Dashboards
+
+    A dashboard is a type of graphical user interface which often
+    provides at-a-glance views of key performance indicators relevant
+    to a particular objective or business process. In other usage,
+    "dashboard" is another name for "progress report" or "report."
+
 **** Dashboard
 
      An extensible Emacs dashboard, with sections for
@@ -4713,74 +4791,7 @@
 
       #+END_SRC
 
-*** Multimedia
-**** Emms
-
-     Emms is the Emacs Multi-Media System. It tries to be a clean and small
-     application to play multimedia files from Emacs using external
-     players. The basic functionality of Emms consists of three parts:
-     The core, the sources, and the players.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'emms nil t)
-      (require 'emms-setup nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; list of players that emms can use (only mpv)
-      (customize-set-variable 'emms-player-list '(emms-player-mpv))
-
-      ;; string used for displaying the current track in mode-line and titlebar
-      (customize-set-variable 'emms-mode-line-format "")
-
-      ;; list of players that EMMS can use
-      (customize-set-variable 'emms-player-list '(emms-player-mpv))
-
-      ;;  the default name of the EMMS playlist buffer
-      (customize-set-variable 'emms-playlist-buffer-name "EMMS|Playlist")
-
-      ;; the default directory to look for media files.
-      (customize-set-variable
-       'emms-source-file-default-directory (expand-file-name "~/media/"))
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; disable emms mode line
-      ;; (add-hook 'emms-playlist-mode-hook
-      ;;           (lambda ()
-      ;;             (when (and (boundp 'emms-mode-line-active-p)
-      ;;                        (fboundp 'emms-mode-line-disable))
-      ;;               (progn
-      ;;                 (if emms-mode-line-active-p
-      ;;                     (emms-mode-line-disable))))))
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; if emms is available, enable it
-      ;; (add-hook 'window-setup-hook
-      ;;           (lambda ()
-      ;;             (safe-funcall 'emms-all)
-      ;;             (safe-funcall 'emms-default-players)))
-
-      #+END_SRC
-
 *** Office
-**** Remember
 **** Org
 
      Org is a mode for keeping notes, maintaining ToDo lists, and doing
@@ -4926,64 +4937,6 @@
 
       #+END_SRC
 
-**** Text
-
-     This package provides the fundamental text mode documented in the
-     Emacs user's manual.
-
-     Major mode for editing text written for humans to read.
-     In this mode, paragraphs are delimited only by blank or white lines.
-     You can thus get the full benefit of adaptive filling
-     (see the variable `adaptive-fill-mode').
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'text-mode nil t)
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/text/set-company-backends ()
-        "Set `text-mode' company backends."
-        (interactive)
-        (eos-set-company-backends
-         '((company-ispell :with
-                           company-dabbrev)
-           (company-files))))
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'text-mode-hook
-                (lambda ()
-                  ;; turn on auto fill mode
-                  (turn-on-auto-fill)
-
-                  ;; set company backends
-                  (eos/text/set-company-backends)))
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-      (define-key text-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
-
-      (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
-      (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
-
-      #+END_SRC
-
 **** Markdown
 
      Major mode for editing Markdown files.
@@ -5094,7 +5047,7 @@
 
       #+END_SRC
 
-*** Blog
+**** Blog
 
     Static blog generators are a dime a dozen.
     This is one more, which focuses on being simple.
@@ -5102,7 +5055,7 @@
     The only requirement is that every org file must have a:
     #+TITLE and a #+DATE, and optionally, #+FILETAGS.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
@@ -5110,7 +5063,7 @@
 
      #+END_SRC
 
-**** Functions
+***** Functions
 
      #+BEGIN_SRC emacs-lisp
 
@@ -5156,7 +5109,7 @@
 
      #+END_SRC
 
-**** Customize
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
@@ -5229,90 +5182,9 @@
 
      #+END_SRC
 
-*** Translators
-**** Google-Translate
-
-     Google translate interface.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (and (require 'google-translate nil t)
-                 (require 'google-translate-smooth-ui nil t))
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; alist of translation directions
-      ;; each of direction could be selected directly in
-      ;; the minibuffer during translation.
-      (customize-set-variable
-       'google-translate-translation-directions-alist
-       '(("pt" . "en") ("en" . "pt")))
-
-      ;; default target language
-      (customize-set-variable
-       'google-translate-default-target-language "pt")
-
-      ;; default source language
-      ;; "auto" if you want Google Translate to always detect the source language
-      (customize-set-variable 'google-translate-default-source-language
-                              "auto")
-
-      ;; determines where translation output will be displayed, if
-      ;; `nil' the translation output will be displayed in the pop up
-      ;; buffer (default).
-      (customize-set-variable 'google-translate-output-destination nil)))
-
-      #+END_SRC
-
-*** Notification
-**** Notifications
-
-     For proper usage, Emacs must be started in an environment with an
-     active D-Bus session bus.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'notifications nil t)
-
-      #+END_SRC
+**** Remember
 
 *** Documentation
-**** Eldoc
-
-     As you type a function's symbol name as part of a sexp,
-     it will print the argument list for that function.
-     Behavior is not identical; for example, you need not actually
-     type the function name, you need only move point around in a sexp that
-     calls it.  Also, if point is over a documented variable, it will print
-     the one-line documentation for that variable instead, to remind you of
-     that variable's meaning.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'eldoc nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; number of seconds of idle time to wait before printing.
-      (customize-set-variable 'eldoc-idle-delay 0)
-
-      #+END_SRC
-
 **** Man
 
      This package provides a function, `man', with which you can browse
@@ -5485,7 +5357,138 @@
 
       #+END_SRC
 
+*** Translators
+**** Google-Translate
+
+     Google translate interface.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (when (and (require 'google-translate nil t)
+                 (require 'google-translate-smooth-ui nil t))
+        (progn
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; alist of translation directions
+      ;; each of direction could be selected directly in
+      ;; the minibuffer during translation.
+      (customize-set-variable
+       'google-translate-translation-directions-alist
+       '(("pt" . "en") ("en" . "pt")))
+
+      ;; default target language
+      (customize-set-variable
+       'google-translate-default-target-language "pt")
+
+      ;; default source language
+      ;; "auto" if you want Google Translate to always detect the source language
+      (customize-set-variable 'google-translate-default-source-language
+                              "auto")
+
+      ;; determines where translation output will be displayed, if
+      ;; `nil' the translation output will be displayed in the pop up
+      ;; buffer (default).
+      (customize-set-variable 'google-translate-output-destination nil)))
+
+      #+END_SRC
+
 *** Completions
+**** Dabbrev
+
+    The purpose with this package is to let you write just a few
+    characters of words you've written earlier to be able to expand
+    them.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'dabbrev nil t)
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; non-nil means case sensitive search.
+     (customize-set-variable 'dabbrev-upcase-means-case-search t)
+
+     ;; whether dabbrev treats expansions as the same if they differ in case
+     ;; a value of nil means treat them as different.
+     (customize-set-variable 'dabbrev-case-distinction t)
+
+     #+END_SRC
+
+**** Hippie-exp
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'hippie-exp nil t)
+
+     #+END_SRC
+
+***** Binds
+
+     #+BEGIN_SRC emacs-lisp
+
+     (global-set-key (kbd "M-\\") 'hippie-expand)
+
+     #+END_SRC
+
+**** Yasnippet
+
+     YASnippet is a template system for Emacs. It allows you to type an
+     abbreviation and automatically expand it into
+     function templates. Bundled language templates include:
+     C, C++, C#, Perl, Python, Ruby, SQL, LaTeX, HTML, CSS and more.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'yasnippet nil t)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; binds eos-completion-map
+      (define-key eos-completion-map (kbd "e") 'yas-expand)
+      (define-key eos-completion-map (kbd "i") 'yas-insert-snippet)
+      (define-key eos-completion-map (kbd "v") 'yas-visit-snippet-file)
+
+      ;; binds yas-keymap
+      (add-hook 'yas-minor-mode-hook
+                (lambda ()
+                  (when (boundp 'yas-keymap)
+                    (define-key yas-keymap (kbd "TAB") nil)
+                    (define-key yas-keymap (kbd "<tab>") nil)
+                    (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))))
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable yasnippet after emacs startup
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (safe-funcall 'yas-global-mode 1)))
+
+      #+END_SRC
+
 **** Company
 
      Company is a modular completion framework.
@@ -5657,97 +5660,8 @@
 
       #+END_SRC
 
-**** Yasnippet
-
-     YASnippet is a template system for Emacs. It allows you to type an
-     abbreviation and automatically expand it into
-     function templates. Bundled language templates include:
-     C, C++, C#, Perl, Python, Ruby, SQL, LaTeX, HTML, CSS and more.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'yasnippet nil t)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; binds eos-completion-map
-      (define-key eos-completion-map (kbd "e") 'yas-expand)
-      (define-key eos-completion-map (kbd "i") 'yas-insert-snippet)
-      (define-key eos-completion-map (kbd "v") 'yas-visit-snippet-file)
-
-      ;; binds yas-keymap
-      (add-hook 'yas-minor-mode-hook
-                (lambda ()
-                  (when (boundp 'yas-keymap)
-                    (define-key yas-keymap (kbd "TAB") nil)
-                    (define-key yas-keymap (kbd "<tab>") nil)
-                    (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))))
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; enable yasnippet after emacs startup
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (safe-funcall 'yas-global-mode 1)))
-
-      #+END_SRC
-
 **** Srecode
 **** Autotype
-**** Dabbrev
-
-    The purpose with this package is to let you write just a few
-    characters of words you've written earlier to be able to expand
-    them.
-
-***** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'dabbrev nil t)
-
-     #+END_SRC
-
-***** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; non-nil means case sensitive search.
-     (customize-set-variable 'dabbrev-upcase-means-case-search t)
-
-     ;; whether dabbrev treats expansions as the same if they differ in case
-     ;; a value of nil means treat them as different.
-     (customize-set-variable 'dabbrev-case-distinction t)
-
-     #+END_SRC
-
-**** Hippie-exp
-***** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'hippie-exp nil t)
-
-     #+END_SRC
-
-***** Binds
-
-     #+BEGIN_SRC emacs-lisp
-
-     (global-set-key (kbd "M-\\") 'hippie-expand)
-
-     #+END_SRC
-
 *** Navigation
 **** Imenu
 
@@ -6142,6 +6056,174 @@
       #+END_SRC
 
 ** Programming
+*** Generic
+
+    Generic programming modes (minor and major).
+
+**** Prog-mode
+
+    Generic programming mode, from which others derive.
+
+    #+BEGIN_SRC emacs-lisp
+
+    (require 'prog-mode nil t)
+
+    #+END_SRC
+
+**** Hideshow
+
+    Minor mode to hide and show code and comment blocks.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'hideshow nil t)
+
+     #+END_SRC
+
+***** Hooks
+
+     #+BEGIN_SRC emacs-lisp
+
+     (add-hook 'prog-mode-hook 'hs-minor-mode)
+
+     #+END_SRC
+
+***** Binds
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; ctl-x-map
+     (define-key ctl-x-map (kbd "[") 'hs-toggle-hiding)
+
+     #+END_SRC
+
+**** Conf
+
+    This package is designed to edit many similar varieties of
+    Configuration and initialization files.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'conf-mode nil t)
+
+     #+END_SRC
+
+***** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     (add-to-list 'auto-mode-alist '("\\.compose\\'" . conf-mode))
+     (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))
+
+     #+END_SRC
+
+**** Text
+
+     This package provides the fundamental text mode documented in the
+     Emacs user's manual.
+
+     Major mode for editing text written for humans to read.
+     In this mode, paragraphs are delimited only by blank or white lines.
+     You can thus get the full benefit of adaptive filling
+     (see the variable `adaptive-fill-mode').
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'text-mode nil t)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/text/set-company-backends ()
+        "Set `text-mode' company backends."
+        (interactive)
+        (eos-set-company-backends
+         '((company-ispell :with
+                           company-dabbrev)
+           (company-files))))
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'text-mode-hook
+                (lambda ()
+                  ;; turn on auto fill mode
+                  (turn-on-auto-fill)
+
+                  ;; set company backends
+                  (eos/text/set-company-backends)))
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
+      (define-key text-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
+
+      (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
+      (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
+
+      #+END_SRC
+
+**** Subword
+
+    This package provides the `subword' minor mode, which merges the
+    old remap-based subword.el (derived from cc-mode code) and
+    cap-words.el, which takes advantage of core Emacs
+    word-motion-customization functionality.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'subword nil t)
+
+     #+END_SRC
+
+***** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     (safe-funcall 'global-subword-mode 1)
+
+     #+END_SRC
+
+**** Paren
+
+    It will display highlighting on whatever paren matches the one
+    before or after point.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'paren nil t)
+
+     #+END_SRC
+
+***** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; visualization of matching parens
+     (safe-funcall 'show-paren-mode 1)
+
+     #+END_SRC
+
 *** Lisp
 **** Lisp-mode
 
@@ -6500,7 +6582,7 @@
 
       #+END_SRC
 
-*** ShellScript
+*** Sh
 **** Company-shell
 
      Backend for company mode to complete environment variables, binaries found
@@ -6920,7 +7002,6 @@
       #+BEGIN_SRC emacs-lisp
 
       (when (require 'mql-mode nil t)
-        (progn
 
       #+END_SRC
 
@@ -6932,7 +7013,7 @@
                 (lambda ()
                   ;; set company backends
                   (eos-set-company-backends
-                   '((company-gtags
+                   '((company-etags
                       company-yasnippet
                       company-dabbrev
                       company-dabbrev-code)
@@ -6942,7 +7023,7 @@
                   (eos/set-flycheck-checker 'c/c++-gcc)
 
                   ;; activate mql5 docset
-                  (eos-set-dash-docset '"mql5")))))
+                  (eos-set-dash-docset '"mql5"))))
 
       #+END_SRC
 
@@ -6987,21 +7068,20 @@
 
       #+END_SRC
 
-** Cleaning
-*** Clean
-***** Esc
+** Cleanup
+**** Esc
 
       Clean/unbind keys from esc-map.
 
       #+BEGIN_SRC emacs-lisp
 
       ;; clean esc map
-      (define-key esc-map (kbd "ESC") nil)
+      ;; (define-key esc-map (kbd "ESC") nil)
       (define-key esc-map (kbd "<f10>") nil)
 
       #+END_SRC
 
-***** Ctl-x
+**** Ctl-x
 
       Clean/unbind keys from ctl-x-map.
 
@@ -7066,7 +7146,7 @@
 
       #+END_SRC
 
-***** Minor
+**** Minor
 
       Clean minor-mode-map-alist.
 
@@ -7076,7 +7156,7 @@
 
       #+END_SRC
 
-***** Global
+**** Global
 
       Clean/unbind keys from global-map.
 
@@ -7203,32 +7283,15 @@
 
       #+END_SRC
 
-*** Environ
+** Trash
 
-    User environment.
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; set term to eterm-color
-    ;; (setenv "TERM" "eterm-color")
-
-    ;; the full name of the user logged in
-    (customize-set-variable 'user-login-name (getenv "USER"))
-
-    ;; the email address of the current user
-    (customize-set-variable 'user-mail-address (getenv "EMAIL"))
-
-    #+END_SRC
-
-*** Adapt
-
-   The adapt.el script will be the last think
-   loaded after ~init.el~, you can put more =elisp= code
-   there to add more junk to this already bloated configuration.
+   The trash.el script will be the last think
+   loaded after ~init.el~, you can put more =elisp=
+   code there to add more junk to this shit!
 
    #+BEGIN_SRC emacs-lisp
 
-   (safe-load-file (expand-file-name "adapt.el" user-emacs-directory))
+   (safe-load-file (expand-file-name "trash.el" user-emacs-directory))
 
    #+END_SRC
 

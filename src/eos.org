@@ -1015,8 +1015,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'locate nil t)
-       (progn
+     (require 'locate nil t)
 
      #+END_SRC
 
@@ -1024,7 +1023,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (define-key eos-file-map (kbd "l") 'locate)))
+     (define-key eos-file-map (kbd "l") 'locate)
 
      #+END_SRC
 
@@ -1087,8 +1086,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'diff nil t)
-        (progn
+      (require 'diff nil t)
 
       #+END_SRC
 
@@ -1097,7 +1095,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; a string or list of strings specifying switches to be passed to diff
-      (customize-set-variable 'diff-switches "-u")))
+      (customize-set-variable 'diff-switches "-u")
 
       #+END_SRC
 
@@ -2319,6 +2317,34 @@
 
      #+END_SRC
 
+**** Mode-line
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; remove underline
+      (customize-set-variable 'x-underline-at-descent-line t)
+
+      ;; mode-line format
+      (customize-set-variable 'mode-line-format
+                              '("%e"
+                                ;; "%*%& %l:%c | %I "
+                                mode-line-front-space
+                                mode-line-mule-info
+                                mode-line-modified
+                                mode-line-remote
+                                ;; " %*%& "
+                                ;; mode-line-misc-info
+                                ;; mode-line-misc-info
+                                " "
+                                "%l:%c"
+                                " • %b • "
+                                "(%m)"
+                                (:eval (when vc-mode " »"))
+                                (vc-mode vc-mode)))
+
+      #+END_SRC
+
 *** Editing
 **** Kmacro
 
@@ -2351,8 +2377,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'elec-pair nil t)
-        (progn
+      (require 'elec-pair nil t)
 
       #+END_SRC
 
@@ -2373,7 +2398,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (safe-funcall 'electric-pair-mode 1)))
+      (safe-funcall 'electric-pair-mode 1)
 
       #+END_SRC
 
@@ -3027,8 +3052,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'dired-subtree nil t)
-        (progn
+      (require 'dired-subtree nil t)
 
       #+END_SRC
 
@@ -3057,7 +3081,7 @@
       (when (boundp 'dired-mode-map)
         (progn
           (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
-          (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))))
+          (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))
 
       #+END_SRC
 
@@ -3238,8 +3262,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'multi-term nil t)
-        (progn
+      (require 'multi-term nil t)
 
       #+END_SRC
 
@@ -3264,7 +3287,7 @@
 
       ;; clt-x-map (C-x) prefix
       (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
-      (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)))
+      (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)
 
       #+END_SRC
 
@@ -3449,8 +3472,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (when (require 'ibuffer nil t)
-       (progn
+     (require 'ibuffer nil t)
 
      #+END_SRC
 
@@ -3476,7 +3498,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (define-key ctl-x-map (kbd "b") 'ibuffer)))
+     (define-key ctl-x-map (kbd "b") 'ibuffer)
 
      #+END_SRC
 
@@ -3535,8 +3557,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'undo-tree nil t)
-        (progn
+      (require 'undo-tree nil t)
 
       #+END_SRC
 
@@ -3562,7 +3583,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable
-      (safe-funcall 'global-undo-tree-mode 1)))
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (safe-funcall 'global-undo-tree-mode 1)))
 
       #+END_SRC
 
@@ -3598,8 +3621,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'artist nil t)
-        (progn
+      (require 'artist nil t)
 
       #+END_SRC
 
@@ -3611,7 +3633,7 @@
       (customize-set-variable 'artist-flood-fill-show-incrementally nil)
 
       ;; whether or not to remove white-space at end of lines
-      (customize-set-variable 'artist-trim-line-endings nil)))
+      (customize-set-variable 'artist-trim-line-endings nil)
 
       #+END_SRC
 
@@ -3863,56 +3885,6 @@
 
       #+END_SRC
 
-*** Bar
-**** Moody
-
-     This package provides utilities for displaying elements of the
-     mode line as tabs and ribbons.  It also provides replacements
-     for a few built-in elements.
-
-     Emacs has to be compiled with xpm support, for this package
-     to work properly.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (when (require 'moody nil t)
-        (progn
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; remove underline
-      (customize-set-variable 'x-underline-at-descent-line t)
-
-      ;; change line height
-      (customize-set-variable 'moody-mode-line-height 1)
-
-      ;; mode-line format
-      (customize-set-variable 'mode-line-format
-                              '("%e"
-                                ;; "%*%& %l:%c | %I "
-                                " "
-                                mode-line-mule-info
-                                mode-line-modified
-                                ;; " %*%& "
-                                ;; mode-line-misc-info
-                                ;; mode-line-percent-position
-                                " %l:%c "
-                                ;; mode-line-misc-info
-                                moody-mode-line-buffer-identification
-                                ""
-                                " %m "
-                                (vc-mode moody-vc-mode)
-                                " "
-                                ))))
-
-      #+END_SRC
-
 *** Chat
 **** Rcirc
 
@@ -3990,8 +3962,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'eww nil t)
-        (progn
+      (require 'eww nil t)
 
       #+END_SRC
 
@@ -4023,7 +3994,7 @@
       (add-hook 'eww-mode-hook
                 (lambda ()
                   ;; disable truncate lines
-                  (setq truncate-lines nil)))))
+                  (setq truncate-lines nil)))
 
       #+END_SRC
 
@@ -4032,8 +4003,7 @@
       #+BEGIN_SRC emacs-lisp
 
       (when (boundp 'eww-mode-map)
-        (progn
-          (define-key eww-mode-map (kbd "C-j") 'eww-follow-link)))
+          (define-key eww-mode-map (kbd "C-j") 'eww-follow-link))
 
       #+END_SRC
 
@@ -4217,8 +4187,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'flyspell nil t)
-        (progn
+      (require 'flyspell nil t)
 
       #+END_SRC
 
@@ -4237,7 +4206,7 @@
 
       ;; hooks
       (add-hook 'text-mode-hook #'flyspell-mode)
-      (add-hook 'prog-mode-hook #'flyspell-prog-mode)))
+      (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
       #+END_SRC
 
@@ -4479,8 +4448,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'verb nil t)
-        (progn
+      (require 'verb nil t)
 
       #+END_SRC
 
@@ -4490,9 +4458,8 @@
 
       (add-hook 'org-ctrl-c-ctrl-c-hook
                 (lambda ()
-                  (when (boundp 'verb-mode)
-                    (if verb-mode
-                        (safe-funcall 'verb-send-request-on-point 'this-window)))))))
+                  (when (symbol-function 'verb-mode)
+                        (safe-funcall 'verb-send-request-on-point 'this-window))))
 
       #+END_SRC
 
@@ -4575,8 +4542,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'sql nil t)
-        (progn
+      (require 'sql nil t)
 
       #+END_SRC
 
@@ -4585,7 +4551,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; select the SQL database product used
-      (customize-set-variable 'sql-product "sqlite")))
+      (customize-set-variable 'sql-product "sqlite")
 
       #+END_SRC
 
@@ -4621,7 +4587,7 @@
       (define-key ctl-x-map (kbd "<end>")
         (lambda ()
           (interactive)
-          (safe-start-process "slock" "slock" nil)))
+          (start-process "slock" nil "slock")))
 
       #+END_SRC
 
@@ -4634,7 +4600,7 @@
       (global-set-key (kbd "<print>")
                       (lambda ()
                         (interactive)
-                        (safe-start-process "scrot" "scrot" nil)
+                        (start-process "scrot" nil "scrot")
                         (message "Image save at %s" default-directory)))
 
       #+END_SRC
@@ -4978,8 +4944,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'doc-view nil t)
-        (progn
+      (require 'doc-view nil t)
 
       #+END_SRC
 
@@ -4993,7 +4958,7 @@
        (concat (expand-file-name user-emacs-directory) "cache/docview"))
 
       ;; in continuous mode reaching the page edge advances to next/previous page
-      (customize-set-variable 'doc-view-continuous t)))
+      (customize-set-variable 'doc-view-continuous t)
 
       #+END_SRC
 
@@ -6234,8 +6199,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'lisp-mode nil t)
-        (progn
+      (require 'lisp-mode nil t)
 
       #+END_SRC
 
@@ -6244,7 +6208,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; number of columns to indent the second line of a (def...) form
-      (customize-set-variable 'lisp-body-indent 2)))
+      (customize-set-variable 'lisp-body-indent 2)
 
       #+END_SRC
 
@@ -6363,8 +6327,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'elixir-mode nil t)
-        (progn
+      (require 'elixir-mode nil t)
 
       #+END_SRC
 
@@ -6394,7 +6357,7 @@
                   ;; eos/flycheck/set-cheker '<elixir-checker>)
 
                   ;; set dash docsets
-                  (eos-set-dash-docset '"Elixir")))))
+                  (eos-set-dash-docset '"Elixir")))
 
       #+END_SRC
 
@@ -6608,8 +6571,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'sh-script nil t)
-        (progn
+      (require 'sh-script nil t)
 
       #+END_SRC
 
@@ -6629,7 +6591,7 @@
                      (company-files)))
 
                   ;; set flycheck backends
-                  (eos/set-flycheck-checker 'sh-shellcheck)))))
+                  (eos/set-flycheck-checker 'sh-shellcheck)))
 
       #+END_SRC
 
@@ -7001,7 +6963,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'mql-mode nil t)
+      (require 'mql-mode nil t)
 
       #+END_SRC
 
@@ -7023,7 +6985,7 @@
                   (eos/set-flycheck-checker 'c/c++-gcc)
 
                   ;; activate mql5 docset
-                  (eos-set-dash-docset '"mql5"))))
+                  (eos-set-dash-docset '"mql5")))
 
       #+END_SRC
 
@@ -7044,8 +7006,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (require 'web-mode nil t)
-        (progn
+      (require 'web-mode nil t)
 
       #+END_SRC
 
@@ -7060,11 +7021,10 @@
       (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
       (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
       (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))))
+      (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 
       (when (boundp 'web-mode-engines-alist)
-        (progn
-          (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'")))))
+          (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'"))))
 
       #+END_SRC
 

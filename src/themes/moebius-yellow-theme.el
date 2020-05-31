@@ -174,11 +174,11 @@
     `(css-selector ((t (:foreground ,fg-blue))))
 
     ;; Custom
-    `(custom-button ((t (:background ,bg-white :foreground ,bg-black
+    `(custom-button ((t (:background ,bg-white :foreground ,fg-black
                           :box (:line-width 1 :color ,bg-white)
                           :weight ultra-light :height 1.1 :width ultra-condensed))))
     `(custom-button-pressed-unraised ((t (:inherit custom-button-unraised :foreground ,fg-red))))
-    `(custom-changed ((t (:background ,bg-blue :foreground ,fg-white))))
+    `(custom-changed ((t (:background ,bg-blue :foreground ,fg-black))))
     `(custom-comment-tag ((t (:foreground ,fg-blue))))
     `(custom-group-tag ((t (:inherit variable-pitch :foreground ,fg-blue :weight bold :height 1.2))))
     `(custom-invalid ((t (:background ,bg-red :foreground ,fg-black))))
@@ -609,7 +609,7 @@
     `(widget-button ((t (:inherit button))))
     `(widget-button-pressed ((t (:inherit widget-button :weight bold))))
     `(widget-documentation ((t (:inherit font-lock-doc-face))))
-    `(widget-field ((t (:background ,bg-blue :box (:color ,bg-blue :line-width 2)))))
+    `(widget-field ((t (:background ,bg-blue :foreground ,fg-white :box (:color ,bg-blue :line-width 2)))))
 
     ;; Rpm-spec-mode
     `(rpm-spec-tag-face ((t (:foreground ,fg-blue))))

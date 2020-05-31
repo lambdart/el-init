@@ -1711,7 +1711,7 @@
 
       #+END_SRC
 
-*** Input
+*** Commands
 **** Minibuffer
 
     The “minibuffer” is where Emacs commands read complicated arguments,
@@ -1852,6 +1852,45 @@
      ;; when active, minibuffer prompts that show a default value only show
      ;; the default when it's applicable
      (minibuffer-electric-default-mode 1)
+
+     #+END_SRC
+
+**** Savehist
+
+    Many editors (e.g. Vim) have the feature of saving minibuffer
+    history to an external file after exit.  This package provides the
+    same feature in Emacs.  When set up, it saves recorded minibuffer
+    histories to a file (`~/.emacs-history' by default).  Additional
+    variables may be specified by customizing
+    `savehist-additional-variables'.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'savehist nil t)
+
+     #+END_SRC
+
+***** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; file name where minibuffer history is saved to and loaded from.
+     (customize-set-variable
+      'savehist-file (concat user-emacs-directory "cache/history"))
+
+     ;; if non-nil, save all recorded minibuffer histories.
+     (customize-set-variable 'savehist-save-minibuffer-history t)
+
+     #+END_SRC
+
+***** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; enable savehist mode
+     (safe-funcall 'savehist-mode 1)
 
      #+END_SRC
 
@@ -2553,46 +2592,6 @@
 
      ;; binds
      (define-key ctl-x-map (kbd ".") 'whitespace-mode)
-
-     #+END_SRC
-
-*** History
-**** Savehist
-
-    Many editors (e.g. Vim) have the feature of saving minibuffer
-    history to an external file after exit.  This package provides the
-    same feature in Emacs.  When set up, it saves recorded minibuffer
-    histories to a file (`~/.emacs-history' by default).  Additional
-    variables may be specified by customizing
-    `savehist-additional-variables'.
-
-***** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'savehist nil t)
-
-     #+END_SRC
-
-***** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; file name where minibuffer history is saved to and loaded from.
-     (customize-set-variable
-      'savehist-file (concat user-emacs-directory "cache/history"))
-
-     ;; if non-nil, save all recorded minibuffer histories.
-     (customize-set-variable 'savehist-save-minibuffer-history t)
-
-     #+END_SRC
-
-***** Enable
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; enable savehist mode
-     (safe-funcall 'savehist-mode 1)
 
      #+END_SRC
 
@@ -4458,8 +4457,8 @@
 
       (add-hook 'org-ctrl-c-ctrl-c-hook
                 (lambda ()
-                  (when (symbol-function 'verb-mode)
-                        (safe-funcall 'verb-send-request-on-point 'this-window))))
+                  (when (and (boundp 'verb-mode) verb-mode)
+                    (safe-funcall 'verb-send-request-on-point 'this-window))))
 
       #+END_SRC
 
@@ -4802,29 +4801,13 @@
       (customize-set-variable 'org-edit-src-content-indentation 0)
 
       ;; confirm before evaluation
-      (customize-set-variable 'org-confirm-babel-evaluate nil)
+      (customize-set-variable 'org-confirm-babel-evaluate t)
 
       ;; how the source code edit buffer should be displayed
       (customize-set-variable 'org-src-window-setup 'current-window)
 
       ;; non-nil means C-a and C-e behave specially in headlines and items
       (customize-set-variable 'org-special-ctrl-a/e t)
-
-      ;; languages which can be evaluated in Org buffers.
-      (customize-set-variable 'org-babel-load-languages
-                              '((lisp . t)
-                                (emacs-lisp . t)
-                                (calc . t)
-                                (R . t)
-                                (haskell . t)
-                                (octave . t)
-                                (latex . t)
-                                (sed . t)
-                                (shell . t)
-                                (sqlite . t)
-                                (lua . t)
-                                (perl . t)
-                                (python . t)))
 
       #+END_SRC
 
@@ -4870,7 +4853,16 @@
                   (setq truncate-lines nil)
 
                   ;; set company backends
-                  (eos/org/set-company-backends)))
+                  (eos/org/set-company-backends)
+
+                  ;; languages which can be evaluated in Org buffers.
+                  (org-babel-do-load-languages
+                   'org-babel-load-languages
+                   '((emacs-lisp . t)
+                     (shell . t)
+                     (haskell . t)
+                     (sqlite . t)
+                     (python . t)))))
 
       #+END_SRC
 
@@ -4878,7 +4870,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; silent compiler
+      ;; to silence the compiler
       (defvar org-mode-map nil nil)
 
       (define-key org-mode-map (kbd "C-M-i") 'eos/complete-in-buffer-or-indent)
@@ -5242,7 +5234,10 @@
        (concat (expand-file-name user-emacs-directory) "docsets"))
 
       ;; minimum length to start searching in docsets
-      (customize-set-variable 'dash-docs-min-length 2)
+      (customize-set-variable 'dash-docs-min-length 0)
+
+      ;; format of the displayed candidates
+      (customize-set-variable 'dash-docs-candidate-format "%n")
 
       #+END_SRC
 
@@ -6295,16 +6290,18 @@
       #+END_SRC
 
 *** Haskell
-**** Haskel-mode
+**** Haskell
 
-     A major mode for editing Haskell (the functional programming
-     language.
+     Haskell Mode is an Haskell development Environment for
+     GNU Emacs version 24.3 or later. It provides syntax-based
+     indentation, font locking, editing cabal files, and supports
+     running an inferior Haskell interpreter (e.g. GHCi).
 
 ***** Require
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'haskell-mode nil t)
+     (require 'haskell nil t)
 
      #+END_SRC
 
@@ -6312,11 +6309,97 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; default function to use for completion
       (customize-set-variable 'haskell-completing-read-function 'completing-read)
+
+      ;; whether to add a "declarations" menu entry to menu bar
+      (customize-set-variable 'haskell-decl-scan-bindings-as-variables t)
+
+      ;; whether to put top-level value bindings into a "variables" category
+      (customize-set-variable 'haskell-decl-scan-bindings-as-variables t)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/haskell/set-company-backends ()
+        "Set haskell company backends."
+        (interactive)
+        (eos-set-company-backends
+         '((company-capf
+            company-yasnippet
+            company-dabbrev-code)
+           (company-files))))
 
       #+END_SRC
 
 ***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'haskell-mode-hook
+        (lambda ()
+          ;; set company backends
+          (eos/haskell/set-company-backends)
+
+          ;; set flycheck checker
+          (eos/set-flycheck-checker 'haskell-ghc)
+
+          ;; haskell indentation mode that deals with the layout rule.
+          ;; it rebinds RET, DEL and BACKSPACE, so that indentations can be
+          ;; set and deleted as if they were real tabs.
+          (safe-funcall 'haskell-indentation-mode 1)
+
+          ;; minor mode for enabling haskell-process interaction
+          ;; non-nil if Interactive-Haskell mode is enabled.
+          (safe-funcall 'interactive-haskell-mode 1)))
+
+        ;; activate dash docset (emacs) (not working)
+        ;; (eos-set-dash-docset "Haskell")))
+
+      #+END_SRC
+
+**** Inf-Haskell
+
+     A major mode for the buffer that holds the inferior process.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'inf-haskell nil t)
+
+      #+END_SRC
+
+**** Haskell-doc
+
+     This package provides features to show the type of the Haskell function
+     under the cursor in the minibuffer. It acts as a kind of
+     "Emacs background process", by regularly checking the word under
+     the cursor and matching it against a list of prelude, library,
+     local and global functions.
+
+     This program was inspired by the `eldoc.el'.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'haskell-doc nil t)
+
+     #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; if non-nil use inf-haskell.el to get type and kind information
+      (customize-set-variable 'haskell-doc-use-inf-haskell t)
+
+      #+END_SRC
+
 *** Elixir
 **** Elixir-mode
 

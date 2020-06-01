@@ -395,8 +395,8 @@
       ;; edit
       (global-set-key (kbd "M-i") 'indent-region-or-buffer)
       (global-set-key (kbd "M-j") 'clone-line-or-region)
-      (global-set-key (kbd "M-p") 'transpose-lines-up)
-      (global-set-key (kbd "M-n") 'transpose-lines-down)
+      (global-set-key (kbd "M-n") 'transpose-lines-up)
+      (global-set-key (kbd "M-p") 'transpose-lines-down)
 
       ;; kill
       (define-key ctl-x-map (kbd "k") 'kill-buffer)
@@ -1707,7 +1707,21 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; number of seconds of idle time to wait before printing.
-      (customize-set-variable 'eldoc-idle-delay 0)
+      (customize-set-variable 'eldoc-idle-delay 0.1)
+
+      ;; if value is any non-nil value other than t, symbol name may be truncated
+      ;; if it will enable the function arglist or documentation string to fit on a
+      ;; single line without resizing window
+      (customize-set-variable 'eldoc-echo-area-use-multiline-p t)
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable eldoc globally
+      (safe-funcall 'eldoc-mode 1)
 
       #+END_SRC
 
@@ -3200,6 +3214,7 @@
 ****** Functions
 
       #+BEGIN_SRC emacs-lisp
+
       ;; functions
       (defun eos/term-send-kill-line ()
         "Kill line in multi-term mode with the possibility to paste it like in a normal shell."
@@ -3211,11 +3226,8 @@
       (defun eos/run-term ()
         "Exec \\[term] but asks for the `term-mode' buffer name."
         (interactive)
-        (unless (fboundp 'term)
-          (error "Term not available"))
         (funcall 'term (getenv "SHELL"))
-        (rename-buffer
-         (read-string "Term name: " nil nil "Term") t))
+        (rename-buffer (read-string "Term name: " nil nil "Term") t))
 
       #+END_SRC
 
@@ -3232,12 +3244,6 @@
                   (when (fboundp 'company-mode)
                     (company-mode -1))))
 
-      #+END_SRC
-
-****** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
       ;; bind term-raw-map/term-mode-map with hook
       (add-hook 'term-mode-hook
                 (lambda ()
@@ -3250,7 +3256,18 @@
                       ;; term-mode-map
                       (define-key term-mode-map (kbd "s-q") 'term-char-mode)))))
 
+
+
       #+END_SRC
+
+****** Binds
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; clt-x-map (C-x) prefix
+       (define-key ctl-x-map (kbd "<C-return>") 'eos/run-term)
+
+       #+END_SRC
 
 ***** Multi-term
 
@@ -3285,7 +3302,6 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; clt-x-map (C-x) prefix
-      (define-key ctl-x-map (kbd "<C-return>") 'multi-term)
       (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)
 
       #+END_SRC
@@ -4826,10 +4842,22 @@
           ;; read, tangle, copy and byte compile
           (save-restriction
             (save-excursion
+              ;; TODO: research a better way to insert file contents
               (find-file eos-org-file)
               (org-babel-tangle)
               (copy-file eos-el-file init-file t t t)
               (async-byte-compile-file init-file)))))
+
+      (defun eos/make ()
+        "Call Makefile to build EOS distro."
+        (interactive)
+        (let* ((program "make")
+               (buffer (get-buffer-create "*make*"))
+               (filename (expand-file-name "Makefile" user-emacs-directory))
+               (target "all")
+               (program-args (list "-f" filename target)))
+          (when (executable-find program)
+            (apply 'call-process program nil buffer nil program-args))))
 
       (defun eos/org/set-company-backends ()
         "Set `org-mode' company backends."
@@ -6015,7 +6043,7 @@
 
       #+END_SRC
 
-** Programming
+** Development
 *** Generic
 
     Generic programming modes (minor and major).
@@ -7023,6 +7051,28 @@
 
       #+END_SRC
 
+*** Make
+**** Make-mode
+
+    Major mode for editing standard Makefiles.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'make-mode nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+
+
+      #+END_SRC
+
+***** Hooks
 *** Cmake
 **** Cmake-mode
 

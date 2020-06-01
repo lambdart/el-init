@@ -75,7 +75,7 @@
     `(region ((t (:background ,bg-blue :foreground ,bg-white))))
     `(shadow ((t (:foreground ,fg-dim))))
     `(success ((t (:foreground ,fg-green :weight bold))))
-    `(trailing-whitespace ((t (:background ,fg-red))))
+    `(trailing-whitespace ((t (:background ,bg-red :foreground ,fg-default))))
     `(info-node ((t (:foreground ,fg-orange :slant italic :weight bold))))
     `(lazy-highlight ((t (:background ,bg-blue :foreground ,bg-white))))
     `(line-number ((t (:inherit (shadow black) :back))))
@@ -576,7 +576,7 @@
     `(tty-menu-selected-face ((t (:background ,bg-red :foreground ,bg-white))))
 
     ;; Term
-    `(term-color-black ((t (:background ,bg-default :foreground ,fg-bright))))
+    `(term-color-black ((t (:background ,bg-default :foreground ,fg-default))))
     `(term-color-blue ((t (:background ,bg-blue :foreground ,fg-blue))))
     `(term-color-cyan ((t (:background ,bg-cyan :foreground ,fg-cyan))))
     `(term-color-green ((t (:background ,bg-green :foreground ,fg-green))))
@@ -599,7 +599,7 @@
     `(whitespace-tab ((t (:background unspecified :underline ,bg-bright))))
     `(whitespace-trailing ((t (:background ,bg-orange :foreground unspecified))))
     `(whitespace-big-indent ((t (:background ,bg-red :foreground ,fg-gray))))
-    `(whitespace-line ((t (:background ,fg-red :foreground ,fg-bright))))
+    `(whitespace-line ((t (:background ,bg-red :foreground ,fg-black))))
 
     ;; yas
     ;; yas--field-debug-face

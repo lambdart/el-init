@@ -7068,7 +7068,11 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; if non-nil, automatically clean up continuation lines when saving
+      (customize-set-variable 'makefile-cleanup-continuations t)
 
+      ;; if non-nil, insert a TAB after a target colon
+      (customize-set-variable 'makefile-tab-after-target-colon t)
 
       #+END_SRC
 

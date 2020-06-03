@@ -49,7 +49,7 @@
        (bg-green     "#548b54") (fg-green     "#65a854")
        (bg-cyan      "#1f3f3f") (fg-cyan      "#54a8a8")
        (bg-blue      "#005f87") (fg-blue      "#5476a8")
-       (bg-purple    "#2f2a3f") (fg-purple    "#7d71a8")
+       (bg-purple    "#d9d9d9") (fg-purple    "#7d71a8")
        (bg-magenta   "#8787af") (fg-magenta   "#9754a8")
        (bg-pink      "#3f1f32") (fg-pink      "#cd6889"))
 
@@ -108,7 +108,7 @@
     `(mode-line ((t (:background ,bg-dim :foreground ,bg-black
                       :box (:color ,bg-dim :line-width 2)))))
     `(mode-line-inactive ((t (:background ,bg-dim :foreground ,fg-gray
-                               :box (:line-width 2 :color ,bg-dim)))))
+                               :box (:color ,bg-dim :line-width 2)))))
     `(mode-line-buffer-id ((t (:foreground ,fg-cyan :weight normal))))
 
     ;; Highlight
@@ -435,7 +435,7 @@
     `(transient-separator ((t (:background ,bg-dim :foreground ,fg-white))))
 
     ;; Tooltip
-    `(tooltip ((t (:foreground ,fg-default :background ,bg-gray))))
+    `(tooltip ((t (:background ,bg-default :foreground ,fg-default))))
 
     ;; Org-agenda
     `(org-agenda-restriction-lock ((t (:background ,bg-white :foreground ,fg-gray))))
@@ -449,8 +449,8 @@
 
     ;; Org-block
     `(org-block ((t (:background ,bg-shadow))))
-    `(org-block-begin-line ((t (:background ,fg-blue :foreground ,fg-white))))
-    `(org-block-end-line ((t (:background ,fg-blue :foreground ,fg-white))))
+    `(org-block-begin-line ((t (:background ,bg-purple :foreground ,fg-default))))
+    `(org-block-end-line ((t (:background ,bg-purple :foreground ,fg-default))))
 
     ;; Org-column
     `(org-column ((t (:background ,bg-dim :strike-through nil :underline nil

@@ -893,28 +893,6 @@
 
      #+END_SRC
 
-*** Format
-**** Linum
-
-    Display line numbers format to be display in the current buffer.
-
-***** Require
-
-     #+BEGIN_SRC emacs-lisp
-
-     (require 'linum nil t)
-
-     #+END_SRC
-
-***** Customize
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; format used to display line numbers.
-     (customize-set-variable 'linum-format " %2d ")
-
-     #+END_SRC
-
 ** Vanilla
 
    Major Structures of Emacs: Files, Buffer, Windows, Frames, Input,
@@ -1450,6 +1428,27 @@
 
      ;; enable highlight line
      (safe-funcall 'global-hl-line-mode 1)
+
+     #+END_SRC
+
+***** Linum
+
+    Display line numbers format to be display in the current buffer.
+
+****** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'linum nil t)
+
+     #+END_SRC
+
+****** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; format used to display line numbers.
+     (customize-set-variable 'linum-format " %2d ")
 
      #+END_SRC
 
@@ -2391,7 +2390,9 @@
                                 ;; mode-line-misc-info
                                 " "
                                 "%l:%c"
-                                " • %b • "
+                                " • "
+                                (:eval (propertized-buffer-identification "%b"))
+                                " • "
                                 "(%m)"
                                 (:eval (when vc-mode " »"))
                                 (vc-mode vc-mode)))
@@ -4849,7 +4850,7 @@
               (async-byte-compile-file init-file)))))
 
       (defun eos/make ()
-        "Call Makefile to build EOS distro."
+        "Call Make to build EOS distro."
         (interactive)
         (let* ((program "make")
                (buffer (get-buffer-create "*make*"))
@@ -6627,7 +6628,7 @@
       (define-key c-mode-map (kbd "C-c")
         (lambda ()
           (interactive)
-          (ppcompile-ping)))
+          (compile compile-command)))
 
       ;; c++-mode-map
       ;; set rtags prefix map in c-mode map (C-c r)
@@ -6639,7 +6640,7 @@
       (define-key c++-mode-map (kbd "C-c")
         (lambda ()
           (interactive)
-          (ppcompile-ping)))
+          (compile compile-command)))
 
       #+END_SRC
 

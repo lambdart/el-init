@@ -148,9 +148,9 @@
        (make-sparse-keymap)
        "Docs commands keymap.")
 
-     (defvar eos-file-map
+     (defvar eos-files-map
        (make-sparse-keymap)
-       "File commands keymap.")
+       "Files commands keymap.")
 
      (defvar eos-debug-map
        (make-sparse-keymap)
@@ -178,7 +178,7 @@
                            eos-pm-map
                            eos-sc-map
                            eos-docs-map
-                           eos-file-map
+                           eos-files-map
                            eos-filter-map
                            eos-utils-map
                            eos-window-map
@@ -308,6 +308,9 @@
 
       ;; your preference for a mail composition package
       (customize-set-variable 'mail-user-agent 'message-user-agent)
+
+      ;; what to do when the output buffer is used by another shell command
+      (customize-set-variable 'async-shell-command-buffer 'rename-buffer)
 
       #+END_SRC
 
@@ -975,10 +978,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; eos-file-map
-      (define-key eos-file-map (kbd "f") 'find-file-at-point)
-      (define-key eos-file-map (kbd "d") 'dired-at-point)
-      (define-key eos-file-map (kbd "C-d") 'ffap-list-directory)
+      ;; eos-files-map
+      (define-key eos-files-map (kbd "f") 'find-file-at-point)
+      (define-key eos-files-map (kbd "d") 'dired-at-point)
+      (define-key eos-files-map (kbd "C-d") 'ffap-list-directory)
 
       #+END_SRC
 
@@ -1001,7 +1004,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (define-key eos-file-map (kbd "l") 'locate)
+     (define-key eos-files-map (kbd "l") 'locate)
 
      #+END_SRC
 
@@ -1048,9 +1051,9 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; eos-file-map
-     (define-key eos-file-map (kbd "r") 'recentf-open-files)
-     (define-key eos-file-map (kbd "t") 'eos/icomplete/recentf-open-file)
+     ;; eos-files-map
+     (define-key eos-files-map (kbd "r") 'recentf-open-files)
+     (define-key eos-files-map (kbd "t") 'eos/icomplete/recentf-open-file)
 
      #+END_SRC
 
@@ -2400,6 +2403,29 @@
       #+END_SRC
 
 *** Editing
+**** Indent
+
+     Commands for making and changing indentation in text.
+     These are described in the Emacs manual.
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; indentation can insert tabs if this is non-nil
+      (customize-set-variable 'indent-tabs-mode t)
+
+      ;; default number of columns for margin-changing functions to indent
+      (customize-set-variable 'standard-indent 4)
+
+      ;; if 'complete, TAB first tries to indent the current line
+      ;; if t, hitting TAB always just indents the current line
+      ;; If nil, hitting TAB indents the current line if point is at the left margin
+      ;; or in the line's indentation
+      (customize-set-variable 'tab-always-indent 'complete)
+
+      #+END_SRC
+
 **** Kmacro
 
     The kmacro package provides the user interface to emacs' basic
@@ -2890,7 +2916,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (safe-funcall 'exwm-enable)
+      ;; enable exwm if graphic display is non-nil
+      (when (display-graphic-p)
+        (safe-funcall 'exwm-enable))
 
       #+END_SRC
 
@@ -4066,7 +4094,10 @@
       ;; non-nil means we highlight the current search term in results
       (customize-set-variable 'ag-highlight-search t)
 
-      ;; ag reuse window
+      ;; non-nil means we reuse the existing search results buffer
+      (customize-set-variable 'ag-reuse-buffers t)
+
+      ;; non-nil means we open search results in the same window
       (customize-set-variable 'ag-reuse-window t)
 
       #+END_SRC
@@ -5895,7 +5926,7 @@
                   (setq truncate-lines nil)))
 
       ;; fix compilation buffer colors
-      (add-hook 'compilation-filter-hook
+      (add-hook 'compilation-filter-hook nil
                 (lambda ()
                   (when (eq major-mode 'compilation-mode)
                     (ansi-color-apply-on-region
@@ -6510,6 +6541,28 @@
       #+END_SRC
 
 *** C/C++
+**** Cmacexp
+
+
+     Expand C macros in the region, using the C preprocessor.
+     Normally display output in temp buffer, but
+     prefix arg means replace the region with it.
+
+     The result of the expansion is put in a separate buffer.
+     A user option allows the window displaying the buffer to be optimally sized.
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; non-nil means shrink the *Macroexpansion* window to fit its contents
+      (customize-set-variable 'c-macro-shrink-window-flag t)
+
+      ;; non-nil makes `c-macro-expand' prompt for preprocessor arguments
+      (customize-set-variable 'c-macro-prompt-flag t)
+
+      #+END_SRC
+
 **** Rtags
 
      RTags is a client/server application that indexes C/C++ code and keeps a
@@ -6602,6 +6655,14 @@
            company-dabbrev-code
            company-dabbrev)
            (company-files))))
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      (customize-set-variable 'c-default-style 'awk)
 
       #+END_SRC
 

@@ -5912,29 +5912,6 @@
 
       #+END_SRC
 
-**** Ppcompile
-
-     This Emacs package tries to ease the development workflow that
-     consists of coding locally, compiling remotely, and fixing errors
-     with next-error locally, which is the typical development cycle
-     for C/C++ projects.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'ppcompile nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      (customize-set-variable 'ppcompile-rsync-additional-args "-ar")
-
-      #+END_SRC
-
 *** Versioning
 
     Version control packages.
@@ -6044,14 +6021,17 @@
 
       #+END_SRC
 
+*** Containers
 ** Development
 *** Generic
 
-    Generic programming modes (minor and major).
+    Generic programming modes (minor/major).
 
 **** Prog-mode
 
     Generic programming mode, from which others derive.
+
+***** Require
 
     #+BEGIN_SRC emacs-lisp
 
@@ -6212,6 +6192,45 @@
      (safe-funcall 'show-paren-mode 1)
 
      #+END_SRC
+
+**** Make-mode
+
+    Major mode for editing standard Makefiles.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'make-mode nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; if non-nil, automatically clean up continuation lines when saving
+      (customize-set-variable 'makefile-cleanup-continuations t)
+
+      ;; if non-nil, insert a TAB after a target colon
+      (customize-set-variable 'makefile-tab-after-target-colon t)
+
+      #+END_SRC
+
+***** Hooks
+
+**** Cmake-mode
+
+     Provides syntax highlighting and indentation for CMakeLists.txt and
+     *.cmake source files.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'cmake-mode nil t)
+
+      #+END_SRC
 
 *** Lisp
 **** Lisp-mode
@@ -6625,7 +6644,7 @@
       ;; complete or indent
       (define-key c-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
 
-      (define-key c-mode-map (kbd "C-c")
+      (define-key c-mode-map (kbd "C-c C-c")
         (lambda ()
           (interactive)
           (compile compile-command)))
@@ -6637,7 +6656,7 @@
       ;; complete or indent
       (define-key c++-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
 
-      (define-key c++-mode-map (kbd "C-c")
+      (define-key c++-mode-map (kbd "C-c C-c")
         (lambda ()
           (interactive)
           (compile compile-command)))
@@ -6654,6 +6673,76 @@
       #+BEGIN_SRC emacs-lisp
 
       (require 'company-c-headers nil t)
+
+      #+END_SRC
+
+*** C#
+**** Csharp-mode
+
+     This is a major mode for editing C# files.
+     It performs automatic indentation of C# syntax;
+     font locking; and integration with imenu.el.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'csharp-mode nil t)
+
+      #+END_SRC
+
+*** Go
+**** Go-mode
+
+     The major mode for editing Go files.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'go-mode nil t)
+
+      #+END_SRC
+
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun eos/go/set-company-backends ()
+        "Set go company backends."
+        (interactive)
+        (eos-set-company-backends
+         '((company-yasnippet :with
+                              company-dabbrev
+                              company-dabbrev-code)
+           (company-files))))
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'go-mode-hook
+                (lambda ()
+                  ;; set company backends
+                  (eos/go/set-company-backends)
+
+                  ;; set flycheck checker (go lint)
+                  (eos/set-flycheck-checker 'go-golint)
+
+                  ;; set dash docsets
+                  (eos-set-dash-docset '"Go")))
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; add (*.go . go-mode) to auto-mode-alist
+      ;; init go-mode when a file with the extersion .go is opened
+      (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
 
       #+END_SRC
 
@@ -6927,61 +7016,6 @@
 
       #+END_SRC
 
-*** Go
-**** Go-mode
-
-     The major mode for editing Go files.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'go-mode nil t)
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/go/set-company-backends ()
-        "Set go company backends."
-        (interactive)
-        (eos-set-company-backends
-         '((company-yasnippet :with
-                              company-dabbrev
-                              company-dabbrev-code)
-           (company-files))))
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'go-mode-hook
-                (lambda ()
-                  ;; set company backends
-                  (eos/go/set-company-backends)
-
-                  ;; set flycheck checker (go lint)
-                  (eos/set-flycheck-checker 'go-golint)
-
-                  ;; set dash docsets
-                  (eos-set-dash-docset '"Go")))
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; add (*.go . go-mode) to auto-mode-alist
-      ;; init go-mode when a file with the extersion .go is opened
-      (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
-
-      #+END_SRC
-
 *** Julia
 **** Julia-mode
 
@@ -7010,21 +7044,6 @@
 
       #+END_SRC
 
-*** C#
-**** Csharp-mode
-
-     This is a major mode for editing C# files.
-     It performs automatic indentation of C# syntax;
-     font locking; and integration with imenu.el.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'csharp-mode nil t)
-
-      #+END_SRC
-
 *** Vhdl
 **** Vhdl-mode
 
@@ -7049,46 +7068,6 @@
       #+BEGIN_SRC emacs-lisp
 
       (require 'verilog nil t)
-
-      #+END_SRC
-
-*** Make
-**** Make-mode
-
-    Major mode for editing standard Makefiles.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'make-mode nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; if non-nil, automatically clean up continuation lines when saving
-      (customize-set-variable 'makefile-cleanup-continuations t)
-
-      ;; if non-nil, insert a TAB after a target colon
-      (customize-set-variable 'makefile-tab-after-target-colon t)
-
-      #+END_SRC
-
-***** Hooks
-*** Cmake
-**** Cmake-mode
-
-     Provides syntax highlighting and indentation for CMakeLists.txt and
-     *.cmake source files.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'cmake-mode nil t)
 
       #+END_SRC
 

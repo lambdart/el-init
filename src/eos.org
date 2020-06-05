@@ -1391,13 +1391,6 @@
      ;; so treat two sentences as two when filling
      (customize-set-variable 'sentence-end-double-space nil)
 
-     ;; default indent
-     ;; distance between tab stops (for display of tab characters), in columns.
-     (customize-set-variable 'tab-width 4)
-
-     ;; indentation can insert tabs if this is non-nil.
-     (customize-set-variable 'indent-tabs-mode nil)
-
      ;; kill process not confirmation required
      ;; list of functions called with no args to query before killing a buffer.
      ;; The buffer being killed will be current while the functions are running.
@@ -2417,6 +2410,9 @@
 
       ;; default number of columns for margin-changing functions to indent
       (customize-set-variable 'standard-indent 4)
+
+      ;; distance between tab stops (for display of tab characters), in columns.
+      (customize-set-variable 'tab-width 4)
 
       ;; if 'complete, TAB first tries to indent the current line
       ;; if t, hitting TAB always just indents the current line

@@ -1122,6 +1122,99 @@
 
       #+END_SRC
 
+**** Jka-compr
+
+     This package implements low-level support for reading, writing,
+     and loading compressed files.  It hooks into the low-level file
+     I/O functions (including write-region and insert-file-contents) so
+     that they automatically compress or uncompress a file if the file
+     appears to need it (based on the extension of the file name).
+     Packages like Rmail, VM, GNUS, and Info should be able to work
+     with compressed files without modification.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'jka-compr nil t)
+      (require 'jka-compr-hook nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; list of compression related suffixes to try when loading files
+      (customize-set-variable 'jka-compr-load-suffixes '(".gz" ".el.gz"))
+
+      ;; if you set this outside Custom while Auto Compression mode is
+      ;; already enabled (as it is by default), you have to call
+      ;; `jka-compr-update' after setting it to properly update other
+      ;; variables. Setting this through Custom does that automatically.
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; turn on the mode
+      (safe-funcall 'auto-compression-mode 1)
+
+      #+END_SRC
+
+**** Arc-mode
+
+      Major mode for viewing an archive file in a dired-like way.
+      You can move around using the usual cursor motion commands.
+      Lettera no longer insert themselves.
+      Type ‘e’ to pull a file out of the archive and into its own buffer;
+      or click mouse-2 on the file’s line in the archive mode buffer.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'arc-mode nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; TODO
+
+      #+END_SRC
+
+**** Dired
+
+     This is a major mode for file management operations.
+
+     The most common operations performed on files or groups of files
+     include creating, opening (e.g. viewing, playing, editing or
+     printing), renaming, moving or copying, deleting and searching
+     for files, as well as modifying file attributes, properties and
+     file permissions.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'dired nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable dired-find-alternate-file
+      (put 'dired-find-alternate-file 'disabled nil)
+
+      #+END_SRC
+
 *** Frames
 
     When Emacs is started on a graphical display, e.g., on the X Window
@@ -3019,33 +3112,6 @@
     A file manager or file browser is a computer program that provides
     a user interface to manage files and folders.
 
-***** Dired
-
-     This is a major mode for file management operations.
-
-     The most common operations performed on files or groups of files
-     include creating, opening (e.g. viewing, playing, editing or
-     printing), renaming, moving or copying, deleting and searching
-     for files, as well as modifying file attributes, properties and
-     file permissions.
-
-****** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      (require 'dired nil t)
-
-      #+END_SRC
-
-****** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; enable dired-find-alternate-file
-      (put 'dired-find-alternate-file 'disabled nil)
-
-      #+END_SRC
-
 ***** Dired-async
 
      This package provides a redefinition of `dired-create-file' function,
@@ -3061,20 +3127,20 @@
 
       #+END_SRC
 
-****** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      (safe-funcall 'dired-async-mode 1)
-
-      #+END_SRC
-
 ****** Binds
 
       #+BEGIN_SRC emacs-lisp
 
       (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
       (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)
+
+      #+END_SRC
+
+****** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (safe-funcall 'dired-async-mode 1)
 
       #+END_SRC
 

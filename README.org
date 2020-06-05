@@ -16,10 +16,11 @@
   the final structure it's advisable to view this
   =README= only as a reference/guide for the author himself.
 
-  So, my advise is: read emacs/elisp manual and write
-  your own ~init.el~, but feel free to fork or copy
-  anything from ~/src/eos.org~ that attends
-  your needs :)
+  So, here goes a little bit of advice: READ Emacs/Elisp manual! (RTFM)!
+
+  And write your own ~init.el~, but feel free
+  to fork or copy anything from ~/src/eos.org~
+  that attends your needs :)
 
 ** Screenshot
 
@@ -40,16 +41,17 @@
   Org-mode is used to write/organize the configuration
   (~src/eos.org~) in a literate programming format,
   so it contains documentation plus source code blocks
-  that will be tangled generating the ~src/init.el~ script.
+  that will be tangled generating the ~src/init.el~ final
+  Elisp script.
 
   * Note: Throughout this document the word =application=
     refers to any =elisp package= or =external program=.
 
   It's important to understand that all applications with
-  different purposes (made in elisp or not) (in)directly
-  passes through the elisp interpreter.
+  different purposes, made in Elisp or not, passes in a way or
+  another through the Elisp interpreter.
 
-  So again, =application(s)= implies =elisp packages=
+  So again, =application(s)= implies =Emacs/Elisp packages=
   or =external programs=.
 
 ** Features (overview):
@@ -79,7 +81,7 @@
      - Rationalization
      - Versioning
      - Measurement
-     - ...
+     - Etc...
 
    - Understand that data is generic (in computer science we deal
      with idealize components) and can be manipulated (transformed)
@@ -102,7 +104,7 @@
      - Packages
      - Applications
      - Buffers/Windows/Frames
-     - ...
+     - Etc...
 
 * Dependencies
 
@@ -232,16 +234,16 @@
    common/used commands (elisp functions), they are
    divided according to their behavior classification:
 
-   | Prefix Keymap  | Prefix  | Description |
-   |                |         |             |
-   | eos-find-map   | C-x f   | Files       |
-   | eos-window-map | C-x w   | Windows     |
-   | eos-pm-map     | C-x p   | Projects    |
-   | eos-sc-map     | C-x e   | Errors      |
-   | eos-tags-maps  | C-x t   | Tags        |
-   | eos-docs-maps  | C-x l   | Library     |
-   | eos-utils-map  | C-x c   | Utils       |
-   | eos-ac-map     | C-x TAB | Completion  |
+   | Prefix Keymap  | Prefix  | Description  |
+   |                |         |              |
+   | eos-files-map  | C-x f   | Files        |
+   | eos-window-map | C-x w   | Windows      |
+   | eos-pm-map     | C-x p   | Projects     |
+   | eos-sc-map     | C-x e   | Errors       |
+   | eos-tags-maps  | C-x t   | Tags         |
+   | eos-docs-maps  | C-x l   | Library/Docs |
+   | eos-utils-map  | C-x c   | Utilities    |
+   | eos-ac-map     | C-x TAB | Completion   |
 
 ** C-c
 
@@ -260,16 +262,16 @@
    Remember that you always can call the functions =C-h k= (describe-key)
    and =C-h b= (describe-bindings) to require this information.
 
-   | Keymap | Keybind | Function                                  |
-   | Global | C-a     | eos/move/beginning-of-line                |
-   | Global | C-M-v   | scroll-other-window                       |
-   | Global | C-M-y   | scroll-other-window-down                  |
-   | Global | M-i     | eos/edit/indent-region-or-buffer          |
-   | Global | M-c     | comment-or-uncomment-region               |
-   | Global | M-j     | eos/edit/duplicate-current-line-or-region |
-   | Global | M-n     | eos/edit/move-lines-up                    |
-   | Global | M-p     | eos/edit/move-lines-down                  |
-   | ...    | ...     | ...                                       |
+   | Keymap | Keybind | Function                     |
+   | Global | C-a     | back-to-indent-or-line       |
+   | Global | C-M-v   | scroll-other-window          |
+   | Global | C-M-y   | scroll-other-window-down     |
+   | Global | M-i     | indent-region-or-buffer      |
+   | Global | M-c     | comment-or-uncomment-region  |
+   | Global | M-j     | clone-current-line-or-region |
+   | Global | M-n     | transpose-lines-up           |
+   | Global | M-p     | transpose-lines-down         |
+   | ...    | ...     | ...                          |
 
 * Packages
 
@@ -368,10 +370,10 @@
 * Adapt
 
   If you want to modify any aspects (or extend) this configuration
-  without touching the ~/src/eos.org~, just edit/add your own elisp
-  code inside ~/src/adapt.el~.
+  without touching the ~/src/eos.org~, just edit/add your own Elisp
+  code inside ~/src/trash.el~.
 
-  Note: ~src/adapt.el~ will be the last script loaded by ~/src/init.el~.
+  Note: ~src/trash.el~ will be the last script loaded by ~/src/trash.el~.
 
 * Advices
 
@@ -386,18 +388,19 @@
   5. Use the same action flow logic, for the same
      class of commands.
 
-  6. Use as few modules(packages) as possible and always try to use
-     modules already installed on emacs to meet your needs.
-     If we can withdraw a module, do so! Most of the time it takes little
-     or no effort, and the gain is considerable.
+  6. Use as few modules (packages) as possible and always try to use
+     modules already installed on Emacs to meet your needs.
+     If you can withdraw a module, do so! Most of the time it
+     takes little or no effort, and the gain is considerable.
      So be alert to identify these situations!
 
-  7. Prioritize emacs's native packages(builtin) over third-party.
-     If any demand comes to light try to resolve with these packages
-     first, then third-party packages already installed and
-     finally(maybe) the internet. Sometimes a little extension
-     on this blotted-packages sets are everything we need to
-     bring a new feature to live or resolve a issue.
+  7. Prioritize Emacs's native packages (builtin) over third-party
+     ones. If any demand comes to light try to resolve
+     with these packages first, then third-party packages already
+     installed and finally (maybe, a huge one) the internet.
+     Sometimes a little extension on this blotted-packages sets
+     are everything needed to bring a new feature to live or
+     resolve a issue.
 
   8. Successive refinements: in constant refactoring!
      Always improve, do not fear the winds of change!
@@ -424,7 +427,7 @@
   - Q: Why won't just use Doom/Centaur/Spacemacs or any other
     distribution?
   - A: Because they are bloated with a lot of (useless) packages,
-    its more easy (for me) to adapt Emacs Vanilla and learn
+    its more easy (IMHO) to adapt Emacs Vanilla and learn
     Elisp: once for all (in progress)!
 
   - Q: Do you think that everyone who uses Emacs should make their own
@@ -442,13 +445,14 @@
 
 * References
 
-  1. https://www.gnu.org/software/emacs/manual
-  2. http://www.gigamonkeys.com/book
-  3. https://github.com/bbatsov/prelude
+  0. https://www.gnu.org/software/emacs/manual
+  1. https://www.gnu.org/software/emacs/manual/html_node/elisp/index.html
+  3. https://www.gnu.org/software/emacs/manual/html_node/emacs/Keymaps.html
   4. https://cask.readthedocs.io/en/latest
-  5. https://www.gnu.org/software/emacs/manual/html_node/emacs/Keymaps.html
-  6. https://github.com/larstvei/dot-emacs/blob/master/init.org
-  7. https://gitlab.com/protesilaos/dotfiles/-/blob/master/emacs/.emacs.d/emacs-init.org
+  5. http://www.gigamonkeys.com/book
+  6. https://github.com/bbatsov/prelude
+  7. https://github.com/larstvei/dot-emacs/blob/master/init.org
+  8. https://gitlab.com/protesilaos/dotfiles/-/blob/master/emacs/.emacs.d/emacs-init.org
 
 * LICENSE
   MIT

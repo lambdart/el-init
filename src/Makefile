@@ -10,12 +10,11 @@ SCRIPT := $(EMACS) --script
 VEX       := ~/.emacs.d/lisp/vex
 ASYNC     := ~/.emacs.d/site-lisp/async-20200113.1745
 XELB      := ~/.emacs.d/site-lisp/xelb-20190914.0
-EXWM      := ~/.emacs.d/site-lisp/exwm-20200329.0
-DASH      := ~/.emacs.d/site-lisp/dash-20200119.2310
-DASH-DOCS := ~/.emacs.d/site-lisp/dash-docs-20190516.1702
-COMPANY   := ~/.emacs.d/site-lisp/company-20200324.2145
-FLYCHECK  := ~/.emacs.d/site-lisp/flycheck-20200422.2108
-PPCOMPILE := ~/.emacs.d/site-lisp/ppcompile-20200420.1519
+EXWM      := ~/.emacs.d/site-lisp/exwm-20200524.0
+DASH      := ~/.emacs.d/site-lisp/dash-20200524.1947
+DASH-DOCS := ~/.emacs.d/site-lisp/dash-docs-20200516.1943
+COMPANY   := ~/.emacs.d/site-lisp/company-20200525.101
+FLYCHECK  := ~/.emacs.d/site-lisp/flycheck-20200605.1351
 
 # Additional emacs loadpath
 LOADPATH := -L $(VEX) \

@@ -13,6 +13,9 @@
 ;; version control
 (depends-on "magit")
 
+;; file system
+(depends-on "dired-rsync")
+
 ;; filter
 (depends-on "ag")
 
@@ -31,7 +34,6 @@
 ;; office
 (depends-on "dictionary")
 (depends-on "markdown-mode")
-;; (depends-on "nov")
 
 ;; blog
 (depends-on "htmlize")
@@ -43,7 +45,7 @@
 ;; documentation
 (depends-on "dash-docs")
 (depends-on "rfc-docs"
-            :git "https://github.com/esac-io/rfc-docs")
+             :git "https://github.com/esac-io/rfc-docs")
 
 ;; multimedia
 (depends-on "emms")
@@ -56,9 +58,8 @@
 ;; (depends-on "moebius-theme"
 ;;              :git "https://github.com/esac-io/moebius-theme")
 
-;; files
+;; file
 (depends-on "dired-subtree")
-(depends-on "dired-rsync")
 
 ;; edit
 (depends-on "editorconfig")
@@ -75,6 +76,7 @@
 (depends-on "lua-mode")
 (depends-on "elixir-mode")
 (depends-on "csharp-mode")
+(depends-on "haskell-mode")
 
 ;; debuggers
 (depends-on "rmsbolt"
@@ -91,7 +93,7 @@
 (depends-on "dashboard")
 
 ;; window
-(depends-on "buffer-move")
+;; (depends-on "buffer-move")
 
 ;; term & shell
 (depends-on "multi-term")
@@ -101,8 +103,8 @@
 (depends-on "verb")
 
 ;; bar
-(depends-on "moody")
+;; (depends-on "moody")
 
 ;; compile
-(depends-on "ppcompile"
-            :git "https://github.com/whatacold/ppcompile")
+;; (depends-on "ppcompile"
+;;             :git "https://github.com/whatacold/ppcompile")

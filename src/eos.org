@@ -15,8 +15,11 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;;; Package --- eos
-    ;;; Commentary: ... Present day, present time ....
+    ;;; Package --- EOS, EMACS OS
+    ;;
+    ;;; Commentary:
+    ;; ... Present day, present time ....
+    ;;
     ;;; Code:
 
     #+END_SRC
@@ -166,7 +169,7 @@
 
      (defvar eos-rtags-map
        (make-sparse-keymap)
-       "rtag-minor-mode commands keymap.")
+       "Rtag commands keymap.")
 
      #+END_SRC
 
@@ -246,6 +249,31 @@
      (customize-set-variable 'inhibit-startup-echo-area-message nil)
 
      #+END_SRC
+
+*** Warnings
+
+    This package implements the entry points `warn', `lwarn'
+    and `display-warning'.
+
+***** Require
+
+    #+BEGIN_SRC emacs-lisp
+
+    (require 'warnings nil t)
+
+    #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; minimum severity level for displaying the warning buffer
+      (customize-set-variable 'warning-minimum-level :error)
+
+      ;; minimum severity level for logging a warning.
+      (customize-set-variable 'warning-minimum-log-level :warning)
+
+      #+END_SRC
 
 *** Load-path
 
@@ -627,7 +655,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'tls nil t)
+      ;; (require 'tls nil t)
 
       #+END_SRC
 
@@ -638,15 +666,15 @@
       ;; indicate if certificates should be checked against trusted root certs
       ;; if this is ‘ask’, the user can decide whether to accept an
       ;; untrusted certificate
-      (customize-set-variable 'tls-checktrust nil)
+      ;; (customize-set-variable 'tls-checktrust nil)
 
       ;; list of strings containing commands to
       ;; start TLS stream to a host
       ;; '("openssl s_client -connect %h:%p -CAfile %t")
       ;; '("gnutls-cli --x509cafile %t -p %p %h --insecure")
-      (customize-set-variable
-       'tls-program
-       '("gnutls-cli --x509cafile /etc/ssl/certs/ca-certificates.crt -p %p %h"))
+      ;; (customize-set-variable
+      ;; 'tls-program
+      ;; '("gnutls-cli --x509cafile /etc/ssl/certs/ca-certificates.crt -p %p %h"))
 
       #+END_SRC
 
@@ -2482,7 +2510,9 @@
                                 " • "
                                 (:eval (propertized-buffer-identification "%b"))
                                 " • "
-                                "(%m)"
+                                "("
+                                mode-name
+                                ")"
                                 (:eval (when vc-mode " »"))
                                 (vc-mode vc-mode)))
 
@@ -2499,7 +2529,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; indentation can insert tabs if this is non-nil
-      (customize-set-variable 'indent-tabs-mode t)
+      (customize-set-variable 'indent-tabs-mode nil)
 
       ;; default number of columns for margin-changing functions to indent
       (customize-set-variable 'standard-indent 4)
@@ -2531,7 +2561,7 @@
 
 ***** Binds
 
-     #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
 
      (define-key ctl-x-map (kbd "m") 'kmacro-keymap)
 
@@ -3704,7 +3734,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'editorconfig nil t)
+      ;; (require 'editorconfig nil t)
 
       #+END_SRC
 
@@ -3712,7 +3742,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (safe-funcall 'editorconfig-mode)
+      ;; (safe-funcall 'editorconfig-mode 1)
 
       #+END_SRC
 
@@ -6724,7 +6754,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (customize-set-variable 'c-default-style 'awk)
+      ;; TODO research
+      ;; (customize-set-variable 'c-default-style nil)
 
       #+END_SRC
 
@@ -6767,6 +6798,7 @@
       ;; complete or indent
       (define-key c-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
 
+      ;; compilation keybind
       (define-key c-mode-map (kbd "C-c C-c")
         (lambda ()
           (interactive)
@@ -6779,6 +6811,7 @@
       ;; complete or indent
       (define-key c++-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
 
+      ;; compilation keybind
       (define-key c++-mode-map (kbd "C-c C-c")
         (lambda ()
           (interactive)

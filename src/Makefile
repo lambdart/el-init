@@ -1,8 +1,8 @@
 # Emacs invocation
-EMACS_COMMAND   := emacs
+EMACS_COMMAND := emacs
 
 # Use -q to have /usr/local/share/emacs/site-lisp and subdirs in load-path
-EMACS		:= $(EMACS_COMMAND) -Q -q -batch
+EMACS := $(EMACS_COMMAND) -Q -q -batch
 
 EVAL   := $(EMACS) --eval
 SCRIPT := $(EMACS) --script
@@ -18,14 +18,13 @@ FLYCHECK  := ~/.emacs.d/site-lisp/flycheck-20200605.1351
 
 # Additional emacs loadpath
 LOADPATH := -L $(VEX) \
-	    -L $(ASYNC) \
-	    -L $(DASH) \
-	    -L $(XELB) \
-	    -L $(EXWM) \
-	    -L $(DASH-DOCS) \
-	    -L $(FLYCHECK) \
-	    -L $(COMPANY) \
-	    -L $(PPCOMPILE)
+		-L $(ASYNC) \
+		-L $(DASH) \
+		-L $(XELB) \
+		-L $(EXWM) \
+		-L $(DASH-DOCS) \
+		-L $(FLYCHECK) \
+		-L $(COMPANY)
 
 # Scritps to eval
 TANGLE := tangle.el

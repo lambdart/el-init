@@ -305,10 +305,13 @@
     ;; (setenv "TERM" "eterm-color")
 
     ;; the full name of the user logged in
-    (customize-set-variable 'user-login-name (getenv "USER"))
+    ;; (customize-set-variable 'user-login-name (getenv "USER"))
 
     ;; the email address of the current user
-    (customize-set-variable 'user-mail-address (getenv "EMAIL"))
+    ;; (customize-set-variable 'user-mail-address nil)
+
+    ;; the full name of the user logged in.
+    (customize-set-variable 'user-full-name (getenv "USER"))
 
     #+END_SRC
 
@@ -452,7 +455,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-     ;;  (require 'tramp nil t)
+     ;; (require 'tramp nil t)
 
       #+END_SRC
 

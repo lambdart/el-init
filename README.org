@@ -16,7 +16,7 @@
   the final structure it's advisable to view this
   =README= only as a reference/guide for the author himself.
 
-  So, here goes a little bit of advice: READ Emacs/Elisp manual! (RTFM)!
+  So, here goes a little bit of advice: READ Emacs/Elisp manual! (RTFM!)
 
   And write your own ~init.el~, but feel free
   to fork or copy anything from ~/src/eos.org~
@@ -93,7 +93,7 @@
      - No useless/annoying distractions.
      - Just do what was asked and nothing more.
 
-   - Decrease the gap between: =a prof of concept= and the ="final"= release=!
+   - Decrease the gap between: =a prof of concept= and the =final= release!
 
    - Provide tools to easily investigate any process/procedure of
      interest.
@@ -153,7 +153,7 @@
 * Usage
 
   Using this Emacs configuration isn't different of using
-  Emacs vanilla itself with a "few" reforms.
+  vanilla Emacs itself with a "few" reforms.
   As such, the official Emacs tutorial is a great way to understanding
   a little bit of its universe.
 
@@ -173,23 +173,23 @@
   used minor modes and their functions are mapped within
   their respective maps.
 
-  After that, the prefix maps will be placed in the Ctl-x-map prefix
+  After that, the prefix maps will be placed in the =Ctl-x-map= prefix
   map, resulting in the standardization of commands (functions)
-  access sequences (keybinds or chords).
+  access sequences - =keybinds= or =chords=.
 
   For the sake of sanity a lot of keybinds have been cleaned up,
-  it's preferable (in my opinion) a small set of keybinds
-  (only the most used ones) providing that way a more stable (less
-  error prone) overall usability.
+  it's preferable (IMO) a small set of keybinds,
+  only the most used ones, providing that way a more stable, less
+  error prone), overall usability.
 
   When 'exotic' functions are needed to be called, just use
-  =`execute-extended-command'= binded to =M-x=.
+  =execute-extended-command= binded to =M-x=.
 
-  Note: The =`minor-mode-map-alist'= as completely cleaned, this was
+  Note: The =minor-mode-map-alist= was completely clean up, this was
   proven to be a huge pain relief resulting in a considerable
-  productivity gains.
+  productivity gain.
 
-  For more information checkout the =Epilogue/Clean= section at
+  For more information checkout the =Cleanup= section at
   ~src/eos.org~.
 
 ** Basic
@@ -299,7 +299,7 @@
    #+END_SRC
 
    Using different source then Melpa is possible thanks
-   to =`depends-on'= and acceptable fetcher keywords like =:git=:
+   to =depends-on= and acceptable fetcher keywords like =:git=:
 
    #+BEGIN_SRC sh
 
@@ -323,8 +323,9 @@
 
 ** Install
 
-   To install all packages listed on the ~Cask~ file, use `cask
-   install` inside the same directory the ~Cask~ file resides, e.g:
+   To install all packages listed on the ~Cask~ file, use =cask
+   install= inside the user Emac's directory where ~Cask~ file
+   resides, e.g:
 
    #+BEGIN_SRC sh
 
@@ -333,13 +334,13 @@
    #+END_SRC
 
    - Tip: When problems with missing dependencies are encountered
-     (usually happens when using fetcher keyword like :git),
+     (usually happens when using a fetcher keyword like :git),
      put the dependency code snippet ~(depends-on "missing-dep-package-name")
-     above the target package and give `cask install` command another shot.
+     above the target package and give =cask install= command another shot.
 
 ** Remove
 
-   You have to manually remove target package directory.
+   You have to manually remove the target package directory.
    To find out where the packages were installed, use:
 
    #+BEGIN_SRC sh
@@ -349,7 +350,7 @@
    #+END_SRC
 
    To avoid package re-installation remove (depends-on
-   <package-name>) before `cask install` calls.
+   <package-name>) before =cask install= calls.
 
    Delete package's folder:
 
@@ -364,8 +365,7 @@
 
    - IMPORTANT: Don't forgot to remove both: package's folder and
      repository entry, otherwise the package will continue to be
-     installed when =cask install= is executed and
-     loaded by ~src/init.el~.
+     installed when =cask install= is executed.
 
 * Adapt
 
@@ -375,14 +375,14 @@
 
   Note: ~src/trash.el~ will be the last script loaded by ~/src/trash.el~.
 
-* Advices
+* Advises
 
-  0. Do one thing and do it well (KISS).
+  0. Do one thing and do it well (Unix philosophy).
   1. If something is bothering you, fix it!
   2. Global behavior aways available and static.
   3. Few keybinds sets.
 
-  4. Repeat keybinds for mode-specific commands
+  4. Repeat keybinds postfix for mode-specific commands
      according to their logical classification.
 
   5. Use the same action flow logic, for the same
@@ -392,7 +392,7 @@
      modules already installed on Emacs to meet your needs.
      If you can withdraw a module, do so! Most of the time it
      takes little or no effort, and the gain is considerable.
-     So be alert to identify these situations!
+     So, be alert to identify these situations!
 
   7. Prioritize Emacs's native packages (builtin) over third-party
      ones. If any demand comes to light try to resolve
@@ -427,11 +427,11 @@
   - Q: Why won't just use Doom/Centaur/Spacemacs or any other
     distribution?
   - A: Because they are bloated with a lot of (useless) packages,
-    its more easy (IMHO) to adapt Emacs Vanilla and learn
-    Elisp: once for all (in progress)!
+    its more easy (IMHO) to adapt vanilla Emacs and learn
+    Elisp - once for all (in progress)!
 
-  - Q: Do you think that everyone who uses Emacs should make their own
-    configuration ~init.el~?
+  - Q: Do you think that everyone who uses Emacs should write their own
+    configuration file =(init.el)=?
   - A: For sure! It's fun like explore mystical dungeons and slay
     some fearless dragons. The reward? Walk over the rotten and stinky
     carrion of your enemies, who were defeated by your will,

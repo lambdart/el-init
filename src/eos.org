@@ -198,12 +198,12 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; eos prefixs
-     (define-key ctl-x-map (kbd "a") 'eos-filter-map)
+     (define-key ctl-x-map (kbd "f") 'eos-files-map)
+     ;; (define-key ctl-x-map (kbd "a") 'eos-filter-map) ; not used yet
      (define-key ctl-x-map (kbd "p") 'eos-pm-map)
      (define-key ctl-x-map (kbd "t") 'eos-tags-map)
      (define-key ctl-x-map (kbd "c") 'eos-utils-map)
      (define-key ctl-x-map (kbd "e") 'eos-sc-map)
-     (define-key ctl-x-map (kbd "f") 'eos-file-map)
      (define-key ctl-x-map (kbd "l") 'eos-docs-map)
      (define-key ctl-x-map (kbd "<tab>") 'eos-completion-map)
 
@@ -5033,6 +5033,29 @@
       #+END_SRC
 
 **** Org-Agenda
+**** Outline
+
+     This package is a major mode for editing outline-format documents.
+     An outline can be `abstracted' to show headers at any given level,
+     with all stuff below hidden.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (require 'outline nil t)
+
+     #+END_SRC
+
+**** Allout
+
+      Allout outline minor mode provides extensive outline
+      formatting and and manipulation beyond standard emacs
+      outline mode.
+
+***** Require
+***** Customize
+
 **** Tex
 
      Major mode for editing files of input for TeX, LaTeX, or SliTeX.
@@ -5159,7 +5182,10 @@
 
       #+END_SRC
 
-**** Blog
+**** Remember
+
+*** Blogs
+**** Org-static-blog
 
     Static blog generators are a dime a dozen.
     This is one more, which focuses on being simple.
@@ -5293,8 +5319,6 @@
      (customize-set-variable 'org-export-with-section-numbers nil)
 
      #+END_SRC
-
-**** Remember
 
 *** Documentation
 **** Man

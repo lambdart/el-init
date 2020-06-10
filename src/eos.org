@@ -3325,10 +3325,10 @@
 
       ;; regexp to recognize prompts in the inferior process
       ;; (customize-set-variable 'term-prompt-regexp "^\\(>\\|\\(->\\)+\\) *")
-      (customize-set-variable 'term-prompt-regexp ".*:.*>.*? ")
+      (customize-set-variable 'term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
 
       ;; if non-nil, automatically list possibilities on partial completion.
-      (customize-set-variable 'term-completion-autolist t)
+      (customize-set-variable 'term-completion-autolist nil)
 
       ;; if true, buffer name equals process name
       (customize-set-variable 'term-ansi-buffer-base-name t)

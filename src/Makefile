@@ -1,8 +1,10 @@
 # Emacs invocation
 EMACS_COMMAND := emacs
 
-# Use -q to have /usr/local/share/emacs/site-lisp and subdirs in load-path
-EMACS := $(EMACS_COMMAND) -Q -q -batch
+# do not load an init file: -q
+# avoid processing X resources: -Q
+# send messages to stderr: --batch
+EMACS := $(EMACS_COMMAND) -Q -q --batch
 
 EVAL   := $(EMACS) --eval
 SCRIPT := $(EMACS) --script

@@ -431,6 +431,7 @@
       (global-set-key (kbd "M-j") 'clone-line-or-region)
       (global-set-key (kbd "M-n") 'transpose-lines-up)
       (global-set-key (kbd "M-p") 'transpose-lines-down)
+      (global-set-key (kbd "M-l") 'downcase-word)
 
       ;; kill
       (define-key ctl-x-map (kbd "k") 'kill-buffer)
@@ -1343,7 +1344,7 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; set font
-     (safe-set-frame-font "Hermit Light:pixelsize=16")
+     (safe-set-frame-font "Hermit Light:pixelsize=17")
 
      ;; enable window divider
      (window-divider-mode)
@@ -3328,7 +3329,7 @@
       (customize-set-variable 'term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
 
       ;; if non-nil, automatically list possibilities on partial completion.
-      (customize-set-variable 'term-completion-autolist nil)
+      (customize-set-variable 'term-completion-autolist t)
 
       ;; if true, buffer name equals process name
       (customize-set-variable 'term-ansi-buffer-base-name t)
@@ -3379,8 +3380,6 @@
 
                       ;; term-mode-map
                       (define-key term-mode-map (kbd "s-q") 'term-char-mode)))))
-
-
 
       #+END_SRC
 
@@ -5263,7 +5262,7 @@
      (customize-set-variable
       'org-static-blog-publish-directory
       (expand-file-name
-       (concat user-emacs-directory "blog/blog/")))
+       (concat user-emacs-directory "blog/site/esac-io.github.io")))
 
      ;; directory where published ORG files are stored
      (customize-set-variable
@@ -5275,7 +5274,7 @@
      (customize-set-variable
       'org-static-blog-drafts-directory
       (expand-file-name
-       (concat user-emacs-directory "blog/drafts/")))
+       (concat user-emacs-directory "blog/posts/drafts/")))
 
      ;; html to put in the <head> of each page.
      (customize-set-variable
@@ -5993,6 +5992,26 @@
       #+END_SRC
 
 *** Compilation
+**** Auto-compile
+
+     This package provides two minor modes which automatically
+     recompile Emacs Lisp source files. Together these modes guarantee
+     that Emacs never loads outdated byte code files.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'auto-compile nil t)
+
+      #+END_SRC
+
+***** Customize
+
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
 **** Compile
 
      Emacs can run compilers for languages such as C and Fortran, feeding the
@@ -7427,7 +7446,7 @@
       (global-unset-key (kbd "C-@"))
       (global-unset-key (kbd "C-\\"))
       (global-unset-key (kbd "C-_"))
-      (global-unset-key (kbd "M-l"))
+      ;;(global-unset-key (kbd "M-l"))
       (global-unset-key (kbd "M-h"))
       ;; (global-unset-key (kbd "M-\\"))
       (global-unset-key (kbd "M-$"))

@@ -2940,7 +2940,7 @@
                                               (lambda ()
                                                 (interactive)
                                                 (exwm-workspace-switch-create ,i))))
-                                          (number-sequence 0 2))))
+                                          (number-sequence 0 3))))
 
       ;; The following example demonstrates how to use simulation keys to mimic
       ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
@@ -4780,6 +4780,31 @@
       #+END_SRC
 
 *** Calendars
+**** Calendar
+
+     This package offers a set of functions that implements a calendar
+     window. It generates a calendar for the current month, together
+     with the previous and coming months, or for any other three-month
+     period.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'calendar nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; name of the file in which one’s personal diary of dates is kept
+      (customize-set-variable
+       'diary-file (expand-file-name "cache/diary" user-emacs-directory))
+
+      #+END_SRC
+
 *** Dashboards
 
     A dashboard is a type of graphical user interface which often
@@ -5032,6 +5057,37 @@
       #+END_SRC
 
 **** Org-Agenda
+
+
+     Due to the way Org works, TODO items, time-stamped items, and
+     tagged headlines can be scattered throughout a file or even a
+     number of files. To get an overview of open action items, or of
+     events that are important for a particular date, this information
+     must be collected, sorted and displayed in an organized way.
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; the files to be used for agenda display, should be a list of them.
+      (customize-set-variable 'org-agenda-files '("~/org/agenda.org"))
+
+      ;; the separator between blocks in the agenda
+      (customize-set-variable 'org-agenda-block-separator "=")
+
+      ;; a single-character string to be used as the bulk mark
+      (customize-set-variable 'org-agenda-buld-mark-char ">")
+
+      ;; non-nil means make the block agenda more compact
+      (customize-set-variable 'org-agenda-compact-blocks t)
+
+      ;; when t, a confirmation is always needed.
+      ;; when a number N, confirmation is only needed when the text
+      ;; to be killed contains more than N non-white lines
+      (customize-set-variable 'org-agenda-confirm-kill t)
+
+      #+END_SRC
+
 **** Outline
 
      This package is a major mode for editing outline-format documents.

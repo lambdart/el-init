@@ -140,6 +140,6 @@ nsm
 # Emacs private/custom elisp files
 custom.el
 private.el
-adapt.el
+trash.el
 init.el
 eos.el

@@ -15,12 +15,12 @@
   and high volatility, although this is probably
   the final structure it's advisable to view this
   =README= only as a reference and guide for the author himself
-  and close (crazy) friends.
+  and close friends (the crazy ones)!
 
   So, here goes a little bit of advice: read =Emacs/Elisp= manual,
-  using as a exercise the write of your own ~init.el~, but feel
+  using as a exercise, writing your own ~init.el~, but feel
   free to fork or copy anything from ~src/eos.org~ that you like
-  or find useful! :)
+  and find useful! :)
 
 ** Screenshot
 
@@ -51,7 +51,7 @@
   To make even more clear try to follow this statement:
 
   - "I live inside the =Elisp= dynamic interpreter and
-     everything I do can be resumed to a simple list evaluation."
+    everything I do can be resumed to a simple list evaluation."
 
   So this configurations aims to be a primary IO bridge
   (=Elisp= interpreter) between human (me) and the machine (OS).
@@ -81,11 +81,12 @@
    - Just one major language (=Elisp=) to conquer them all!
    - Information comes to you as required and not the other way around.
    - The same keybinds are used everywhere (learn once, use forever and ever).
-   - The same editing capabilities for all applications.
-   - The same =GUI Interface= (frames/window/buffers) for all applications.
+   - The same editing capabilities are used for all applications.
+   - The same =GUI Interface= (frames/window/buffers) are used for all applications.
 
-   - Just one development environment for all projects (independent of
-     the programming language and tools needed to construct it):
+   - Just one integrated development environment for all projects
+   (independent of the programming language and tools needed
+   to construct it):
      - Apparence
      - Editing
      - Documentation
@@ -102,25 +103,26 @@
      - And more, much more ...
 
    - Understand that data is generic (in computer science we deal
-     with idealize components) and can be manipulated, i.e, transformed
-     through different paths.
+   with idealize components) and can be manipulated, i.e, transformed
+   through different paths.
 
    - Huge productivity improvements by:
      - Staying focused, surfing all the time in the same pleasant/comfortable mood.
      - Avoiding useless/annoying distractions.
      - Being precise: Just do what was asked and nothing more.
      - Decreasing the gap between a =prof of concept= and the =final= release.
+     - Providing tools to easily investigate any process/procedure of
+       interest.
 
-   - Providing tools to easily investigate any process/procedure of
-     interest.
-
-   - Communication (=pipes, IPCs, data streams=) between peers are
-     transparent, resulting in a very practical, very convenient
-     integration for all modules and resources available:
+   - Intern communication (=pipes, IPCs, data streams, sockets, you
+   name it=) between peers are transparent, resulting in a very
+   practical, very convenient integration for all modules and
+   resources available:
      - Packages
      - Applications
      - Buffers/Windows/Frames
      - Processes
+     - Sockets
      - Files
      - Etc ...
 
@@ -128,20 +130,15 @@
 
   1. Cask
   2. Emacs >= 26.3
-  3. Packages
+  3. Elisp Packages
      - Listed on: ~.gitmodules~
-
-** Optional
-
-   Some =emacs packages= uses external (non-elisp) programs, like:
-
-   1. Ag - The Silver Searcher
-   2. Global
-   3. Etags
-   4. Aspell/Ispell
-   5. Compton
-   6. Transset
-   7. Rtags Server
+  4. Non-elisp Packages
+     - Ag, The Silver Searcher
+     - Global
+     - Etags
+     - Aspell (or Ispell)
+     - Compton
+     - Transset
 
 * Tested on
 
@@ -150,30 +147,32 @@
 
 * Installation
 
-  NOTE: The installation script was made to speed up
-        the deploy process on my new machines.
+  * NOTE: The installation script it's incomplete and broken do not
+    use it!
 
-  Download and execute (curl required):
+  Download and execute the installation shell script (SH POSIX), the
+  example below uses curl.
 
   #+BEGIN_SRC
      sh -c "$(curl -fsSL https://raw.githubusercontent.com/esac-io/eos/master/scripts/install.sh)"
   #+END_SRC
 
-  Script steps:
+  Steps performed by the script:
 
-  1) Check dependencies
-  2) Clone =cask= and =eos= repositories
-  3) Backup ~.emacs.d~ directory
-  4) Install third-party packages listed in ~/src/default/default.Cask~ file
-  5) Tangle source code from ~src/eos.org~ to ~init.el~
-  6) Byte compile ~init.el~ script
+  1. Check dependencies
+  2. Clone =eos= and sub-module repositories (TODO!)
+  3. Backup ~.emacs.d~ directory
+  4. Byte compile third-party =Elisp= packages (TODO!)
+  5. Tangle source code from ~src/eos.org~ to ~init.el~
+  6. Byte compile ~init.el~ script
+     - Call make passing the right =Makefile= to it.
 
 * Usage
 
   Using this Emacs configuration isn't different of using
   vanilla Emacs itself with a "few" reforms.
-  As such, the official Emacs tutorial is a great way to understanding
-  a little bit of its universe.
+  As such, the official Emacs tutorial is a great way
+  to understanding a little bit of its universe.
 
   So, open Emacs and press =C-h= (the help map prefix) and
   press =t= to evaluate ~help-with-tutorial~ function that will
@@ -182,8 +181,8 @@
   - Enjoy your late nights :)
 
   - Note: The main purpose of the Emacs tutorial is teach you
-    the most important standard Emacs commands (or functions)
-    and the mapped keybinds used to trigger then.
+  the most important standard Emacs commands (or functions)
+  and the mapped keybinds used to trigger then.
 
 * Keybinds
 
@@ -191,19 +190,20 @@
   used minor modes and their functions are mapped within
   their respective maps.
 
-  After that, the prefix maps will be placed in the =Ctl-x-map= prefix
-  map, resulting in the standardization of commands (functions)
+  After that, the prefix maps will be placed in the =Ctl-x-map=
+  prefix, resulting in the standardization of commands (functions)
   access sequences - =keybinds= or =chords=.
 
   For the sake of sanity a lot of keybinds have been cleaned up,
-  it's preferable (IMO) a small set of keybinds,
+  it's preferable (IMHO) a small set of keybinds,
   only the most used ones, providing that way a more stable, less
-  error prone), overall usability.
+  error prone, overall usability.
 
-  When 'exotic' functions are needed to be called, just use
-  =execute-extended-command= binded to =M-x=.
+  When 'exotic' functions needed to be called, just use
+  =execute-extended-command= binded to =M-x=, also know as the
+  =minibuffer=.
 
-  Note: The =minor-mode-map-alist= was completely clean up, this was
+  Note: The =minor-mode-map-alist= was completely erased, this was
   proven to be a huge pain relief resulting in a considerable
   productivity gain.
 
@@ -293,8 +293,8 @@
 
 * Packages
 
-  Packages are installed as git sub-modules are listed on the
-  ~.gitmodules~ file.
+  Packages are installed as git sub-modules (see gitsubmodules(7) - man
+  pages for more information) and they are listed on ~.gitmodules~ file.
 
 * Adapt
 
@@ -332,7 +332,7 @@
      resolve a issue.
 
   8. Successive refinements: in constant refactoring!
-     Always improve, do not fear the winds of change!
+     Always improve, never fear the winds of change!
 
   9. Have fun!
 
@@ -357,7 +357,7 @@
     distribution?
   - A: Because they are bloated with a lot of (useless) packages,
     its more easy (IMHO) to adapt vanilla Emacs and learn
-    Elisp - once for all (in progress)!
+    =Elisp= - once for all (in progress)!
 
   - Q: Do you think that everyone who uses Emacs should write their own
     configuration file =(init.el)=?

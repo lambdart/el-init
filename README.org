@@ -53,8 +53,9 @@
   - "I live inside the =Elisp= dynamic interpreter and
     everything I do can be resumed to a simple list evaluation."
 
-  So this configurations aims to be a primary IO bridge
-  (=Elisp= interpreter) between human (me) and the machine (OS).
+  So this configurations aims to be a primary Input/Output (IO) bridge
+  (the =Elisp= interpreter) between: the human mind and
+  the machine (OS).
 
   In other words, an Emacs configuration well designed
   and integrated that provides a generic computer environment
@@ -85,8 +86,8 @@
    - The same =GUI Interface= (frames/window/buffers) are used for all applications.
 
    - Just one integrated development environment for all projects
-   (independent of the programming language and tools needed
-   to construct it):
+     (independent of the programming language and tools needed
+     to construct it):
      - Apparence
      - Editing
      - Documentation
@@ -103,8 +104,8 @@
      - And more, much more ...
 
    - Understand that data is generic (in computer science we deal
-   with idealize components) and can be manipulated, i.e, transformed
-   through different paths.
+     with idealize components) and can be manipulated, i.e, transformed
+     through different paths.
 
    - Huge productivity improvements by:
      - Staying focused, surfing all the time in the same pleasant/comfortable mood.
@@ -115,9 +116,9 @@
        interest.
 
    - Intern communication (=pipes, IPCs, data streams, sockets, you
-   name it=) between peers are transparent, resulting in a very
-   practical, very convenient integration for all modules and
-   resources available:
+     name it=) between peers are transparent, resulting in a very
+     practical, very convenient integration for all modules and
+     resources available:
      - Packages
      - Applications
      - Buffers/Windows/Frames

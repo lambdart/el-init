@@ -4,23 +4,23 @@
 
 * EOS
 
-  Just another org-mode based Emacs configuration,
-  or a elisp interpreter desktop distribution.
+  An org-mode based Emacs configuration (=src/eos.org=),
+  or a =Elisp= interpreter desktop distribution.
   | Wait... What!? |
 
 * Disclaimer
 
-  I don't recommend anyone to install or use this
-  configuration directly as there is no support for it
-  and changes quite often, although this is probably
+  I don't recommend anyone to install or use this as its
+  main Emacs configuration (=init.el=), due its lack of support
+  and high volatility, although this is probably
   the final structure it's advisable to view this
-  =README= only as a reference/guide for the author himself.
+  =README= only as a reference and guide for the author himself
+  and close (crazy) friends.
 
-  So, here goes a little bit of advice: READ Emacs/Elisp manual! (RTFM!)
-
-  And write your own ~init.el~, but feel free
-  to fork or copy anything from ~/src/eos.org~
-  that attends your needs :)
+  So, here goes a little bit of advice: read =Emacs/Elisp= manual,
+  using as a exercise the write of your own ~init.el~, but feel
+  free to fork or copy anything from ~src/eos.org~ that you like
+  or find useful! :)
 
 ** Screenshot
 
@@ -31,87 +31,105 @@
 
    | Present Day, heh... Present Time |
 
+
 * Introduction
 
-  Using Emacs (Elisp interpreter) as the only IO bridge
-  between human and machine. In another words, an Emacs
-  configuration well designed and integrated that provides
-  a generic computer environment for everyday use.
+  I find the definition of Emacs, given by its official manual a
+  little bit misleading and inaccurate, if you have some
+  technical background a better definition would be (IMHO):
 
-  Org-mode is used to write/organize the configuration
+  A lisp interpreter with builtin libraries that provides
+  editing and data visualization functionalities.
+  The core (the interpreter and other primary features)
+  are written in the C programming language and all the rest
+  in a lisp dialect called =Elisp= (=Emacs lisp=).
+
+  That way it's more clear to the reader that Emacs is not a text
+  editor, but a whole platform capable to interact with the resources
+  provided by the operation system.
+
+  To make even more clear try to follow this statement:
+
+  - "I live inside the =Elisp= dynamic interpreter and
+     everything I do can be resumed to a simple list evaluation."
+
+  So this configurations aims to be a primary IO bridge
+  (=Elisp= interpreter) between human (me) and the machine (OS).
+
+  In other words, an Emacs configuration well designed
+  and integrated that provides a generic computer environment
+  for everyday use.
+
+  =Org-mode= is used to write and organize the configuration
   (~src/eos.org~) in a literate programming format,
-  so it contains documentation plus source code blocks
-  that will be tangled generating the ~src/init.el~ final
-  Elisp script.
+  so it contains =Elisp= source code blocks - that will be tangled
+  generating the ~src/init.el~ final script - and the
+  referent documentation.
 
   * Note: Throughout this document the word =application=
     refers to any =elisp package= or =external program=.
 
   It's important to understand that all applications with
-  different purposes, made in Elisp or not, passes in a way or
-  another through the Elisp interpreter.
+  different purposes, made in =Elisp= or not, passes in a
+  way or another through the interpreter.
 
-  So again, =application(s)= implies =Emacs/Elisp packages=
+  So again, =application(s)= implies =Elisp packages=
   or =external programs=.
 
-** Features (overview):
+** Features:
 
-   - Just one major language (=ELISP=) to conquer them all!
+   - Just one major language (=Elisp=) to conquer them all!
    - Information comes to you as required and not the other way around.
-   - Use the same keybinds everywhere (learn once, use forever and ever).
+   - The same keybinds are used everywhere (learn once, use forever and ever).
+   - The same editing capabilities for all applications.
+   - The same =GUI Interface= (frames/window/buffers) for all applications.
 
-   - Use the same editor capabilities for all applications
-     (or at least try to).
-
-   - Use the same =GUI Interface= (frames/window/buffers) for all
-     applications.
-
-   - Just one development environment for all languages:
+   - Just one development environment for all projects (independent of
+     the programming language and tools needed to construct it):
      - Apparence
      - Editing
      - Documentation
      - Communication
      - Navigation
      - Completion
-     - Syntax/Spell Check
+     - Syntax/Spell Checking
      - Interpretation
      - Compilation
      - Debugging
      - Testing
      - Rationalization
      - Versioning
-     - Measurement
-     - Etc...
+     - And more, much more ...
 
    - Understand that data is generic (in computer science we deal
-     with idealize components) and can be manipulated (transformed)
+     with idealize components) and can be manipulated, i.e, transformed
      through different paths.
 
-   - Huge improvements in productivity:
-     - Stay focused, surfing in the same pleasant/comfortable
-       flow (my preferred kind of mood).
-     - No useless/annoying distractions.
-     - Just do what was asked and nothing more.
+   - Huge productivity improvements by:
+     - Staying focused, surfing all the time in the same pleasant/comfortable mood.
+     - Avoiding useless/annoying distractions.
+     - Being precise: Just do what was asked and nothing more.
+     - Decreasing the gap between a =prof of concept= and the =final= release.
 
-   - Decrease the gap between: =a prof of concept= and the =final= release!
-
-   - Provide tools to easily investigate any process/procedure of
+   - Providing tools to easily investigate any process/procedure of
      interest.
 
-   - Communication (=pipes/ipcs/streams of data=) between peers are
-     transparent, proving a very easy and convenient integration for
-     all modules:
+   - Communication (=pipes, IPCs, data streams=) between peers are
+     transparent, resulting in a very practical, very convenient
+     integration for all modules and resources available:
      - Packages
      - Applications
      - Buffers/Windows/Frames
-     - Etc...
+     - Processes
+     - Files
+     - Etc ...
 
 * Dependencies
 
   1. Cask
   2. Emacs >= 26.3
   3. Packages
-     - Listed on: ~default/default.Cask~
+     - Listed on: ~.gitmodules~
 
 ** Optional
 
@@ -275,102 +293,13 @@
 
 * Packages
 
-  Cask is a project management tool for Emacs that helps automate the
-  package development cycle; development, dependencies, testing,
-  building, packaging and more.
-
-  Cask can also be used to manage dependencies for your
-  local Emacs configuration.
-
-  It’s based on a ~Cask~ file, which identifies an Emacs Lisp package,
-  provides meta information about the package and
-  declares its contents and dependencies.
-
-** Configure
-
-   To add more packages just edit the ~/.emacs.d/Cask~ file, generated
-   by installation script, e.g, to add 'function-args' package,
-   put the code snippet below inside the ~Cask~ file.
-
-   #+BEGIN_SRC sh
-
-   (depends-on "function-args")
-
-   #+END_SRC
-
-   Using different source then Melpa is possible thanks
-   to =depends-on= and acceptable fetcher keywords like =:git=:
-
-   #+BEGIN_SRC sh
-
-   (depends-on "undo-tree"
-    :git "http://www.dr-qubit.org/git/undo-tree.git")
-
-   #+END_SRC
-
-   In the first variant, install the package from a package archive,
-   optionally requiring a minimum-version. In the second variant,
-   install the package from a VCS repository.
-
-   Fetcher keywords:
-
-   - =(:git :bzr :hg :darcs :svn :cvs=)
-
-   The argument is the package's repository URL
-   source.
-
-   For more details see [[https://cask.readthedocs.io/en/latest/guide/usage.html][cask's manual]].
-
-** Install
-
-   To install all packages listed on the ~Cask~ file, use =cask
-   install= inside the user Emac's directory where ~Cask~ file
-   resides, e.g:
-
-   #+BEGIN_SRC sh
-
-   $ cd ~/emacs.d; cask install
-
-   #+END_SRC
-
-   - Tip: When problems with missing dependencies are encountered
-     (usually happens when using a fetcher keyword like :git),
-     put the dependency code snippet ~(depends-on "missing-dep-package-name")
-     above the target package and give =cask install= command another shot.
-
-** Remove
-
-   You have to manually remove the target package directory.
-   To find out where the packages were installed, use:
-
-   #+BEGIN_SRC sh
-
-   $ find ~/.emacs.d/.cask -type d -name <package-name>*
-
-   #+END_SRC
-
-   To avoid package re-installation remove (depends-on
-   <package-name>) before =cask install= calls.
-
-   Delete package's folder:
-
-   #+BEGIN_SRC emacs-lisp
-
-   $ rm -rf ~/.emacs.d/.cask/26.3/elpa/dashboard-20200225.745
-
-   #+END_SRC
-
-   In this example, dashboard package files will be deleted,
-   its configuration will be skipped.
-
-   - IMPORTANT: Don't forgot to remove both: package's folder and
-     repository entry, otherwise the package will continue to be
-     installed when =cask install= is executed.
+  Packages are installed as git sub-modules are listed on the
+  ~.gitmodules~ file.
 
 * Adapt
 
   If you want to modify any aspects (or extend) this configuration
-  without touching the ~/src/eos.org~, just edit/add your own Elisp
+  without touching the ~/src/eos.org~, just edit/add your own =Elisp=
   code inside ~/src/trash.el~.
 
   Note: ~src/trash.el~ will be the last script loaded by ~/src/trash.el~.

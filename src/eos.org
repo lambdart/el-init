@@ -1898,7 +1898,8 @@
       (customize-set-variable 'completion-auto-help 'lazy)
 
       ;; list of completion styles to use: see `completion-styles-alist variable
-      (customize-set-variable 'completion-styles '(partial-completion substring initials))
+      (customize-set-variable 'completion-styles
+                              '(flex partial-completion substring initials))
 
       ;; list of category-specific user overrides for completion styles.
       (customize-set-variable 'completion-category-overrides
@@ -6129,11 +6130,11 @@
                   (setq truncate-lines nil)))
 
       ;; fix compilation buffer colors
-      (add-hook 'compilation-filter-hook nil
-                (lambda ()
-                  (when (eq major-mode 'compilation-mode)
-                    (ansi-color-apply-on-region
-                     compilation-filter-start (point-max)))))
+      ;; (add-hook 'compilation-filter-hook
+      ;;           (lambda ()
+      ;;             (when (eq major-mode 'compilation-mode)
+      ;;               (ansi-color-apply-on-region
+      ;;                compilation-filter-start (point-max)))))
 
       #+END_SRC
 
@@ -6853,7 +6854,7 @@
         (eos-set-company-backends
          '((company-c-headers)
            (company-keywords :with
-                             company-rtags
+                             ;; company-rtags
                              company-yasnippet
                              company-dabbrev-code
                              company-dabbrev)

@@ -1899,7 +1899,7 @@
 
       ;; list of completion styles to use: see `completion-styles-alist variable
       (customize-set-variable 'completion-styles
-                              '(flex partial-completion substring initials))
+                              '(partial-completion substring initials flex))
 
       ;; list of category-specific user overrides for completion styles.
       (customize-set-variable 'completion-category-overrides
@@ -5249,12 +5249,51 @@
 
 **** Remember
 
+     Todo lists, schedules, phone databases... everything we use
+     databases for is really just a way to extend the power of our
+     memory. To be able to remember what our conscious mind may not
+     currently have access to.
+
+     "Remember" is a mode for remembering data. It uses whatever
+     back-end is appropriate to record and correlate the data, but it's
+     main intention is to allow you to express as _little_ structure as
+     possible up front.
+
+     There are many different databases out there -- and good ones --
+     which this mode is not trying to replace. Rather, it's how that
+     data gets there that's the question. Most of the time, we just
+     want to say "Remember so-and-so's phone number, or that I have to
+     buy dinner for the cats tonight."
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     (require 'remember nil t)
+
+     #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
 *** Blogs
+
+    A blog (a truncation of 'weblog') is a discussion or informational
+    website published on the World Wide Web consisting of discrete,
+    often informal diary-style text entries (posts).
+
+    Posts are typically displayed in reverse chronological order, so
+    that the most recent post appears first, at the top of the web page.
+
 **** Org-static-blog
 
      Static blog generators are a dime a dozen.
      This is one more, which focuses on being simple.
      All files are simple org-mode files in a directory.
+
      The only requirement is that every org file must have a:
      #+TITLE and a #+DATE, and optionally, #+FILETAGS.
 
@@ -5274,41 +5313,15 @@
         "Insert HTML-FILE when file exists."
         (if (file-exists-p html-file)
             (with-temp-buffer
-              (insert-file-contents html-file)
+              (insert-file-contents (expand-file-name html-file))
               (buffer-string))
           ""))
-
-      (defun eos/blog/update-html ()
-        "Update pages (header, preamble and postamble) themes."
-        (interactive)
-        ;; update page header
-        (customize-set-variable
-         'org-static-blog-page-header
-         (eos/blog/insert-html
-          (expand-file-name
-           (concat user-emacs-directory "blog/html/header.html"))))
-
-        ;; update preamble
-        (customize-set-variable
-         'org-static-blog-page-preamble
-         (eos/blog/insert-html
-          (expand-file-name
-           (concat user-emacs-directory "blog/html/preamble.html"))))
-
-        ;; update postamble
-        (customize-set-variable
-         'org-static-blog-page-postamble
-         (format
-          (eos/blog/insert-html
-           (expand-file-name
-            (concat user-emacs-directory "blog/html/postamble.html")))
-          (org-version))))
 
       (defun eos/blog/publish ()
         "Update htmls and call `org-static-blog-publish'."
         (interactive)
-        (eos/blog/update-html)
-        (safe-funcall 'org-static-blog-publish))
+        ;; (eos/blog/update-html)
+        (safe-funcall 'org-static-blog-publish t))
 
       #+END_SRC
 
@@ -5326,50 +5339,38 @@
 
       ;; directory where published HTML files are stored
       (customize-set-variable
-       'org-static-blog-publish-directory
-       (expand-file-name
-        (concat user-emacs-directory "blog/site/esac-io.github.io")))
+       'org-static-blog-publish-directory "~/core/dev/hidden-ones/site/preview/")
 
       ;; directory where published ORG files are stored
       (customize-set-variable
-       'org-static-blog-posts-directory
-       (expand-file-name
-        (concat user-emacs-directory "blog/posts/")))
+       'org-static-blog-posts-directory "~/core/dev/hidden-ones/posts/")
 
       ;; directory where unpublished ORG files are stored.
       (customize-set-variable
-       'org-static-blog-drafts-directory
-       (expand-file-name
-        (concat user-emacs-directory "blog/posts/drafts/")))
+       'org-static-blog-drafts-directory "~/core/dev/hidden-ones/posts/drafts/")
 
       ;; html to put in the <head> of each page.
       (customize-set-variable
        'org-static-blog-page-header
-       (eos/blog/insert-html
-        (expand-file-name
-         (concat user-emacs-directory "blog/html/header.html"))))
+       (eos/blog/insert-html "~/core/dev/hidden-ones/html/header.html"))
 
       ;; html to put before the content of each page.
       (customize-set-variable
        'org-static-blog-page-preamble
-       (eos/blog/insert-html
-        (expand-file-name
-         (concat user-emacs-directory "blog/html/preamble.html"))))
+       (eos/blog/insert-html "~/core/dev/hidden-ones/html/preamble.html"))
 
       ;; html to put after the content of each page.
       (customize-set-variable
        'org-static-blog-page-postamble
        (format
-        (eos/blog/insert-html
-         (expand-file-name
-          (concat user-emacs-directory "blog/html/postamble.html")))
+        (eos/blog/insert-html "~/core/dev/hidden-ones/html/postamble.html")
         (org-version)))
 
       ;; use preview versions of posts on multipost pages
       (customize-set-variable 'org-static-blog-use-preview t)
 
       ;; when preview is enabled, convert <h1> to <h2> for the previews
-      (customize-set-variable 'org-static-blog-preview-convert-titles t)
+      (customize-set-variable 'org-static-blog-preview-convert-titles nil)
 
       ;; the HTML appended to the preview if some part of the post is hidden
       (customize-set-variable 'org-static-blog-preview-ellipsis "(...)")
@@ -5381,7 +5382,7 @@
       (customize-set-variable 'org-export-with-toc t)
 
       ;; non-nil means add section numbers to headlines when exporting
-      (customize-set-variable 'org-export-with-section-numbers nil)
+      (customize-set-variable 'org-export-with-section-numbers t)
 
       #+END_SRC
 

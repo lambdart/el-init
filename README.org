@@ -4,23 +4,38 @@
 
 * EOS
 
-  An org-mode based Emacs configuration (=src/eos.org=),
-  or a =Elisp= interpreter desktop distribution.
+  A simple literate programmed Emacs configuration
+  that relies on =org-mode=, or a =Elisp= interpreter
+  desktop distribution.
   | Wait... What!? |
+
+  In other words, an =Emacs= configuration well designed
+  and integrated that provides a generic computer environment
+  for everyday use.
 
 * Disclaimer
 
-  I don't recommend anyone to install or use this as its
-  main Emacs configuration (=init.el=), due its lack of support
-  and high volatility, although this is probably
-  the final structure it's advisable to view this
-  =README= only as a reference and guide for the author himself
-  and close friends (the crazy ones)!
+  I don't recommend anyone to install or use this directly,
+  due its lack of support and high volatility, although
+  this is probably the final structure it's advisable to
+  view this =README= only as a reference/guide for the
+  author himself (and some crazy friends that insists in use this
+  peace of shit! Thanks guys, really appreciate all the suggestions,
+  and criticism, much love and freedom in your lives)!
 
-  So, here goes a little bit of advice: read =Emacs/Elisp= manual,
-  using as a exercise, writing your own ~init.el~, but feel
-  free to fork or copy anything from ~src/eos.org~ that you like
-  and find useful! :)
+  So, here goes a little bit of advice, for everyone: read
+  =Emacs/Elisp= manual, and use as a exercise writing your
+  own ~init.el~, but feel free to fork or copy anything from
+  ~src/eos.org~ that you like or find useful!
+  d(-_-)b - nice song, right?!
+
+  Its better to understand, once for all, that as an Emacs
+  user you automatically become a developer of it
+  (=the user developer concept=), that's no way around it,
+  unfortunately some people find this overwhelm, others
+  find it formidable myself included!
+
+  So, maybe Emacs its not for you, no problem, move on :)
 
 ** Screenshot
 
@@ -31,35 +46,44 @@
 
    | Present Day, heh... Present Time |
 
-
 * Introduction
 
-  I find the definition of Emacs, given by its official manual a
-  little bit misleading and inaccurate, if you have some
-  technical background a better definition would be (IMHO):
+  The definition of Emacs given by its official manual can be a
+  little bit misleading, after years of experience using it and being
+  frustrated to not fully understand its true nature, I decided that
+  was time for a good old research, lets say most of the
+  studies were not conclusive.
 
-  A lisp interpreter with builtin libraries that provides
+  But as soon I start to write =Elisp= code to extend it, the answer
+  pops on my mind and the frustration removed, and now in a
+  =conceptual level= admiration is the only sentiment that as left.
+
+  So, IMO =Emacs= should be explained in the following terms:
+
+  A =lisp= interpreter with builtin libraries that provides
   editing and data visualization functionalities.
-  The core (the interpreter and other primary features)
-  are written in the C programming language and all the rest
-  in a lisp dialect called =Elisp= (=Emacs lisp=).
+  The core - the interpreter and basic features -
+  are written using the =C= programming language,
+  and all the other packages in a =lisp= dialect called
+  =Emacs Lisp=, generally abbreviated to =Elisp=.
 
-  That way it's more clear to the reader that Emacs is not a text
-  editor, but a whole platform capable to interact with the resources
-  provided by the operation system.
+  #+BEGIN_SRC
 
-  To make even more clear try to follow this statement:
+  Don't be fooled by appearances, if you are using Emacs you are
+  'inside' the Elisp interpreter, and everything you do is evaluating
+  lists, one after another!
 
-  - "I live inside the =Elisp= dynamic interpreter and
-    everything I do can be resumed to a simple list evaluation."
+  #+END_SRC
 
-  So this configurations aims to be a primary Input/Output (IO) bridge
-  (the =Elisp= interpreter) between: the human mind and
-  the machine (OS).
+  That way it's more clear to the reader that Emacs is not
+  a mere text editor and offers a much more richer environment,
+  a huge organic ecosystem capable to interact in a very dynamic
+  way with any resource of interest.
 
-  In other words, an Emacs configuration well designed
-  and integrated that provides a generic computer environment
-  for everyday use.
+  The aim of this project is to provide an organized configuration
+  for =Emacs= to provide a generic =IO= bridge between the human mind
+  and the machine resources, that are managed, of course, by the
+  operation system in question.
 
   =Org-mode= is used to write and organize the configuration
   (~src/eos.org~) in a literate programming format,
@@ -342,23 +366,34 @@
   - Q: Mac/Windows will be supported any time soon?
   - A: Nope.
 
-  - Q: Why don't you use evil/hydra/which-key/use-package/etc?
+  - Q: Why don't you use =evil/hydra/which-key/use-package/etc=?
   - A: It is not just a matter of taste, it is simply because
     they get in the way disturbing the desired transformation to
     occur, and I prefer a more direct/effective approach.
-    Remember that’s the way I think, you can add these modules
-    on your own and make your life a little more miserable, be my guess!
+    Remember that's the way I think, you can add these modules
+    on your own and make your life a little more miserable,
+    be my guess!
 
-  - Q: And what about helm/ivy/counsel/swiper?
+  - Q: And what about =helm/ivy/counsel/swiper=?
   - A: Well, Icomplete its minimal (works very similar to the beloved
     dmenu), builtin, generic, fast, less intrusive, and fulfill
     all my needs, thanks Prot, to bring this forgotten package to light!
 
-  - Q: Why won't just use Doom/Centaur/Spacemacs or any other
+  - Q: Do you think Emacs has a future?
+  - A: Maybe, as was already said the =concept= of the lisp
+    machine as the main interface to be used for any task is great,
+    however the =execution= side of it is a complete mess,
+    open the =info buffer= and you will see what I mean.
+    This lack of organization makes everything more difficult that
+    has to be, and one day - if we don't do anything - the whole
+    project may become unmanageable - sad, dudes! :/, let's do
+    SOMETHING about it! :D
+
+  - Q: Why won't just use =Doom/Centaur/Spacemacs= or any other
     distribution?
-  - A: Because they are bloated with a lot of (useless) packages,
-    its more easy (IMHO) to adapt vanilla Emacs and learn
-    =Elisp= - once for all (in progress)!
+  - A: Because they are bloated with a lot of useless packages,
+    its more easy IMHO to adapt vanilla Emacs and learn
+    =Elisp= - once for all (working in progress)!
 
   - Q: Do you think that everyone who uses Emacs should write their own
     configuration file =(init.el)=?

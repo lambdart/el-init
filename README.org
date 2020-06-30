@@ -19,23 +19,29 @@
   due its lack of support and high volatility, although
   this is probably the final structure it's advisable to
   view this =README= only as a reference/guide for the
-  author himself (and some crazy friends that insists in use this
-  peace of shit! Thanks guys, really appreciate all the suggestions,
-  and criticism, much love and freedom in your lives)!
+  author himself (and some crazy friends, thanks guys,
+  I really appreciate all the suggestions and criticism,
+  much love and freedom upon your lives)!
 
   So, here goes a little bit of advice, for everyone: read
-  =Emacs/Elisp= manual, and use as a exercise writing your
-  own ~init.el~, but feel free to fork or copy anything from
-  ~src/eos.org~ that you like or find useful!
-  d(-_-)b - nice song, right?!
+  =Emacs/Elisp= manual (RTFM), and use as an exercise writing
+  your own ~init.el~, but feel free to fork or copy
+  anything from ~src/eos.org~ that you like or find useful.
 
-  Its better to understand, once for all, that as an Emacs
-  user you automatically become a developer of it
-  (=the user developer concept=), that's no way around it,
+  Learning =Elisp= may be trick at first, compared to other languages,
+  but once you understated the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Evaluation.html][evaluation]] process, everything
+  else turns out to be a piece of cake.
+
+  d(-_-)b, nice song!
+
+  It's better to understand, once for all, that as an =Emacs=
+  user you automatically become a developer of it,
+  =the user developer concept=, that's no way around it,
   unfortunately some people find this overwhelm, others
-  find it formidable myself included!
+  find it formidable - myself included!
 
-  So, maybe Emacs its not for you, no problem, move on :)
+  Knowing that, maybe you should consider that =Emacs= isn't for you,
+  no problem, just move on :)
 
 ** Screenshot
 
@@ -54,36 +60,31 @@
   was time for a good old research, lets say most of the
   studies were not conclusive.
 
-  But as soon I start to write =Elisp= code to extend it, the answer
-  pops on my mind and the frustration removed, and now in a
-  =conceptual level= admiration is the only sentiment that as left.
+  But as soon as I started to write some =Elisp= code to extend it,
+  the answer came to me and the frustration was completely removed.
 
-  So, IMO =Emacs= should be explained in the following terms:
+  So, IMHO =Emacs= should be explained in the following terms:
 
   A =lisp= interpreter with builtin libraries that provides
   editing and data visualization functionalities.
   The core - the interpreter and basic features -
   are written using the =C= programming language,
   and all the other packages in a =lisp= dialect called
-  =Emacs Lisp=, generally abbreviated to =Elisp=.
+  =Emacs Lisp= generally abbreviated to =Elisp=.
+
+  And now in a =conceptual level= it's easy to see why
+  admiration is the only thing left.
 
   #+BEGIN_SRC
-
   Don't be fooled by appearances, if you are using Emacs you are
   'inside' the Elisp interpreter, and everything you do is evaluating
   lists, one after another!
-
   #+END_SRC
 
   That way it's more clear to the reader that Emacs is not
   a mere text editor and offers a much more richer environment,
   a huge organic ecosystem capable to interact in a very dynamic
   way with any resource of interest.
-
-  The aim of this project is to provide an organized configuration
-  for =Emacs= to provide a generic =IO= bridge between the human mind
-  and the machine resources, that are managed, of course, by the
-  operation system in question.
 
   =Org-mode= is used to write and organize the configuration
   (~src/eos.org~) in a literate programming format,
@@ -100,6 +101,12 @@
 
   So again, =application(s)= implies =Elisp packages=
   or =external programs=.
+
+** Goal
+
+   The aim of this project is to provide a generic =IO= bridge
+   between the human mind and the machine resources, that are
+   managed by the operation system.
 
 ** Features:
 

@@ -16,3 +16,6 @@
 [submodule "src/lib/ag.el"]
 	path = src/lib/ag.el
 	url = https://github.com/Wilfred/ag.el.git
+[submodule "libs/company-c-headers"]
+	path = libs/company-c-headers
+	url = https://github.com/randomphrase/company-c-headers

@@ -1,7 +1,8 @@
-#+TITLE: Emacs Configuration File
+#+TITLE: EOS - Emacs Operating System
 #+AUTHOR: esac
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
+#+STARTUP: showall
 
 * EOS
 
@@ -384,7 +385,7 @@
       #+END_SRC
 
 ***** Utils
-****** TODO Replace this, with vex-utils.el.
+****** TODO Put this in vex.el
 
        #+BEGIN_SRC emacs-lisp
 
@@ -4931,6 +4932,28 @@
       #+END_SRC
 
 *** Office
+**** Outline
+
+     This package is a major mode for editing outline-format documents.
+     An outline can be `abstracted' to show headers at any given level,
+     with all stuff below hidden.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'outline nil t)
+
+      #+END_SRC
+
+**** Allout
+
+     Allout outline minor mode provides extensive outline
+     formatting and and manipulation beyond standard emacs
+     outline mode.
+
+***** Require
+***** Customize
 **** Org
 
      Org is a mode for keeping notes, maintaining ToDo lists, and doing
@@ -5096,30 +5119,13 @@
       ;; the Emacs Calendar’s diary
       (customize-set-variable 'org-agenda-include-diary t)
 
-      #+END_SRC
-
-**** Outline
-
-     This package is a major mode for editing outline-format documents.
-     An outline can be `abstracted' to show headers at any given level,
-     with all stuff below hidden.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'outline nil t)
+      ;; inhibit startup when preparing agenda buffers
+      ;; when this variable is t, the initialization of the Org agenda
+      ;; buffers is inhibited: e.g. the visibility state is not set, the
+      ;; tables are not re-aligned, etc.
+      (customize-set-variable 'org-agenda-inhibit-startup t)
 
       #+END_SRC
-
-**** Allout
-
-     Allout outline minor mode provides extensive outline
-     formatting and and manipulation beyond standard emacs
-     outline mode.
-
-***** Require
-***** Customize
 
 **** Tex
 
@@ -6109,7 +6115,7 @@
         (interactive)
         (let ((candidates compile-history))
           (compile
-           (completing-read "Compile command: " candidates nil t))))
+           (completing-read "Compile command: " candidates nil 'confirm))))
 
       #+END_SRC
 

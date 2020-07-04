@@ -625,7 +625,7 @@
       ;; people would not find useful.
       ;; `paranoid': On this level, the user is queried for
       ;; most new connections
-      (customize-set-variable 'network-security-level 'paranoid)
+      (customize-set-variable 'network-security-level 'high)
 
       ;; the file the security manager settings will be stored in.
       (customize-set-variable 'nsm-settings-file
@@ -1900,7 +1900,7 @@
 
       ;; list of completion styles to use: see `completion-styles-alist variable
       (customize-set-variable 'completion-styles
-                              '(partial-completion substring initials flex))
+                              '(partial-completion substring flex initials))
 
       ;; list of category-specific user overrides for completion styles.
       (customize-set-variable 'completion-category-overrides
@@ -2893,7 +2893,7 @@
      user interface. Most window managers are designed to help provide
      a desktop environment.
 
-     Finally a Emacs window means X WINDOW as well :D! Thanks to EXWM! (great
+     Finally an Emacs window means X WINDOW as well :D! Thanks to EXWM! (great
      package).
 
 ***** Exwm

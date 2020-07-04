@@ -3632,11 +3632,68 @@
       ;; if non-nil, display the current Ibuffer buffer itself
       (customize-set-variable 'ibuffer-view-ibuffer nil)
 
+      ;; if non-nil, then show the names of filter groups which are empty
+      (customize-set-variable 'ibuffer-show-empty-filter-groups nil)
+
+      ;; an alist of filtering groups to switch between.
+      (customize-set-variable
+       'ibuffer-saved-filter-groups
+       (quote (("default"
+                ("Emacs" (or
+                          (name . "^\\*scratch\\*$")
+                          (name . "^\\*Warnings\\*$")
+                          (name . "^\\*Messages\\*$")))
+                ("Debug" (name . "^\\*Backtrace\\*$"))
+
+                ("Info"  (or (name . "^\\*info\\*$")
+                             (name . "^\\*Help\\*$")
+                             (name . "Man")))
+                ("Custom" (name . "^\\*Customize "))
+
+                ("Ag" (name . "^\\*ag\\*$"))
+                ("Occur" (name . "^\\*occur\\*$"))
+
+                ("Term" (mode . term-mode))
+                ("Shell" (mode . shell-mode))
+                ("Exwm" (mode . exwm-mode))
+                ("Comint" (mode . comint-mode))
+                ("Dired" (mode . dired-mode))
+                ("Magit" (name . "^\\magit:"))
+
+                ("Planner" (or
+                            (name . "^\\*Calendar\\*$")
+                            (name . "^diary$")
+                            (mode . muse-mode)))
+
+                ("Flycheck" (name . "^\\*Flycheck"))
+
+                ("Gnus" (or
+                         (mode . message-mode)
+                         (mode . bbdb-mode)
+                         (mode . mail-mode)
+                         (mode . gnus-group-mode)
+                         (mode . gnus-summary-mode)
+                         (mode . gnus-article-mode)
+                         (name . "^\\.bbdb$")
+                         (name . "^\\.newsrc-dribble")))))))
+
       #+END_SRC
 
 ***** Display
 
       #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; hook run upon entry into `ibuffer-mode'
+      (add-hook 'ibuffer-mode-hook
+                '(lambda ()
+                   (ibuffer-auto-mode 1)
+                   (ibuffer-switch-to-saved-filter-groups "default")))
 
       #+END_SRC
 

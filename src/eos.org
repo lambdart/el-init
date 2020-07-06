@@ -3579,7 +3579,7 @@
                    (concat user-emacs-directory "themes"))
 
       ;; load theme
-      (load-theme 'moebius-yellow t)
+      (load-theme 'moebius t)
 
       #+END_SRC
 
@@ -3642,31 +3642,43 @@
                 ("Emacs" (or
                           (name . "^\\*scratch\\*$")
                           (name . "^\\*Warnings\\*$")
+                          (name . "^\\*Completions\\*$")
                           (name . "^\\*Messages\\*$")))
-                ("Debug" (name . "^\\*Backtrace\\*$"))
 
-                ("Info"  (or (name . "^\\*info\\*$")
-                             (name . "^\\*Help\\*$")
-                             (name . "Man")))
+                ("Comint" (or
+                           (mode . comint-mode)
+                           (name . "^\\*Async Shell Command\\*$")
+                           (name . "^\\*dashboard\\*$")
+                           (name . "^\\*tramp")))
+
+                ("Debug"  (or
+                           (name . "^\\*Backtrace\\*$")
+                           (name . "^\\*debug")))
+
+                ("Flycheck" (name . "^\\*Flycheck"))
+
                 ("Custom" (name . "^\\*Customize "))
 
-                ("Ag" (name . "^\\*ag\\*$"))
-                ("Occur" (name . "^\\*occur\\*$"))
+                ("Info"  (or
+                          (name . "^\\*info\\*$")
+                          (name . "^\\*Help\\*$")
+                          (name . "Man")))
+
+                ("Grep" (or
+                         (name . "^\\*ag\\*$")
+                         (name . "^\\*occur\\*$")
+                         (name . "^\\*Locate\\*$")))
 
                 ("Term" (mode . term-mode))
-                ("Shell" (mode . shell-mode))
+                ("Shell" (mode . Shell))
                 ("Exwm" (mode . exwm-mode))
-                ("Comint" (mode . comint-mode))
                 ("Dired" (mode . dired-mode))
-                ("Magit" (name . "^\\magit:"))
+                ("Magit" (name . "^\\magit"))
 
                 ("Planner" (or
                             (name . "^\\*Calendar\\*$")
                             (name . "^diary$")
                             (mode . muse-mode)))
-
-                ("Flycheck" (name . "^\\*Flycheck"))
-
                 ("Gnus" (or
                          (mode . message-mode)
                          (mode . bbdb-mode)

@@ -3579,7 +3579,7 @@
                    (concat user-emacs-directory "themes"))
 
       ;; load theme
-      (load-theme 'moebius t)
+      (load-theme 'moebius-yellow t)
 
       #+END_SRC
 
@@ -3651,34 +3651,37 @@
                            (name . "^\\*dashboard\\*$")
                            (name . "^\\*tramp")))
 
-                ("Debug"  (or
-                           (name . "^\\*Backtrace\\*$")
-                           (name . "^\\*debug")))
-
-                ("Flycheck" (name . "^\\*Flycheck"))
-
-                ("Custom" (name . "^\\*Customize "))
+                ("Custom" (mode . Custom-mode))
 
                 ("Info"  (or
-                          (name . "^\\*info\\*$")
-                          (name . "^\\*Help\\*$")
-                          (name . "Man")))
+                          (mode . info-mode)
+                          (mode . help-mode)
+                          (mode . man-mode)))
+
+                ("Tags" (mode . tags-table-mode))
+                ("Compile" (mode . compilation-mode))
+                ("Debug"  (mode . debugger-mode))
+                ("Flycheck" (mode . flycheck-mode))
 
                 ("Grep" (or
-                         (name . "^\\*ag\\*$")
-                         (name . "^\\*occur\\*$")
-                         (name . "^\\*Locate\\*$")))
+                         (mode . ag-mode)
+                         (mode . occur-mode)
+                         (mode . locate-mode)))
 
                 ("Term" (mode . term-mode))
                 ("Shell" (mode . Shell))
                 ("Exwm" (mode . exwm-mode))
                 ("Dired" (mode . dired-mode))
-                ("Magit" (name . "^\\magit"))
+                ("Magit" (or
+                         (mode . magit-mode)
+                         (mode . magit-diff-mode)
+                         (mode . magit-process-mode)))
 
                 ("Planner" (or
                             (name . "^\\*Calendar\\*$")
                             (name . "^diary$")
                             (mode . muse-mode)))
+
                 ("Gnus" (or
                          (mode . message-mode)
                          (mode . bbdb-mode)

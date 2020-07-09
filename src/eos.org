@@ -1,4 +1,4 @@
-#+TITLE: EOS - Emacs Operating System
+#+TITLE: EOS - Emacs OS
 #+AUTHOR: esac
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
@@ -2886,7 +2886,7 @@
       #+END_SRC
 
 *** Managers
-**** X Windows
+**** Wm (X11)
 
      A window manager is system software that controls the placement
      and appearance of windows within a windowing system in a graphical
@@ -3654,14 +3654,19 @@
                 ("Custom" (mode . Custom-mode))
 
                 ("Info"  (or
-                          (mode . info-mode)
+                          (mode . Info-mode)
+                          (mode . dictionary-mode)
                           (mode . help-mode)
                           (mode . man-mode)))
 
                 ("Tags" (mode . tags-table-mode))
                 ("Compile" (mode . compilation-mode))
                 ("Debug"  (mode . debugger-mode))
-                ("Flycheck" (mode . flycheck-mode))
+
+                ("Flycheck" (or
+                             (mode . flycheck-mode)
+                             (mode . flycheck-error-list-mode)
+                             (name . "^\\*Flycheck error messages\\*$")))
 
                 ("Grep" (or
                          (mode . ag-mode)
@@ -3673,9 +3678,10 @@
                 ("Exwm" (mode . exwm-mode))
                 ("Dired" (mode . dired-mode))
                 ("Magit" (or
-                         (mode . magit-mode)
-                         (mode . magit-diff-mode)
-                         (mode . magit-process-mode)))
+                          (mode . magit-mode)
+                          (mode . magit-status-mode)
+                          (mode . magit-diff-mode)
+                          (mode . magit-process-mode)))
 
                 ("Planner" (or
                             (name . "^\\*Calendar\\*$")

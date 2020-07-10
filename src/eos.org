@@ -3579,7 +3579,7 @@
                    (concat user-emacs-directory "themes"))
 
       ;; load theme
-      (load-theme 'moebius-yellow t)
+      (load-theme 'moebius-sun t)
 
       #+END_SRC
 

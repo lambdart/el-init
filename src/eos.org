@@ -3649,7 +3649,8 @@
                            (mode . comint-mode)
                            (name . "^\\*Async Shell Command\\*$")
                            (name . "^\\*dashboard\\*$")
-                           (name . "^\\*tramp")))
+                           (name . "^\\*tramp")
+                           (name . "^\\*make\\*$")))
 
                 ("Custom" (mode . Custom-mode))
 
@@ -3657,10 +3658,16 @@
                           (mode . Info-mode)
                           (mode . dictionary-mode)
                           (mode . help-mode)
-                          (mode . man-mode)))
+                          (mode . Man-mode)))
 
-                ("Tags" (mode . tags-table-mode))
-                ("Compile" (mode . compilation-mode))
+                ("Tags" (or
+                         (mode . tags-table-mode)
+                         (mode . xref--xref-buffer-mode)))
+
+                ("Compilation" (or
+                                (mode . compilation-mode)
+                                (name . "^\\*compilation\\*$")))
+
                 ("Debug"  (mode . debugger-mode))
 
                 ("Flycheck" (or
@@ -3674,7 +3681,7 @@
                          (mode . locate-mode)))
 
                 ("Term" (mode . term-mode))
-                ("Shell" (mode . Shell))
+                ("Shell" (mode . shell-mode))
                 ("Exwm" (mode . exwm-mode))
                 ("Dired" (mode . dired-mode))
                 ("Magit" (or
@@ -5351,11 +5358,11 @@
 
 ***** Require
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     (require 'remember nil t)
+      (require 'remember nil t)
 
-     #+END_SRC
+      #+END_SRC
 
 ***** Customize
 
@@ -6215,11 +6222,11 @@
                   (setq truncate-lines nil)))
 
       ;; fix compilation buffer colors
-      ;; (add-hook 'compilation-filter-hook
-      ;;           (lambda ()
-      ;;             (when (eq major-mode 'compilation-mode)
-      ;;               (ansi-color-apply-on-region
-      ;;                compilation-filter-start (point-max)))))
+      (add-hook 'compilation-filter-hook
+                (lambda ()
+                  (when (eq major-mode 'compilation-mode)
+                    (ansi-color-apply-on-region
+                     compilation-filter-start (point-max)))))
 
       #+END_SRC
 

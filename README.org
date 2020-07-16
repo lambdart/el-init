@@ -87,7 +87,7 @@
   functionalities. Its core - the interpreter and basic
   features - are written using the =C= programming language,
   and all the other packages, who extends it, in a lisp
-  dialect call =Emacs Lisp=, usually abbreviated to
+  dialect called =Emacs Lisp=, usually abbreviated to
   =Elisp=. The =interpreter= is the main interface to
   interact with its components, and =lists= are evaluated
   to do so.
@@ -98,11 +98,11 @@
   That way it's more clear to the reader that Emacs is not
   a mere =text editor= and offers a much more richer environment,
   a huge organic ecosystem capable to interact in a very dynamic
-  way with any resource of interest, provided by the
-  Operating System abstraction layer.
+  way with any resource of interest - provided by the OS abstraction
+  layer.
 
-  That's why this configuration can be see as
-  (IMHO) an =Emacs/Elisp= distribution.
+  That's why this configuration can be see as (IMHO)
+  an =Emacs/Elisp= distribution.
 
   =Org-mode= is used to write and organize the configuration
   (~src/eos.org~) in a literate programming format,
@@ -404,19 +404,18 @@
     all my needs, thanks Prot, to bring this forgotten package to light!
 
   - Q: Do you think Emacs has a future?
-  - A: Maybe, as was already said the =concept= of the lisp
-    machine as the main interface to be used for any task is great,
-    however the =execution= side of it is a complete mess,
-    open the =info buffer= and you will see what I mean.
-    This lack of organization makes everything more difficult that
-    has to be, and one day - if we don't do anything - the whole
-    project may become unmanageable - sad, dudes! :/, let's do
-    SOMETHING about it! :D
+  - A: Maybe, the =concept= of the lisp machine as the main interface
+    to be used to do any task is great, however the =execution= side of
+    it, is in a complete mess state, open the =info buffer= and you
+    will see what I mean. This lack of organization makes everything
+    more difficult that has to be, and one day - if we don't do
+    anything - the whole project may become unmanageable.
+    Sad, dudes! Let's do SOMETHING about it!
 
   - Q: Why won't just use =Doom/Centaur/Spacemacs= or any other
     distribution?
   - A: Because they are bloated with a lot of useless packages,
-    its more easy IMHO to adapt vanilla Emacs and learn
+    its more easy (IMHO) to adapt vanilla Emacs and learn
     =Elisp= - once for all (working in progress)!
 
   - Q: Do you think that everyone who uses Emacs should write their own

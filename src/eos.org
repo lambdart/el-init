@@ -3682,7 +3682,11 @@
 
                 ("Term" (mode . term-mode))
                 ("Shell" (mode . shell-mode))
+
                 ("Exwm" (mode . exwm-mode))
+                ("Emms" (mode . emms-playlist-mode))
+
+
                 ("Dired" (mode . dired-mode))
                 ("Magit" (or
                           (mode . magit-mode)
@@ -4071,21 +4075,21 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; list of players that emms can use (only mpv)
-      (customize-set-variable 'emms-player-list '(emms-player-mpv))
-
       ;; string used for displaying the current track in mode-line and titlebar
       (customize-set-variable 'emms-mode-line-format "")
 
       ;; list of players that EMMS can use
       (customize-set-variable 'emms-player-list '(emms-player-mpv))
 
+      ;; default list of players for emms-setup
+      ;; (customize-set-variable 'emms-setup-default-player-list '(emms-player-mpv))
+
       ;;  the default name of the EMMS playlist buffer
-      (customize-set-variable 'emms-playlist-buffer-name "EMMS|Playlist")
+      (customize-set-variable 'emms-playlist-buffer-name "*EMMS Playlist*")
 
       ;; the default directory to look for media files.
       (customize-set-variable
-       'emms-source-file-default-directory (expand-file-name "~/media/"))
+       'emms-source-file-default-directory (expand-file-name "~/media/music"))
 
       #+END_SRC
 
@@ -4093,26 +4097,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; disable emms mode line
-      ;; (add-hook 'emms-playlist-mode-hook
-      ;;           (lambda ()
-      ;;             (when (and (boundp 'emms-mode-line-active-p)
-      ;;                        (fboundp 'emms-mode-line-disable))
-      ;;               (progn
-      ;;                 (if emms-mode-line-active-p
-      ;;                     (emms-mode-line-disable))))))
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
       ;; if emms is available, enable it
-      ;; (add-hook 'window-setup-hook
-      ;;           (lambda ()
-      ;;             (safe-funcall 'emms-all)
-      ;;             (safe-funcall 'emms-default-players)))
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'emms-default-players)))
 
       #+END_SRC
 

@@ -13,6 +13,7 @@ VEX       := ~/.emacs.d/lisp/vex
 ASYNC     := ~/.emacs.d/site-lisp/async-20200113.1745
 XELB      := ~/.emacs.d/site-lisp/xelb-20190914.0
 EXWM      := ~/.emacs.d/site-lisp/exwm-20200524.0
+EMMS      := ~/.emacs.d/site-lisp/emms-20200528.2116
 DASH      := ~/.emacs.d/site-lisp/dash-20200524.1947
 DASH-DOCS := ~/.emacs.d/site-lisp/dash-docs-20200516.1943
 COMPANY   := ~/.emacs.d/site-lisp/company-20200525.101
@@ -24,6 +25,7 @@ LOADPATH := -L $(VEX) \
 		-L $(DASH) \
 		-L $(XELB) \
 		-L $(EXWM) \
+		-L $(EMMS) \
 		-L $(DASH-DOCS) \
 		-L $(FLYCHECK) \
 		-L $(COMPANY)

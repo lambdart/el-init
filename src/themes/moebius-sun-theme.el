@@ -165,6 +165,7 @@
 
     ;; Compilation
     `(compilation-info ((,class (:foreground ,fg-green :weight normal))))
+    `(compilation-mode-line-fail ((,class (:foreground ,fg-red :weight normal))))
     `(compilation-mode-line-exit ((,class (:inherit compilation-info :foreground ,fg-green :weight bold))))
 
     ;; CSS
@@ -229,6 +230,9 @@
     `(dired-header ((,class (:foreground ,fg-turquoise :weight bold :inherit unspecified))))
     `(dired-mark ((,class (:foreground ,fg-pink :inherit unspecified))))
     `(dired-marked ((,class (:inherit nil :background ,bg-magenta :foreground ,fg-bright))))
+    `(dired-async-message ((,class (:foreground ,fg-cyan))))
+    `(dired-async-failures ((,class (:foreground ,fg-red))))
+    `(dired-async-mode-message ((,class (:foreground ,fg-orange))))
 
     ;; Dictionary
     ;; dictionary-button-face                    white
@@ -237,6 +241,12 @@
     ;; dictionary-word-entry-face                gray (italic)
     `(diary ((,class (:inherit nil :background nil :foreground ,fg-red))))
     `(dictionary-reference-face ((,class (:inherit nil :background nil :foreground ,fg-orange))))
+
+    ;; Emms
+    `(emms-metaplaylist-mode-current-face ((,class (:foreground ,fg-blue))))
+    `(emms-metaplaylist-mode-face ((,class (:foreground ,fg-red))))
+    `(emms-playlist-selected-face ((,class (:foreground ,fg-blue))))
+    `(emms-playlist-track-face ((,class (:foreground ,fg-default))))
 
     ;; Ediff
     `(ediff-current-diff-A ((,class (:inherit diff-removed))))

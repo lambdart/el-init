@@ -384,31 +384,6 @@
 
       #+END_SRC
 
-***** Utils
-****** TODO Put this in vex.el
-
-       #+BEGIN_SRC emacs-lisp
-
-       (defun set-frame-transparency (&optional opacity)
-         "Set OPACITY transparency in current frame."
-         (interactive "P")
-         (let ((opacity (or opacity
-                            (read-number "Opacity: " 0.8))))
-           (if (executable-find "transset")
-               (async-shell-command (format "transset -a %.1f" opacity))
-             (message "transset not found"))))
-
-       (defun set-background-image (&optional image-file)
-         "Set IMAGE-FILE as background using feh binary."
-         (interactive "P")
-         (setq image-file (or image-file
-                              (read-file-name "Image: ")))
-         (if (executable-find "feh")
-             (async-shell-command (format "feh  --bg-fill %s" image-file))
-           (message "feh not found")))
-
-       #+END_SRC
-
 ***** Binds
 
       Fundamental/core binds.
@@ -1299,17 +1274,16 @@
      ;; alist of default values for frame creation
      (add-to-list 'default-frame-alist '(internal-border-width . 2))
 
-
      #+END_SRC
 
 **** Functions
 
      #+BEGIN_SRC emacs-lisp
 
-     (defun safe-set-frame-font (font)
-       "Set the default font to FONT."
-       (cond ((find-font (font-spec :name font))
-              (set-frame-font font nil t))))
+     ;; (defun safe-set-frame-font (font)
+     ;;   "Set the default font to FONT."
+     ;;   (cond ((find-font (font-spec :name font))
+     ;;          (set-frame-font font nil t))))
 
      #+END_SRC
 

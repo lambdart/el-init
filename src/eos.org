@@ -372,7 +372,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'vex nil t)
+      (require 'vex)
+      (require 'vex-util)
 
       #+END_SRC
 

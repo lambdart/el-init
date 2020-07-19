@@ -6133,17 +6133,11 @@
         "make -C ~/core/dev/eos/src all"
         "Default compile command for EOS.")
 
-      (defun eos-compile (dir command)
-        "Compile COMMAND at specific DIR.
-      Just a `compile` function wrapper."
-        (if (file-exists-p dir)
-            (let ((default-directory dir))
-              (compile command))))
-
       (defun eos/compile ()
         "Call `eos-compile' passing the right arguments."
         (interactive)
-        (eos-compile default-directory eos-compile-command))
+        (compile-at-dir (expand-file-name user-emacs-directory)
+                        eos-compile-command))
 
       (defun eos/icomplete/compile ()
         "Icomplete compile command completitions."

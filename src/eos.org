@@ -2,7 +2,7 @@
 #+AUTHOR: esac
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
-#+STARTUP: showall
+#+STARTUP: overview
 
 * EOS
 
@@ -6129,12 +6129,21 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      (defvar eos-compile-command
+        "make -C ~/core/dev/eos/src all"
+        "Default compile command for EOS.")
+
       (defun eos-compile (dir command)
         "Compile COMMAND at specific DIR.
       Just a `compile` function wrapper."
         (if (file-exists-p dir)
             (let ((default-directory dir))
               (compile command))))
+
+      (defun eos/compile ()
+        "Call `eos-compile' passing the right arguments."
+        (interactive)
+        (eos-compile default-directory eos-compile-command))
 
       (defun eos/icomplete/compile ()
         "Icomplete compile command completitions."
@@ -6541,6 +6550,13 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      (defun eos/elisp/self-compile ()
+        "Self `byte-compile' current file."
+        (interactive)
+        (let ((current-file (buffer-file-name (current-buffer))))
+          (when current-file
+            (byte-compile-file current-file))))
+
       (defun eos/elisp/set-company-backends ()
         "Set elisp company backends."
         (interactive)
@@ -6591,7 +6607,8 @@
           ;; eval
           (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
           (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
-          (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-buffer)
+          (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
+          (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eos/elisp/self-compile)
 
           ;; complete
           (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/complete-in-buffer-or-indent)
@@ -6889,6 +6906,7 @@
            (company-keywords :with
                              ;; company-rtags
                              company-yasnippet
+                             company-etags
                              company-dabbrev-code
                              company-dabbrev)
            (company-files))))

@@ -1277,26 +1277,14 @@
 
      #+END_SRC
 
-**** Functions
-
-     #+BEGIN_SRC emacs-lisp
-
-     ;; (defun safe-set-frame-font (font)
-     ;;   "Set the default font to FONT."
-     ;;   (cond ((find-font (font-spec :name font))
-     ;;          (set-frame-font font nil t))))
-
-     #+END_SRC
-
 **** Hooks
 
      #+BEGIN_SRC emacs-lisp
 
      ;; set transparency after a frame is created
-     ;; (add-hook 'after-make-frame-functions
-     ;;            (lambda (frame)
-     ;;              (interactive)
-     ;;              (set-frame-transparency .8)))
+     (add-hook 'after-make-frame-functions
+                (lambda (frame)
+                  (set-frame-transparency .9)))
 
      #+END_SRC
 
@@ -3643,7 +3631,8 @@
                                 (mode . compilation-mode)
                                 (name . "^\\*compilation\\*$")))
 
-                ("Debug"  (mode . debugger-mode))
+                ("Debug"  (or (mode . debugger-mode)
+                              (name . "^\\*debug")))
 
                 ("Flycheck" (or
                              (mode . flycheck-mode)
@@ -5076,17 +5065,6 @@
               (org-babel-tangle)
               (copy-file eos-el-file init-file t t t)
               (async-byte-compile-file init-file)))))
-
-      (defun eos/make ()
-        "Call Make to build EOS distro."
-        (interactive)
-        (let* ((program "make")
-               (buffer (get-buffer-create "*make*"))
-               (filename (expand-file-name "Makefile" user-emacs-directory))
-               (target "all")
-               (program-args (list "-f" filename target)))
-          (when (executable-find program)
-            (apply 'call-process program nil buffer nil program-args))))
 
       (defun eos/org/set-company-backends ()
         "Set `org-mode' company backends."

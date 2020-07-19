@@ -87,7 +87,7 @@ GTAGS
 .projectile
 
 # dir-locals
-.dir-locals.el
+# .dir-locals.el
 
 # editorconfig
 .editorconfig

@@ -2849,15 +2849,15 @@
       #+END_SRC
 
 *** Managers
-**** Wm (X11)
+**** Windows (X)
 
      A window manager is system software that controls the placement
      and appearance of windows within a windowing system in a graphical
      user interface. Most window managers are designed to help provide
      a desktop environment.
 
-     Finally an Emacs window means X WINDOW as well :D! Thanks to EXWM! (great
-     package).
+     Finally an Emacs window means X11/Xorg WINDOW as well :D!
+     Thanks to EXWM! (great package/library).
 
 ***** Exwm
 
@@ -3057,19 +3057,6 @@
      software tools that automates the process of installing,
      upgrading, configuring, and removing computer programs for a
      computer's system environment (like EMACS) in a consistent manner.
-
-***** Cask
-
-      Cask is a project management tool fo Emacs that helps
-      automate the package development cycle; development,
-      dependencies, testing, building, packaging and more.
-
-      Cask can also be used to manage dependencies for your local
-      Emacs configuration.
-
-      I do prefer cask over packages.el, because the management
-      of third party packages can be done outside of emacs,
-      provinding more control and flexibility.
 
 ***** Packages
 
@@ -3603,8 +3590,10 @@
        'ibuffer-saved-filter-groups
        (quote (("default"
                 ("Emacs" (or
+                          (name . "^\\*eldoc for")
                           (name . "^\\*scratch\\*$")
                           (name . "^\\*Warnings\\*$")
+                          (name . "^\\*Completions\\*$")
                           (name . "^\\*Completions\\*$")
                           (name . "^\\*Messages\\*$")))
 
@@ -3629,6 +3618,7 @@
 
                 ("Compilation" (or
                                 (mode . compilation-mode)
+                                (mode . emacs-lisp-compilation-mode)
                                 (name . "^\\*compilation\\*$")))
 
                 ("Debug"  (or (mode . debugger-mode)
@@ -3669,6 +3659,7 @@
                          (mode . mail-mode)
                          (mode . gnus-group-mode)
                          (mode . gnus-summary-mode)
+
                          (mode . gnus-article-mode)
                          (name . "^\\.bbdb$")
                          (name . "^\\.newsrc-dribble")))))))
@@ -4064,6 +4055,7 @@
       ;; if emms is available, enable it
       (add-hook 'window-setup-hook
                 (lambda ()
+                  (funcall 'emms-all)
                   (funcall 'emms-default-players)))
 
       #+END_SRC
@@ -4818,9 +4810,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; global-map
-      (global-set-key (kbd "s-0") 'eos/toggle-audio)
-      (global-set-key (kbd "s--") 'eos/reduce-volume)
-      (global-set-key (kbd "s-=") 'eos/raise-volume)
+      ;; (global-set-key (kbd "s-0") 'eos/toggle-audio)
+      ;; (global-set-key (kbd "s--") 'eos/reduce-volume)
+      ;; (global-set-key (kbd "s-=") 'eos/raise-volume)
 
       #+END_SRC
 
@@ -6133,7 +6125,7 @@
         "make -C ~/core/dev/eos/src all"
         "Default compile command for EOS.")
 
-      (defun eos/compile ()
+      (defun eos-compile ()
         "Call `eos-compile' passing the right arguments."
         (interactive)
         (compile-at-dir (expand-file-name user-emacs-directory)
@@ -6152,6 +6144,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; non-nil to scroll the *compilation* buffer window as output appears
+      (customize-set-variable 'compilation-scroll-output t)
+
+      ;; if t, always kill a running compilation process before starting a new one
       (customize-set-variable 'compilation-always-kill t)
 
       #+END_SRC
@@ -6543,13 +6539,6 @@
 ***** Functions
 
       #+BEGIN_SRC emacs-lisp
-
-      (defun eos/elisp/self-compile ()
-        "Self `byte-compile' current file."
-        (interactive)
-        (let ((current-file (buffer-file-name (current-buffer))))
-          (when current-file
-            (byte-compile-file current-file))))
 
       (defun eos/elisp/set-company-backends ()
         "Set elisp company backends."

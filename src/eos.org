@@ -405,7 +405,7 @@
 
       ;; edit
       (global-set-key (kbd "M-i") 'indent-region-or-buffer)
-      (global-set-key (kbd "M-j") 'clone-line-or-region)
+      (global-set-key (kbd "M-j") 'duplicate-line-or-region)
       (global-set-key (kbd "M-n") 'transpose-lines-up)
       (global-set-key (kbd "M-p") 'transpose-lines-down)
       (global-set-key (kbd "M-l") 'downcase-word)
@@ -2663,33 +2663,11 @@
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/occur-at-point ()
-        "Occur with symbol or region as its arguments."
-        (interactive)
-        (let* ((bounds (if (use-region-p)
-                           (cons (region-beginning) (region-end))
-                         (bounds-of-thing-at-point 'symbol)))
-               (string nil))
-          (unless bounds
-            (setq string (read-string "Occur: ")))
-          (if bounds
-              (progn
-                (occur (buffer-substring-no-properties
-                        (car bounds) (cdr bounds)))
-                (deactivate-mark))
-            (occur string))))
-
-      #+END_SRC
-
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
-      (global-set-key (kbd "M-s M-o") 'eos/occur-at-point)
+      (global-set-key (kbd "M-s M-o") 'occur-at-point)
 
       #+END_SRC
 
@@ -3638,8 +3616,10 @@
                 ("Shell" (mode . shell-mode))
 
                 ("Exwm" (mode . exwm-mode))
-                ("Emms" (mode . emms-playlist-mode))
 
+                ("Emms" (or
+                         (mode . emms-playlist-mode)
+                         (name . "^\\*EMMS-LOG\\*$")))
 
                 ("Dired" (mode . dired-mode))
                 ("Magit" (or
@@ -3659,7 +3639,6 @@
                          (mode . mail-mode)
                          (mode . gnus-group-mode)
                          (mode . gnus-summary-mode)
-
                          (mode . gnus-article-mode)
                          (name . "^\\.bbdb$")
                          (name . "^\\.newsrc-dribble")))))))
@@ -6591,7 +6570,7 @@
           (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
           (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
           (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
-          (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eos/elisp/self-compile)
+          (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile)
 
           ;; complete
           (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/complete-in-buffer-or-indent)

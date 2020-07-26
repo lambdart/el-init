@@ -71,6 +71,19 @@
 
     #+END_SRC
 
+*** Loaddefs
+
+    Loaddefs.el, load builtin emacs definitions -
+    automatically extracted autoloads.
+
+***** Require
+
+    #+BEGIN_SRC emacs-lisp
+
+    (require 'loaddefs nil t)
+
+    #+END_SRC
+
 *** Garbage Collector
 
     This works surprisingly well. While the minibuffer is open,
@@ -286,7 +299,7 @@
     #+BEGIN_SRC emacs-lisp
 
     ;; add sub-directories to `load-path'."
-    (dolist (dir '("site-lisp"))
+    (dolist (dir '("lisp" "site-lisp"))
       (let ((default-directory
               (expand-file-name dir user-emacs-directory)))
         (normal-top-level-add-subdirs-to-load-path)))
@@ -924,7 +937,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'files nil t)
+      ;; (require 'files nil t)
 
       #+END_SRC
 
@@ -979,7 +992,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'ffap nil t)
+      ;; (require 'ffap nil t)
 
       #+END_SRC
 
@@ -1005,7 +1018,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'locate nil t)
+      ;; (require 'locate nil t)
 
       #+END_SRC
 
@@ -1076,7 +1089,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'diff nil t)
+      ;; (require 'diff nil t)
 
       #+END_SRC
 
@@ -1102,7 +1115,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'ediff nil t)
+      ;; (require 'ediff nil t)
 
       #+END_SRC
 
@@ -1283,8 +1296,8 @@
 
      ;; set transparency after a frame is created
      (add-hook 'after-make-frame-functions
-                (lambda (frame)
-                  (set-frame-transparency .9)))
+               (lambda (frame)
+                 (set-frame-transparency .9)))
 
      #+END_SRC
 
@@ -3588,6 +3601,7 @@
                           (mode . Info-mode)
                           (mode . dictionary-mode)
                           (mode . help-mode)
+                          (mode . apropos-mode)
                           (mode . Man-mode)))
 
                 ("Tags" (or
@@ -3680,11 +3694,22 @@
      simultaneously have other occurrences edited in the same way, with visual
      feedback as you type.
 
+***** Load
+
+      #+BEGIN_SRC emacs-lisp
+
+      (load-file
+       (expand-file-name
+        "site-lisp/iedit/iedit-autoloads.el"
+        user-emacs-directory))
+
+      #+END_SRC
+
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'iedit nil t)
+      ;; (require 'iedit nil t)
 
       #+END_SRC
 
@@ -3709,7 +3734,7 @@
           (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence)))
 
       ;; bind (global)
-      ;; (global-set-key (kbd "C-;") 'iedit-mode)
+      (global-set-key (kbd "C-;") 'iedit-mode)
 
       #+END_SRC
 
@@ -4027,6 +4052,23 @@
 
       #+END_SRC
 
+***** Binds
+
+      Sometimes it's better to put binds under
+      some hook - `emms-playlist-mode-hook' umbrella.
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; register emms playlist hook
+      (add-hook 'emms-playlist-mode-hook
+                (lambda ()
+                  ;; avoid warnings
+                  (when (boundp 'emms-playlist-mode-map)
+                    ;; add files inside playlist mode buffer
+                    (define-key emms-playlist-mode-map (kbd "A") 'emms-add-file))))
+
+      #+END_SRC
+
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -4266,13 +4308,13 @@
      a utility for managing dictionaries used by the library.
 
      Note : Ispell minor mode configuration requires aspell program.
-     TIP  : On FreeBSD: pkg info aspell
+     TIP  : On FreeBSD: pkg info aspell.
 
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'ispell nil t)
+      ;; (require 'ispell nil t)
 
       #+END_SRC
 
@@ -4463,11 +4505,28 @@
 
      Cannon mimics Dmenu inside Emacs with minibuffer helps.
 
+
+     Simulate Dmenu command cmd-line program to dynamic/interactive
+     launch applications/commands regarding $PATH
+     environment variable using Emacs vanilla builtin
+     facilities (minibuffer/completions).
+
+***** Autoload
+
+      #+BEGIN_SRC emacs-lisp
+
+      (load-file
+       (expand-file-name
+        "lisp/cannon/cannon-autoloads.el"
+        user-emacs-directory))
+
+      #+END_SRC
+
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'cannon nil t)
+      ;; (require 'cannon nil t)
 
       #+END_SRC
 
@@ -6008,6 +6067,38 @@
 
       #+END_SRC
 
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
+**** Gdb-mi
+
+     This mode acts as a graphical user interface to GDB.  You can interact with
+     GDB through the GUD buffer in the usual way, but there are also further
+     buffers which control the execution and describe the state of your program.
+     It separates the input/output of your program from that of GDB and displays
+     expressions and their current values in their own buffers.  It also uses
+     features such as the fringe/display margin for breakpoints, and
+     the toolbar (see the GDB Graphical Interface section in the Emacs info
+     manual).
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      (require 'gdb-mi nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
+**** Realgud
 **** Rmsbolt
 
      A compiler output viewer.
@@ -6035,6 +6126,8 @@
 
       #+END_SRC
 
+*** Testing
+**** Ert
 *** Building
 **** Cmake-ide
 

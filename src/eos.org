@@ -372,31 +372,12 @@
       #+END_SRC
 
 **** Vex
-***** Load-path
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (add-to-list 'load-path
-      ;;              (expand-file-name "lisp/vex" user-emacs-directory))
-
-      #+END_SRC
-
-***** Autoload
-
-      #+BEGIN_SRC emacs-lisp
-
-      (load-file
-      (expand-file-name "lisp/vex/vex-autoloads.el" user-emacs-directory))
-
-      #+END_SRC
-
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
       (require 'vex-autoloads nil t)
       (require 'vex nil t)
-      ;; (require 'vex-util nil t)
 
       #+END_SRC
 

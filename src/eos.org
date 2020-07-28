@@ -273,7 +273,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'warnings nil t)
+      ;; (require 'warnings nil t)
 
       #+END_SRC
 
@@ -340,7 +340,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'simple nil t)
+      ;; (require 'simple nil t)
 
       #+END_SRC
 
@@ -376,8 +376,17 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-to-list 'load-path
-                   (expand-file-name "lisp/vex" user-emacs-directory))
+      ;; (add-to-list 'load-path
+      ;;              (expand-file-name "lisp/vex" user-emacs-directory))
+
+      #+END_SRC
+
+***** Autoload
+
+      #+BEGIN_SRC emacs-lisp
+
+      (load-file
+      (expand-file-name "lisp/vex/vex-autoloads.el" user-emacs-directory))
 
       #+END_SRC
 
@@ -385,8 +394,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'vex)
-      (require 'vex-util)
+      (require 'vex-autoloads nil t)
+      (require 'vex nil t)
+      ;; (require 'vex-util nil t)
 
       #+END_SRC
 
@@ -490,7 +500,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'imap nil t)
+      ;; (require 'imap nil t)
 
       #+END_SRC
 
@@ -515,7 +525,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'smtpmail nil t)
+      ;; (require 'smtpmail nil t)
 
       #+END_SRC
 
@@ -551,7 +561,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'nnimap nil t)
+      ;; (require 'nnimap nil t)
 
       #+END_SRC
 
@@ -573,7 +583,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'sendmail nil t)
+      ;; (require 'sendmail nil t)
 
       #+END_SRC
 
@@ -599,7 +609,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'nsm nil t)
+      ;; (require 'nsm nil t)
 
       #+END_SRC
 
@@ -627,7 +637,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'eps-config nil t)
+      ;; (require 'eps-config nil t)
 
       #+END_SRC
 
@@ -681,7 +691,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require  'gnutls nil t)
+      ;; (require 'gnutls nil t)
 
       #+END_SRC
 
@@ -709,7 +719,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'epa nil t)
+      ;; (require 'epa nil t)
 
       #+END_SRC
 
@@ -742,7 +752,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'notifications nil t)
+      ;; (require 'notifications nil t)
 
       #+END_SRC
 
@@ -760,7 +770,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'forms nil t)
+      ;; (require 'forms nil t)
 
       #+END_SRC
 
@@ -774,8 +784,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'async nil t)
-      (require 'async-bytecomp nil t)
+      (require 'async-autoloads nil t)
+      ;; (require 'async nil t)
+      ;; (require 'async-bytecomp nil t)
 
       #+END_SRC
 
@@ -800,7 +811,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'nnmail nil t)
+      ;; (require 'nnmail nil t)
 
       #+END_SRC
 
@@ -855,7 +866,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'shr nil t)
+      ;; (require 'shr nil t)
 
       #+END_SRC
 
@@ -892,7 +903,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'custom nil t)
+      ;; (require 'custom nil t)
 
       #+END_SRC
 
@@ -909,7 +920,7 @@
 
       #+END_SRC
 
-***** Load
+***** Enable
 
       #+BEGIN_SRC emacs-lisp
 
@@ -1158,8 +1169,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'jka-compr nil t)
-      (require 'jka-compr-hook nil t)
+      ;; (require 'jka-compr nil t)
+      ;; (require 'jka-compr-hook nil t)
 
       #+END_SRC
 
@@ -1198,7 +1209,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'arc-mode nil t)
+      ;; (require 'arc-mode nil t)
 
       #+END_SRC
 
@@ -1224,7 +1235,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'dired nil t)
+      (require 'dired nil t)
 
       #+END_SRC
 
@@ -1253,7 +1264,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'frame nil t)
+     ;; (require 'frame nil t)
 
      #+END_SRC
 
@@ -1297,7 +1308,7 @@
      ;; set transparency after a frame is created
      (add-hook 'after-make-frame-functions
                (lambda (frame)
-                 (set-frame-transparency .9)))
+                 (set-frame-transparency .8)))
 
      #+END_SRC
 
@@ -1442,7 +1453,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'windmove nil t)
+      ;; (require 'windmove nil t)
 
       #+END_SRC
 
@@ -1466,7 +1477,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'page nil t)
+      ;; (require 'page nil t)
 
       #+END_SRC
 
@@ -1516,7 +1527,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'hl-line nil t)
+       ;; (require 'hl-line nil t)
 
        #+END_SRC
 
@@ -1537,7 +1548,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'linum nil t)
+       ;; (require 'linum nil t)
 
        #+END_SRC
 
@@ -1559,7 +1570,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'display-line-numbers nil t)
+       ;; (require 'display-line-numbers nil t)
 
        #+END_SRC
 
@@ -1655,7 +1666,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'help nil t)
+      ;; (require 'help nil t)
 
       #+END_SRC
 
@@ -1706,7 +1717,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'help-fns nil t)
+      ;; (require 'help-fns nil t)
 
       #+END_SRC
 
@@ -1742,7 +1753,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'help-mode nil t)
+      ;; (require 'help-mode nil t)
 
       #+END_SRC
 
@@ -1765,7 +1776,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'info nil t)
+      ;; (require 'info nil t)
 
       #+END_SRC
 
@@ -1795,7 +1806,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'eldoc nil t)
+      ;; (require 'eldoc nil t)
 
       #+END_SRC
 
@@ -1839,7 +1850,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'minibuffer nil t)
+      ;; (require 'minibuffer nil t)
 
       #+END_SRC
 
@@ -1932,10 +1943,11 @@
       ;; research (maybe this is not necessary) (C-k: kill line)
       ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
 
-      ;; ctl-x-map
-      (define-key ctl-x-map (kbd "a") 'select-minibuffer-or-completions-window)
+      ;; goto-map
+      (define-key goto-map (kbd "v") 'goto-minibuffer-window)
+      (define-key goto-map (kbd "M-v") 'goto-minibuffer-or-completions-window)
 
-      ;; esc-map
+      ;; esc-map (force minibuffer to exit)
       (define-key esc-map (kbd "ESC")
         (lambda ()
           (interactive)
@@ -1980,7 +1992,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'savehist nil t)
+      ;; (require 'savehist nil t)
 
       #+END_SRC
 
@@ -2015,7 +2027,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'completion nil t)
+      ;; (require 'completion nil t)
 
       #+END_SRC
 
@@ -2287,22 +2299,20 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (boundp 'icomplete-minibuffer-map)
-        (progn
-          (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-          (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
-          (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions)
-          (define-key icomplete-minibuffer-map (kbd "SPC") 'nil)
+      (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
+      (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
+      (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions)
+      (define-key icomplete-minibuffer-map (kbd "SPC") 'nil)
 
-          ;; toogle styles
-          (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
+      ;; toogle styles
+      (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
 
-          ;; basic
-          (define-key icomplete-minibuffer-map (kbd "C-.")
-            (lambda ()
-              (interactive)
-              (let ((current-prefix-arg t))
-                (funcall 'eos/icomplete/toggle-completion-styles))))))
+      ;; basic
+      (define-key icomplete-minibuffer-map (kbd "C-.")
+        (lambda ()
+          (interactive)
+          (let ((current-prefix-arg t))
+            (funcall 'eos/icomplete/toggle-completion-styles))))
 
       ;; eos-utils-map
       (define-key eos-utils-map (kbd "m") 'eos/icomplete/mark-ring)
@@ -2318,6 +2328,9 @@
 
       ;; enable (global)
       (icomplete-mode 1)
+
+      ;; enable fido-mode
+      ;; (fido-mode 1)
 
       #+END_SRC
 
@@ -2342,7 +2355,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'tool-bar nil t)
+      ;; (require 'tool-bar nil t)
 
       #+END_SRC
 
@@ -2365,7 +2378,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'tooltip nil t)
+      ;; (require 'tooltip nil t)
 
       #+END_SRC
 
@@ -2408,7 +2421,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'menu-bar nil t)
+      ;; (require 'menu-bar nil t)
 
       #+END_SRC
 
@@ -2429,7 +2442,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'scroll-bar nil t)
+      ;; (require 'scroll-bar nil t)
 
       #+END_SRC
 
@@ -2452,7 +2465,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'fringe nil t)
+      ;; (require 'fringe nil t)
 
       #+END_SRC
 
@@ -2500,6 +2513,23 @@
 
       #+END_SRC
 
+**** Wallpaper
+
+     Set default wallpaper (uses vex-util package!).
+
+***** Hooks
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; set wallpaper
+     (add-hook 'window-setup-hook
+               (lambda()
+                 (set-wallpaper
+                  "~/media/images/wallpapers/studio-ghibli/ghibli-7.jpg"
+                  "-g -0-0")))
+
+     #+END_SRC
+
 *** Editing
 **** Indent
 
@@ -2537,7 +2567,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'kmacro nil t)
+      ;; (require 'kmacro nil t)
 
       #+END_SRC
 
@@ -2558,7 +2588,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'elec-pair nil t)
+      ;; (require 'elec-pair nil t)
 
       #+END_SRC
 
@@ -2592,7 +2622,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'newcomment nil t)
+      ;; (require 'newcomment nil t)
 
       #+END_SRC
 
@@ -2615,7 +2645,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'face-remap nil t)
+      ;; (require 'face-remap nil t)
 
       #+END_SRC
 
@@ -2636,7 +2666,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'isearch nil t)
+      ;; (require 'isearch nil t)
 
       #+END_SRC
 
@@ -2672,7 +2702,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'replace nil t)
+      ;; (require 'replace nil t)
 
       #+END_SRC
 
@@ -2693,7 +2723,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'whitespace nil t)
+      ;; (require 'whitespace nil t)
 
       #+END_SRC
 
@@ -2724,7 +2754,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'tmm nil t)
+      ;; (require 'tmm nil t)
 
       #+END_SRC
 
@@ -2740,7 +2770,7 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (require 'server nil t)
+     ;; (require 'server nil t)
 
      #+END_SRC
 
@@ -2756,6 +2786,19 @@
      #+END_SRC
 
 ** Applications
+*** Loaddefs (site-lisp)
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; load-path
+    (add-to-list 'load-path
+       (expand-file-name "site-lisp" user-emacs-directory))
+
+    ;; autoload
+    (require 'local-loaddefs nil t)
+
+    #+END_SRC
+
 *** CLI
 
     Command line interface (CLI) is a text-based interface that is
@@ -2782,7 +2825,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'shell nil t)
+      ;; (require 'shell nil t)
 
       #+END_SRC
 
@@ -2826,7 +2869,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'eshell nil t)
+      ;; (require 'eshell nil t)
 
       #+END_SRC
 
@@ -2859,10 +2902,11 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'exwm nil t)
-       (require 'exwm-core nil t)
-       (require 'exwm-config nil t)
-       (require 'exwm-workspace nil t)
+       (require 'exwm-autoloads nil t)
+       ;; (require 'exwm nil t)
+       ;; (require 'exwm-core nil t)
+       ;; (require 'exwm-config nil t)
+       ;; (require 'exwm-workspace nil t)
 
        #+END_SRC
 
@@ -2983,11 +3027,12 @@
        ;; update the buffer name by X11 window title
        (add-hook 'exwm-update-title-hook
                  (lambda ()
-                   (interactive)
+                   (when (and (fboundp 'exwm-workspace-rename-buffer)
+                              (boundp 'exwm-class-name)
+                              (boundp 'exwm-title))
                    (exwm-workspace-rename-buffer
                     (truncate-string-to-width
-                     (concat exwm-class-name "|" exwm-title)
-                     32))))
+                     (concat exwm-class-name "|" exwm-title) 32)))))
 
        #+END_SRC
 
@@ -3011,7 +3056,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'exwm-randr nil t)
+       ;; (require 'exwm-randr nil t)
 
        #+END_SRC
 
@@ -3100,7 +3145,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'dired-async nil t)
+       ;; (require 'dired-async nil t)
 
        #+END_SRC
 
@@ -3133,7 +3178,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'dired-subtree nil t)
+       ;; (require 'dired-subtree-autoloads nil t)
 
        #+END_SRC
 
@@ -3177,7 +3222,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'dired-rsync nil t)
+       ;; (require 'dired-rsync nil t)
 
        #+END_SRC
 
@@ -3215,7 +3260,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'bookmark nil t)
+      ;; (require 'bookmark nil t)
 
       #+END_SRC
 
@@ -3257,7 +3302,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'term nil t)
+       ;; (require 'term nil t)
 
        #+END_SRC
 
@@ -3350,7 +3395,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'multi-term nil t)
+       ;; (require 'multi-term nil t)
 
        #+END_SRC
 
@@ -3428,7 +3473,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'password-store nil t)
+      ;; (require 'password-store nil t)
 
       #+END_SRC
 
@@ -3444,7 +3489,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'time nil t)
+      ;; (require 'time nil t)
 
       #+END_SRC
 
@@ -3471,7 +3516,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable display time
-      (safe-funcall 'display-time-mode 1)
+      ;; (safe-funcall 'display-time-mode 1)
 
       #+END_SRC
 
@@ -3488,7 +3533,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'all-the-icons nil t)
+       ;; (require 'all-the-icons nil t)
 
        #+END_SRC
 
@@ -3559,7 +3604,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'ibuffer nil t)
+      ;; (require 'ibuffer nil t)
 
       #+END_SRC
 
@@ -3635,7 +3680,21 @@
                          (mode . emms-playlist-mode)
                          (name . "^\\*EMMS-LOG\\*$")))
 
+                ("Eww" (mode . eww-mode))
                 ("Dired" (mode . dired-mode))
+
+                ("Gnus" (or
+                         (mode . message-mode)
+                         (mode . bbdb-mode)
+                         (mode . mail-mode)
+                         (mode . gnus-group-mode)
+                         (mode . gnus-server-mode)
+                         (mode . gnus-summary-mode)
+                         (mode . gnus-article-mode)
+                         (mode . gnus-browse-mode)
+                         (name . "^\\.bbdb$")
+                         (name . "^\\.newsrc-dribble")))
+
                 ("Magit" (or
                           (mode . magit-mode)
                           (mode . magit-status-mode)
@@ -3645,17 +3704,7 @@
                 ("Planner" (or
                             (name . "^\\*Calendar\\*$")
                             (name . "^diary$")
-                            (mode . muse-mode)))
-
-                ("Gnus" (or
-                         (mode . message-mode)
-                         (mode . bbdb-mode)
-                         (mode . mail-mode)
-                         (mode . gnus-group-mode)
-                         (mode . gnus-summary-mode)
-                         (mode . gnus-article-mode)
-                         (name . "^\\.bbdb$")
-                         (name . "^\\.newsrc-dribble")))))))
+                            (mode . muse-mode)))))))
 
       #+END_SRC
 
@@ -3694,22 +3743,11 @@
      simultaneously have other occurrences edited in the same way, with visual
      feedback as you type.
 
-***** Load
-
-      #+BEGIN_SRC emacs-lisp
-
-      (load-file
-       (expand-file-name
-        "site-lisp/iedit/iedit-autoloads.el"
-        user-emacs-directory))
-
-      #+END_SRC
-
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'iedit nil t)
+      ;; (require 'iedit-autoloads nil t)
 
       #+END_SRC
 
@@ -3751,7 +3789,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'undo-tree nil t)
+      ;; (require 'undo-tree nil t)
 
       #+END_SRC
 
@@ -3815,7 +3853,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'artist nil t)
+      ;; (require 'artist nil t)
 
       #+END_SRC
 
@@ -3840,7 +3878,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'elfeed nil t)
+      ;; (require 'elfeed nil t)
 
       #+END_SRC
 
@@ -3883,7 +3921,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'gnus nil t)
+      ;; (require 'gnus nil t)
 
       #+END_SRC
 
@@ -4025,8 +4063,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'emms nil t)
-      (require 'emms-setup nil t)
+      (require 'emms-autoloads nil t)
+      ;; (require 'emms nil t)
+      ;; (require 'emms-setup nil t)
 
       #+END_SRC
 
@@ -4100,7 +4139,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'rcirc nil t)
+      ;; (require 'rcirc nil t)
 
       #+END_SRC
 
@@ -4158,7 +4197,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'eww nil t)
+      ;; (require 'eww nil t)
 
       #+END_SRC
 
@@ -4213,7 +4252,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'browse-url nil t)
+      ;; (require 'browse-url nil t)
 
       #+END_SRC
 
@@ -4235,7 +4274,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'ag nil t)
+      ;; (require 'ag-autoloads nil t)
 
       #+END_SRC
 
@@ -4277,7 +4316,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'grep nil t)
+      ;; (require 'grep nil t)
 
       #+END_SRC
 
@@ -4386,7 +4425,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'flyspell nil t)
+      ;; (require 'flyspell nil t)
 
       #+END_SRC
 
@@ -4511,22 +4550,11 @@
      environment variable using Emacs vanilla builtin
      facilities (minibuffer/completions).
 
-***** Autoload
-
-      #+BEGIN_SRC emacs-lisp
-
-      (load-file
-       (expand-file-name
-        "lisp/cannon/cannon-autoloads.el"
-        user-emacs-directory))
-
-      #+END_SRC
-
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'cannon nil t)
+      (require 'cannon-autoloads nil t)
 
       #+END_SRC
 
@@ -4555,7 +4583,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (safe-funcall 'cannon-mode 1)
+      ;; (safe-funcall 'cannon-mode 1)
 
       #+END_SRC
 
@@ -4664,7 +4692,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'verb nil t)
+      ;; (require 'verb nil t)
 
       #+END_SRC
 
@@ -4696,7 +4724,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'comint nil t)
+      ;; (require 'comint nil t)
 
       #+END_SRC
 
@@ -4727,7 +4755,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'ielm nil t)
+      ;; (require 'ielm nil t)
 
       #+END_SRC
 
@@ -4758,7 +4786,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'sql nil t)
+      ;; (require 'sql nil t)
 
       #+END_SRC
 
@@ -4866,7 +4894,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'calendar nil t)
+      ;; (require 'calendar nil t)
 
       #+END_SRC
 
@@ -5046,7 +5074,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'org nil t)
+      ;; (require 'org nil t)
 
       #+END_SRC
 
@@ -5078,23 +5106,6 @@
 ***** Functions
 
       #+BEGIN_SRC emacs-lisp
-
-      (defun eos/build ()
-        "If the current buffer is 'init.org' the code-blocks are tangled.
-      The tangled file will be compiled."
-        (interactive)
-        (let ((prog-mode-hook nil) ; avoid running hooks when tangling.
-              (eos-org-file (expand-file-name "eos.org" user-emacs-directory))
-              (eos-el-file  (expand-file-name "eos.el" user-emacs-directory))
-              (init-file    (expand-file-name "init.el" user-emacs-directory)))
-          ;; read, tangle, copy and byte compile
-          (save-restriction
-            (save-excursion
-              ;; TODO: research a better way to insert file contents
-              (find-file eos-org-file)
-              (org-babel-tangle)
-              (copy-file eos-el-file init-file t t t)
-              (async-byte-compile-file init-file)))))
 
       (defun eos/org/set-company-backends ()
         "Set `org-mode' company backends."
@@ -5135,10 +5146,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; to silence the compiler
-      (defvar org-mode-map nil nil)
-
-      (define-key org-mode-map (kbd "C-M-i") 'eos/complete-in-buffer-or-indent)
+      (eval-after-load 'org
+        (lambda()
+          (when (boundp 'org-mode-map)
+            (define-key org-mode-map (kbd "C-M-i") 'eos/complete-in-buffer-or-indent))))
 
       #+END_SRC
 
@@ -5196,7 +5207,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'tex-mode nil t)
+      ;; (require 'tex-mode nil t)
 
       #+END_SRC
 
@@ -5208,7 +5219,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'markdown-mode nil t)
+      ;; (require 'markdown-mode nil t)
 
       #+END_SRC
 
@@ -5241,7 +5252,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'doc-view nil t)
+      ;; (require 'doc-view nil t)
 
       #+END_SRC
 
@@ -5267,7 +5278,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'dictionary nil t)
+      ;; (require 'dictionary nil t)
 
       #+END_SRC
 
@@ -5331,7 +5342,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'remember nil t)
+      ;; (require 'remember nil t)
 
       #+END_SRC
 
@@ -5363,7 +5374,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'org-static-blog nil t)
+      ;; (require 'org-static-blog nil t)
 
       #+END_SRC
 
@@ -5459,7 +5470,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'man nil t)
+      ;; (require 'man nil t)
 
       #+END_SRC
 
@@ -5497,7 +5508,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'woman nil t)
+      ;; (require 'woman nil t)
 
       #+END_SRC
 
@@ -5609,7 +5620,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'rfc-docs nil t)
+      ;; (require 'rfc-docs nil t)
 
       #+END_SRC
 
@@ -5633,9 +5644,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (and (require 'google-translate nil t)
-                 (require 'google-translate-smooth-ui nil t))
-        (progn
+      ;; (require 'google-translate nil t)
+      ;; (require 'google-translate-smooth-ui nil t)
 
       #+END_SRC
 
@@ -5662,7 +5672,7 @@
       ;; determines where translation output will be displayed, if
       ;; `nil' the translation output will be displayed in the pop up
       ;; buffer (default).
-      (customize-set-variable 'google-translate-output-destination nil)))
+      (customize-set-variable 'google-translate-output-destination nil)
 
       #+END_SRC
 
@@ -5677,7 +5687,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'dabbrev nil t)
+      ;; (require 'dabbrev nil t)
 
       #+END_SRC
 
@@ -5699,7 +5709,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'hippie-exp nil t)
+      ;; (require 'hippie-exp nil t)
 
       #+END_SRC
 
@@ -5722,7 +5732,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'yasnippet nil t)
+      ;; (require 'yasnippet nil t)
 
       #+END_SRC
 
@@ -5767,7 +5777,7 @@
       #+BEGIN_SRC emacs-lisp
 
       (require 'company nil t)
-      (require 'company-etags nil t)
+      ;; (require 'company-etags nil t)
 
       #+END_SRC
 
@@ -5904,7 +5914,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'company-statistics nil t)
+      ;; (require 'company-statistics nil t)
 
       #+END_SRC
 
@@ -5940,7 +5950,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'imenu nil t)
+      ;; (require 'imenu nil t)
 
       #+END_SRC
 
@@ -5978,7 +5988,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'etags nil t)
+      ;; (require 'etags nil t)
 
       #+END_SRC
 
@@ -6022,7 +6032,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'xref nil t)
+      ;; (require 'xref nil t)
 
       #+END_SRC
 
@@ -6063,7 +6073,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'gud nil t)
+      ;; (require 'gud nil t)
 
       #+END_SRC
 
@@ -6088,7 +6098,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'gdb-mi nil t)
+      ;; (require 'gdb-mi nil t)
 
       #+END_SRC
 
@@ -6107,7 +6117,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'rmsbolt nil t)
+      ;; (require 'rmsbolt nil t)
 
       #+END_SRC
 
@@ -6165,7 +6175,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'auto-compile nil t)
+      ;; (require 'auto-compile nil t)
 
       #+END_SRC
 
@@ -6265,7 +6275,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'magit nil t)
+      ;; (require 'magit nil t)
 
       #+END_SRC
 
@@ -6287,7 +6297,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'ede nil t)
+      ;; (require 'ede nil t)
 
       #+END_SRC
 
@@ -6303,7 +6313,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'projectile nil t)
+      ;; (require 'projectile nil t)
 
       #+END_SRC
 
@@ -6374,7 +6384,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'prog-mode nil t)
+      ;; (require 'prog-mode nil t)
 
       #+END_SRC
 
@@ -6386,7 +6396,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'hideshow nil t)
+      ;; (require 'hideshow nil t)
 
       #+END_SRC
 
@@ -6416,7 +6426,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'conf-mode nil t)
+      ;; (require 'conf-mode nil t)
 
       #+END_SRC
 
@@ -6443,7 +6453,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'text-mode nil t)
+      ;; (require 'text-mode nil t)
 
       #+END_SRC
 
@@ -6498,7 +6508,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'subword nil t)
+      ;; (require 'subword nil t)
 
       #+END_SRC
 
@@ -6519,7 +6529,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'paren nil t)
+      ;; (require 'paren nil t)
 
       #+END_SRC
 
@@ -6540,7 +6550,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'make-mode nil t)
+      ;; (require 'make-mode nil t)
 
       #+END_SRC
 
@@ -6567,7 +6577,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'cmake-mode nil t)
+      ;; (require 'cmake-mode nil t)
 
       #+END_SRC
 
@@ -6581,7 +6591,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'lisp-mode nil t)
+      ;; (require 'lisp-mode nil t)
 
       #+END_SRC
 
@@ -6604,7 +6614,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'elisp-mode nil t)
+      ;; (require 'elisp-mode nil t)
 
       #+END_SRC
 
@@ -6658,7 +6668,6 @@
 
       ;; emacs-lisp-mode-map
       (when (boundp 'emacs-lisp-mode-map)
-        (progn
           ;; eval
           (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
           (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
@@ -6673,7 +6682,7 @@
           (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
           (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
           (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
-          (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)))
+          (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil))
 
       #+END_SRC
 
@@ -6689,7 +6698,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'haskell nil t)
+      ;; (require 'haskell nil t)
 
       #+END_SRC
 
@@ -6757,7 +6766,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'inf-haskell nil t)
+      ;; (require 'inf-haskell nil t)
 
       #+END_SRC
 
@@ -6775,7 +6784,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'haskell-doc nil t)
+      ;; (require 'haskell-doc nil t)
 
       #+END_SRC
 
@@ -6798,7 +6807,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'elixir-mode nil t)
+      ;; (require 'elixir-mode nil t)
 
       #+END_SRC
 
@@ -6845,7 +6854,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'ess-r-mode nil t)
+      ;; (require 'ess-r-mode nil t)
 
       #+END_SRC
 
@@ -6882,7 +6891,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'rtags nil t)
+      ;; (require 'rtags nil t)
 
       #+END_SRC
 
@@ -6928,7 +6937,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'company-rtags nil t)
+      ;; (require 'company-rtags nil t)
 
       #+END_SRC
 
@@ -7046,7 +7055,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'company-c-headers nil t)
+      ;; (require 'company-c-headers nil t)
 
       #+END_SRC
 
@@ -7061,7 +7070,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'csharp-mode nil t)
+      ;; (require 'csharp-mode nil t)
 
       #+END_SRC
 
@@ -7074,7 +7083,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'go-mode nil t)
+      ;; (require 'go-mode nil t)
 
       #+END_SRC
 
@@ -7130,7 +7139,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'company-shell nil t)
+      ;; (require 'company-shell nil t)
 
       #+END_SRC
 
@@ -7146,7 +7155,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'sh-script nil t)
+      ;; (require 'sh-script nil t)
 
       #+END_SRC
 
@@ -7178,7 +7187,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'fish-mode nil t)
+      ;; (require 'fish-mode nil t)
 
       #+END_SRC
 
@@ -7218,7 +7227,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'lua-mode nil t)
+      ;; (require 'lua-mode nil t)
 
       #+END_SRC
 
@@ -7300,7 +7309,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'tcl nil t)
+      ;; (require 'tcl nil t)
 
       #+END_SRC
 
@@ -7313,7 +7322,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'cperl-mode nil t)
+      ;; (require 'cperl-mode nil t)
 
       #+END_SRC
 
@@ -7333,7 +7342,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'python nil t)
+      ;; (require 'python nil t)
 
       #+END_SRC
 
@@ -7400,7 +7409,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'julia-mode nil t)
+      ;; (require 'julia-mode nil t)
 
       #+END_SRC
 
@@ -7414,7 +7423,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'ess-julia nil t)
+      ;; (require 'ess-julia nil t)
 
       #+END_SRC
 
@@ -7427,7 +7436,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'vhdl-mode nil t)
+      ;; (require 'vhdl-mode nil t)
 
       #+END_SRC
 
@@ -7441,7 +7450,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'verilog nil t)
+      ;; (require 'verilog nil t)
 
       #+END_SRC
 
@@ -7454,7 +7463,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'mql-mode nil t)
+      ;; (require 'mql-mode nil t)
 
       #+END_SRC
 
@@ -7497,7 +7506,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'web-mode nil t)
+      ;; (require 'web-mode nil t)
 
       #+END_SRC
 

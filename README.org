@@ -5,7 +5,7 @@
 * EOS
 
   A simple literate programmed Emacs configuration
-  that relies on =org-mode=, or a =Elisp= interpreter
+  that relies on =org-mode=, or an =Elisp= interpreter
   desktop distribution.
   | Wait... What!? |
 
@@ -16,32 +16,32 @@
 * Disclaimer
 
   I don't recommend anyone to install or use this directly,
-  due its lack of support and high volatility, although
-  this is probably the final structure it's advisable to
+  due to its lack of support and high volatility, although
+  this is probably the final structure, it's advisable to
   view this =README= only as a reference/guide for the
   author himself (and some crazy friends, thanks guys,
   I really appreciate all the suggestions and criticism,
   much love and freedom upon your lives)!
 
-  So, here goes a little bit of advice, for everyone: read
+  So, here goes a little bit of advice for everyone: read
   =Emacs/Elisp= manual (RTFM), and use as an exercise writing
   your own ~init.el~, but feel free to fork or copy
   anything from ~src/eos.org~ that you like or find useful.
 
-  Learning =Elisp= may be trick at first, compared to other languages,
-  but once you understated the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Evaluation.html][evaluation]] process, everything
-  else turns out to be a piece of cake.
+  Learning =Elisp= may be tricky at first, compared to other
+  languages, but once you understated the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Evaluation.html][evaluation]] process,
+  everything else turns out to be a piece of cake.
 
   d(-_-)b, nice song!
 
-  It's better to understand, once for all, that as an =Emacs=
-  user you automatically become a developer of it,
-  =the user developer concept=, that's no way around it,
-  unfortunately some people find this overwhelm, others
-  find it formidable - myself included!
+  It's better to understand, once and for all, that as an =Emacs=
+  user you automatically become a developer of it, this is =the user
+  developer concept=, and there's no way around it. Unfortunately some
+  people find this overwhelming, but others find it formidable -
+  myself included!
 
-  Knowing that, maybe you should consider that =Emacs= isn't for you,
-  no problem, just move on :)
+  Knowing that, maybe you should consider =Emacs= isn't for you.
+  No problem, just move on :)
 
 ** Screenshot
 
@@ -55,7 +55,7 @@
 * Introduction
 
   =Emacs= is not only a =text editor=, but a complete
-  programmable platform capable of transform any data
+  programmable platform capable of transforming any data
   of interest.
 
   =Emacs= can be extended and twisted using the =Elisp=
@@ -65,60 +65,60 @@
   * The same interface is used to program and evaluate.
 
   =ELISP= is a functional programming language - a
-  dialect of =LISP=, all we do (inside =Emacs=)
+  dialect of =LISP=, and all we do (inside =Emacs=)
   is related to the =Elisp= interpreter, i.e,
   lists are evaluated one after another, and as a side effect,
   data transformations are performed resulting in the desired feature.
 
-  To not keep everything in the realm of abstraction,
-  let's see a example:
+  To take things out of the realm of abstraction, let's see an
+  example:
 
-  When =(move-beginning-of-line 1)= list is evaluated
+  When =(move-beginning-of-line 1)= list is evaluated,
   the cursor will be brought back to the beginning of the
-  current line. Note the desire feature is to move the cursor
-  to the beginning of the line, after the evaluation of the
-  list in question the data transformation that occurs is
-  related to display the cursor in a different position.
+  current line. Note the desired feature is to move the cursor
+  to the beginning of the line and, after evaluating the list, the
+  data transformation that occurs is related to displaying the cursor
+  in a different position.
 
-  * Features are side effects of data transformations and sometimes
-    the computation to perform a particular transformation as
+  * Features are side effects of data transformations and, sometimes,
+    the computation to perform a particular transformation has almost
     nothing to do with the desired outcome.
 
-  Let's summary in a single statement:
+  To summarize everything in a single statement:
 
   =Emacs= is a programmable platform with builtin
-  libraries that provides editing and data visualization
+  libraries that provide editing and data visualization
   functionalities. Its core - the interpreter and basic
-  features - are written using the =C= programming language,
-  and all the other packages, who extends it, in a =LISP=
-  dialect called =Emacs Lisp=, usually abbreviated to
+  features - is written using the =C= programming language,
+  and all the other packages that extend it use a =LISP=
+  dialect called =Emacs Lisp=, usually abbreviated as
   =Elisp=. The =interpreter= is the main interface to
-  interact with its components, and =lists= are evaluated
+  interact with its components and =lists= are evaluated
   to do so.
 
-  In other words, we live inside the =Elisp= interpreter
-  triggering actions that are resumed to lists evaluations.
+  We live inside the =Elisp= interpreter triggering actions that are
+  simply lists evaluations.
 
-  That way is more clear to the reader that Emacs is not
-  a mere =text editor= and offers a much more richer environment,
-  a huge organic ecosystem capable to interact in a very dynamic
+  This train of thought makes it clearer to the reader that Emacs
+  is not a mere =text editor=. It offers a much richer environment
+  as a huge organic ecosystem capable of interacting in a very dynamic
   way with any resource of interest provided by the operating system.
 
-  That's why this configuration can be see (IMHO)
-  as an =Emacs/Elisp= distribution.
+  That's why this configuration can be seen (IMHO) as an =Emacs/Elisp=
+  distribution.
 
-  =Org-mode= is used to write and organize the configuration
-  (~src/eos.org~) in a literate programming format,
-  so it contains =Elisp= source code blocks - that will be tangled
-  generating the ~src/init.el~ final script - and the
-  referent documentation.
+  Finally, =Org-mode= is used to write and organize the configuration
+  (~src/eos.org~) in a literate programming format, meaning it
+  contains =Elisp= source code blocks - that will be tangled
+  generating the ~src/init.el~ final script - and the referent
+  documentation.
 
   * Note: Throughout this document the word =application=
     refers to any =elisp package= or =external program=.
 
   It's important to understand that all applications with
-  different purposes, made in =Elisp= or not, passes in a
-  way or another through the interpreter.
+  different purposes, made in =Elisp= or not, pass, in a
+  way or another, through the interpreter.
 
   So again, =application(s)= implies =Elisp packages=
   or =external programs=.
@@ -139,7 +139,7 @@
    - Just one integrated development environment for all projects
      (independent of the programming language and tools needed
      to construct it):
-     - Apparence
+     - Appearance
      - Editing
      - Documentation
      - Communication
@@ -155,7 +155,7 @@
      - And more, much more ...
 
    - Understand that data is generic (in computer science we deal
-     with idealize components) and can be manipulated, i.e, transformed
+     with idealized components) and can be manipulated, i.e, transformed
      through different paths.
 
    - Huge productivity improvements by:
@@ -199,7 +199,7 @@
 
 * Installation
 
-  * NOTE: The installation script it's incomplete and broken do not
+  * NOTE: The installation script is incomplete and broken do not
     use it!
 
   Download and execute the installation shell script (SH POSIX), the
@@ -221,10 +221,10 @@
 
 * Usage
 
-  Using this Emacs configuration isn't different of using
+  Using this Emacs configuration isn't different from using
   vanilla Emacs itself with a "few" reforms.
-  As such, the official Emacs tutorial is a great way
-  to understanding a little bit of its universe.
+  As such, the official Emacs tutorial is a great way to understand a
+  little bit of its universe.
 
   So, open Emacs and press =C-h= (the help map prefix) and
   press =t= to evaluate ~help-with-tutorial~ function that will
@@ -232,7 +232,7 @@
 
   - Enjoy your late nights :)
 
-  - Note: The main purpose of the Emacs tutorial is teach you
+  - Note: The main purpose of the Emacs tutorial is teaching you
   the most important standard Emacs commands (or functions)
   and the mapped keybinds used to trigger then.
 
@@ -247,12 +247,12 @@
   access sequences - =keybinds= or =chords=.
 
   For the sake of sanity a lot of keybinds have been cleaned up,
-  it's preferable (IMHO) a small set of keybinds,
-  only the most used ones, providing that way a more stable, less
-  error prone, overall usability.
+  It's preferable (IMO) to have a small set of keybinds, consisting
+  only of the most used ones, providing a more stable and less error
+  prone overall usability.
 
-  When 'exotic' functions needed to be called, just use
-  =execute-extended-command= binded to =M-x=, also know as the
+  When 'exotic' functions must to be called, just use
+  =execute-extended-command= binded to =M-x=, also known as the
   =minibuffer=.
 
   Note: The =minor-mode-map-alist= was completely erased, this was
@@ -276,7 +276,7 @@
 
 **** Keymaps
 
-     Keymaps are data structures that holds key sequences (chords) and
+     Keymaps are data structures that hold key sequences (chords) and
      map/trigger commands (elisp functions).
 
      | Keymap           | Prefix Key | Available | Description        |
@@ -289,7 +289,7 @@
 ** Help
 
    To verify what keys are mapped use =M-x describe-bindings RET=
-   or =C-h b=, it's possible to restrict the search using =C-h= or =?=
+   or =C-h b=. It's possible to restrict the search using =C-h= or =?=
    post-fix for a specific map, e.g:
 
    | Keybind | Description           |
@@ -300,9 +300,9 @@
 
 ** C-x
 
-   New keymaps are defined to hold the most
-   common/used commands (elisp functions), they are
-   divided according to their behavior classification:
+   New keymaps are defined to hold the most common/used commands
+   (elisp functions). They are divided according to their behavior
+   classification:
 
    | Prefix Keymap  | Prefix  | Description  |
    |                |         |              |
@@ -329,8 +329,8 @@
    Not all keybinds will be listed here, just the keybinds that
    have changed from the standard and the most used ones.
 
-   Remember that you always can call the functions =C-h k= (describe-key)
-   and =C-h b= (describe-bindings) to require this information.
+   Remember that you can always call the functions =C-h k= (describe-key)
+   and =C-h b= (describe-bindings) to inquire this information.
 
    | Keymap | Keybind | Function                     |
    | Global | C-a     | back-to-indent-or-line       |
@@ -356,7 +356,7 @@
 
   Note: ~src/trash.el~ will be the last script loaded by ~/src/trash.el~.
 
-* Advises
+* Advices
 
   0. Do one thing and do it well (Unix philosophy).
   1. If something is bothering you, fix it!
@@ -376,12 +376,12 @@
      So, be alert to identify these situations!
 
   7. Prioritize Emacs's native packages (builtin) over third-party
-     ones. If any demand comes to light try to resolve
-     with these packages first, then third-party packages already
-     installed and finally (maybe, a huge one) the internet.
-     Sometimes a little extension on this blotted-packages sets
-     are everything needed to bring a new feature to live or
-     resolve a issue.
+     ones. If any demand comes to light, try to solve it with these
+     packages first, then third-party packages already
+     installed and finally (if it's a huge one) the internet.
+     Sometimes a little extension on these blotted-packages sets
+     is everything that's needed to bring a new feature to life or
+     solve an issue.
 
   8. Successive refinements: in constant refactoring!
      Always improve, never fear the winds of change!
@@ -395,43 +395,44 @@
 
   - Q: Why don't you use =evil/hydra/which-key/use-package/etc=?
   - A: It is not just a matter of taste, it is simply because
-    they get in the way disturbing the desired transformation to
-    occur, and I prefer a more direct/effective approach.
+    they get in the way and disturb the desired transformation from
+    properly occurring, and I prefer a more direct/effective approach.
     Remember that's the way I think, you can add these modules
     on your own and make your life a little more miserable,
-    be my guess!
+    be my guest!
 
   - Q: And what about =helm/ivy/counsel/swiper=?
-  - A: Well, Icomplete its minimal (works very similar to the beloved
+  - A: Well, Icomplete is minimal (works very similar to the beloved
     dmenu), builtin, generic, fast, less intrusive, and fulfill
-    all my needs, thanks Prot, to bring this forgotten package to light!
+    all my needs. Thanks, Prot, for bringing this forgotten package to
+    light!
 
   - Q: Do you think Emacs has a future?
   - A: Maybe, the =concept= of the lisp machine as the main interface
     to be used to do any task is great, however the =execution= side of
     it, is in a complete mess state, open the =info buffer= and you
     will see what I mean. This lack of organization makes everything
-    more difficult that has to be, and one day - if we don't do
+    more difficult than it has to be, and one day - if we don't do
     anything - the whole project may become unmanageable.
-    Sad, dudes! Let's do SOMETHING about it!
+    Sad, dudes! Let's DO SOMETHING about it!
 
   - Q: Why won't just use =Doom/Centaur/Spacemacs= or any other
     distribution?
-  - A: Because they are bloated with a lot of useless packages,
-    its more easy (IMHO) to adapt vanilla Emacs and learn
-    =Elisp= - once for all (working in progress)!
+  - A: Because they are bloated with a lot of useless packages.
+    It's easier (IMHO) to adapt vanilla Emacs and learn
+    =Elisp= - once and for all (a work in progress)!
 
   - Q: Do you think that everyone who uses Emacs should write their own
     configuration file =(init.el)=?
-  - A: For sure! It's fun like explore mystical dungeons and slay
-    some fearless dragons. The reward? Walk over the rotten and stinky
-    carrion of your enemies, who were defeated by your will,
-    and contemplate the symphony formed by the cry of despair
+  - A: For sure! It's fun like exploring mystical dungeons and
+    fearlessly slaying some dragons. The reward? Walking over the
+    rotten and stinky carrion of your enemies defeated by your will,
+    and contemplating the symphony formed by the cry of despair
     whispered by their widows.
 
   - Q: Pull requests will be accepted in this repository?
-  - A: Probably not, Emacs configurations are too personal,
-    fork it or copy any snippet of code that you like:
+  - A: Probably not, Emacs configurations are too personal.
+    Fork it or copy any snippet of code that you like:
     MIT License, mate!
 
 * References

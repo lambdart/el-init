@@ -364,10 +364,14 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; column number display in the mode line
-      (funcall 'column-number-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'column-number-mode 1)))
 
       ;; buffer size display in the mode line
-      (funcall 'size-indication-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'size-indication-mode 1)))
 
       #+END_SRC
 
@@ -1174,7 +1178,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; turn on the mode
-      (safe-funcall 'auto-compression-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'auto-compression-mode 1)))
 
       #+END_SRC
 
@@ -1312,14 +1318,20 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; set font
-     (safe-set-frame-font "Hermit Light:pixelsize=17")
+     ;; set default font
+     (add-hook 'window-setup-hook
+               (lambda ()
+                 (safe-set-frame-font "Hermit Light:pixelsize=17")))
 
      ;; enable window divider
-     (window-divider-mode)
+     (add-hook 'window-setup-hook
+               (lambda ()
+                 (funcall 'window-divider-mode)))
 
      ;; disable blink cursor
-     (blink-cursor-mode 1)
+     (add-hook 'window-setup-hook
+               (lambda ()
+                 (funcall 'blink-cursor-mode 1)))
 
      #+END_SRC
 
@@ -1445,7 +1457,7 @@
       ;; window move default keybinds (shift-up/down etc..)
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (safe-funcall 'windmove-default-keybindings)))
+                  (funcall 'windmove-default-keybindings)))
 
       #+END_SRC
 
@@ -1467,8 +1479,10 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable narrow functions
-      (put 'narrow-to-page 'disabled nil)
-      (put 'narrow-to-region 'disabled nil)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (put 'narrow-to-page 'disabled nil)
+                  (put 'narrow-to-region 'disabled nil)))
 
       #+END_SRC
 
@@ -1517,7 +1531,9 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; enable highlight line
-       (safe-funcall 'global-hl-line-mode 1)
+       (add-hook 'window-setup-hook
+                 (lambda ()
+                   (funcall 'global-hl-line-mode 1)))
 
        #+END_SRC
 
@@ -1683,7 +1699,7 @@
 
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (safe-funcall 'temp-buffer-resize-mode 1)))
+                  (funcall 'temp-buffer-resize-mode 1)))
 
       #+END_SRC
 
@@ -1810,7 +1826,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable eldoc globally
-      (safe-funcall 'eldoc-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda()
+                  (funcall 'eldoc-mode 1)))
 
       #+END_SRC
 
@@ -1947,16 +1965,22 @@
       ;; minibuffer text that would be ignored because of this is given the
       ;; properties in `file-name-shadow-properties', which may
       ;; be used to make the ignored text invisible, dim, etc.
-      (file-name-shadow-mode -1)
+      (add-hook 'window-setup-hook
+                (lambda()
+                  (funcall 'file-name-shadow-mode -1)))
 
       ;; when active, any recursive use of the minibuffer will show
       ;; the recursion depth in the minibuffer prompt, this is only
       ;; useful if `enable-recursive-minibuffers' is non-nil
-      (minibuffer-depth-indicate-mode -1)
+      (add-hook 'window-setup-hook
+                (lambda()
+                  (funcall 'minibuffer-depth-indicate-mode -1)))
 
       ;; when active, minibuffer prompts that show a default value only show
       ;; the default when it's applicable
-      (minibuffer-electric-default-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda()
+                  (funcall 'minibuffer-electric-default-mode 1)))
 
       #+END_SRC
 
@@ -1995,7 +2019,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable savehist mode
-      (safe-funcall 'savehist-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'savehist-mode 1)))
 
       #+END_SRC
 
@@ -2112,7 +2138,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable dynamic completion mode
-      (safe-funcall 'dynamic-completion-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'dynamic-completion-mode 1)))
 
       #+END_SRC
 
@@ -2308,7 +2336,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable (global)
-      (icomplete-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                   (funcall 'icomplete-mode 1)))
 
       ;; enable fido-mode
       ;; (fido-mode 1)
@@ -2386,7 +2416,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (tooltip-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'tooltip-mode 1)))
 
       #+END_SRC
 
@@ -2590,7 +2622,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (safe-funcall 'electric-pair-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'electric-pair-mode 1)))
 
       #+END_SRC
 
@@ -2670,7 +2704,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; delete selection-mode
-      (safe-funcall 'delete-selection-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'delete-selection-mode 1)))
 
       #+END_SRC
 
@@ -2767,7 +2803,7 @@
      #+END_SRC
 
 ** Applications
-*** Loaddefs (site-lisp)
+*** Loaddefs
 
     #+BEGIN_SRC emacs-lisp
 
@@ -2775,7 +2811,7 @@
     (add-to-list 'load-path
        (expand-file-name "site-lisp" user-emacs-directory))
 
-    ;; autoload
+    ;; require load loaddefs
     (require 'local-loaddefs nil t)
 
     #+END_SRC
@@ -3022,8 +3058,10 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; enable exwm if graphic display is non-nil
-       (when (display-graphic-p)
-         (safe-funcall 'exwm-enable))
+       (add-hook 'after-init-hook
+                       (lambda ()
+                         (when (display-graphic-p)
+                           (safe-funcall 'exwm-enable))))
 
        #+END_SRC
 
@@ -3090,26 +3128,6 @@
 
        #+END_SRC
 
-****** Customize
-
-       #+BEGIN_SRC emacs-lisp
-
-       (customize-set-variable
-        'package-archives
-        '(("gnu" . "https://elpa.gnu.org/packages/")
-          ("melpa" . "https://melpa.org/packages/")))
-
-       #+END_SRC
-
-****** Enable
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; enable (manually only)
-       ;; (package-initialize)
-
-       #+END_SRC
-
 **** Files
 
      A file manager or file browser is a computer program that provides
@@ -3143,7 +3161,9 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (safe-funcall 'dired-async-mode 1)
+       (add-hook 'window-setup-hook
+                 (lambda ()
+                    (funcall 'dired-async-mode 1)))
 
        #+END_SRC
 
@@ -4383,7 +4403,8 @@
 
       ;; enable globally after emacs startup
       (add-hook 'window-setup-hook
-                (lambda () (ispell-minor-mode 1)))
+                (lambda ()
+                  (funcall 'ispell-minor-mode 1)))
 
       #+END_SRC
 
@@ -4480,15 +4501,7 @@
       (add-hook 'prog-mode-hook
                 (lambda ()
                   (interactive)
-                  (flycheck-mode 1)))
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (global-flycheck-mode 1)
+                  (funcall 'flycheck-mode 1)))
 
       #+END_SRC
 
@@ -4557,14 +4570,6 @@
 
       ;; clt-x-map (C-x) prefix
       (define-key ctl-x-map (kbd "C-l") 'cannon-launch)
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (safe-funcall 'cannon-mode 1)
 
       #+END_SRC
 
@@ -5881,7 +5886,8 @@
 
       ;; enable globally
       (add-hook 'window-setup-hook
-                (lambda() (safe-funcall 'global-company-mode 1)))
+                (lambda()
+                  (funcall 'global-company-mode 1)))
 
       #+END_SRC
 
@@ -6415,8 +6421,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-to-list 'auto-mode-alist '("\\.compose\\'" . conf-mode))
-      (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (add-to-list 'auto-mode-alist '("\\.compose\\'" . conf-mode))
+                  (add-to-list 'auto-mode-alist '("\\.dockerfile\\'" . conf-mode))))
 
       #+END_SRC
 
@@ -6497,7 +6505,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (safe-funcall 'global-subword-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'global-subword-mode 1)))
 
       #+END_SRC
 
@@ -6519,7 +6529,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; visualization of matching parens
-      (safe-funcall 'show-paren-mode 1)
+      (add-hook 'window-setup-hook
+                      (lambda ()
+                        (funcall 'show-paren-mode 1)))
 
       #+END_SRC
 
@@ -7106,7 +7118,9 @@
 
       ;; add (*.go . go-mode) to auto-mode-alist
       ;; init go-mode when a file with the extersion .go is opened
-      (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
+      (add-hook 'window-setup-hook
+                      (lambda ()
+                        (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))))
 
       #+END_SRC
 
@@ -7276,8 +7290,10 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; add auto-mode
-      (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
-      (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))
+      (add-hook 'window-setup-hook
+                      (lambda ()
+                        (add-to-list 'auto-mode-alist '("\\.lua$" . lua-mode))
+                        (add-to-list 'interpreter-mode-alist '("lua" . lua-mode))))
 
       #+END_SRC
 
@@ -7495,17 +7511,19 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; add files extensions to web-mode
-      (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-
-      (when (boundp 'web-mode-engines-alist)
-        (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'"))))
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  ;; add files extensions to web-mode
+                  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+                  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+                  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+                  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+                  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+                  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+                  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+                  ;; resolve warning
+                  (when (boundp 'web-mode-engines-alist)
+                    (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'"))))))
 
       #+END_SRC
 
@@ -7733,15 +7751,8 @@
 
 ** Trash
 
-   The trash.el script will be the last think
-   loaded after ~init.el~, you can put more =elisp=
-   code there to add more junk to this shit!
-
-   #+BEGIN_SRC emacs-lisp
-
-   (safe-load-file (expand-file-name "trash.el" user-emacs-directory))
-
-   #+END_SRC
+   The ~/site-lisp/trash/trash.el~ script will be used to
+   put more =elisp= code there to add more junk to this shit!
 
 ** EOF
 

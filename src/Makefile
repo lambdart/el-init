@@ -44,7 +44,7 @@ TANGLE_SCRIPT = tangle.el
 INIT_SCRIPT = init.el
 
 # Elisp auxiliary source files
-EL := tangle.el custom.el trash.el
+EL := tangle.el custom.el
 
 # Source-Compiled files mapping
 ELC := $(EL:.el=.elc)

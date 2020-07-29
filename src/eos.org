@@ -6,8 +6,9 @@
 
 * EOS
 
-  Using emacs (lisp interpreter) as the only
-  IO bridge between human and machine.
+  Emacs OS - an org-mode based =Elisp= distribution,
+  using =Emacs= as the only IO bridge between human (mind)
+  and the machine (resources).
 
 ** Boot
 *** Header
@@ -16,7 +17,7 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;;; Package --- EOS, EMACS OS
+    ;;; EOS --- eos.org: an org-mode based Elisp distribution
     ;;
     ;;; Commentary:
     ;; ... Present day, present time ....
@@ -296,7 +297,13 @@
     of this variable is a list of directories to search when
     loading files.
 
-    Uses ~subdirs.el~ and =export EMACSLOADPATH=$EMACSLOADPATH:=.
+    Uses ~subdirs.el~ and $EMACSLOADPATH environment variable
+
+    #+BEGIN_SRC example
+
+    export EMACSLOADPATH=$EMACSLOADPATH:~/.emacs.d/lisp:~/.emacs.d/site-lisp
+
+    #+END_SRC
 
 *** Environment
 
@@ -319,8 +326,7 @@
     #+END_SRC
 
 ** Libraries
-*** Fundamental
-**** Loaddefs
+*** Loaddefs
 
      #+BEGIN_SRC emacs-lisp
 
@@ -329,6 +335,7 @@
 
      #+END_SRC
 
+*** Fundamental
 **** Simple
 
      A grab-bag of basic Emacs commands not specifically related to
@@ -378,8 +385,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'vex-autoloads nil t)
-      (require 'vex nil t)
+      ;; (require 'vex nil t)
 
       #+END_SRC
 
@@ -760,9 +766,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'async-autoloads nil t)
       ;; (require 'async nil t)
-      ;; (require 'async-bytecomp nil t)
 
       #+END_SRC
 
@@ -897,15 +901,6 @@
 
       #+END_SRC
 
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; load custom-file
-      ;; (safe-load-file custom-file)
-
-      #+END_SRC
-
 ** Vanilla
 
    Major Structures of Emacs: Files, Buffer, Windows, Frames, Input,
@@ -933,7 +928,6 @@
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
-
       ;; control use of version numbers for backup files.
       (customize-set-variable 'version-control t)
 
@@ -964,9 +958,9 @@
       (customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))
 
       ;; create cache directory
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (safe-mkdir (concat user-emacs-directory "cache"))))
+      ;; (add-hook 'window-setup-hook
+      ;;           (lambda ()
+      ;;             (safe-mkdir (concat user-emacs-directory "cache"))))
 
       #+END_SRC
 
@@ -1938,7 +1932,8 @@
           (let ((minibuffer (active-minibuffer-window)))
             (when minibuffer
               (select-window minibuffer)
-              (safe-funcall 'minibuffer-keyboard-quit)))))
+              (when (fboundp 'minibuffer-keyboard-quit)
+                (funcall 'minibuffer-keyboard-quit))))))
 
       #+END_SRC
 
@@ -2360,7 +2355,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; disable
-      (safe-funcall 'tool-bar-mode '0)
+      ;; (safe-funcall 'tool-bar-mode '0)
 
       #+END_SRC
 
@@ -2427,7 +2422,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (safe-funcall 'menu-bar-mode 0)
+      ;; (safe-funcall 'menu-bar-mode 0)
 
       #+END_SRC
 
@@ -2449,7 +2444,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; disable scroll bar
-      (safe-funcall 'scroll-bar-mode 0)
+      ;; (safe-funcall 'scroll-bar-mode 0)
 
       #+END_SRC
 
@@ -2807,7 +2802,7 @@
      ;; enable emacs server after startup
      (add-hook 'after-init-hook
                 (lambda ()
-                  (safe-funcall 'server-start)))
+                  (funcall 'server-start)))
 
      #+END_SRC
 
@@ -2924,11 +2919,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       ;; (require 'exwm-autoloads nil t)
        ;; (require 'exwm nil t)
-       ;; (require 'exwm-core nil t)
-       ;; (require 'exwm-config nil t)
-       ;; (require 'exwm-workspace nil t)
 
        #+END_SRC
 
@@ -3649,6 +3640,7 @@
                            (name . "^\\*make\\*$")))
 
                 ("Custom" (mode . Custom-mode))
+                ("IRC" (mode . rcirc-mode))
 
                 ("Info"  (or
                           (mode . Info-mode)
@@ -3825,7 +3817,7 @@
       ;; enable
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (safe-funcall 'global-undo-tree-mode 1)))
+                  (funcall 'global-undo-tree-mode 1)))
 
       #+END_SRC
 
@@ -4155,7 +4147,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; non-nil means log IRC activity to disk
+      ;; non-nil means log irc activity to disk
       ;; logfiles are kept in `rcirc-log-directory
       (customize-set-variable 'rcirc-log-flag nil)
 
@@ -4168,8 +4160,18 @@
       ;; list of authentication passwords (not your job)
       (customize-set-variable 'rcirc-authinfo nil)
 
+      ;; prompt string to use in IRC buffers
+      ;; %n nick, %s server, %t target, a channel or a user
+      (customize-set-variable 'rcirc-prompt " » ")
+
       ;; coding system used to decode incoming irc messages
       (customize-set-variable 'rcirc-decode-coding-system 'utf-8)
+
+      ;; the default reason to send when quitting a server
+      (customize-set-variable 'rcirc-default-quit-reason "oops...")
+
+      ;; the default reason to send when parting from a channel
+      (customize-set-variable 'rcirc-default-part-reason "<-")
 
       ;; responses which will be hidden when `rcirc-omit-mode is enable
       (customize-set-variable 'rcirc-omit-responses
@@ -4177,25 +4179,18 @@
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-
-      #+END_SRC
-
 ***** Hooks
-***** Binds
-***** Enable
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (rcirc-omit-mode 1)))
+      (add-hook 'rcirc-mode-hook
+                (lambda ()
+                  ;; (funcall 'rcirc-omit-mode 1)
+                  (funcall 'flyspell-mode 1)))
 
       #+END_SRC
 
-**** Jabber
-**** Slack
+***** Binds
 *** Browser
 **** Eww
 
@@ -4555,7 +4550,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'cannon-autoloads nil t)
+      ;; (require 'cannon nil t)
 
       #+END_SRC
 
@@ -4696,7 +4691,7 @@
       (add-hook 'org-ctrl-c-ctrl-c-hook
                 (lambda ()
                   (when (and (boundp 'verb-mode) verb-mode)
-                    (safe-funcall 'verb-send-request-on-point 'this-window))))
+                    (funcall 'verb-send-request-on-point 'this-window))))
 
       #+END_SRC
 
@@ -4809,7 +4804,7 @@
       ;; start compton after emacs initialize
       (add-hook 'after-init-hook
                 (lambda ()
-                  (safe-start-process "compton" "compton" "-b")))
+                    (safe-start-process "compton" "compton" "-b")))
 
       #+END_SRC
 
@@ -4990,10 +4985,10 @@
       (defun eos/dashboard/open-buffer ()
         "Opens or switch to *dashboard* buffer."
         (interactive)
-        (safe-funcall 'dashboard-insert-startupify-lists)
+        (funcall 'dashboard-insert-startupify-lists)
         (unless (get-buffer "*dashboard*")
           (generate-new-buffer "*dashboard*"))
-        (safe-funcall 'dashboard-refresh-buffer))
+        (funcall 'dashboard-refresh-buffer))
 
       (defun eos-dashboard-insert-footer ()
         "Insert dashboard-footer message."
@@ -5392,7 +5387,7 @@
         "Update htmls and call `org-static-blog-publish'."
         (interactive)
         ;; (eos/blog/update-html)
-        (safe-funcall 'org-static-blog-publish t))
+        (funcall 'org-static-blog-publish t))
 
       #+END_SRC
 
@@ -5760,7 +5755,7 @@
       ;; enable yasnippet after emacs startup
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (safe-funcall 'yas-global-mode 1)))
+                  (funcall 'yas-global-mode 1)))
 
       #+END_SRC
 
@@ -6366,7 +6361,7 @@
 
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (safe-funcall 'projectile-mode 1)))
+                  (funcall 'projectile-mode 1)))
 
       #+END_SRC
 
@@ -6648,11 +6643,11 @@
       ;; enable minor modes
       (add-hook 'emacs-lisp-mode-hook
                 (lambda()
-                  (safe-funcall 'eldoc-mode 1)))
+                  (funcall 'eldoc-mode 1)))
 
       (add-hook 'lisp-interaction-mode-hook
                 (lambda()
-                  (safe-funcall 'eldoc-mode 1)))
+                  (funcall 'eldoc-mode 1)))
 
       ;; set backends (company, flychecker, dash-docs)
       (add-hook 'emacs-lisp-mode-hook
@@ -6753,11 +6748,11 @@
                   ;; haskell indentation mode that deals with the layout rule.
                   ;; it rebinds RET, DEL and BACKSPACE, so that indentations can be
                   ;; set and deleted as if they were real tabs.
-                  (safe-funcall 'haskell-indentation-mode 1)
+                  (funcall 'haskell-indentation-mode 1)
 
                   ;; minor mode for enabling haskell-process interaction
                   ;; non-nil if Interactive-Haskell mode is enabled.
-                  (safe-funcall 'interactive-haskell-mode 1)))
+                  (funcall 'interactive-haskell-mode 1)))
 
       ;; activate dash docset (emacs) (not working)
       ;; (eos-set-dash-docset "Haskell")))
@@ -7399,7 +7394,7 @@
       (add-hook 'python-mode-hook
                 (lambda()
                   ;; enable eldoc mode
-                  (safe-funcall 'eldoc-mode 1)))
+                  (funcall 'eldoc-mode 1)))
 
       ;; set backends
       (add-hook 'python-mode-hook
@@ -7768,10 +7763,10 @@
 
      #+END_SRC
 
-** Trash
+** Lab
 
-   Reminder: To add more junk to this shit,
-   edit the ~emacs.d/site-lisp/trash/trash.el~.
+   To add more experiments to this already bloated
+   configuration edit ~emacs.d/lisp/lab/lab.el~.
 
 ** EOF
 

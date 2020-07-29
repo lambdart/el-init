@@ -407,6 +407,7 @@
       (global-set-key (kbd "M-n") 'transpose-lines-up)
       (global-set-key (kbd "M-p") 'transpose-lines-down)
       (global-set-key (kbd "M-l") 'downcase-word)
+      (global-set-key (kbd "C-w") 'kill-region-or-backward-word)
 
       ;; kill
       (define-key ctl-x-map (kbd "k") 'kill-buffer)
@@ -1409,6 +1410,9 @@
 
       ;; kill buffer and window
       (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
+
+      ;; switch to the last buffer in the buffer list
+      (define-key ctl-x-map (kbd "C-u") 'unbury-buffer)
 
       #+END_SRC
 
@@ -2709,6 +2713,30 @@
       #+BEGIN_SRC emacs-lisp
 
       (global-set-key (kbd "M-s M-o") 'occur-at-point)
+
+      #+END_SRC
+
+**** Rectangle
+
+     Rectangle: Operations on rectangles!
+
+     This package provides the operations on rectangles that are documented
+     in the Emacs manual.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'rect nil t)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; TODO: find-out prefix map
+      (global-set-key (kbd "C-x r %") 'replace-rectangle)
 
       #+END_SRC
 
@@ -7571,7 +7599,7 @@
      (define-key ctl-x-map (kbd "C-z") nil)
      (define-key ctl-x-map (kbd "C-p") nil)
      (define-key ctl-x-map (kbd "C-h") nil)
-     (define-key ctl-x-map (kbd "C-u") nil)
+     ;; (define-key ctl-x-map (kbd "C-u") nil)
      (define-key ctl-x-map (kbd "C-\@") nil)
      (define-key ctl-x-map (kbd "M-:") nil)
 
@@ -7630,7 +7658,7 @@
      (global-unset-key (kbd "M-$"))
      (global-unset-key (kbd "M-("))
      (global-unset-key (kbd "M-)"))
-     (global-unset-key (kbd "M-r"))
+     ;; (global-unset-key (kbd "M-r"))
      (global-unset-key (kbd "M-{"))
      (global-unset-key (kbd "M-}"))
      (global-unset-key (kbd "S-SPC"))

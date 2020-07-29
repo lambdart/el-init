@@ -1,7 +1,7 @@
-;;; adapt  --- Adapt
+;;; trash.el  --- Trash -*- lexical-binding: t -*-
 ;;; Commentary:
 ;;; Code:
 
 
-(provide 'adapt)
-;;; adapt.el ends here
+(provide 'trash)
+;;; trash.el ends here

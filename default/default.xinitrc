@@ -9,11 +9,7 @@ setxkbmap -option ctrl:nocaps    # Make Caps Lock a Control key
 # edit files in place (used by e.g. `git commit`).
 export VISUAL=emacsclient
 export EDITOR="$VISUAL"
+export EMACSLOADPATH=$EMACSLOADPATH:~/.emacs.d/site-lisp:~/.emacs.d/lisp
 
-# set background
-# exec set-background &
-
-# Finally launch emacs.
-# exec dbus-launch --exit-with-session emacs
-# exec emacs --daemon -f exwm-enable
-exec emacs
+# finally launch emacs (breaks dashboards)
+exec dbus-launch --exit-with-session emacs -f exwm-enable --debug-init

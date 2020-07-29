@@ -1,9 +1,11 @@
-;; set proper project(mms) variables
-((nil . (
-          ;; cmake-ide
-          (cmake-ide-build-dir    . "~/core/dev/mms/build")
-          (cmake-ide-make-command . "make")
+;; set emacs-lisp-mode local variables
+((emacs-lisp-mode
+  ;; compile command
+  (compile-command . "make -C ~/.emacs.d all")))
 
-          ;; projectile
-          (projectile-project-compilation-cmd . "cmake --build build")
-)))
+;; set c++-mode local variables
+((c++-mode
+  ;; compile command
+  (compile-command . "make all")
+  ;; indent style
+  (c-file-style . "user")))

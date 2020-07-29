@@ -296,18 +296,7 @@
     of this variable is a list of directories to search when
     loading files.
 
-    #+BEGIN_SRC emacs-lisp
-
-    ;; add sub-directories to `load-path'."
-    (dolist (dir '("lisp" "site-lisp"))
-      (let ((default-directory
-              (expand-file-name dir user-emacs-directory)))
-        (normal-top-level-add-subdirs-to-load-path)))
-
-    ;; clean load-path list (remove duplicates)
-    (delete-dups load-path)
-
-    #+END_SRC
+    Uses ~subdirs.el~ and =export EMACSLOADPATH=$EMACSLOADPATH:=.
 
 *** Environment
 
@@ -331,6 +320,15 @@
 
 ** Libraries
 *** Fundamental
+**** Loaddefs
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; require (local) lisp loaddefs
+     (require 'lisp-loaddefs nil t)
+
+     #+END_SRC
+
 **** Simple
 
      A grab-bag of basic Emacs commands not specifically related to
@@ -382,14 +380,6 @@
 
       (require 'vex-autoloads nil t)
       (require 'vex nil t)
-
-      #+END_SRC
-
-***** Declare
-
-      #+BEGIN_SRC emacs-lisp
-
-      (declare-function safe-funcall "vex-c" (func &rest args))
 
       #+END_SRC
 
@@ -827,7 +817,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'mm-bodies nil t)
+      ;; (require 'mm-bodies nil t)
 
       #+END_SRC
 
@@ -835,7 +825,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64))
+      (when (boundp 'mm-body-charset-encoding-alist)
+        (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64)))
 
       #+END_SRC
 
@@ -925,6 +916,7 @@
     discretely in a computer storage device.
 
 **** Files
+
      Defines most of Emacs's file- and directory-handling functions,
      including basic file visiting, backup generation, link handling,
      ITS-id version control, load- and write-hook handling, and the like.
@@ -1037,7 +1029,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'recentf nil t)
+      ;; (require 'recentf nil t)
 
       #+END_SRC
 
@@ -1055,13 +1047,13 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/icomplete/recentf-open-file ()
-        "Open `recent-list' item in a new buffer.
-      The user's $HOME directory is abbreviated as a tilde."
-        (interactive)
-        (let ((files (mapcar 'abbreviate-file-name recentf-list)))
-          (find-file
-           (completing-read "Recentf: " files nil t))))
+      ;; (defun eos/icomplete/recentf-open-file ()
+      ;;   "Open `recent-list' item in a new buffer.
+      ;; The user's $HOME directory is abbreviated as a tilde."
+      ;;   (interactive)
+      ;;   (let ((files (mapcar 'abbreviate-file-name recentf-list)))
+      ;;     (find-file
+      ;;      (completing-read "Recentf: " files nil t))))
 
       #+END_SRC
 
@@ -1071,7 +1063,7 @@
 
       ;; eos-files-map
       (define-key eos-files-map (kbd "r") 'recentf-open-files)
-      (define-key eos-files-map (kbd "t") 'eos/icomplete/recentf-open-file)
+      ;; (define-key eos-files-map (kbd "t") 'eos/icomplete/recentf-open-file)
 
       #+END_SRC
 
@@ -1222,7 +1214,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'dired nil t)
+      ;; (require 'dired nil t)
 
       #+END_SRC
 
@@ -1231,7 +1223,9 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; enable dired-find-alternate-file
-      (put 'dired-find-alternate-file 'disabled nil)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (put 'dired-find-alternate-file 'disabled nil)))
 
       #+END_SRC
 
@@ -1607,19 +1601,6 @@
 
        #+END_SRC
 
-****** Hooks
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; (add-hook 'buffer-list-update-hook
-       ;;           (lambda ()
-       ;;             (when (boundp 'eos/big-file-p)
-       ;;               (if (eos/big-file-p)
-       ;;                   (or display-line-numbers
-       ;;                       (setq display-line-numbers 0))))))
-
-       #+END_SRC
-
 *** Conding-System
 
     Emacs supports a wide variety of international character sets, including
@@ -1953,7 +1934,7 @@
           (let ((minibuffer (active-minibuffer-window)))
             (when minibuffer
               (select-window minibuffer)
-              (minibuffer-keyboard-quit)))))
+              (safe-funcall 'minibuffer-keyboard-quit)))))
 
       #+END_SRC
 
@@ -2375,7 +2356,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; disable
-      (safe-funcall 'tool-bar-mode 0)
+      (safe-funcall 'tool-bar-mode '0)
 
       #+END_SRC
 
@@ -2695,7 +2676,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'delsel nil t)
+      ;; (require 'delsel nil t)
 
       #+END_SRC
 
@@ -2796,9 +2777,9 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; enable emacs server after startup
-     (add-hook 'window-setup-hook
-               (lambda ()
-                 (safe-funcall 'server-start)))
+     (add-hook 'after-init-hook
+                (lambda ()
+                  (safe-funcall 'server-start)))
 
      #+END_SRC
 
@@ -2807,12 +2788,8 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; load-path
-    (add-to-list 'load-path
-       (expand-file-name "site-lisp" user-emacs-directory))
-
-    ;; require load loaddefs
-    (require 'local-loaddefs nil t)
+    ;; require packages loaddefs
+    (require 'site-lisp-loaddefs nil t)
 
     #+END_SRC
 
@@ -2919,7 +2896,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'exwm-autoloads nil t)
+       ;; (require 'exwm-autoloads nil t)
        ;; (require 'exwm nil t)
        ;; (require 'exwm-core nil t)
        ;; (require 'exwm-config nil t)
@@ -3058,10 +3035,10 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; enable exwm if graphic display is non-nil
-       (add-hook 'after-init-hook
-                       (lambda ()
-                         (when (display-graphic-p)
-                           (safe-funcall 'exwm-enable))))
+       ;; (add-hook 'after-init-hook
+       ;;                 (lambda ()
+       ;;                   (when (display-graphic-p)
+       ;;                     (safe-funcall 'exwm-enable))))
 
        #+END_SRC
 
@@ -3152,8 +3129,9 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
-       (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file)
+       (when (boundp 'dired-mode-map)
+         (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
+         (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file))
 
        #+END_SRC
 
@@ -3240,7 +3218,8 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (define-key dired-mode-map (kbd "C-c C-r") 'dired-rsync)
+       (when (boundp 'dired-mode-map)
+         (define-key dired-mode-map (kbd "C-c C-r") 'dired-rsync))
 
        #+END_SRC
 
@@ -4064,7 +4043,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'emms-autoloads nil t)
+      ;; (require 'emms-autoloads nil t)
       ;; (require 'emms nil t)
       ;; (require 'emms-setup nil t)
 
@@ -4114,10 +4093,10 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; if emms is available, enable it
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (funcall 'emms-all)
-                  (funcall 'emms-default-players)))
+      ;; (add-hook 'window-setup-hook
+      ;;           (lambda ()
+      ;;             (funcall 'emms-all)
+      ;;             (funcall 'emms-default-players)))
 
       #+END_SRC
 
@@ -4548,7 +4527,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'cannon-autoloads nil t)
+      ;; (require 'cannon-autoloads nil t)
 
       #+END_SRC
 
@@ -4639,20 +4618,20 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (defun eos/message-header-add-gcc ()
-         "While `gnus' is running, add a Gcc header, if missing.
-       The Gcc header places a copy of the outgoing message to the
-       appropriate directory of the IMAP server, as per the contents of
-       `auth-sources'.
-       In the absence of a Gcc header, the outgoing message will not
-       appear in the appropriate IMAP directory, though it will still be
-       sent. Add this function to `message-header-setup-hook'."
-         (if (gnus-alive-p)
-             (progn
-               (when (message-fetch-field "Gcc")
-                 (message-remove-header "Gcc")
-                 (message-add-header "Gcc: nnimap+pub:Sent")))
-           (message "Gnus is not running. No GCC field inserted.")))
+       ;; (defun eos/message-header-add-gcc ()
+       ;;   "While `gnus' is running, add a Gcc header, if missing.
+       ;; The Gcc header places a copy of the outgoing message to the
+       ;; appropriate directory of the IMAP server, as per the contents of
+       ;; `auth-sources'.
+       ;; In the absence of a Gcc header, the outgoing message will not
+       ;; appear in the appropriate IMAP directory, though it will still be
+       ;; sent. Add this function to `message-header-setup-hook'."
+       ;;   (if (gnus-alive-p)
+       ;;       (progn
+       ;;         (when (message-fetch-field "Gcc")
+       ;;           (message-remove-header "Gcc")
+       ;;           (message-add-header "Gcc: nnimap+pub:Sent")))
+       ;;     (message "Gnus is not running. No GCC field inserted.")))
 
        #+END_SRC
 
@@ -4661,7 +4640,7 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; hook called narrowed to the headers when setting up a message buffer
-       (add-hook 'message-header-setup-hook 'eos/message-header-add-gcc)
+       ;; (add-hook 'message-header-setup-hook 'eos/message-header-add-gcc)
 
        ;; normal hook, run each time a new outgoing message is initialized
        (add-hook 'message-setup-hook 'message-sort-headers)
@@ -4910,7 +4889,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'dashboard nil t)
+      ;; (require 'dashboard nil t)
 
       #+END_SRC
 
@@ -4926,8 +4905,8 @@
                                 (bookmarks . 4)))
 
       ;; banners directory
-      (customize-set-variable 'dashboard-banners-directory
-                              (concat user-emacs-directory "banner/"))
+      ;; (customize-set-variable 'dashboard-banners-directory
+      ;;                         (expand-file-name "banner"  user-emacs-directory))
 
       ;; specify the startup banner
       (customize-set-variable 'dashboard-startup-banner 1)
@@ -4983,6 +4962,7 @@
       (defun eos/dashboard/open-buffer ()
         "Opens or switch to *dashboard* buffer."
         (interactive)
+        (safe-funcall 'dashboard-insert-startupify-lists)
         (unless (get-buffer "*dashboard*")
           (generate-new-buffer "*dashboard*"))
         (safe-funcall 'dashboard-refresh-buffer))
@@ -5002,7 +4982,11 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; init dashboard after emacs initialize
-      (add-hook 'after-init-hook 'dashboard-setup-startup-hook)
+      ;; (funcall 'dashboard-setup-startup-hook)
+      ;; (add-hook 'window-setup-hook
+                ;; (lambda ()
+                ;;   (funcall 'dashboard-insert-startupify-lists)
+                ;;   (eos/dashboard/open-buffer))
 
       ;; insert footer
       (add-hook 'dashboard-mode-hook
@@ -6182,7 +6166,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'compile nil t)
+      ;; (require 'compile nil t)
 
       #+END_SRC
 
@@ -6197,15 +6181,15 @@
       (defun eos-compile ()
         "Call `eos-compile' passing the right arguments."
         (interactive)
-        (compile-at-dir (expand-file-name user-emacs-directory)
-                        eos-compile-command))
+        (compile-at-dir
+         (expand-file-name user-emacs-directory) eos-compile-command))
 
-      (defun eos/icomplete/compile ()
-        "Icomplete compile command completitions."
-        (interactive)
-        (let ((candidates compile-history))
-          (compile
-           (completing-read "Compile command: " candidates nil 'confirm))))
+      ;; (defun eos/icomplete/compile ()
+      ;;   "Icomplete compile command completitions."
+      ;;   (interactive)
+      ;;   (let ((candidates compile-history))
+      ;;     (compile
+      ;;      (completing-read "Compile command: " candidates nil 'confirm))))
 
       #+END_SRC
 
@@ -6233,7 +6217,8 @@
       ;; fix compilation buffer colors
       (add-hook 'compilation-filter-hook
                 (lambda ()
-                  (when (eq major-mode 'compilation-mode)
+                  (when (and (eq major-mode 'compilation-mode)
+                             (boundp 'compilation-filter-start))
                     (ansi-color-apply-on-region
                      compilation-filter-start (point-max)))))
 
@@ -6244,7 +6229,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; utils map
-      (define-key eos-utils-map (kbd "c") 'eos/icomplete/compile)
+      ;; (define-key eos-utils-map (kbd "c") 'eos/icomplete/compile)
 
       #+END_SRC
 
@@ -6895,7 +6880,7 @@
       ;; set rtags binary path
       (customize-set-variable
        'rtags-path
-       (concat user-emacs-directory "site-lisp/rtags/build/bin/"))
+       (expand-file-name "rtags/build/bin/" user-emacs-directory))
 
       ;; method to use to display RTags results, like references
       (customize-set-variable 'rtags-display-result-backend 'default)
@@ -6946,7 +6931,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'cc-mode nil t)
+      ;; (require 'cc-mode nil t)
 
       #+END_SRC
 
@@ -7011,31 +6996,37 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; c-mode-map
-      ;; set rtags prefix map in c-mode map (C-c r)
-      (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
+      ;; register binds through hook
+      (add-hook 'c-mode-hook
+                (lambda ()
+                  (when (boundp 'c-mode-map)
+                    ;; set rtags prefix map in c-mode map (C-c r)
+                    (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
 
-      ;; complete or indent
-      (define-key c-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
+                    ;; complete or indent
+                    (define-key c-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
 
-      ;; compilation keybind
-      (define-key c-mode-map (kbd "C-c C-c")
-        (lambda ()
-          (interactive)
-          (compile compile-command)))
+                    ;; compilation keybind
+                    (define-key c-mode-map (kbd "C-c C-c")
+                      (lambda ()
+                        (interactive)
+                        (funcall 'compile compile-command))))))
 
-      ;; c++-mode-map
-      ;; set rtags prefix map in c-mode map (C-c r)
-      (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
+      ;; register binds through hook
+      (add-hook 'c++-mode-hook
+                (lambda ()
+                  (when (boundp 'c++-mode-map)
+                    ;; set rtags prefix map in c-mode map (C-c r)
+                    (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
 
-      ;; complete or indent
-      (define-key c++-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
+                    ;; complete or indent
+                    (define-key c++-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
 
-      ;; compilation keybind
-      (define-key c++-mode-map (kbd "C-c C-c")
-        (lambda ()
-          (interactive)
-          (compile compile-command)))
+                    ;; compilation keybind
+                    (define-key c++-mode-map (kbd "C-c C-c")
+                      (lambda ()
+                        (interactive)
+                        (funcall 'compile compile-command))))))
 
       #+END_SRC
 
@@ -7751,8 +7742,8 @@
 
 ** Trash
 
-   The ~/site-lisp/trash/trash.el~ script will be used to
-   put more =elisp= code there to add more junk to this shit!
+   Reminder: To add more junk to this shit,
+   edit the ~emacs.d/site-lisp/trash/trash.el~.
 
 ** EOF
 

@@ -1,6 +1,9 @@
-#+author: esac
-#+startup: overview
-#+property: header-args :comments yes :results silent
+#+AUTHOR: esac
+#+EMAIL: esac-io@tutanota.com
+#+KEYWORDS: eos readme, readme
+#+LANGUAGE: en
+#+STARTUP: overview
+#+PROPERTY: header-args :comments yes :results silent
 
 * EOS
 
@@ -125,8 +128,10 @@
 
 ** Goal
 
-   Provide a generic =INPUT-TRANSFORM-OUPUT= bridge between the
-   human mind and the machine resources.
+   Use =Emacs= as the only interface to perform
+   =INPUT-TRANSFORM-OUPUT= cycles, i.e, provide
+   a dynamic bridge between - the human mind and
+   the machine resources.
 
 ** Features:
 
@@ -180,11 +185,10 @@
 
 * Dependencies
 
-  1. Cask
-  2. Emacs >= 26.3
-  3. Elisp Packages
-     - Listed on: ~.gitmodules~
-  4. Non-elisp Packages
+  1. Emacs >= 26.3
+  2. Elisp Packages
+     - TODO: List!
+  3. Elf Binaries
      - Ag, The Silver Searcher
      - Global
      - Etags

@@ -348,15 +348,15 @@
 
 *** Load-prefer
 
-     In noninteractive sessions, prioritize non-byte-compiled source files to
-     prevent the use of stale byte-code. Otherwise, it saves us a little IO time
-     to skip the mtime checks on every *.elc file.
+    In noninteractive sessions, prioritize non-byte-compiled source files to
+    prevent the use of stale byte-code. Otherwise, it saves us a little IO time
+    to skip the mtime checks on every *.elc file.
 
-     #+BEGIN_SRC emacs-lisp
+    #+BEGIN_SRC emacs-lisp
 
-     (setq load-prefer-newer noninteractive)
+    (setq load-prefer-newer noninteractive)
 
-     #+END_SRC
+    #+END_SRC
 
 *** Environment
 
@@ -811,6 +811,16 @@
 
       #+END_SRC
 
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'epa-file-enable)))
+
+      #+END_SRC
+
 *** Notify
 **** Notifications
 
@@ -917,8 +927,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (boundp 'mm-body-charset-encoding-alist)
-        (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64)))
+      (eval-after-load 'mm-bodies
+        (lambda ()
+          (when (boundp 'mm-body-charset-encoding-alist)
+            (add-to-list 'mm-body-charset-encoding-alist '(utf-8 . base64)))))
 
       #+END_SRC
 
@@ -1015,6 +1027,7 @@
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
+
       ;; control use of version numbers for backup files.
       (customize-set-variable 'version-control t)
 
@@ -1728,8 +1741,7 @@
 
       ;; maximum height of a window displaying a temporary buffer.
       (customize-set-variable 'temp-buffer-max-height
-                              (lambda
-                                (buffer)
+                              (lambda (buffer)
                                 (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
                                     (/ (x-display-pixel-height) (frame-char-height) 4)
                                   (/ (- (frame-height) 4) 4))))
@@ -1770,29 +1782,6 @@
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/describe-symbol-at-point (&optional arg)
-        "Get help (documentation) for the symbol at point as ARG.
-
-      With a prefix argument, switch to the *Help* window.  If that is
-      already focused, switch to the most recently used window
-      instead."
-        (interactive "P")
-        (let ((symbol (symbol-at-point)))
-          (when symbol
-            (describe-symbol symbol)))
-        (when current-prefix-arg
-          (let ((help (get-buffer-window "*Help*")))
-            (when help
-              (if (not (eq (selected-window) help))
-                  (select-window help)
-                (select-window (get-mru-window)))))))
-
-      #+END_SRC
-
 **** Help-mode
 
      Help-mode, which is the mode used by *Help* buffers, and
@@ -1810,8 +1799,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (boundp 'help-mode-map)
-        (define-key help-mode-map (kbd "C-j") 'push-button))
+      (eval-after-load 'help-mode
+        (lambda ()
+          (when (boundp 'help-mode-map)
+            (define-key help-mode-map (kbd "C-j") 'push-button))))
 
       #+END_SRC
 
@@ -1990,6 +1981,8 @@
       ;; minibuffer-local-map
       (define-key minibuffer-local-map (kbd "M-`") 'minibuffer-completion-help)
       (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
+      (define-key minibuffer-local-map (kbd "M-w") 'minibuffer-complete-word)
+      (define-key minibuffer-local-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       ;; research (maybe this is not necessary) (C-k: kill line)
       ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
@@ -1999,14 +1992,7 @@
       (define-key goto-map (kbd "M-v") 'goto-minibuffer-or-completions-window)
 
       ;; esc-map (force minibuffer to exit)
-      (define-key esc-map (kbd "ESC")
-        (lambda ()
-          (interactive)
-          (let ((minibuffer (active-minibuffer-window)))
-            (when minibuffer
-              (select-window minibuffer)
-              (when (fboundp 'minibuffer-keyboard-quit)
-                (funcall 'minibuffer-keyboard-quit))))))
+      (define-key esc-map (kbd "ESC") 'force-minibuffer-exit)
 
       #+END_SRC
 
@@ -2125,37 +2111,6 @@
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/complete-or-indent ()
-        "Complete or indent."
-        (interactive)
-        (if (looking-at "\\_>")
-            (when (fboundp 'complete)
-              (complete nil)))
-        (indent-according-to-mode))
-
-      (defun eos/complete-at-point-or-indent ()
-        "This smart tab is a `minibuffer' compliant.
-      It acts as usual in the `minibuffer'.
-      Else, if mark is active, indents region.
-      Else if point is at the end of a symbol, expands it.
-      Else indents the current line."
-        (interactive)
-        (if (minibufferp)
-            (unless (minibuffer-complete)
-              (complete-symbol nil))
-          (if mark-active
-              (indent-region (region-beginning)
-                             (region-end))
-            (if (looking-at "\\_>")
-                (complete-symbol nil)
-              (indent-according-to-mode)))))
-
-      #+END_SRC
-
 ***** Display
 
       #+BEGIN_SRC emacs-lisp
@@ -2163,7 +2118,6 @@
       (add-to-list 'display-buffer-alist
                    '("\\*Completions\\*"
                      (display-buffer-below-selected display-buffer-at-bottom)
-                     (inhibit-same-window . t)
                      (window-height . fit-window-to-buffer)))
 
       #+END_SRC
@@ -2173,16 +2127,14 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; completion-list-mode-map
-      (define-key completion-list-mode-map (kbd "h") 'eos/describe-symbol-at-point)
-      (define-key completion-list-mode-map (kbd "?") 'eos/describe-symbol-at-point)
       (define-key completion-list-mode-map (kbd "q") 'delete-completion-window)
       (define-key completion-list-mode-map (kbd "d") 'delete-completion-line)
       (define-key completion-list-mode-map (kbd "TAB") 'next-completion)
-      (define-key completion-list-mode-map (kbd "SPC") 'previous-completion)
+      (define-key completion-list-mode-map (kbd "DEL") 'previous-completion)
       (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
       (define-key completion-list-mode-map (kbd "RET") 'choose-completion)
-      (define-key completion-list-mode-map (kbd "C-k") 'eos/kill-line)
-      (define-key completion-list-mode-map (kbd "ESC ESC") 'eos/focus-minibuffer-or-completions)
+            (define-key completion-list-mode-map (kbd "ESC") 'force-minibuffer-exit)
+      (define-key completion-list-mode-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       #+END_SRC
 
@@ -2364,7 +2316,7 @@
       (define-key eos-utils-map (kbd "m") 'eos/icomplete/mark-ring)
 
       ;; global-map
-      (global-set-key (kbd "M-y") 'eos/icomplete/kill-ring)
+      ;; (global-set-key (kbd "M-y") 'eos/icomplete/kill-ring)
 
       #+END_SRC
 
@@ -3495,23 +3447,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'auth-source nil t)
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos-auth-search (host user)
-        "Lookup (format HOST USER PORT) password on auth-source default file."
-        (let ((auth (auth-source-search :host host :user user)))
-          (if auth
-              (let ((secretf (plist-get (car auth) :secret)))
-                (if secretf
-                    (funcall secretf)
-                  (message "Auth entry for %s@%s has no secret!" user host)))
-            (message "No auth entry found for %s@%s" user host))))
+      ;; (require 'auth-source nil t)
 
       #+END_SRC
 
@@ -3826,7 +3762,7 @@
       ;; bind (iedit-mode-keymap)
       (when (boundp 'iedit-mode-keymap)
         (progn
-          (define-key iedit-mode-keymap (kbd "<tab>") 'eos/complete-in-buffer-or-indent)
+          (define-key iedit-mode-keymap (kbd "<tab>") 'eos-complete-in-buffer-or-indent)
           (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence)))
 
       ;; bind (global)
@@ -4144,7 +4080,19 @@
 
       ;; the default directory to look for media files.
       (customize-set-variable
-       'emms-source-file-default-directory (expand-file-name "~/media/music"))
+       'emms-source-file-default-directory (expand-file-name "~/media/music/"))
+
+      #+END_SRC
+
+***** Aliases
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defalias 'play-playlist 'emms-play-playlist
+        "An `emms-play-playlist' alias.")
+
+      (defalias 'save-playlist 'emms-playlist-save
+        "An `emms-playlist-save' alias.")
 
       #+END_SRC
 
@@ -4156,12 +4104,12 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; register emms playlist hook
-      (add-hook 'emms-playlist-mode-hook
-                (lambda ()
-                  ;; avoid warnings
-                  (when (boundp 'emms-playlist-mode-map)
-                    ;; add files inside playlist mode buffer
-                    (define-key emms-playlist-mode-map (kbd "A") 'emms-add-file))))
+      (eval-after-load 'emms-playlist-mode
+        (lambda ()
+          ;; avoid warnings
+          (when (boundp 'emms-playlist-mode-map)
+            ;; add files inside playlist mode buffer
+            (define-key emms-playlist-mode-map (kbd "A") 'emms-add-file))))
 
       #+END_SRC
 
@@ -4234,6 +4182,15 @@
       (customize-set-variable 'rcirc-omit-responses
                               '("JOIN" "PART" "QUIT" "NICK"))
 
+      ;; an alist of IRC connections to establish when running `rcirc'
+      (customize-set-variable 'rcirc-server-alist
+                              '(("chat.freenode.net"
+                                 :port 6697
+                                 :server-alias "freenode"
+                                 :encryption tls
+                                 :nick "esac"
+                                 :channels ("#emacs #emacs-berlin #freebsd"))))
+
       #+END_SRC
 
 ***** Hooks
@@ -4287,9 +4244,8 @@
       #+BEGIN_SRC emacs-lisp
 
       (add-hook 'eww-mode-hook
-                (lambda ()
-                  ;; disable truncate lines
-                  (setq truncate-lines nil)))
+                ;; disable truncate lines
+                (lambda () (setq truncate-lines nil)))
 
       #+END_SRC
 
@@ -4297,8 +4253,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (boundp 'eww-mode-map)
-        (define-key eww-mode-map (kbd "C-j") 'eww-follow-link))
+      (eval-after-load 'eww
+        (lambda ()
+          (when (boundp 'eww-mode-map)
+            (define-key eww-mode-map (kbd "C-j") 'eww-follow-link))))
 
       #+END_SRC
 
@@ -4439,23 +4397,6 @@
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; silent compiler
-      (defvar ispell-current-dictionary nil nil)
-
-      (defun eos/ispell/switch-dictionary ()
-        "Switch dictionaries."
-        (interactive)
-        (let* ((dic ispell-current-dictionary)
-               (change (if (string= dic "english") "brasileiro" "english")))
-          (ispell-change-dictionary change)
-          (message "Dictionary switched from %s to %s" dic change)))
-
-      #+END_SRC
-
 ***** Enable
 
       #+BEGIN_SRC emacs-lisp
@@ -4525,17 +4466,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/set-flycheck-checker (checker)
+      (defun eos-set-flycheck-checker (checker)
         "Set flycheck CHECKER variable."
-        (make-local-variable 'flycheck-checker)
         (when (boundp 'flycheck-checker)
           (setq flycheck-checker checker)))
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
 
       #+END_SRC
 
@@ -4576,9 +4510,7 @@
       (define-key eos-sc-map (kbd "m") 'flycheck-mode)
       (define-key eos-sc-map (kbd "s") 'flycheck-select-checker)
       (define-key eos-sc-map (kbd "?") 'flycheck-describe-checker)
-
-      ;; (define-key eos-sc-map (kbd "M") 'flycheck-manual)
-      ;; (define-key eos-sc-map (kbd "v") 'flycheck-verify-setup)
+      (define-key eos-sc-map (kbd "v") 'flycheck-verify-setup)
 
       #+END_SRC
 
@@ -4649,7 +4581,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'message nil t)
+       ;; (require 'message nil t)
 
        #+END_SRC
 
@@ -5014,13 +4946,14 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/dashboard/open-buffer ()
+      (defun eos-initialize-dashboard ()
         "Opens or switch to *dashboard* buffer."
         (interactive)
-        (funcall 'dashboard-insert-startupify-lists)
-        (unless (get-buffer "*dashboard*")
-          (generate-new-buffer "*dashboard*"))
-        (funcall 'dashboard-refresh-buffer))
+        (let ((buffer (get-buffer "*dashboard*")))
+          (unless buffer
+            (setq buffer (generate-new-buffer "*dashboard*")))
+          (funcall 'dashboard-insert-startupify-lists)
+          (funcall 'dashboard-refresh-buffer)))
 
       (defun eos-dashboard-insert-footer ()
         "Insert dashboard-footer message."
@@ -5036,18 +4969,19 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; init dashboard after emacs initialize
-      ;; (funcall 'dashboard-setup-startup-hook)
-      ;; (add-hook 'window-setup-hook
-      ;; (lambda ()
-      ;;   (funcall 'dashboard-insert-startupify-lists)
-      ;;   (eos/dashboard/open-buffer))
-
       ;; insert footer
       (add-hook 'dashboard-mode-hook
                 (lambda ()
                   (interactive)
                   (eos-dashboard-insert-footer)))
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'after-init-hook 'eos-initialize-dashboard)
 
       #+END_SRC
 
@@ -5174,7 +5108,7 @@
       (eval-after-load 'org
         (lambda()
           (when (boundp 'org-mode-map)
-            (define-key org-mode-map (kbd "C-M-i") 'eos/complete-in-buffer-or-indent))))
+            (define-key org-mode-map (kbd "C-M-i") 'eos-complete-in-buffer-or-indent))))
 
       #+END_SRC
 
@@ -5262,7 +5196,7 @@
 
       (when (boundp 'markdown-mode-map)
         (progn
-          (define-key markdown-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)))
+          (define-key markdown-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)))
 
       #+END_SRC
 
@@ -5418,7 +5352,6 @@
       (defun eos/blog/publish ()
         "Update htmls and call `org-static-blog-publish'."
         (interactive)
-        ;; (eos/blog/update-html)
         (funcall 'org-static-blog-publish t))
 
       #+END_SRC
@@ -5514,9 +5447,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (when (boundp 'Man-mode-map)
-        (progn
-          (define-key Man-mode-map (kbd "C-j") 'push-button)))
+      (eval-after-load 'Man-mode
+        (lambda ()
+          (when (boundp 'Man-mode-map)
+            (define-key Man-mode-map (kbd "C-j") 'push-button))))
 
       ;; eos-docs-map docs actions prefix map
       (define-key eos-docs-map (kbd "m") 'manual-entry)
@@ -5748,12 +5682,12 @@
       (define-key eos-completion-map (kbd "v") 'yas-visit-snippet-file)
 
       ;; binds yas-keymap
-      (add-hook 'yas-minor-mode-hook
-                (lambda ()
-                  (when (boundp 'yas-keymap)
-                    (define-key yas-keymap (kbd "TAB") nil)
-                    (define-key yas-keymap (kbd "<tab>") nil)
-                    (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))))
+      (eval-after-load 'yasnippet
+        (lambda ()
+          (when (boundp 'yas-keymap)
+            (define-key yas-keymap (kbd "TAB") nil)
+            (define-key yas-keymap (kbd "<tab>") nil)
+            (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))))
 
       #+END_SRC
 
@@ -5838,39 +5772,25 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/icomplete/company ()
-        "Insert the selected company candidate directly at point."
-        (interactive)
-        (unless company-candidates
-          (company-complete-common))
-        (unless (= (length company-candidates) 0)
-          (let ((candidate (completing-read "Complete: " company-candidates nil nil)))
-            (delete-char (- (length company-common)))
-            (insert candidate))))
-
       (defun eos-set-company-backends (backends)
         "Set company back ends with BACKENDS."
         (make-local-variable 'company-backends)
         (when (boundp 'company-backends)
           (setq company-backends backends)))
 
-      (defun eos/company-complete-or-indent ()
+      (defun eos-company-complete-or-indent ()
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
-        (if (looking-at "\\_>")
-            (progn
-              (when (fboundp 'company-complete)
-                (funcall 'company-complete)))
-          (indent-according-to-mode)))
+        (cond ((looking-at "\\_>")
+          (funcall 'company-complete))
+         (t (indent-according-to-mode))))
 
-      (defun eos/complete-in-buffer-or-indent ()
+      (defun eos-complete-in-buffer-or-indent ()
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
-        (if (looking-at "\\_>")
-            (progn
-              (when (fboundp 'company-complete-common)
-                (funcall 'company-complete-common)))
-          (indent-according-to-mode)))
+        (cond ((looking-at "\\_>")
+          (funcall 'company-complete-common))
+         (t (indent-according-to-mode))))
 
       #+END_SRC
 
@@ -5879,12 +5799,13 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; company-active-map
-      (when (boundp 'company-active-map)
-        (progn
-          (define-key company-active-map (kbd "TAB") 'company-complete-common)
-          (define-key company-active-map (kbd "C-j") 'company-complete-selection)
-          (define-key company-active-map (kbd "C-n") 'company-select-next)
-          (define-key company-active-map (kbd "C-p") 'company-select-previous)))
+      (eval-after-load 'company
+        (lambda ()
+          (when (boundp 'company-active-map)
+            (define-key company-active-map (kbd "TAB") 'company-complete-common)
+            (define-key company-active-map (kbd "C-j") 'company-complete-selection)
+            (define-key company-active-map (kbd "C-n") 'company-select-next)
+            (define-key company-active-map (kbd "C-p") 'company-select-previous))))
 
       ;; eos-complete map
       (define-key eos-completion-map (kbd "TAB") 'company-ispell)
@@ -5892,7 +5813,7 @@
       (define-key eos-completion-map (kbd "t") 'company-etags)
 
       ;; global
-      (global-set-key (kbd "TAB") 'eos/complete-in-buffer-or-indent)
+      (global-set-key (kbd "TAB") 'eos-complete-in-buffer-or-indent)
 
       #+END_SRC
 
@@ -6216,13 +6137,6 @@
         (compile-at-dir
          (expand-file-name user-emacs-directory) eos-compile-command))
 
-      ;; (defun eos/icomplete/compile ()
-      ;;   "Icomplete compile command completitions."
-      ;;   (interactive)
-      ;;   (let ((candidates compile-history))
-      ;;     (compile
-      ;;      (completing-read "Compile command: " candidates nil 'confirm))))
-
       #+END_SRC
 
 ***** Customize
@@ -6261,7 +6175,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; utils map
-      ;; (define-key eos-utils-map (kbd "c") 'eos/icomplete/compile)
+      ;; (define-key eos-utils-map (kbd "c") 'compile-history)
 
       #+END_SRC
 
@@ -6496,7 +6410,7 @@
       #+BEGIN_SRC emacs-lisp
 
       (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-      (define-key text-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
+      (define-key text-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
 
       (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
       (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
@@ -6665,7 +6579,7 @@
                   (eos/elisp/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos/set-flycheck-checker 'emacs-lisp)
+                  (eos-set-flycheck-checker 'emacs-lisp)
 
                   ;; activate dash docset (emacs)
                   (eos-set-dash-docset "Emacs Lisp")))
@@ -6677,22 +6591,22 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; emacs-lisp-mode-map
-      (when (boundp 'emacs-lisp-mode-map)
-        ;; eval
-        (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
-        (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
-        (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
-        (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile)
+      (eval-after-load 'elisp-mode
+        (lambda ()
+          (when (boundp 'emacs-lisp-mode-map)
+            ;; unbind
+            (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
+            (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
+            (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
+            (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
+            (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil)
 
-        ;; complete
-        (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos/complete-in-buffer-or-indent)
-
-        ;; quality of life (unbind)
-        (define-key emacs-lisp-mode-map (kbd "DEL") 'nil)
-        (define-key emacs-lisp-mode-map (kbd "ESC") 'nil)
-        (define-key emacs-lisp-mode-map (kbd "C-x") 'nil)
-        (define-key emacs-lisp-mode-map (kbd "C-M-x") 'nil)
-        (define-key emacs-lisp-mode-map (kbd "C-M-q") 'nil))
+            ;; bind
+            (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
+            (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
+            (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
+            (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile)
+            (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos-complete-in-buffer-or-indent))))
 
       #+END_SRC
 
@@ -6752,7 +6666,7 @@
                   (eos/haskell/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos/set-flycheck-checker 'haskell-ghc)
+                  (eos-set-flycheck-checker 'haskell-ghc)
 
                   ;; haskell indentation mode that deals with the layout rule.
                   ;; it rebinds RET, DEL and BACKSPACE, so that indentations can be
@@ -7009,7 +6923,7 @@
                   (eos-set-dash-docset '"C")
 
                   ;; set flycheck checker
-                  (eos/set-flycheck-checker 'c/c++-clang)))
+                  (eos-set-flycheck-checker 'c/c++-clang)))
 
       (add-hook 'c++-mode-hook
                 (lambda ()
@@ -7017,7 +6931,7 @@
                   (eos/cc/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos/set-flycheck-checker 'c++-cppcheck)
+                  (eos-set-flycheck-checker 'c++-cppcheck)
 
                   ;; set dash docset
                   (eos-set-dash-docset '"C++")))
@@ -7028,37 +6942,27 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; register binds through hook
-      (add-hook 'c-mode-hook
-                (lambda ()
-                  (when (boundp 'c-mode-map)
-                    ;; set rtags prefix map in c-mode map (C-c r)
-                    (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
+      (eval-after-load 'cc-mode
+        (lambda ()
+          (when (and (boundp 'c-mode-map) (boundp 'c++-mode-map))
+            ;; set rtags prefix map in c-mode map (C-c r)
+            (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
+            (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
 
-                    ;; complete or indent
-                    (define-key c-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
+            ;; complete or indent
+            (define-key c-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
+            (define-key c++-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
 
-                    ;; compilation keybind
-                    (define-key c-mode-map (kbd "C-c C-c")
-                      (lambda ()
-                        (interactive)
-                        (funcall 'compile compile-command))))))
+            ;; compilation keybind
+            (define-key c-mode-map (kbd "C-c C-c")
+              (lambda ()
+                (interactive)
+                (funcall 'compile compile-command)))
 
-      ;; register binds through hook
-      (add-hook 'c++-mode-hook
-                (lambda ()
-                  (when (boundp 'c++-mode-map)
-                    ;; set rtags prefix map in c-mode map (C-c r)
-                    (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
-
-                    ;; complete or indent
-                    (define-key c++-mode-map (kbd "TAB") 'eos/complete-in-buffer-or-indent)
-
-                    ;; compilation keybind
-                    (define-key c++-mode-map (kbd "C-c C-c")
-                      (lambda ()
-                        (interactive)
-                        (funcall 'compile compile-command))))))
+            (define-key c++-mode-map (kbd "C-c C-c")
+              (lambda ()
+                (interactive)
+                (funcall 'compile compile-command))))))
 
       #+END_SRC
 
@@ -7128,7 +7032,7 @@
                   (eos/go/set-company-backends)
 
                   ;; set flycheck checker (go lint)
-                  (eos/set-flycheck-checker 'go-golint)
+                  (eos-set-flycheck-checker 'go-golint)
 
                   ;; set dash docsets
                   (eos-set-dash-docset '"Go")))
@@ -7193,7 +7097,7 @@
                      (company-files)))
 
                   ;; set flycheck backends
-                  (eos/set-flycheck-checker 'sh-shellcheck)))
+                  (eos-set-flycheck-checker 'sh-shellcheck)))
 
       #+END_SRC
 
@@ -7301,7 +7205,7 @@
                   (eos/lua/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos/set-flycheck-checker 'lua)
+                  (eos-set-flycheck-checker 'lua)
 
                   ;; activate dash docset
                   (eos-set-dash-docset "Lua")))
@@ -7412,7 +7316,7 @@
                   (eos/python/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos/set-flycheck-checker 'python-pycompile)
+                  (eos-set-flycheck-checker 'python-pycompile)
 
                   ;; set dash docsets
                   (eos-set-dash-docset '"Python 3")))
@@ -7502,7 +7406,7 @@
                      (company-files)))
 
                   ;; select flycheck checker (use gcc)
-                  (eos/set-flycheck-checker 'c/c++-gcc)
+                  (eos-set-flycheck-checker 'c/c++-gcc)
 
                   ;; activate mql5 docset
                   (eos-set-dash-docset '"mql5")))

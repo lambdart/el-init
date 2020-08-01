@@ -2160,7 +2160,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'icomplete nil t)
+      ;; (require 'icomplete nil t)
 
       #+END_SRC
 
@@ -2195,101 +2195,7 @@
       (customize-set-variable 'icomplete-with-completion-tables t)
 
       ;; if non-nil, also use icomplete when completing in non-mini buffers
-      ;; TODO: research
       (customize-set-variable 'icomplete-in-buffer nil)
-
-      #+END_SRC
-
-      #+RESULTS:
-
-***** Kill-ring
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/icomplete/kill-ring-save (&optional arg)
-        "Expand and save current icomplete match (ARG) to the kill ring.
-      With a prefix argument, insert the match to the point in the
-      current buffer"
-        (interactive "*P")
-        (when (and (minibufferp)
-                   (bound-and-true-p icomplete-mode))
-          (kill-new (field-string-no-properties))
-          (if current-prefix-arg
-              (progn
-                (select-window (get-mru-window))
-                (insert (car kill-ring)
-                        (abort-recursive-edit))))))
-
-      #+END_SRC
-
-***** Mark-ring
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/icomplete-mark-ring-line-string-at-pos (pos)
-        "Return line string at position POS."
-        (save-excursion
-          (goto-char pos)
-          (forward-line 0)
-          (let ((line (car (split-string (thing-at-point 'line) "[\n\r]"))))
-            (remove-text-properties 0 (length line) '(read-only) line)
-            (if (string= "" line)
-                "<EMPTY LINE>"
-              line))))
-
-      (defun eos/icomplete/mark-ring ()
-        "Browse `mark-ring' interactively."
-        (interactive)
-        (let* (candidates)
-          (setq candidates
-                (cl-loop with marks = (if (mark t)
-                                          (cons (mark-marker) mark-ring)
-                                        mark-ring)
-                         for marker in marks
-                         with max-line-number = (line-number-at-pos (point-max))
-                         with width = (length (number-to-string max-line-number))
-                         for m = (format (concat "%" (number-to-string width) "d: %s")
-                                         (line-number-at-pos marker)
-                                         (eos/icomplete-mark-ring-line-string-at-pos marker))
-                         unless (and recip (assoc m recip))
-                         collect (cons m marker) into recip
-                         finally return recip))
-          (if candidates
-              (progn
-                (let (candidate)
-                  (setq candidate (completing-read "Mark-ring: " candidates nil t))
-                  (goto-char (cdr (assoc candidate candidates))))))
-          (message "Mark ring is empty")))
-
-      #+END_SRC
-
-***** Toggle
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun eos/icomplete/toggle-completion-styles (&optional arg)
-        "Toggle between completion styles.
-      With pregix ARG use basic completion instead.
-      These styles are described in `completion-styles-alist'."
-        (interactive "*P")
-        (when (and (minibufferp)
-                   (bound-and-true-p icomplete-mode))
-          (let* ((completion-styles-original completion-styles)
-                 (basic    '(basic emacs22))
-                 (initials '(initials substring partial-completion))
-                 (prefix   '(partial-completion substring initials)))
-
-            ;; choose basic, initials or prefix
-            (if current-prefix-arg
-                (setq-local completion-styles basic)
-              (progn
-                (if (not (eq (car completion-styles) 'initials))
-                    (setq-local completion-styles initials)
-                  (setq-local completion-styles prefix))))
-
-            ;; show which current completion style
-            (message "Completion style: %s "
-                     (format "%s" (car completion-styles))))))
 
       #+END_SRC
 
@@ -2297,26 +2203,15 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-      (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
-      (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions)
-      (define-key icomplete-minibuffer-map (kbd "SPC") 'nil)
-
-      ;; toogle styles
-      (define-key icomplete-minibuffer-map (kbd "C-,") 'eos/icomplete/toggle-completion-styles)
-
-      ;; basic
-      (define-key icomplete-minibuffer-map (kbd "C-.")
+      (eval-after-load 'icomplete
         (lambda ()
-          (interactive)
-          (let ((current-prefix-arg t))
-            (funcall 'eos/icomplete/toggle-completion-styles))))
-
-      ;; eos-utils-map
-      (define-key eos-utils-map (kbd "m") 'eos/icomplete/mark-ring)
-
-      ;; global-map
-      ;; (global-set-key (kbd "M-y") 'eos/icomplete/kill-ring)
+          (when (boundp 'icomplete-minibuffer-map)
+            ;; unbind
+            (define-key icomplete-minibuffer-map (kbd "SPC") 'nil)
+            ;; bind
+            (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
+            (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
+            (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions))))
 
       #+END_SRC
 
@@ -2324,13 +2219,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; enable (global)
+      ;; enable globally
       (add-hook 'window-setup-hook
                 (lambda ()
                   (funcall 'icomplete-mode 1)))
-
-      ;; enable fido-mode
-      ;; (fido-mode 1)
 
       #+END_SRC
 
@@ -4458,7 +4350,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'flycheck nil t)
+      ;; (require 'flycheck nil t)
 
       #+END_SRC
 
@@ -5447,7 +5339,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eval-after-load 'Man-mode
+      (eval-after-load 'man
         (lambda ()
           (when (boundp 'Man-mode-map)
             (define-key Man-mode-map (kbd "C-j") 'push-button))))
@@ -5497,7 +5389,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'dash-docs nil t)
+      ;; (require 'dash-docs nil t)
 
       #+END_SRC
 
@@ -5712,8 +5604,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (require 'company nil t)
-      ;; (require 'company-etags nil t)
+      ;; (require 'company nil t)
 
       #+END_SRC
 
@@ -5782,14 +5673,14 @@
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
-          (funcall 'company-complete))
+               (funcall 'company-complete))
          (t (indent-according-to-mode))))
 
       (defun eos-complete-in-buffer-or-indent ()
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
-          (funcall 'company-complete-common))
+          (safe-funcall 'company-complete-common))
          (t (indent-according-to-mode))))
 
       #+END_SRC
@@ -6164,9 +6055,10 @@
       (add-hook 'compilation-filter-hook
                 (lambda ()
                   (when (and (eq major-mode 'compilation-mode)
-                             (boundp 'compilation-filter-start))
-                    (ansi-color-apply-on-region
-                     compilation-filter-start (point-max)))))
+                             (boundp 'compilation-filter-start)
+                             (fboundp 'ansi-color-apply-on-region))
+                    (funcall 'ansi-color-apply-on-region
+                             compilation-filter-start (point-max)))))
 
       #+END_SRC
 

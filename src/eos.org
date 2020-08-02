@@ -130,8 +130,8 @@
 
      ;; (add-hook 'window-setup-hook
      ;;           (lambda ()
-     ;;             (setq gc-cons-threshold 800000)));; 16777216 ; 16mb
-     ;; ;;                   gc-cons-percentage 0.1)))
+     ;;             (setq gc-cons-threshold 800000
+     ;;                   gc-cons-percentage 0.1)))
 
      #+END_SRC
 
@@ -2928,12 +2928,6 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       ;; set frame opacy
-       ;; (add-hook 'exwm-init-hook
-       ;;           (lambda ()
-       ;;             (interactive)
-       ;;             (set-frame-transparency 0.8)))
-
        ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
        ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
        ;; are run when a new X window class name or title is available.  Here's
@@ -2994,8 +2988,7 @@
 
        (customize-set-variable 'exwm-workspace-number
                                (if (boundp 'exwm-randr-workspace-monitor-plist)
-                                   (progn
-                                     (/ (safe-length exwm-randr-workspace-monitor-plist) 2))
+                                   (/ (safe-length exwm-randr-workspace-monitor-plist) 2)
                                  1))
 
        #+END_SRC
@@ -3240,18 +3233,19 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; functions
-       (defun eos/term-send-kill-line ()
+       (defun eos-term-send-kill-line ()
          "Kill line in multi-term mode with the possibility to paste it like in a normal shell."
          (interactive)
          (when (fboundp 'term-send-raw-string)
            (kill-line)
            (term-send-raw-string "\C-k")))
 
-       (defun eos/run-term ()
-         "Exec \\[term] but asks for the `term-mode' buffer name."
-         (interactive)
+       (defun eos-term (name)
+         "Call `term' and asks for a buffer NAME."
+         (interactive
+          (list (read-string "Term name: " nil nil "Term")))
          (funcall 'term (getenv "SHELL"))
-         (rename-buffer (read-string "Term name: " nil nil "Term") t))
+         (rename-buffer name t))
 
        #+END_SRC
 
@@ -3287,7 +3281,7 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; clt-x-map (C-x) prefix
-       (define-key ctl-x-map (kbd "<C-return>") 'eos/run-term)
+       (define-key ctl-x-map (kbd "<C-return>") 'eos-term)
 
        #+END_SRC
 
@@ -3633,7 +3627,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'iedit-autoloads nil t)
+      ;; (require 'iedit nil t)
 
       #+END_SRC
 
@@ -3652,10 +3646,11 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; bind (iedit-mode-keymap)
-      (when (boundp 'iedit-mode-keymap)
-        (progn
-          (define-key iedit-mode-keymap (kbd "<tab>") 'eos-complete-in-buffer-or-indent)
-          (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence)))
+      (eval-after-load 'iedit
+        (lambda ()
+          (when (boundp 'iedit-mode-keymap)
+            (define-key iedit-mode-keymap (kbd "<tab>") 'eos-complete-in-buffer-or-indent)
+            (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence))))
 
       ;; bind (global)
       (global-set-key (kbd "C-;") 'iedit-mode)
@@ -5149,16 +5144,20 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/dictionary-search-at-point ()
-        "Dictionary with word at point as its arguments."
+      (defun eos-dictionary-search-at-point ()
+        "Search WORD in dictionary at point."
         (interactive)
         (let ((word (thing-at-point 'word)))
+          ;; asks for a word if none was found at point
           (unless word
             (setq word (read-string "Word: ")))
-          (if word
-              (when (fboundp 'dictionary-search)
-                (dictionary-search word))
-            (message "Missing word"))))
+          ;; switch/case
+          (cond
+           ((eq word "") (message "Missing word")) ; no word submited
+           ;; default, search in dictionary
+           (t
+            (when (fboundp 'dictionary-search)
+              (dictionary-search word))))))
 
       #+END_SRC
 
@@ -5167,7 +5166,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; binds
-      (define-key eos-docs-map (kbd ".") 'eos/dictionary-search-at-point)
+      (define-key eos-docs-map (kbd ".") 'eos-dictionary-search-at-point)
 
       #+END_SRC
 
@@ -5650,12 +5649,9 @@
       ;; the list of active backends (completion engines)
       (customize-set-variable
        'company-backends
-       '(company-capf
-         company-files
-         company-ispell
-         (company-dabbrev-code
-          company-keywords)
-         company-dabbrev))
+       '(company-capf company-files company-ispell
+                      (company-dabbrev-code company-keywords)
+                      company-dabbrev))
 
       #+END_SRC
 
@@ -5680,7 +5676,7 @@
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
-          (safe-funcall 'company-complete-common))
+          (safe-funcall 'company-complete-common nil))
          (t (indent-according-to-mode))))
 
       #+END_SRC
@@ -6055,10 +6051,9 @@
       (add-hook 'compilation-filter-hook
                 (lambda ()
                   (when (and (eq major-mode 'compilation-mode)
-                             (boundp 'compilation-filter-start)
-                             (fboundp 'ansi-color-apply-on-region))
-                    (funcall 'ansi-color-apply-on-region
-                             compilation-filter-start (point-max)))))
+                             (boundp 'compilation-filter-start))
+                    (safe-funcall 'ansi-color-apply-on-region
+                                  `(,compilation-filter-start ,(point-max))))))
 
       #+END_SRC
 

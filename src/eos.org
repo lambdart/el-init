@@ -13,7 +13,7 @@
   Using =Emacs= as the only dynamic interface
   between human and machine.
 
-** Boot
+** Bootstrap
 *** Header
 
     Define the package header to avoid warnings, and just a
@@ -4689,16 +4689,17 @@
      improvements over the original xcompmgr, like window frame opacity and
      inactive window transparency.
 
-     Start compton after emacs initialize.
+     Start compton after emacs initialize (late time decision), put
+     this at =~/.xinitrc=.
 
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
       ;; start compton after emacs initialize
-      (add-hook 'after-init-hook
-                (lambda ()
-                  (safe-start-process "compton" "compton" "-b")))
+      ;; (add-hook 'after-init-hook
+      ;;           (lambda ()
+      ;;             (safe-start-process "compton" "compton" "-b")))
 
       #+END_SRC
 
@@ -4710,10 +4711,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key ctl-x-map (kbd "<end>")
-        (lambda ()
-          (interactive)
-          (start-process "slock" nil "slock")))
+      (define-key ctl-x-map (kbd "<end>") 'lock-screen)
 
       #+END_SRC
 
@@ -7580,12 +7578,6 @@
      (global-unset-key (kbd "<S-down-mouse-1>"))
 
      #+END_SRC
-
-** Lab
-
-   To add more experiments to this configuration
-   edit ~emacs.d/lisp/lab/lab.el~ and reload it:
-   =M-x load-library RET lab RET=.
 
 ** EOF
 

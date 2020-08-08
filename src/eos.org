@@ -243,6 +243,7 @@
                            eos-filter-map
                            eos-utils-map
                            eos-window-map
+                           eos-media-map
                            eos-completion-map
                            eos-rtags-map))
        (define-prefix-command prefix-map))
@@ -264,7 +265,7 @@
      (define-key ctl-x-map (kbd "c") 'eos-utils-map) ; commands
      (define-key ctl-x-map (kbd "e") 'eos-sc-map) ; errors
      (define-key ctl-x-map (kbd "l") 'eos-docs-map) ; library
-     (define-key ctl-x-map (kbd "RET") 'eos-media-map) ;
+     (define-key ctl-x-map (kbd "v") 'eos-media-map) ; media
      (define-key ctl-x-map (kbd "<tab>") 'eos-completion-map) ; tab - complete
 
      #+END_SRC
@@ -821,9 +822,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (funcall 'epa-file-enable)))
+      ;; (add-hook 'window-setup-hook
+      ;;           (lambda ()
+      ;;             (funcall 'epa-file-enable)))
 
       #+END_SRC
 
@@ -1313,6 +1314,15 @@
       (add-hook 'window-setup-hook
                 (lambda ()
                   (put 'dired-find-alternate-file 'disabled nil)))
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; commands extensions map
+      (define-key ctl-x-map (kbd "C-d") 'dired)
 
       #+END_SRC
 
@@ -2138,11 +2148,12 @@
       (define-key completion-list-mode-map (kbd "?") 'describe-symbol-at-point)
       (define-key completion-list-mode-map (kbd "q") 'delete-completion-window)
       (define-key completion-list-mode-map (kbd "d") 'delete-completion-line)
+      (define-key completion-list-mode-map (kbd "w") 'kill-ring-save)
+      (define-key completion-list-mode-map (kbd "RET") 'choose-completion)
       (define-key completion-list-mode-map (kbd "TAB") 'next-completion)
       (define-key completion-list-mode-map (kbd "DEL") 'previous-completion)
       (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
-      (define-key completion-list-mode-map (kbd "RET") 'choose-completion)
-      (define-key completion-list-mode-map (kbd "ESC") 'force-minibuffer-exit)
+      (define-key completion-list-mode-map (kbd "C-g") 'force-minibuffer-exit)
       (define-key completion-list-mode-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       #+END_SRC
@@ -3276,12 +3287,11 @@
                  (lambda ()
                    (when (and (boundp 'term-raw-map)
                               (boundp 'term-mode-map))
-                     (progn
-                       ;; term-raw-map
-                       (define-key term-raw-map (kbd "s-q") 'term-line-mode)
+                     ;; term-raw-map
+                     (define-key term-raw-map (kbd "s-q") 'term-line-mode)
 
-                       ;; term-mode-map
-                       (define-key term-mode-map (kbd "s-q") 'term-char-mode)))))
+                     ;; term-mode-map
+                     (define-key term-mode-map (kbd "s-q") 'term-char-mode))))
 
        #+END_SRC
 
@@ -3646,7 +3656,7 @@
 
       ;; if no-nil, the key is inserted into global-map,
       ;; isearch-mode-map, esc-map and help-map.
-      (customize-set-variable 'iedit-toggle-key-default t)
+      ;; (customize-set-variable 'iedit-toggle-key-default (kbd "C-;"))
 
       #+END_SRC
 
@@ -4008,7 +4018,7 @@
             (define-key emms-playlist-mode-map (kbd "A") 'emms-add-file))))
 
       ;; binds eos-media-map
-      (define-key eos-media-map (kbd "RET") 'emms-pause)
+      (define-key eos-media-map (kbd "v") 'emms-pause)
       (define-key eos-media-map (kbd "n") 'emms-next)
       (define-key eos-media-map (kbd "p") 'emms-previous)
       (define-key eos-media-map (kbd "a") 'emms-add-file)
@@ -4078,10 +4088,10 @@
       (customize-set-variable 'rcirc-decode-coding-system 'utf-8)
 
       ;; the default reason to send when quitting a server
-      (customize-set-variable 'rcirc-default-quit-reason "oops...")
+      (customize-set-variable 'rcirc-default-quit-reason "d(-_-)b")
 
       ;; the default reason to send when parting from a channel
-      (customize-set-variable 'rcirc-default-part-reason "<-")
+      (customize-set-variable 'rcirc-default-part-reason "")
 
       ;; responses which will be hidden when `rcirc-omit-mode is enable
       (customize-set-variable 'rcirc-omit-responses
@@ -4094,7 +4104,7 @@
                                  :server-alias "freenode"
                                  :encryption tls
                                  :nick "esac"
-                                 :channels ("#emacs #emacs-berlin #freebsd"))))
+                                 :channels ("#emacs #freebsd"))))
 
       #+END_SRC
 
@@ -4350,8 +4360,8 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; hooks
-      (add-hook 'text-mode-hook #'flyspell-mode)
-      (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+      ;; (add-hook 'text-mode-hook #'flyspell-mode)
+      ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
       #+END_SRC
 
@@ -5692,7 +5702,7 @@
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
-          (safe-funcall 'company-complete-common nil))
+          (safe-funcall 'company-complete nil))
          (t (indent-according-to-mode))))
 
       #+END_SRC
@@ -5711,9 +5721,13 @@
             (define-key company-active-map (kbd "C-p") 'company-select-previous))))
 
       ;; eos-complete map
-      (define-key eos-completion-map (kbd "TAB") 'company-ispell)
+      (define-key eos-completion-map (kbd "`") 'company-ispell)
       (define-key eos-completion-map (kbd "f") 'company-files)
-      (define-key eos-completion-map (kbd "t") 'company-etags)
+      (define-key eos-completion-map (kbd "e") 'company-etags)
+      (define-key eos-completion-map (kbd "y") 'company-yasnippet)
+
+      ;; redundancy
+      (define-key eos-completion-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
 
       ;; global
       (global-set-key (kbd "TAB") 'eos-complete-in-buffer-or-indent)
@@ -6033,6 +6047,18 @@
       (defvar eos-compile-command
         "make -C ~/core/dev/eos/src all"
         "Default compile command for EOS.")
+
+      (defun eos-update-packages-autoloads ()
+        "Update packages autoloads using Vex `update-packages-autoloads'."
+        (interactive)
+        (let ((lisp-dir (expand-file-name "lisp/" user-emacs-directory))
+              (site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)))
+          ;; update lisp autoloads
+          (update-packages-autoloads
+           lisp-dir (concat lisp-dir "lisp-loaddefs.el"))
+          ;; update site-lisp autolods
+          (update-packages-autoloads
+           site-lisp-dir (concat site-lisp-dir "site-lisp-loaddefs.el"))))
 
       (defun eos-compile ()
         "Call `eos-compile' passing the right arguments."
@@ -6453,12 +6479,10 @@
         "Set elisp company backends."
         (interactive)
         (eos-set-company-backends
-         '((company-elisp :with
-                          company-capf
-                          company-yasnippet
-                          company-dabbrev-code)
+         '((company-elisp :with company-capf company-dabbrev-code)
            (company-dabbrev)
            (company-files))))
+           ;; (company-yasnippet)
 
       #+END_SRC
 
@@ -7435,8 +7459,8 @@
      ;; (define-key ctl-x-map (kbd "n") nil)
      ;; (define-key ctl-x-map (kbd "f") nil)
      ;; (define-key ctl-x-map (kbd "a") nil)
+     ;; (define-key ctl-x-map (kbd "v") nil)
      (define-key ctl-x-map (kbd "h") nil)
-     (define-key ctl-x-map (kbd "v") nil)
      (define-key ctl-x-map (kbd "x") nil)
      (define-key ctl-x-map (kbd "X") nil)
 

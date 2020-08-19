@@ -542,6 +542,15 @@
     `(rst-level-5 ((,class (:background unspecified))))
     `(rst-level-6 ((,class (:background unspecified))))
 
+    ;; RCIRC
+    `(rcirc-my-nick ((,class (:foreground ,fg-blue))))
+    `(rcirc-nick-in-message ((,class (:foreground ,fg-orange))))
+    `(rcirc-nick-in-message-full-line ((,class (:foreground ,fg-default))))
+    `(rcirc-other-nick ((,class (:foreground ,fg-cyan))))
+    `(rcirc-prompt ((,class (:foreground ,fg-default))))
+    `(rcirc-server ((,class (:foreground ,fg-pink))))
+    `(rcirc-server-prefix ((,class (:foreground ,fg-default))))
+
     ;; Sh
     `(sh-escaped-newline ((,class (:foreground ,fg-purple :inherit unspecified :weight bold))))
     `(sh-heredoc ((,class (:foreground ,fg-green))))
@@ -610,9 +619,8 @@
     `(whitespace-big-indent ((,class (:background ,bg-red :foreground ,fg-gray))))
     `(whitespace-line ((,class (:background ,bg-red :foreground ,fg-black))))
 
-    ;; yas
-    ;; yas--field-debug-face
-    `(yas-field-highlight-face ((,class (:background ,bg-black :foreground ,fg-blue))))
+    ;; Yasnippet
+    `(yas-field-highlight-face ((,class (:background ,bg-shadow :foreground ,bg-yellow))))
 
     ;; Widget
     `(widget-button ((,class (:inherit button))))

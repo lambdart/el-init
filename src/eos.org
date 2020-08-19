@@ -501,6 +501,7 @@
       (global-set-key (kbd "C-M-y") 'scroll-other-window-down)
 
       ;; edit
+      (global-set-key (kbd "M-y") 'insert-kill-ring)
       (global-set-key (kbd "M-i") 'indent-region-or-buffer)
       (global-set-key (kbd "M-j") 'duplicate-line-or-region)
       (global-set-key (kbd "M-n") 'transpose-lines-up)
@@ -1585,7 +1586,6 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; custom
      ;; non-nil means do not display continuation lines.
      (customize-set-variable 'truncate-lines nil)
 
@@ -1602,6 +1602,12 @@
 
      ;; non-nil means load prefers the newest version of a file.
      (customize-set-variable 'load-prefer-newer t)
+
+     ;; enable: (erase-buffer)
+     ;; Delete the entire contents of the current buffer.
+     (add-hook 'window-setup-hook
+               (lambda ()
+                 (put 'erase-buffer 'disabled nil)))
 
      #+END_SRC
 
@@ -2435,8 +2441,8 @@
       (add-hook 'window-setup-hook
                 (lambda()
                   (set-wallpaper
-                   "~/media/images/wallpapers/studio-ghibli/ghibli-7.jpg"
-                   "-g -0-0")))
+                   "~/media/images/wallpapers/studio-ghibli/zelda.png"
+                   "-g -0+70")))
 
       #+END_SRC
 
@@ -4360,8 +4366,8 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; hooks
-      ;; (add-hook 'text-mode-hook #'flyspell-mode)
-      ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+      (add-hook 'text-mode-hook #'flyspell-mode)
+      (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
       #+END_SRC
 
@@ -5604,7 +5610,10 @@
           (when (boundp 'yas-keymap)
             (define-key yas-keymap (kbd "TAB") nil)
             (define-key yas-keymap (kbd "<tab>") nil)
-            (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))))
+            (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))
+
+          ;; unbind: clean minor mode map alist
+          (setq minor-mode-map-alist nil)))
 
       #+END_SRC
 
@@ -5696,14 +5705,14 @@
         (interactive)
         (cond ((looking-at "\\_>")
                (funcall 'company-complete))
-         (t (indent-according-to-mode))))
+              (t (indent-according-to-mode))))
 
       (defun eos-complete-in-buffer-or-indent ()
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
-          (safe-funcall 'company-complete nil))
-         (t (indent-according-to-mode))))
+               (safe-funcall 'company-complete nil))
+              (t (indent-according-to-mode))))
 
       #+END_SRC
 
@@ -5730,7 +5739,7 @@
       (define-key eos-completion-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
 
       ;; global
-      (global-set-key (kbd "TAB") 'eos-complete-in-buffer-or-indent)
+      (global-set-key (kbd "C-TAB") 'eos-complete-in-buffer-or-indent)
 
       #+END_SRC
 
@@ -6235,6 +6244,14 @@
 
       #+END_SRC
 
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key prog-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
+
+      #+END_SRC
+
 **** Hideshow
 
      Minor mode to hide and show code and comment blocks.
@@ -6482,7 +6499,7 @@
          '((company-elisp :with company-capf company-dabbrev-code)
            (company-dabbrev)
            (company-files))))
-           ;; (company-yasnippet)
+      ;; (company-yasnippet)
 
       #+END_SRC
 
@@ -6533,7 +6550,7 @@
             (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
             (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
             (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile)
-            (define-key emacs-lisp-mode-map (kbd "<tab>") 'eos-complete-in-buffer-or-indent))))
+            (define-key emacs-lisp-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent))))
 
       #+END_SRC
 
@@ -7472,7 +7489,9 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (setq minor-mode-map-alist nil)
+     (add-hook 'window-setup-hook
+               (lambda ()
+                 (setq minor-mode-map-alist nil)))
 
      #+END_SRC
 

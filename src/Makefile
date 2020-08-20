@@ -15,28 +15,6 @@ CC := -f batch-byte-compile
 EC := --eval
 SC := --script
 
-# Packages paths (temporary!)
-VEX       = ~/.emacs.d/lisp/vex
-ASYNC     = ~/.emacs.d/site-lisp/async
-XELB      = ~/.emacs.d/site-lisp/xelb
-EXWM      = ~/.emacs.d/site-lisp/exwm
-EMMS      = ~/.emacs.d/site-lisp/emms
-DASH      = ~/.emacs.d/site-lisp/dash
-DASH-DOCS = ~/.emacs.d/site-lisp/dash-docs
-COMPANY   = ~/.emacs.d/site-lisp/company
-FLYCHECK  = ~/.emacs.d/site-lisp/flycheck
-
-# Additional emacs load-path
-LOAD_PATH := -L $(VEX) \
-		-L $(ASYNC) \
-		-L $(DASH) \
-		-L $(XELB) \
-		-L $(EXWM) \
-		-L $(EMMS) \
-		-L $(DASH-DOCS) \
-		-L $(FLYCHECK) \
-		-L $(COMPANY)
-
 # Tangle script
 TANGLE_SCRIPT = tangle.el
 
@@ -61,7 +39,7 @@ tangle:
 
 # Compile generated init.el final generated script
 init:
-	${EMACS} ${LOAD_PATH} ${CC} ${INIT_SCRIPT}
+	${EMACS} ${CC} ${INIT_SCRIPT}
 
 # Entry point
 all: tangle init compile

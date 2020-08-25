@@ -1307,6 +1307,14 @@
 
       #+END_SRC
 
+***** Alias
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defalias 'create-empty-file 'dired-create-empty-file)
+
+      #+END_SRC
+
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp

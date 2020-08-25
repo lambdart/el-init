@@ -2441,8 +2441,8 @@
       (add-hook 'window-setup-hook
                 (lambda()
                   (set-wallpaper
-                   "~/media/images/wallpapers/studio-ghibli/zelda.png"
-                   "-g -0+70")))
+                   "~/media/images/wallpapers/studio-ghibli/ghibli-7.jpg"
+                   "-g -0-0")))
 
       #+END_SRC
 
@@ -2723,9 +2723,9 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; enable emacs server after startup
-     (add-hook 'after-init-hook
-               (lambda ()
-                 (funcall 'server-start)))
+     ;; (add-hook 'after-init-hook
+     ;;           (lambda ()
+     ;;             (funcall 'server-start)))
 
      #+END_SRC
 
@@ -4024,12 +4024,13 @@
             (define-key emms-playlist-mode-map (kbd "A") 'emms-add-file))))
 
       ;; binds eos-media-map
-      (define-key eos-media-map (kbd "v") 'emms-pause)
-      (define-key eos-media-map (kbd "n") 'emms-next)
-      (define-key eos-media-map (kbd "p") 'emms-previous)
-      (define-key eos-media-map (kbd "a") 'emms-add-file)
       (define-key eos-media-map (kbd "P") 'play-playlist)
+      (define-key eos-media-map (kbd "a") 'emms-add-file)
+      (define-key eos-media-map (kbd "s") 'emms-start)
       (define-key eos-media-map (kbd "q") 'emms-stop)
+      (define-key eos-media-map (kbd "v") 'emms-pause)
+      (define-key eos-media-map (kbd "p") 'emms-previous)
+      (define-key eos-media-map (kbd "n") 'emms-next)
       (define-key eos-media-map (kbd "r") 'emms-random)
 
       #+END_SRC
@@ -4356,7 +4357,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; string that is the name of the default dictionary
+      ;; a string that is the name of the default dictionary
+      ;; this is passed to the ‘ispell-change-dictionary’ when flyspell is started
       (customize-set-variable 'flyspell-default-dictionary "english")
 
       #+END_SRC
@@ -5264,7 +5266,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/blog/insert-html (html-file)
+      (defun org-static-blog--insert-html (html-file)
         "Insert HTML-FILE when file exists."
         (if (file-exists-p html-file)
             (with-temp-buffer
@@ -5272,9 +5274,32 @@
               (buffer-string))
           ""))
 
-      (defun eos/blog/publish ()
-        "Update htmls and call `org-static-blog-publish'."
+      (defun org-static-blog--update-html ()
+        "Update html content."
+
+        ;; html to put in the <head> of each page.
+        (customize-set-variable
+         'org-static-blog-page-header
+         (org-static-blog--insert-html "~/core/dev/hidden-ones/html/header.html"))
+
+        ;; html to put before the content of each page.
+        (customize-set-variable
+         'org-static-blog-page-preamble
+         (org-static-blog--insert-html "~/core/dev/hidden-ones/html/preamble.html"))
+
+        ;; html to put after the content of each page.
+        (customize-set-variable
+         'org-static-blog-page-postamble
+         (format
+          (org-static-blog--insert-html "~/core/dev/hidden-ones/html/postamble.html")
+          (org-version))))
+
+      (defun org-static-blog-update ()
+        "Update html content/layout and publish."
         (interactive)
+        ;; setup html/layout pages
+        (org-static-blog--update-html)
+        ;; export the org files
         (funcall 'org-static-blog-publish t))
 
       #+END_SRC
@@ -5299,25 +5324,29 @@
       (customize-set-variable
        'org-static-blog-posts-directory "~/core/dev/hidden-ones/posts/")
 
+      ;; directory where published ORG files are stored
+      (customize-set-variable
+       'org-static-blog-pages-directory "~/core/dev/hidden-ones/pages/")
+
       ;; directory where unpublished ORG files are stored.
       (customize-set-variable
-       'org-static-blog-drafts-directory "~/core/dev/hidden-ones/posts/drafts/")
+       'org-static-blog-drafts-directory "~/core/dev/hidden-ones/drafts/")
 
       ;; html to put in the <head> of each page.
       (customize-set-variable
        'org-static-blog-page-header
-       (eos/blog/insert-html "~/core/dev/hidden-ones/html/header.html"))
+       (org-static-blog--insert-html "~/core/dev/hidden-ones/html/header.html"))
 
       ;; html to put before the content of each page.
       (customize-set-variable
        'org-static-blog-page-preamble
-       (eos/blog/insert-html "~/core/dev/hidden-ones/html/preamble.html"))
+       (org-static-blog--insert-html "~/core/dev/hidden-ones/html/preamble.html"))
 
       ;; html to put after the content of each page.
       (customize-set-variable
        'org-static-blog-page-postamble
        (format
-        (eos/blog/insert-html "~/core/dev/hidden-ones/html/postamble.html")
+        (org-static-blog--insert-html "~/core/dev/hidden-ones/html/postamble.html")
         (org-version)))
 
       ;; use preview versions of posts on multipost pages
@@ -6057,17 +6086,24 @@
         "make -C ~/core/dev/eos/src all"
         "Default compile command for EOS.")
 
+      (defvar eos-site-loaddefs
+        (concat
+         (expand-file-name "site-lisp/" user-emacs-directory) "site-lisp-loaddefs.el")
+        "Default site-lisp-loaddefs file.")
+
+      (defvar eos-lisp-loaddefs
+        (concat
+         (expand-file-name "lisp/" user-emacs-directory) "lisp-loaddefs.el")
+        "Default lisp-loaddefs file.")
+
       (defun eos-update-packages-autoloads ()
         "Update packages autoloads using Vex `update-packages-autoloads'."
         (interactive)
-        (let ((lisp-dir (expand-file-name "lisp/" user-emacs-directory))
-              (site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)))
+        (let ((files (list eos-site-loaddefs eos-lisp-loaddefs)))
           ;; update lisp autoloads
-          (update-packages-autoloads
-           lisp-dir (concat lisp-dir "lisp-loaddefs.el"))
-          ;; update site-lisp autolods
-          (update-packages-autoloads
-           site-lisp-dir (concat site-lisp-dir "site-lisp-loaddefs.el"))))
+          (dolist (file files)
+            (update-packages-autoloads
+             (file-name-directory file) file))))
 
       (defun eos-compile ()
         "Call `eos-compile' passing the right arguments."

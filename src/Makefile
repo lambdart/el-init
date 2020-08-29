@@ -1,13 +1,13 @@
 # Emacs invocation
+# Don't load an init file: -q
+# Avoid processing X resources: -Q
+# Send messages to stderr: --batch
 EMACS = emacs -Q -q --batch
 
 # Remove command
 RM = rm -f
 
 # Define Compile Command (CC)
-# Don't load an init file: -q
-# Avoid processing X resources: -Q
-# Send messages to stderr: --batch
 # Call batch-byte-compile function: -f
 CC := -f batch-byte-compile
 
@@ -22,7 +22,7 @@ TANGLE_SCRIPT = tangle.el
 INIT_SCRIPT = init.el
 
 # Elisp auxiliary source files
-EL := tangle.el custom.el early-init.el
+EL := tangle.el early-init.el
 
 # Source-Compiled files mapping
 ELC := $(EL:.el=.elc)

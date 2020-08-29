@@ -1421,7 +1421,7 @@
      ;; set default font
      (add-hook 'window-setup-hook
                (lambda ()
-                 (safe-set-frame-font "Hermit Light:pixelsize=17")))
+                 (safe-set-frame-font "Hermit-13:weight:light")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -2241,7 +2241,8 @@
         (lambda ()
           (when (boundp 'icomplete-minibuffer-map)
             ;; unbind
-            (define-key icomplete-minibuffer-map (kbd "SPC") 'nil)
+            (define-key icomplete-minibuffer-map (kbd "SPC") nil)
+            (define-key icomplete-minibuffer-map (kbd "RET") 'minibuffer-complete-and-exit)
             ;; bind
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
@@ -2755,6 +2756,18 @@
     (require 'site-lisp-loaddefs nil t)
 
     #+END_SRC
+
+**** Lazy
+
+     Automatic generate load definitions.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (require 'lazy)
+
+     #+END_SRC
 
 *** CLI
 
@@ -4119,7 +4132,7 @@
                                  :server-alias "freenode"
                                  :encryption tls
                                  :nick "esac"
-                                 :channels ("#emacs #freebsd"))))
+                                 :channels ("#emacs #emacs-br #lisp-br #freebsd"))))
 
       #+END_SRC
 
@@ -4222,7 +4235,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'ag-autoloads nil t)
+      ;; (require 'ag nil t)
 
       #+END_SRC
 
@@ -5189,12 +5202,11 @@
       (defun eos-dictionary-search-at-point ()
         "Search WORD in dictionary at point."
         (interactive)
-        (let ((word (thing-at-point 'word)))
-          ;; asks for a word if none was found at point
-          (unless word
-            (setq word (read-string "Word: ")))
+        (let ((word (or (thing-at-point 'word)
+                        (read-string "Word: "))))
           ;; switch/case
           (cond
+           ;; word?
            ((eq word "") (message "Missing word")) ; no word submited
            ;; default, search in dictionary
            (t
@@ -6093,25 +6105,6 @@
       (defvar eos-compile-command
         "make -C ~/core/dev/eos/src all"
         "Default compile command for EOS.")
-
-      (defvar eos-site-loaddefs
-        (concat
-         (expand-file-name "site-lisp/" user-emacs-directory) "site-lisp-loaddefs.el")
-        "Default site-lisp-loaddefs file.")
-
-      (defvar eos-lisp-loaddefs
-        (concat
-         (expand-file-name "lisp/" user-emacs-directory) "lisp-loaddefs.el")
-        "Default lisp-loaddefs file.")
-
-      (defun eos-update-packages-autoloads ()
-        "Update packages autoloads using Vex `update-packages-autoloads'."
-        (interactive)
-        (let ((files (list eos-site-loaddefs eos-lisp-loaddefs)))
-          ;; update lisp autoloads
-          (dolist (file files)
-            (update-packages-autoloads
-             (file-name-directory file) file))))
 
       (defun eos-compile ()
         "Call `eos-compile' passing the right arguments."

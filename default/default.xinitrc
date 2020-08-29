@@ -1,8 +1,7 @@
-# Xresources
-# [[ -f ~/.Xresources ]] && xrdb -merge -I$HOME ~/.Xresources
-xrdb ~/.Xresources
+# load Xresources
+[[ -f ~/.Xresources ]] && xrdb -merge -I$HOME ~/.Xresources
 
-# set keyboard
+# swap crtl to caps
 setxkbmap -option ctrl:swapcaps  # Swap Left Control and Caps Lock
 setxkbmap -option ctrl:nocaps    # Make Caps Lock a Control key
 
@@ -11,5 +10,5 @@ export VISUAL=emacsclient
 export EDITOR="$VISUAL"
 export EMACSLOADPATH=$EMACSLOADPATH:~/.emacs.d/site-lisp:~/.emacs.d/lisp
 
-# finally launch emacs (breaks dashboards)
+# finally launch emacs
 exec dbus-launch --exit-with-session emacs -f exwm-enable --debug-init

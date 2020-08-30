@@ -9,7 +9,7 @@
 
   An =Emacs= configuration - written in org - well designed
   and integrated that provides a generic computer environment
-  (=VIRTUAL LISP MACHINE=) for everyday use.
+  - =VIRTUAL LISP MACHINE= - for everyday use.
 
   | Wait... What!? |
 
@@ -66,8 +66,8 @@
   of interest, a virtualized =LISP MACHINE= on top of
   your operating system.
 
-  * "LISP MACHINE" is a generic term. A Lisp Machine is a computer
-  whose operating system and applications are written in Lisp.
+  * =LISP MACHINE= is a generic term. A Lisp Machine is a computer
+    whose operating system and applications are written in Lisp.
 
   =Emacs= can be extended and twisted using the =Elisp=
   interpreter which is also the main interface to
@@ -134,10 +134,9 @@
 ** Objective
 
    Use =EMACS= as a =LISP MACHINE=, i.e, the only dynamic interface
-   to perform data transformations:
+   to perform data transformations: =INPUT-TRANSFORM-OUTPUT= cycles.
 
-   * =INPUT-TRANSFORM-OUTPUT= cycles.
-   * The only bridge between mind and machine.
+   * The only bridge between human and machine.
 
 ** Features:
 

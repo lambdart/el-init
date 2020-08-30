@@ -9,16 +9,16 @@
 
   An =Emacs= configuration - written in org - well designed
   and integrated that provides a generic computer environment
-  - =VIRTUAL LISP MACHINE= - for everyday use.
+  =VIRTUAL LISP MACHINE= for everyday use.
 
   | Wait... What!? |
 
-  "Some people (including me) have started to refer to
+  Some people (including me) have started to refer to
   =Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
   because, clearly, it is a software program and not a physical
   computer, but as that line starts to blur it seems like a useful
   epithet for =Emacs=, because these days it looks more and more like
-  an operating system."
+  an operating system.
 
 * Disclaimer
 

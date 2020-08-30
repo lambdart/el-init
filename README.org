@@ -1,20 +1,24 @@
 #+AUTHOR: esac
 #+EMAIL: esac-io@tutanota.com
-#+KEYWORDS: eos readme, readme
+#+KEYWORDS: virtual lisp machine, vlm, readme
 #+LANGUAGE: en
 #+STARTUP: overview
 #+PROPERTY: header-args :comments yes :results silent
 
-* EOS
+* VLM
 
-  A simple literate programmed Emacs configuration
-  that relies on =org-mode=, or an =Elisp= interpreter
-  desktop distribution.
+  An =Emacs= configuration - written in org - well designed
+  and integrated that provides a generic computer environment
+  (=VIRTUAL LISP MACHINE=) for everyday use.
+
   | Wait... What!? |
 
-  In other words, an =Emacs= configuration well designed
-  and integrated that provides a generic computer
-  environment for everyday use.
+  "Some people (including me) have started to refer to
+  =Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
+  because, clearly, it is a software program and not a physical
+  computer, but as that line starts to blur it seems like a useful
+  epithet for =Emacs=, because these days it looks more and more like
+  an operating system."
 
 * Disclaimer
 
@@ -29,7 +33,7 @@
   So, here goes a little bit of advice for everyone: read
   =Emacs/Elisp= manual (RTFM), and use as an exercise writing
   your own ~init.el~, but feel free to fork or copy
-  anything from ~src/eos.org~ that you like or find useful.
+  anything from ~src/vlm.org~ that you like or find useful.
 
   Learning =Elisp= may be tricky at first, compared to other
   languages, but once you understated the [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Evaluation.html][evaluation]] process,
@@ -48,10 +52,10 @@
 
 ** Screenshot
 
-   #+CAPTION: EMACS OS
-   #+NAME:   fig:EOS-screenshot
+   #+CAPTION: VIRTUAL LISP MACHINE
+   #+NAME:   fig:VLM-screenshot
 
-   [[./assets/eos.png]]
+   [[./assets/vlm.png]]
 
    | Present Day, heh... Present Time |
 
@@ -59,7 +63,11 @@
 
   =Emacs= is not only a =text editor=, but a complete
   programmable platform capable of transforming any data
-  of interest.
+  of interest, a virtualized =LISP MACHINE= on top of
+  your operating system.
+
+  * "LISP MACHINE" is a generic term. A Lisp Machine is a computer
+  whose operating system and applications are written in Lisp.
 
   =Emacs= can be extended and twisted using the =Elisp=
   interpreter which is also the main interface to
@@ -89,12 +97,12 @@
 
   To summarize everything in a single statement:
 
-  =Emacs= is a programmable platform with builtin
-  libraries that provide editing and data visualization
-  functionalities. Its core - the interpreter and basic
-  features - is written using the =C= programming language,
-  and all the other packages that extend it use a =LISP=
-  dialect called =Emacs Lisp=, usually abbreviated as
+  =Emacs= is a programmable platform with builtin libraries that
+  provide editing and data visualization functionalities.
+  Its core - the interpreter and basic features -
+  is written using the =C= programming language,
+  and all the other packages that extend it use a =LISP= dialect
+  called =Emacs Lisp=, usually abbreviated as
   =Elisp=. The =interpreter= is the main interface to
   interact with its components and =lists= are evaluated
   to do so.
@@ -107,11 +115,8 @@
   as a huge organic ecosystem capable of interacting in a very dynamic
   way with any resource of interest provided by the operating system.
 
-  That's why this configuration can be seen (IMHO) as an =Emacs/Elisp=
-  distribution.
-
   Finally, =Org-mode= is used to write and organize the configuration
-  (~src/eos.org~) in a literate programming format, meaning it
+  (~src/vlm.org~) in a literate programming format, meaning it
   contains =Elisp= source code blocks - that will be tangled
   generating the ~src/init.el~ final script - and the referent
   documentation.
@@ -126,12 +131,13 @@
   So again, =application(s)= implies =Elisp packages=
   or =external programs=.
 
-** Goal
+** Objective
 
-   Use =Emacs= as the only interface to perform
-   =INPUT-TRANSFORM-OUPUT= cycles, i.e, provide
-   a dynamic bridge between - the human mind and
-   the machine resources.
+   Use =EMACS= as a =LISP MACHINE=, i.e, the only dynamic interface
+   to perform data transformations:
+
+   * =INPUT-TRANSFORM-OUTPUT= cycles.
+   * The only bridge between mind and machine.
 
 ** Features:
 
@@ -187,7 +193,7 @@
 
   1. Emacs >= 26.3
   2. Elisp Packages
-     - TODO: List!
+     - TODO: List packages!
   3. Elf Binaries
      - Ag, The Silver Searcher
      - Global
@@ -197,6 +203,8 @@
      - Transset
 
 * Tested on
+
+  * EMACS : 26.3, 28.0.50
 
   - FreeBSD 12.1 RELEASE
   - Debian GNU/Linux 10
@@ -210,16 +218,16 @@
   example below uses curl.
 
   #+BEGIN_SRC
-     sh -c "$(curl -fsSL https://raw.githubusercontent.com/esac-io/eos/master/scripts/install.sh)"
+     sh -c "$(curl -fsSL https://raw.githubusercontent.com/esac-io/vlm/master/scripts/install.sh)"
   #+END_SRC
 
   Steps performed by the script:
 
   1. Check dependencies
-  2. Clone =eos= and sub-module repositories (TODO!)
+  2. Clone =vlm= and sub-module repositories (TODO!)
   3. Backup ~.emacs.d~ directory
   4. Byte compile third-party =Elisp= packages (TODO!)
-  5. Tangle source code from ~src/eos.org~ to ~init.el~
+  5. Tangle source code from ~src/vlm.org~ to ~init.el~
   6. Byte compile ~init.el~ script
      - Call make passing the right =Makefile= to it.
 
@@ -264,7 +272,7 @@
   productivity gain.
 
   For more information checkout the =Cleanup= section at
-  ~src/eos.org~.
+  ~src/vlm.org~.
 
 ** Basic
 
@@ -310,14 +318,14 @@
 
    | Prefix Keymap  | Prefix  | Description  |
    |                |         |              |
-   | eos-files-map  | C-x f   | Files        |
-   | eos-window-map | C-x w   | Windows      |
-   | eos-pm-map     | C-x p   | Projects     |
-   | eos-sc-map     | C-x e   | Errors       |
-   | eos-tags-maps  | C-x t   | Tags         |
-   | eos-docs-maps  | C-x l   | Library/Docs |
-   | eos-utils-map  | C-x c   | Utilities    |
-   | eos-ac-map     | C-x TAB | Completion   |
+   | vlm-files-map  | C-x f   | Files        |
+   | vlm-window-map | C-x w   | Windows      |
+   | vlm-pm-map     | C-x p   | Projects     |
+   | vlm-sc-map     | C-x e   | Errors       |
+   | vlm-tags-maps  | C-x t   | Tags         |
+   | vlm-docs-maps  | C-x l   | Library/Docs |
+   | vlm-utils-map  | C-x c   | Utilities    |
+   | vlm-ac-map     | C-x TAB | Completion   |
 
 ** C-c
 
@@ -349,16 +357,7 @@
 
 * Packages
 
-  Packages are installed as git sub-modules (see gitsubmodules(7) - man
-  pages for more information) and they are listed on ~.gitmodules~ file.
-
-* Adapt
-
-  If you want to modify any aspects (or extend) this configuration
-  without touching the ~/src/eos.org~, just edit/add your own =Elisp=
-  code inside ~/src/trash.el~.
-
-  Note: ~src/trash.el~ will be the last script loaded by ~/src/trash.el~.
+  Packages listed on ~packages.org~ file. (TODO!)
 
 * Advices
 
@@ -382,7 +381,7 @@
   7. Prioritize Emacs's native packages (builtin) over third-party
      ones. If any demand comes to light, try to solve it with these
      packages first, then third-party packages already
-     installed and finally (if it's a huge one) the internet.
+     installed and finally the internet. (A HUGE MAYBE)!
      Sometimes a little extension on these blotted-packages sets
      is everything that's needed to bring a new feature to life or
      solve an issue.
@@ -443,12 +442,12 @@
 
   0. https://www.gnu.org/software/emacs/manual
   1. https://www.gnu.org/software/emacs/manual/html_node/elisp/index.html
-  3. https://www.gnu.org/software/emacs/manual/html_node/emacs/Keymaps.html
-  4. https://cask.readthedocs.io/en/latest
+  2. https://www.gnu.org/software/emacs/manual/html_node/emacs/Keymaps.html
+  3. https://en.wikipedia.org/wiki/Lisp_machine
+  4. https://www.emacswiki.org/emacs/LispMachine
   5. http://www.gigamonkeys.com/book
-  6. https://github.com/bbatsov/prelude
-  7. https://github.com/larstvei/dot-emacs/blob/master/init.org
-  8. https://gitlab.com/protesilaos/dotfiles/-/blob/master/emacs/.emacs.d/emacs-init.org
+  6. https://github.com/larstvei/dot-emacs/blob/master/init.org
+  7. https://protesilaos.com/dotemacs/
 
 * LICENSE
   MIT

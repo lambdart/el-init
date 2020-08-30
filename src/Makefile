@@ -32,7 +32,7 @@ $(ELC): $(EL)
 	${EMACS} ${CC} ${.ALLSRC}
 
 # Run tangle script (org related)
-# the script will tangle the source code blocks from EOS.org
+# the script will tangle the source code blocks from vlm.org
 # to compose the init.el final script
 tangle:
 	${EMACS} ${SC} ${TANGLE_SCRIPT}

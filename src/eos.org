@@ -1,17 +1,47 @@
-#+TITLE: EOS
+#+TITLE: Virtual Lisp Machine
 #+AUTHOR: esac
 #+EMAIL: esac-io@tutanota.com
-#+DESCRIPTION: an org-mode based Emacs distribution
-#+KEYWORDS: emacs, eos, emacs config, init.el
+#+DESCRIPTION: an org-mode based Emacs configuration
+#+KEYWORDS: emacs, org, liretate programming, config, init.el
 #+LANGUAGE: en
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
 #+STARTUP: overview
 
-* EOS
+* Introduction
 
-  Using =Emacs= as the only dynamic interface
-  between human and machine.
+  Literate programming is a programming paradigm introduced by Donald
+  Knuth  in which a computer program is given an explanation of its
+  logic in a natural language, such as English, interspersed with
+  snippets  of macros and traditional source code, from which
+  compilable source code can be generated.
+
+  =Org-mode= is used to write and organize the configuration
+  in a literate programming format, meaning it contains
+  Elisp source code blocks - that will be tangled generating the
+  =init.el= final script - and the referent documentation.
+
+* Objective
+
+  Use =Emacs= as the only dynamic interface between
+  human and machine, i.e, as a LISP MACHINE.
+
+* VLM
+
+  A "Lisp Machine" is a generic term. A Lisp Machine is a
+  computer whose operating system and applications are
+  written in Lisp.
+
+  Some people have started to refer to Emacs as a LISP MACHINE.
+  It is not strictly a lisp machine because, clearly, it is a software
+  program and not a physical computer, but as that line starts to blur
+  it seems like a useful epithet for Emacs because these days Emacs
+  looks more and more like an operating system (a virtualized lisp
+  machine).
+
+  So, =VLM= stands for =Virtual Lisp Machine=, the prefix =vlm-=
+  will appear often through this document in reference to this
+  definition.
 
 ** Bootstrap
 *** Header
@@ -22,7 +52,7 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;;; init.el --- an org-mode based Elisp distribution
+    ;;; init.el --- Virtual Lisp Machine Configuration (init.el)
 
     ;;; Commentary:
 
@@ -50,33 +80,14 @@
 *** Verify
 **** Version
 
-     Verify emacs version.
+     Verify Emacs version.
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; (when (version< emacs-version "26.3")
-     ;;   (error "This requires Emacs 26.3 and above!"))
+     (when (version< emacs-version "26.3")
+       (error "This requires Emacs 26.3 and above!"))
 
      #+END_SRC
-
-*** Literate
-
-    Literate programming is a programming paradigm
-    introduced by Donald Knuth in which a computer program is
-    given an explanation of its logic in a natural language,
-    such as English, interspersed with snippets of macros and
-    traditional source code, from which compilable source code
-    can be generated.
-
-    Literate programming it's only possible thanks to org-mode,
-    (its not necessary to load org-mode here, but I will leave
-    as reference).
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; (require 'org nil t)
-
-    #+END_SRC
 
 *** Loaddefs
 
@@ -180,51 +191,51 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (defvar eos-window-map
+     (defvar vlm-window-map
        (make-sparse-keymap)
        "Window commands keymap.")
 
-     (defvar eos-tags-map
+     (defvar vlm-tags-map
        (make-sparse-keymap)
        "Tags (navigation) commands keymap.")
 
-     (defvar eos-pm-map
+     (defvar vlm-pm-map
        (make-sparse-keymap)
        "Project management commands keymap.")
 
-     (defvar eos-sc-map
+     (defvar vlm-sc-map
        (make-sparse-keymap)
        "Syntax check commands keymap.")
 
-     (defvar eos-completion-map
+     (defvar vlm-completion-map
        (make-sparse-keymap)
        "Completion commands keymap.")
 
-     (defvar eos-docs-map
+     (defvar vlm-docs-map
        (make-sparse-keymap)
        "Docs commands keymap.")
 
-     (defvar eos-files-map
+     (defvar vlm-files-map
        (make-sparse-keymap)
        "Files commands keymap.")
 
-     (defvar eos-debug-map
+     (defvar vlm-debug-map
        (make-sparse-keymap)
        "Debug commands keymap.")
 
-     (defvar eos-filter-map
+     (defvar vlm-filter-map
        (make-sparse-keymap)
        "Filter commands keymap.")
 
-     (defvar eos-utils-map
+     (defvar vlm-utils-map
        (make-sparse-keymap)
        "Utils commands keymap.")
 
-     (defvar eos-rtags-map
+     (defvar vlm-rtags-map
        (make-sparse-keymap)
        "Rtag commands keymap.")
 
-     (defvar eos-media-map
+     (defvar vlm-media-map
        (make-sparse-keymap)
        "Media commands keymap.")
 
@@ -235,17 +246,17 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     (dolist (prefix-map '(eos-tags-map
-                           eos-pm-map
-                           eos-sc-map
-                           eos-docs-map
-                           eos-files-map
-                           eos-filter-map
-                           eos-utils-map
-                           eos-window-map
-                           eos-media-map
-                           eos-completion-map
-                           eos-rtags-map))
+     (dolist (prefix-map '(vlm-tags-map
+                           vlm-pm-map
+                           vlm-sc-map
+                           vlm-docs-map
+                           vlm-files-map
+                           vlm-filter-map
+                           vlm-utils-map
+                           vlm-window-map
+                           vlm-media-map
+                           vlm-completion-map
+                           vlm-rtags-map))
        (define-prefix-command prefix-map))
 
      #+END_SRC
@@ -257,16 +268,16 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; eos prefixs
-     (define-key ctl-x-map (kbd "f") 'eos-files-map) ;; files
-     ;; (define-key ctl-x-map (kbd "") 'eos-filter-map)
-     (define-key ctl-x-map (kbd "p") 'eos-pm-map) ; project
-     (define-key ctl-x-map (kbd "t") 'eos-tags-map) ; tags
-     (define-key ctl-x-map (kbd "c") 'eos-utils-map) ; commands
-     (define-key ctl-x-map (kbd "e") 'eos-sc-map) ; errors
-     (define-key ctl-x-map (kbd "l") 'eos-docs-map) ; library
-     (define-key ctl-x-map (kbd "v") 'eos-media-map) ; media
-     (define-key ctl-x-map (kbd "<tab>") 'eos-completion-map) ; tab - complete
+     ;; vlm prefix maps
+     (define-key ctl-x-map (kbd "f") 'vlm-files-map) ;; files
+     ;; (define-key ctl-x-map (kbd "") 'vlm-filter-map)
+     (define-key ctl-x-map (kbd "p") 'vlm-pm-map) ; project
+     (define-key ctl-x-map (kbd "t") 'vlm-tags-map) ; tags
+     (define-key ctl-x-map (kbd "c") 'vlm-utils-map) ; commands
+     (define-key ctl-x-map (kbd "e") 'vlm-sc-map) ; errors
+     (define-key ctl-x-map (kbd "l") 'vlm-docs-map) ; library
+     (define-key ctl-x-map (kbd "v") 'vlm-media-map) ; media
+     (define-key ctl-x-map (kbd "<tab>") 'vlm-completion-map) ; tab - complete
 
      #+END_SRC
 
@@ -513,11 +524,11 @@
       (define-key ctl-x-map (kbd "k") 'kill-buffer)
 
       ;; mark
-      (define-key eos-utils-map (kbd "h") 'mark-whole-buffer)
-      (define-key eos-utils-map (kbd "s") 'mark-sexp)
-      (define-key eos-utils-map (kbd "p") 'mark-paragraph)
-      (define-key eos-utils-map (kbd "w") 'mark-word)
-      (define-key eos-utils-map (kbd "g") 'mark-goto-char)
+      (define-key vlm-utils-map (kbd "h") 'mark-whole-buffer)
+      (define-key vlm-utils-map (kbd "s") 'mark-sexp)
+      (define-key vlm-utils-map (kbd "p") 'mark-paragraph)
+      (define-key vlm-utils-map (kbd "w") 'mark-word)
+      (define-key vlm-utils-map (kbd "g") 'mark-goto-char)
 
       #+END_SRC
 
@@ -1091,10 +1102,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; eos-files-map
-      (define-key eos-files-map (kbd "f") 'find-file-at-point)
-      (define-key eos-files-map (kbd "d") 'dired-at-point)
-      (define-key eos-files-map (kbd "C-d") 'ffap-list-directory)
+      ;; vlm-files-map
+      (define-key vlm-files-map (kbd "f") 'find-file-at-point)
+      (define-key vlm-files-map (kbd "d") 'dired-at-point)
+      (define-key vlm-files-map (kbd "C-d") 'ffap-list-directory)
 
       #+END_SRC
 
@@ -1117,7 +1128,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key eos-files-map (kbd "l") 'locate)
+      (define-key vlm-files-map (kbd "l") 'locate)
 
       #+END_SRC
 
@@ -1150,9 +1161,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; eos-files-map
-      (define-key eos-files-map (kbd "r") 'recentf-open-files)
-      (define-key eos-files-map (kbd "t") 'recentf-find-file)
+      ;; vlm-files-map
+      (define-key vlm-files-map (kbd "r") 'recentf-open-files)
+      (define-key vlm-files-map (kbd "t") 'recentf-find-file)
 
       #+END_SRC
 
@@ -1502,13 +1513,13 @@
       (define-key ctl-x-map (kbd "C-,") 'previous-buffer)
       (define-key ctl-x-map (kbd "C-.") 'next-buffer)
 
-      ;; binds (eos-window prefix map)
-      (define-key eos-window-map (kbd "1") 'maximize-window)
-      (define-key eos-window-map (kbd "q") 'minimize-window)
-      (define-key eos-window-map (kbd "w") 'balance-windows)
+      ;; binds (vlm-window prefix map)
+      (define-key vlm-window-map (kbd "1") 'maximize-window)
+      (define-key vlm-window-map (kbd "q") 'minimize-window)
+      (define-key vlm-window-map (kbd "w") 'balance-windows)
 
       ;; binds ctl-x-map (C-x w)
-      (define-key ctl-x-map (kbd "w") 'eos-window-map)
+      (define-key ctl-x-map (kbd "w") 'vlm-window-map)
 
       ;; switch to buffer
       (define-key ctl-x-map (kbd "C-b") 'switch-to-buffer)
@@ -2015,7 +2026,7 @@
       (define-key minibuffer-local-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       ;; research (maybe this is not necessary) (C-k: kill line)
-      ;; (define-key minibuffer-local-map (kbd "M-w") 'eos/icomplete/kill-ring-save)
+      ;; (define-key minibuffer-local-map (kbd "M-w") 'vlm/icomplete/kill-ring-save)
 
       ;; goto-map
       (define-key goto-map (kbd "v") 'goto-minibuffer-window)
@@ -2242,7 +2253,7 @@
           (when (boundp 'icomplete-minibuffer-map)
             ;; unbind
             (define-key icomplete-minibuffer-map (kbd "SPC") nil)
-            (define-key icomplete-minibuffer-map (kbd "RET") 'minibuffer-complete-and-exit)
+            (define-key icomplete-minibuffer-map (kbd "RET") 'icomplete-force-complete-and-exit)
             ;; bind
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
@@ -2763,11 +2774,11 @@
 
 ***** Require
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     ;; (require 'lazy)
+      ;; (require 'lazy)
 
-     #+END_SRC
+      #+END_SRC
 
 *** CLI
 
@@ -3280,14 +3291,14 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; functions
-       (defun eos-term-send-kill-line ()
+       (defun vlm-term-send-kill-line ()
          "Kill line in multi-term mode with the possibility to paste it like in a normal shell."
          (interactive)
          (when (fboundp 'term-send-raw-string)
            (kill-line)
            (term-send-raw-string "\C-k")))
 
-       (defun eos-term (name)
+       (defun vlm-term (name)
          "Call `term' and asks for a buffer NAME."
          (interactive
           (list (read-string "Term name: " nil nil "Term")))
@@ -3327,7 +3338,7 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; clt-x-map (C-x) prefix
-       (define-key ctl-x-map (kbd "<C-return>") 'eos-term)
+       (define-key ctl-x-map (kbd "<C-return>") 'vlm-term)
 
        #+END_SRC
 
@@ -3489,7 +3500,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; add eos-theme-dir to theme load path
+      ;; add vlm-theme-dir to theme load path
       (add-to-list 'custom-theme-load-path
                    (concat user-emacs-directory "themes"))
 
@@ -3695,7 +3706,7 @@
       (eval-after-load 'iedit
         (lambda ()
           (when (boundp 'iedit-mode-keymap)
-            (define-key iedit-mode-keymap (kbd "<tab>") 'eos-complete-in-buffer-or-indent)
+            (define-key iedit-mode-keymap (kbd "<tab>") 'vlm-complete-in-buffer-or-indent)
             (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence))))
 
       ;; bind (global)
@@ -4044,15 +4055,15 @@
             ;; add files inside playlist mode buffer
             (define-key emms-playlist-mode-map (kbd "A") 'emms-add-file))))
 
-      ;; binds eos-media-map
-      (define-key eos-media-map (kbd "P") 'play-playlist)
-      (define-key eos-media-map (kbd "a") 'emms-add-file)
-      (define-key eos-media-map (kbd "s") 'emms-start)
-      (define-key eos-media-map (kbd "q") 'emms-stop)
-      (define-key eos-media-map (kbd "v") 'emms-pause)
-      (define-key eos-media-map (kbd "p") 'emms-previous)
-      (define-key eos-media-map (kbd "n") 'emms-next)
-      (define-key eos-media-map (kbd "r") 'emms-random)
+      ;; binds vlm-media-map
+      (define-key vlm-media-map (kbd "P") 'play-playlist)
+      (define-key vlm-media-map (kbd "a") 'emms-add-file)
+      (define-key vlm-media-map (kbd "s") 'emms-start)
+      (define-key vlm-media-map (kbd "q") 'emms-stop)
+      (define-key vlm-media-map (kbd "v") 'emms-pause)
+      (define-key vlm-media-map (kbd "p") 'emms-previous)
+      (define-key vlm-media-map (kbd "n") 'emms-next)
+      (define-key vlm-media-map (kbd "r") 'emms-random)
 
       #+END_SRC
 
@@ -4259,12 +4270,12 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; projects keymap
-      (define-key eos-pm-map (kbd "a") 'ag-project-at-point)
+      (define-key vlm-pm-map (kbd "a") 'ag-project-at-point)
 
       ;; filter keymap
-      (define-key eos-filter-map (kbd "a") 'ag)
-      (define-key eos-filter-map (kbd "d") 'ag-dired)
-      (define-key eos-filter-map (kbd "f") 'ag-files)
+      (define-key vlm-filter-map (kbd "a") 'ag)
+      (define-key vlm-filter-map (kbd "d") 'ag-dired)
+      (define-key vlm-filter-map (kbd "f") 'ag-files)
 
       #+END_SRC
 
@@ -4295,7 +4306,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key eos-filter-map (kbd "r") 'rgrep)
+      (define-key vlm-filter-map (kbd "r") 'rgrep)
 
       #+END_SRC
 
@@ -4355,9 +4366,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; eos-sc-map
-      (define-key eos-sc-map (kbd "i") 'ispell-word)
-      (define-key eos-sc-map (kbd "I") 'ispell-buffer)
+      ;; vlm-sc-map
+      (define-key vlm-sc-map (kbd "i") 'ispell-word)
+      (define-key vlm-sc-map (kbd "I") 'ispell-buffer)
 
       #+END_SRC
 
@@ -4410,7 +4421,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos-set-flycheck-checker (checker)
+      (defun vlm-set-flycheck-checker (checker)
         "Set flycheck CHECKER variable."
         (when (boundp 'flycheck-checker)
           (setq flycheck-checker checker)))
@@ -4447,14 +4458,14 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; binds
-      (define-key eos-sc-map (kbd "C-g") 'keyboard-quit)
-      (define-key eos-sc-map (kbd "e") 'flycheck-list-errors)
-      (define-key eos-sc-map (kbd "b") 'flycheck-buffer)
-      (define-key eos-sc-map (kbd "d") 'flycheck-disable-checker)
-      (define-key eos-sc-map (kbd "m") 'flycheck-mode)
-      (define-key eos-sc-map (kbd "s") 'flycheck-select-checker)
-      (define-key eos-sc-map (kbd "?") 'flycheck-describe-checker)
-      (define-key eos-sc-map (kbd "v") 'flycheck-verify-setup)
+      (define-key vlm-sc-map (kbd "C-g") 'keyboard-quit)
+      (define-key vlm-sc-map (kbd "e") 'flycheck-list-errors)
+      (define-key vlm-sc-map (kbd "b") 'flycheck-buffer)
+      (define-key vlm-sc-map (kbd "d") 'flycheck-disable-checker)
+      (define-key vlm-sc-map (kbd "m") 'flycheck-mode)
+      (define-key vlm-sc-map (kbd "s") 'flycheck-select-checker)
+      (define-key vlm-sc-map (kbd "?") 'flycheck-describe-checker)
+      (define-key vlm-sc-map (kbd "v") 'flycheck-verify-setup)
 
       #+END_SRC
 
@@ -4570,33 +4581,9 @@
 
        #+END_SRC
 
-****** Functions
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; (defun eos/message-header-add-gcc ()
-       ;;   "While `gnus' is running, add a Gcc header, if missing.
-       ;; The Gcc header places a copy of the outgoing message to the
-       ;; appropriate directory of the IMAP server, as per the contents of
-       ;; `auth-sources'.
-       ;; In the absence of a Gcc header, the outgoing message will not
-       ;; appear in the appropriate IMAP directory, though it will still be
-       ;; sent. Add this function to `message-header-setup-hook'."
-       ;;   (if (gnus-alive-p)
-       ;;       (progn
-       ;;         (when (message-fetch-field "Gcc")
-       ;;           (message-remove-header "Gcc")
-       ;;           (message-add-header "Gcc: nnimap+pub:Sent")))
-       ;;     (message "Gnus is not running. No GCC field inserted.")))
-
-       #+END_SRC
-
 ****** Hooks
 
        #+BEGIN_SRC emacs-lisp
-
-       ;; hook called narrowed to the headers when setting up a message buffer
-       ;; (add-hook 'message-header-setup-hook 'eos/message-header-add-gcc)
 
        ;; normal hook, run each time a new outgoing message is initialized
        (add-hook 'message-setup-hook 'message-sort-headers)
@@ -4888,7 +4875,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos-initialize-dashboard ()
+      (defun vlm-initialize-dashboard ()
         "Opens or switch to *dashboard* buffer."
         (interactive)
         (let ((buffer (get-buffer "*dashboard*")))
@@ -4897,7 +4884,7 @@
           (funcall 'dashboard-insert-startupify-lists)
           (funcall 'dashboard-refresh-buffer)))
 
-      (defun eos-dashboard-insert-footer ()
+      (defun vlm-dashboard-insert-footer ()
         "Insert dashboard-footer message."
         (read-only-mode 0)
         (when (boundp 'dashboard-footer)
@@ -4915,7 +4902,7 @@
       (add-hook 'dashboard-mode-hook
                 (lambda ()
                   (interactive)
-                  (eos-dashboard-insert-footer)))
+                  (vlm-dashboard-insert-footer)))
 
       #+END_SRC
 
@@ -4923,7 +4910,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-hook 'after-init-hook 'eos-initialize-dashboard)
+      (add-hook 'after-init-hook 'vlm-initialize-dashboard)
 
       #+END_SRC
 
@@ -5008,10 +4995,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/org/set-company-backends ()
+      (defun vlm/org/set-company-backends ()
         "Set `org-mode' company backends."
         (interactive)
-        (eos-set-company-backends
+        (vlm-set-company-backends
          '((company-dabbrev :with
                             company-yasnippet
                             company-dabbrev-code
@@ -5030,7 +5017,7 @@
                   (setq truncate-lines nil)
 
                   ;; set company backends
-                  (eos/org/set-company-backends)
+                  (vlm/org/set-company-backends)
 
                   ;; languages which can be evaluated in Org buffers.
                   (org-babel-do-load-languages
@@ -5050,7 +5037,7 @@
       (eval-after-load 'org
         (lambda()
           (when (boundp 'org-mode-map)
-            (define-key org-mode-map (kbd "C-M-i") 'eos-complete-in-buffer-or-indent))))
+            (define-key org-mode-map (kbd "C-M-i") 'vlm-complete-in-buffer-or-indent))))
 
       #+END_SRC
 
@@ -5138,7 +5125,7 @@
 
       (when (boundp 'markdown-mode-map)
         (progn
-          (define-key markdown-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)))
+          (define-key markdown-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)))
 
       #+END_SRC
 
@@ -5199,7 +5186,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos-dictionary-search-at-point ()
+      (defun vlm-dictionary-search-at-point ()
         "Search WORD in dictionary at point."
         (interactive)
         (let ((word (or (thing-at-point 'word)
@@ -5220,7 +5207,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; binds
-      (define-key eos-docs-map (kbd ".") 'eos-dictionary-search-at-point)
+      (define-key vlm-docs-map (kbd ".") 'vlm-dictionary-search-at-point)
 
       #+END_SRC
 
@@ -5424,8 +5411,8 @@
           (when (boundp 'Man-mode-map)
             (define-key Man-mode-map (kbd "C-j") 'push-button))))
 
-      ;; eos-docs-map docs actions prefix map
-      (define-key eos-docs-map (kbd "m") 'manual-entry)
+      ;; vlm-docs-map docs actions prefix map
+      (define-key vlm-docs-map (kbd "m") 'manual-entry)
 
       #+END_SRC
 
@@ -5456,7 +5443,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key eos-docs-map (kbd "w") 'woman)
+      (define-key vlm-docs-map (kbd "w") 'woman)
 
       #+END_SRC
 
@@ -5494,7 +5481,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos-set-dash-docset (docset)
+      (defun vlm-set-dash-docset (docset)
         "Activate a DOCSET, if available."
         (when (fboundp 'dash-docs-activate-docset)
           (funcall 'dash-docs-activate-docset docset)))
@@ -5505,13 +5492,13 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; eos-docs-map
-      (define-key eos-docs-map (kbd "u") 'dash-docs-update-docset)
-      ;; (define-key eos-docs-map (kbd "i") 'dash-docs-async-install-docset)
-      (define-key eos-docs-map (kbd "i") 'dash-docs-install-docset)
-      (define-key eos-docs-map (kbd "l") 'dash-docs-search-docs)
-      (define-key eos-docs-map (kbd "a") 'dash-docs-activate-docset)
-      (define-key eos-docs-map (kbd "d") 'dash-docs-deactivate-docset)
+      ;; vlm-docs-map
+      (define-key vlm-docs-map (kbd "u") 'dash-docs-update-docset)
+      ;; (define-key vlm-docs-map (kbd "i") 'dash-docs-async-install-docset)
+      (define-key vlm-docs-map (kbd "i") 'dash-docs-install-docset)
+      (define-key vlm-docs-map (kbd "l") 'dash-docs-search-docs)
+      (define-key vlm-docs-map (kbd "a") 'dash-docs-activate-docset)
+      (define-key vlm-docs-map (kbd "d") 'dash-docs-deactivate-docset)
 
       #+END_SRC
 
@@ -5648,10 +5635,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; binds eos-completion-map
-      (define-key eos-completion-map (kbd "e") 'yas-expand)
-      (define-key eos-completion-map (kbd "i") 'yas-insert-snippet)
-      (define-key eos-completion-map (kbd "v") 'yas-visit-snippet-file)
+      ;; binds vlm-completion-map
+      (define-key vlm-completion-map (kbd "e") 'yas-expand)
+      (define-key vlm-completion-map (kbd "i") 'yas-insert-snippet)
+      (define-key vlm-completion-map (kbd "v") 'yas-visit-snippet-file)
 
       ;; binds yas-keymap
       (eval-after-load 'yasnippet
@@ -5743,20 +5730,20 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos-set-company-backends (backends)
+      (defun vlm-set-company-backends (backends)
         "Set company back ends with BACKENDS."
         (make-local-variable 'company-backends)
         (when (boundp 'company-backends)
           (setq company-backends backends)))
 
-      (defun eos-company-complete-or-indent ()
+      (defun vlm-company-complete-or-indent ()
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
                (funcall 'company-complete))
               (t (indent-according-to-mode))))
 
-      (defun eos-complete-in-buffer-or-indent ()
+      (defun vlm-complete-in-buffer-or-indent ()
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
@@ -5778,17 +5765,17 @@
             (define-key company-active-map (kbd "C-n") 'company-select-next)
             (define-key company-active-map (kbd "C-p") 'company-select-previous))))
 
-      ;; eos-complete map
-      (define-key eos-completion-map (kbd "`") 'company-ispell)
-      (define-key eos-completion-map (kbd "f") 'company-files)
-      (define-key eos-completion-map (kbd "e") 'company-etags)
-      (define-key eos-completion-map (kbd "y") 'company-yasnippet)
+      ;; vlm-complete map
+      (define-key vlm-completion-map (kbd "`") 'company-ispell)
+      (define-key vlm-completion-map (kbd "f") 'company-files)
+      (define-key vlm-completion-map (kbd "e") 'company-etags)
+      (define-key vlm-completion-map (kbd "y") 'company-yasnippet)
 
       ;; redundancy
-      (define-key eos-completion-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
+      (define-key vlm-completion-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
 
       ;; global
-      (global-set-key (kbd "C-TAB") 'eos-complete-in-buffer-or-indent)
+      (global-set-key (kbd "C-TAB") 'vlm-complete-in-buffer-or-indent)
 
       #+END_SRC
 
@@ -5866,7 +5853,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key eos-tags-map (kbd "i") 'imenu)
+      (define-key vlm-tags-map (kbd "i") 'imenu)
 
       #+END_SRC
 
@@ -5912,13 +5899,13 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key eos-tags-map (kbd "s") 'tags-search)
-      (define-key eos-tags-map (kbd "r") 'tags-query-replace)
-      (define-key eos-tags-map (kbd "f") 'find-tag)
-      (define-key eos-tags-map (kbd "l") 'list-tags)
-      (define-key eos-tags-map (kbd "v") 'visit-tags-table)
-      (define-key eos-tags-map (kbd "d") 'tags-reset-tags-tables)
-      (define-key eos-tags-map (kbd "c") 'select-tags-table)
+      (define-key vlm-tags-map (kbd "s") 'tags-search)
+      (define-key vlm-tags-map (kbd "r") 'tags-query-replace)
+      (define-key vlm-tags-map (kbd "f") 'find-tag)
+      (define-key vlm-tags-map (kbd "l") 'list-tags)
+      (define-key vlm-tags-map (kbd "v") 'visit-tags-table)
+      (define-key vlm-tags-map (kbd "d") 'tags-reset-tags-tables)
+      (define-key vlm-tags-map (kbd "c") 'select-tags-table)
 
       #+END_SRC
 
@@ -5955,7 +5942,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key eos-tags-map (kbd "a") 'xref-find-apropos)
+      (define-key vlm-tags-map (kbd "a") 'xref-find-apropos)
 
       #+END_SRC
 
@@ -6102,15 +6089,14 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defvar eos-compile-command
-        "make -C ~/core/dev/eos/src all"
-        "Default compile command for EOS.")
+      (defvar vlm-compile-command
+        "make -C ~/.emacs.d all"
+        "Default compile command for VLM.")
 
-      (defun eos-compile ()
-        "Call `eos-compile' passing the right arguments."
+      (defun vlm-compile ()
+        "Invoke `compile-at-dir' passing the right arguments."
         (interactive)
-        (compile-at-dir
-         (expand-file-name user-emacs-directory) eos-compile-command))
+        (compile vlm-compile-command))
 
       #+END_SRC
 
@@ -6150,7 +6136,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; utils map
-      (define-key eos-utils-map (kbd "c") 'compile-history)
+      (define-key vlm-utils-map (kbd "c") 'compile-history)
 
       #+END_SRC
 
@@ -6232,24 +6218,24 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key eos-pm-map (kbd "g") 'projectile-grep)
-      (define-key eos-pm-map (kbd "p") 'projectile-ag)
-      (define-key eos-pm-map (kbd "t") 'projectile-find-tag)
-      (define-key eos-pm-map (kbd "f") 'projectile-find-file)
-      (define-key eos-pm-map (kbd "<f5>") 'projectile-compile-project)
-      (define-key eos-pm-map (kbd "&") 'projectile-run-eshell)
-      (define-key eos-pm-map (kbd "o") 'projectile-switch-project)
-      (define-key eos-pm-map (kbd "r") 'projectile-replace-regexp)
-      (define-key eos-pm-map (kbd "R") 'projectile-replace)
-      (define-key eos-pm-map (kbd "s") 'projectile-save-project-buffers)
-      (define-key eos-pm-map (kbd "d") 'projectile-discover-projects-in-directory)
-      (define-key eos-pm-map (kbd "c") 'projectile-cleanup-known-projects)
-      (define-key eos-pm-map (kbd "C") 'projectile-invalidate-cache)
-      (define-key eos-pm-map (kbd "U") 'projectile-purge-dir-from-cache)
-      (define-key eos-pm-map (kbd "u") 'projectile-purge-file-from-cache)
-      (define-key eos-pm-map (kbd ".") 'projectile-edit-dir-locals)
-      (define-key eos-pm-map (kbd "k") 'projectile-kill-buffers)
-      (define-key eos-pm-map (kbd "D") 'projectile-remove-known-project)
+      (define-key vlm-pm-map (kbd "g") 'projectile-grep)
+      (define-key vlm-pm-map (kbd "p") 'projectile-ag)
+      (define-key vlm-pm-map (kbd "t") 'projectile-find-tag)
+      (define-key vlm-pm-map (kbd "f") 'projectile-find-file)
+      (define-key vlm-pm-map (kbd "<f5>") 'projectile-compile-project)
+      (define-key vlm-pm-map (kbd "&") 'projectile-run-eshell)
+      (define-key vlm-pm-map (kbd "o") 'projectile-switch-project)
+      (define-key vlm-pm-map (kbd "r") 'projectile-replace-regexp)
+      (define-key vlm-pm-map (kbd "R") 'projectile-replace)
+      (define-key vlm-pm-map (kbd "s") 'projectile-save-project-buffers)
+      (define-key vlm-pm-map (kbd "d") 'projectile-discover-projects-in-directory)
+      (define-key vlm-pm-map (kbd "c") 'projectile-cleanup-known-projects)
+      (define-key vlm-pm-map (kbd "C") 'projectile-invalidate-cache)
+      (define-key vlm-pm-map (kbd "U") 'projectile-purge-dir-from-cache)
+      (define-key vlm-pm-map (kbd "u") 'projectile-purge-file-from-cache)
+      (define-key vlm-pm-map (kbd ".") 'projectile-edit-dir-locals)
+      (define-key vlm-pm-map (kbd "k") 'projectile-kill-buffers)
+      (define-key vlm-pm-map (kbd "D") 'projectile-remove-known-project)
 
       #+END_SRC
 
@@ -6285,7 +6271,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key prog-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
+      (define-key prog-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
 
       #+END_SRC
 
@@ -6364,10 +6350,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/text/set-company-backends ()
+      (defun vlm/text/set-company-backends ()
         "Set `text-mode' company backends."
         (interactive)
-        (eos-set-company-backends
+        (vlm-set-company-backends
          '((company-ispell :with
                            company-dabbrev)
            (company-files))))
@@ -6384,7 +6370,7 @@
                   (turn-on-auto-fill)
 
                   ;; set company backends
-                  (eos/text/set-company-backends)))
+                  (vlm/text/set-company-backends)))
 
       #+END_SRC
 
@@ -6393,7 +6379,7 @@
       #+BEGIN_SRC emacs-lisp
 
       (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-      (define-key text-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
+      (define-key text-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
 
       (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
       (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
@@ -6529,10 +6515,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/elisp/set-company-backends ()
+      (defun vlm/elisp/set-company-backends ()
         "Set elisp company backends."
         (interactive)
-        (eos-set-company-backends
+        (vlm-set-company-backends
          '((company-elisp :with company-capf company-dabbrev-code)
            (company-dabbrev)
            (company-files))))
@@ -6557,13 +6543,13 @@
       (add-hook 'emacs-lisp-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos/elisp/set-company-backends)
+                  (vlm/elisp/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos-set-flycheck-checker 'emacs-lisp)
+                  (vlm-set-flycheck-checker 'emacs-lisp)
 
                   ;; activate dash docset (emacs)
-                  (eos-set-dash-docset "Emacs Lisp")))
+                  (vlm-set-dash-docset "Emacs Lisp")))
 
       #+END_SRC
 
@@ -6587,7 +6573,7 @@
             (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
             (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
             (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile)
-            (define-key emacs-lisp-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent))))
+            (define-key emacs-lisp-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent))))
 
       #+END_SRC
 
@@ -6626,10 +6612,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/haskell/set-company-backends ()
+      (defun vlm/haskell/set-company-backends ()
         "Set haskell company backends."
         (interactive)
-        (eos-set-company-backends
+        (vlm-set-company-backends
          '((company-capf
             company-yasnippet
             company-dabbrev-code)
@@ -6644,10 +6630,10 @@
       (add-hook 'haskell-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos/haskell/set-company-backends)
+                  (vlm/haskell/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos-set-flycheck-checker 'haskell-ghc)
+                  (vlm-set-flycheck-checker 'haskell-ghc)
 
                   ;; haskell indentation mode that deals with the layout rule.
                   ;; it rebinds RET, DEL and BACKSPACE, so that indentations can be
@@ -6659,7 +6645,7 @@
                   (funcall 'interactive-haskell-mode 1)))
 
       ;; activate dash docset (emacs) (not working)
-      ;; (eos-set-dash-docset "Haskell")))
+      ;; (vlm-set-dash-docset "Haskell")))
 
       #+END_SRC
 
@@ -6732,17 +6718,17 @@
       (add-hook 'elixir-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos-set-company-backends
+                  (vlm-set-company-backends
                    '(company-yasnippet
                      company-dabbrev
                      company-dabbrev-code
                      (company-files)))
 
                   ;; set syntax checker
-                  ;; eos/flycheck/set-cheker '<elixir-checker>)
+                  ;; vlm/flycheck/set-cheker '<elixir-checker>)
 
                   ;; set dash docsets
-                  (eos-set-dash-docset '"Elixir")))
+                  (vlm-set-dash-docset '"Elixir")))
 
       #+END_SRC
 
@@ -6821,19 +6807,19 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; eos-rtags-map
-      (define-key eos-rtags-map (kbd "l") 'rtags-taglist)
-      (define-key eos-rtags-map (kbd "I") 'rtags-install)
-      (define-key eos-rtags-map (kbd "y") 'rtags-symbol-type)
-      (define-key eos-rtags-map (kbd "l") 'rtags-symbol-info)
-      (define-key eos-rtags-map (kbd "n") 'rtags-rename-symbol)
-      (define-key eos-rtags-map (kbd "m") 'rtags-asm-file)
-      (define-key eos-rtags-map (kbd "h") 'rtags-find-file-history)
-      (define-key eos-rtags-map (kbd "x") 'rtags-fixit)
-      (define-key eos-rtags-map (kbd "d") 'rtags-diagnostics)
-      (define-key eos-rtags-map (kbd "c") 'rtags-compile-file)
-      (define-key eos-rtags-map (kbd "-") 'rtags-compilation-flags)
-      (define-key eos-rtags-map (kbd ".") 'rtags-find-functions-called-by-this-function)
+      ;; vlm-rtags-map
+      (define-key vlm-rtags-map (kbd "l") 'rtags-taglist)
+      (define-key vlm-rtags-map (kbd "I") 'rtags-install)
+      (define-key vlm-rtags-map (kbd "y") 'rtags-symbol-type)
+      (define-key vlm-rtags-map (kbd "l") 'rtags-symbol-info)
+      (define-key vlm-rtags-map (kbd "n") 'rtags-rename-symbol)
+      (define-key vlm-rtags-map (kbd "m") 'rtags-asm-file)
+      (define-key vlm-rtags-map (kbd "h") 'rtags-find-file-history)
+      (define-key vlm-rtags-map (kbd "x") 'rtags-fixit)
+      (define-key vlm-rtags-map (kbd "d") 'rtags-diagnostics)
+      (define-key vlm-rtags-map (kbd "c") 'rtags-compile-file)
+      (define-key vlm-rtags-map (kbd "-") 'rtags-compilation-flags)
+      (define-key vlm-rtags-map (kbd ".") 'rtags-find-functions-called-by-this-function)
 
       #+END_SRC
 
@@ -6867,10 +6853,10 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; c/c++ company backends
-      (defun eos/cc/set-company-backends ()
+      (defun vlm/cc/set-company-backends ()
         "Set C/C++ common company backends."
         (interactive)
-        (eos-set-company-backends
+        (vlm-set-company-backends
          '((company-c-headers)
            (company-keywords :with
                              ;; company-rtags
@@ -6898,24 +6884,24 @@
       (add-hook 'c-mode-hook
                 (lambda ()
                   ;; set cc common company backends
-                  (eos/cc/set-company-backends)
+                  (vlm/cc/set-company-backends)
 
                   ;; set dash docset
-                  (eos-set-dash-docset '"C")
+                  (vlm-set-dash-docset '"C")
 
                   ;; set flycheck checker
-                  (eos-set-flycheck-checker 'c/c++-clang)))
+                  (vlm-set-flycheck-checker 'c/c++-clang)))
 
       (add-hook 'c++-mode-hook
                 (lambda ()
                   ;; set cc common backends (company and flycheck)
-                  (eos/cc/set-company-backends)
+                  (vlm/cc/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos-set-flycheck-checker 'c++-cppcheck)
+                  (vlm-set-flycheck-checker 'c++-cppcheck)
 
                   ;; set dash docset
-                  (eos-set-dash-docset '"C++")))
+                  (vlm-set-dash-docset '"C++")))
 
       #+END_SRC
 
@@ -6927,12 +6913,12 @@
         (lambda ()
           (when (and (boundp 'c-mode-map) (boundp 'c++-mode-map))
             ;; set rtags prefix map in c-mode map (C-c r)
-            (define-key c-mode-map (kbd "C-c r") 'eos-rtags-map)
-            (define-key c++-mode-map (kbd "C-c r") 'eos-rtags-map)
+            (define-key c-mode-map (kbd "C-c r") 'vlm-rtags-map)
+            (define-key c++-mode-map (kbd "C-c r") 'vlm-rtags-map)
 
             ;; complete or indent
-            (define-key c-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
-            (define-key c++-mode-map (kbd "TAB") 'eos-complete-in-buffer-or-indent)
+            (define-key c-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
+            (define-key c++-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
 
             ;; compilation keybind
             (define-key c-mode-map (kbd "C-c C-c")
@@ -6992,10 +6978,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/go/set-company-backends ()
+      (defun vlm/go/set-company-backends ()
         "Set go company backends."
         (interactive)
-        (eos-set-company-backends
+        (vlm-set-company-backends
          '((company-yasnippet :with
                               company-dabbrev
                               company-dabbrev-code)
@@ -7010,13 +6996,13 @@
       (add-hook 'go-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos/go/set-company-backends)
+                  (vlm/go/set-company-backends)
 
                   ;; set flycheck checker (go lint)
-                  (eos-set-flycheck-checker 'go-golint)
+                  (vlm-set-flycheck-checker 'go-golint)
 
                   ;; set dash docsets
-                  (eos-set-dash-docset '"Go")))
+                  (vlm-set-dash-docset '"Go")))
 
       #+END_SRC
 
@@ -7069,7 +7055,7 @@
       (add-hook 'sh-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos-set-company-backends
+                  (vlm-set-company-backends
                    '((company-shell :with
                                     company-shell-env
                                     company-yasnippet)
@@ -7078,7 +7064,7 @@
                      (company-files)))
 
                   ;; set flycheck backends
-                  (eos-set-flycheck-checker 'sh-shellcheck)))
+                  (vlm-set-flycheck-checker 'sh-shellcheck)))
 
       #+END_SRC
 
@@ -7098,10 +7084,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/fish/set-company-backends ()
+      (defun vlm/fish/set-company-backends ()
         "Set fish company backends."
         (interactive)
-        (eos-set-company-backends
+        (vlm-set-company-backends
          '((company-fish-shell :with
                                company-yasnippet)
            (company-dabbrev
@@ -7117,7 +7103,7 @@
       (add-hook 'fish-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos/fish/set-company-backends)))
+                  (vlm/fish/set-company-backends)))
 
       #+END_SRC
 
@@ -7165,10 +7151,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/lua/set-company-backends ()
+      (defun vlm/lua/set-company-backends ()
         "Set lua company backends."
         (interactive)
-        (eos-set-company-backends
+        (vlm-set-company-backends
          '((company-yasnippet :with
                               company-dabbrev
                               company-dabbrev-code)
@@ -7183,13 +7169,13 @@
       (add-hook 'lua-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos/lua/set-company-backends)
+                  (vlm/lua/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos-set-flycheck-checker 'lua)
+                  (vlm-set-flycheck-checker 'lua)
 
                   ;; activate dash docset
-                  (eos-set-dash-docset "Lua")))
+                  (vlm-set-dash-docset "Lua")))
 
       #+END_SRC
 
@@ -7267,10 +7253,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun eos/python/set-company-backends ()
+      (defun vlm/python/set-company-backends ()
         "Set python company backends."
         (interactive)
-        (eos-set-company-backends
+        (vlm-set-company-backends
          '((company-keywords :with
                              company-yasnippet
                              company-dabbrev-code
@@ -7294,13 +7280,13 @@
       (add-hook 'python-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos/python/set-company-backends)
+                  (vlm/python/set-company-backends)
 
                   ;; set flycheck checker
-                  (eos-set-flycheck-checker 'python-pycompile)
+                  (vlm-set-flycheck-checker 'python-pycompile)
 
                   ;; set dash docsets
-                  (eos-set-dash-docset '"Python 3")))
+                  (vlm-set-dash-docset '"Python 3")))
 
       #+END_SRC
 
@@ -7379,7 +7365,7 @@
       (add-hook 'mql-mode-hook
                 (lambda ()
                   ;; set company backends
-                  (eos-set-company-backends
+                  (vlm-set-company-backends
                    '((company-etags
                       company-yasnippet
                       company-dabbrev
@@ -7387,10 +7373,10 @@
                      (company-files)))
 
                   ;; select flycheck checker (use gcc)
-                  (eos-set-flycheck-checker 'c/c++-gcc)
+                  (vlm-set-flycheck-checker 'c/c++-gcc)
 
                   ;; activate mql5 docset
-                  (eos-set-dash-docset '"mql5")))
+                  (vlm-set-dash-docset '"mql5")))
 
       #+END_SRC
 

@@ -8,6 +8,13 @@
 #+PROPERTY: header-args :tangle yes
 #+STARTUP: overview
 
+  Some people (including me) have started to refer to
+  =Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
+  because, clearly, it is a software program and not a physical
+  computer, but as that line starts to blur it seems like a useful
+  epithet for =Emacs=, because these days it looks more and more like
+  an operating system.
+
 * Introduction
 
   Literate programming is a programming paradigm introduced by Donald

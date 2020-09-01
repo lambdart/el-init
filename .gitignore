@@ -100,12 +100,6 @@ history
 .backup
 .org
 
-# Cask dir
-.cask
-
-# Cask file
-Cask
-
 # Emacs Packages directories
 tutorial
 irony
@@ -138,8 +132,7 @@ blog
 nsm
 
 # Emacs private/custom elisp files
+cannon
 custom.el
 private.el
-trash.el
 init.el
-eos.el

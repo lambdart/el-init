@@ -130,19 +130,14 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; threshold inital value
-     (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
      ;; gc-cons-percentage 0.5)
+     (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
 
      #+END_SRC
 
 **** Hooks
 
      #+BEGIN_SRC emacs-lisp
-
-     ;; (add-hook 'window-setup-hook
-     ;;           (lambda ()
-     ;;             (setq gc-cons-threshold 800000
-     ;;                   gc-cons-percentage 0.1)))
 
      #+END_SRC
 
@@ -355,13 +350,31 @@
     of this variable is a list of directories to search when
     loading files.
 
-    Uses ~subdirs.el~ and $EMACSLOADPATH environment variable
+    If the environment variable =EMACSLOADPATH= is set, it modifies the
+    above initialization procedure. Emacs initializes `load-path' based on
+    the value of the environment variable.
+
+    The syntax of =EMACSLOADPATH= is the same as used for 'PATH';
+    directories are separated by ':' (or ';', on some operating systems).
+    Here is an example of how to set =EMACSLOADPATH= variable (from a
+    'sh'-style shell).
 
     #+BEGIN_SRC example
-
     export EMACSLOADPATH=$EMACSLOADPATH:~/.emacs.d/lisp:~/.emacs.d/site-lisp
-
     #+END_SRC
+
+    See ~defaults/default.xinitrc~ file for a detailed example.
+
+    For each directory in `load-path', Emacs then checks to see if it
+    contains a file `subdirs.el', and if so, loads it. The `subdirs.el'
+    file is created when Emacs is built/installed, and contains code that
+    causes Emacs to add any subdirectories of those directories to
+    `load-path'. Both immediate subdirectories and subdirectories multiple
+    levels down are added. But it excludes subdirectories whose names do
+    not start with a letter or digit, and subdirectories named 'RCS' or
+    'CVS', and subdirectories containing a file named =.nosearch=.
+
+    See ~defaults/default.subdir.el~ file example.
 
 *** Load-prefer
 
@@ -764,6 +777,7 @@
       ;; start TLS stream to a host
       ;; '("openssl s_client -connect %h:%p -CAfile %t")
       ;; '("gnutls-cli --x509cafile %t -p %p %h --insecure")
+
       ;; (customize-set-variable
       ;; 'tls-program
       ;; '("gnutls-cli --x509cafile /etc/ssl/certs/ca-certificates.crt -p %p %h"))
@@ -1076,10 +1090,16 @@
       ;; alist of filename patterns and backup directory names
       (customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))
 
-      ;; create cache directory
-      ;; (add-hook 'window-setup-hook
-      ;;           (lambda ()
-      ;;             (safe-mkdir (concat user-emacs-directory "cache"))))
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; create cache directory, if necessary
+      (add-hook 'window-setup-hook
+                 (lambda ()
+                   (safe-mkdir (concat user-emacs-directory "cache"))))
 
       #+END_SRC
 
@@ -1387,13 +1407,6 @@
      ;; alist of parameters for the initial X window frame
      (add-to-list 'initial-frame-alist '(fullscreen . fullheight))
 
-     ;; (vertical-scroll-bars)
-     ;; (bottom-divider-width . 0)
-     ;; (right-divider-width . 6)
-
-     ;; set font by face attribute (reference)
-     ;; (set-face-attribute 'default nil :height)
-
      ;; alist of default values for frame creation
      (add-to-list 'default-frame-alist '(internal-border-width . 2))
 
@@ -1413,12 +1426,6 @@
 **** Binds
 
      #+BEGIN_SRC emacs-lisp
-
-     ;; ctl-x-5-map (frame prefix map)
-     ;;     (define-key ctl-x-5-map (kbd "t")
-     ;;       ((lambda ()
-     ;;          (interactive)
-     ;;          (set-frame-transparency 1))))
 
      ;; global map
      (global-set-key (kbd "C-x C-o") 'other-frame)
@@ -1540,12 +1547,6 @@
       that will have succeeded in placing its buffer there.
 
       #+BEGIN_SRC emacs-lisp
-
-      ;; (add-to-list 'display-buffer-alist
-      ;;              '(("\\*Choices\\*"
-      ;;                 (display-buffer-below-selected display-buffer-at-bottom)
-      ;;                 (inhibit-same-window . t)
-      ;;                 (window-height . fit-window-to-buffer))))
 
       #+END_SRC
 
@@ -2691,6 +2692,23 @@
 
       #+END_SRC
 
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; specify which kind of blank is visualized
+      ;; empty was removed
+      (customize-set-variable
+       'whitespace-style
+       '(face
+         tabs spaces trailing lines
+         space-before-tab newline indentation
+         space-after-tab space-mark tab-mark
+         newline-mark missing-newline-at-eof))
+
+      #+END_SRC
+
+
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -2770,13 +2788,19 @@
 
 **** Lazy
 
-     Automatic generate load definitions.
+     Automatic generate `autoload' definitions.
 
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
       ;; (require 'lazy)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
 
       #+END_SRC
 
@@ -5025,6 +5049,7 @@
                    '((emacs-lisp . t)
                      (shell . t)
                      (haskell . t)
+                     (ocaml . t)
                      (sqlite . t)
                      (python . t)))))
 

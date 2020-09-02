@@ -8,6 +8,10 @@
 #+PROPERTY: header-args :tangle yes
 #+STARTUP: overview
 
+  A =Lisp Machine= is a generic term. A Lisp Machine is a
+  computer whose operating system and applications are
+  written in Lisp.
+
   Some people (including me) have started to refer to
   =Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
   because, clearly, it is a software program and not a physical
@@ -35,20 +39,9 @@
 
 * VLM
 
-  A "Lisp Machine" is a generic term. A Lisp Machine is a
-  computer whose operating system and applications are
-  written in Lisp.
-
-  Some people have started to refer to Emacs as a LISP MACHINE.
-  It is not strictly a lisp machine because, clearly, it is a software
-  program and not a physical computer, but as that line starts to blur
-  it seems like a useful epithet for Emacs because these days Emacs
-  looks more and more like an operating system (a virtualized lisp
-  machine).
-
-  So, =VLM= stands for =Virtual Lisp Machine=, the prefix =vlm-=
-  will appear often through this document in reference to this
-  definition.
+  So, =VLM= stands for =Virtual Lisp Machine= and the prefix
+  =vlm-= will appear often through this document in reference
+  to this definition.
 
 ** Bootstrap
 *** Header

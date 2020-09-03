@@ -1361,7 +1361,13 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; commands extensions map
+      ;; dired-mode-map
+      (eval-after-load 'dired
+        (lambda ()
+          (when (boundp 'dired-mode-map)
+            (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file))))
+
+      ;; clt-x-map
       (define-key ctl-x-map (kbd "C-d") 'dired)
 
       #+END_SRC
@@ -1503,6 +1509,9 @@
 
       ;; if non-nil, left and right side windows occupy full frame height
       (customize-set-variable 'window-sides-vertical nil)
+
+      ;; non-nil value means always make a separate frame
+      ;; (customize-set-variable 'pop-up-frames nil)
 
       #+END_SRC
 
@@ -1918,6 +1927,41 @@
       #+END_SRC
 
 *** Commands
+**** History
+
+     Commands history.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'chistory nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; maximum length of history lists before truncation takes place
+      (customize-set-variable 'history-length 256)
+
+      ;;list history of commands that used the minibuffer
+      (customize-set-variable 'list-command-history-max 128)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; ctl-x-map
+      (define-key ctl-x-map (kbd "C-c") 'execute-command-history)
+
+      ;; (define-key vlm-utils-map (kbd "e") 'execute-command-history)
+
+      #+END_SRC
+
 **** Minibuffer
 
      The “minibuffer” is where Emacs commands read complicated arguments,
@@ -2025,9 +2069,6 @@
       (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
       (define-key minibuffer-local-map (kbd "M-w") 'minibuffer-complete-word)
       (define-key minibuffer-local-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
-
-      ;; research (maybe this is not necessary) (C-k: kill line)
-      ;; (define-key minibuffer-local-map (kbd "M-w") 'vlm/icomplete/kill-ring-save)
 
       ;; goto-map
       (define-key goto-map (kbd "v") 'goto-minibuffer-window)
@@ -2254,8 +2295,10 @@
           (when (boundp 'icomplete-minibuffer-map)
             ;; unbind
             (define-key icomplete-minibuffer-map (kbd "SPC") nil)
-            (define-key icomplete-minibuffer-map (kbd "RET") 'icomplete-force-complete-and-exit)
+            ;; (define-key icomplete-minibuffer-map (kbd "RET") 'nil)
+
             ;; bind
+            ;; (define-key icomplete-minibuffer-map (kbd "RET") 'minibuffer-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions))))
@@ -2760,12 +2803,39 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; enable emacs server after startup
+     ;; enable emacs server after startup (not used anymore)
      ;; (add-hook 'after-init-hook
      ;;           (lambda ()
      ;;             (funcall 'server-start)))
 
      #+END_SRC
+
+*** Network
+**** Net-utils
+
+   Wrap common network utility programs (ping, traceroute, netstat,
+   nslookup, arp, route). Note that these wrappers are of the diagnostic
+   functions of these programs only.
+
+   Implement some very basic protocols in Emacs Lisp (finger and whois)
+
+   Support connections to HOST/PORT, generally for debugging and the like.
+   In other words, for doing much the same thing as "telnet HOST PORT", and
+   then typing commands.
+
+***** Require
+
+   #+BEGIN_SRC emacs-lisp
+
+   ;; (require 'net-utils)
+
+   #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
 
 ** Applications
 *** Loaddefs
@@ -2802,7 +2872,25 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; non-nil means starts to monitor the directories
+      (customize-set-variable 'lazy-enable-filenotify-flag t)
+
+      ;; non-nil means show debug messages
+      (customize-set-variable 'lazy-debug-messages-flag t)
+
       #+END_SRC
+
+***** Enable
+
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'turn-on-lazy-mode)))
+
+      #+END_SRC
+
 
 *** CLI
 
@@ -7488,9 +7576,9 @@
      (define-key ctl-x-map (kbd "<right>") nil)
      (define-key ctl-x-map (kbd "<left>") nil)
 
+     ;; (define-key ctl-x-map (kbd "C-d") nil)
      (define-key ctl-x-map (kbd "C-o") nil)
-     (define-key ctl-x-map (kbd "C-d") nil)
-     (define-key ctl-x-map (kbd "C-c") nil)
+     ;; (define-key ctl-x-map (kbd "C-c") nil)
      (define-key ctl-x-map (kbd "C-j") nil)
      (define-key ctl-x-map (kbd "C-+") nil)
      (define-key ctl-x-map (kbd "C-a") nil)

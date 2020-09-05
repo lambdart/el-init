@@ -525,7 +525,7 @@
       (global-set-key (kbd "C-M-y") 'scroll-other-window-down)
 
       ;; edit
-      (global-set-key (kbd "M-y") 'insert-kill-ring)
+      (global-set-key (kbd "M-y") 'browse-kill-ring)
       (global-set-key (kbd "M-i") 'indent-region-or-buffer)
       (global-set-key (kbd "M-j") 'duplicate-line-or-region)
       (global-set-key (kbd "M-n") 'transpose-lines-up)
@@ -1365,6 +1365,7 @@
       (eval-after-load 'dired
         (lambda ()
           (when (boundp 'dired-mode-map)
+            (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
             (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file))))
 
       ;; clt-x-map
@@ -1445,7 +1446,7 @@
      ;; set default font
      (add-hook 'window-setup-hook
                (lambda ()
-                 (safe-set-frame-font "Hermit-13:weight:light")))
+                 (safe-set-frame-font "Hermit Light-13")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -1944,10 +1945,10 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; maximum length of history lists before truncation takes place
-      (customize-set-variable 'history-length 256)
+      (customize-set-variable 'history-length 1024)
 
       ;;list history of commands that used the minibuffer
-      (customize-set-variable 'list-command-history-max 128)
+      (customize-set-variable 'list-command-history-max history-length)
 
       #+END_SRC
 
@@ -2837,6 +2838,30 @@
 
       #+END_SRC
 
+*** Features
+**** Loadhist
+
+     These library provides functions to exploit the load-history
+     system variable. Entry points include `unload-feature',
+     `symbol-file', and `feature-file', documented in the
+     Emacs Lisp manual.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'loadhist nil t)
+
+      #+END_SRC
+
+***** Aliases
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defalias 'unload-library 'unload-feature)
+
+      #+END_SRC
+
 ** Applications
 *** Loaddefs
 
@@ -2890,7 +2915,6 @@
                   (funcall 'turn-on-lazy-mode)))
 
       #+END_SRC
-
 
 *** CLI
 
@@ -3892,6 +3916,7 @@
 
       #+END_SRC
 
+**** Browse-kill-ring
 *** Graphics
 **** Artist
 
@@ -4594,13 +4619,7 @@
      through the arrow keys or typing a part of the name,
      and the line is printed to stdout.
 
-     Cannon mimics Dmenu inside Emacs with minibuffer helps.
-
-
-     Simulate Dmenu command cmd-line program to dynamic/interactive
-     launch applications/commands regarding $PATH
-     environment variable using Emacs vanilla builtin
-     facilities (minibuffer/completions).
+     Cannon mimics Dmenu inside Emacs with the help of minibuffer.
 
 ***** Require
 

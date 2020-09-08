@@ -8,16 +8,16 @@
 #+PROPERTY: header-args :tangle yes
 #+STARTUP: overview
 
-  A =Lisp Machine= is a generic term. A Lisp Machine is a
-  computer whose operating system and applications are
-  written in Lisp.
+A =Lisp Machine= is a generic term. A Lisp Machine is a
+computer whose operating system and applications are
+written in Lisp.
 
-  Some people (including me) have started to refer to
-  =Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
-  because, clearly, it is a software program and not a physical
-  computer, but as that line starts to blur it seems like a useful
-  epithet for =Emacs=, because these days it looks more and more like
-  an operating system.
+Some people (including me) have started to refer to
+=Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
+because, clearly, it is a software program and not a physical
+computer, but as that line starts to blur it seems like a useful
+epithet for =Emacs=, because these days it looks more and more like
+an operating system.
 
 * Introduction
 
@@ -549,7 +549,6 @@
       (define-key vlm-utils-map (kbd "s") 'mark-sexp)
       (define-key vlm-utils-map (kbd "p") 'mark-paragraph)
       (define-key vlm-utils-map (kbd "w") 'mark-word)
-      (define-key vlm-utils-map (kbd "g") 'mark-goto-char)
 
       #+END_SRC
 
@@ -1065,6 +1064,14 @@
 
       #+END_SRC
 
+***** Aliases
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defalias 'create-directory 'make-directory)
+
+      #+END_SRC
+
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
@@ -1106,8 +1113,8 @@
 
       ;; create cache directory, if necessary
       (add-hook 'window-setup-hook
-                 (lambda ()
-                   (safe-mkdir (concat user-emacs-directory "cache"))))
+                (lambda ()
+                  (safe-mkdir (concat user-emacs-directory "cache"))))
 
       #+END_SRC
 
@@ -1454,7 +1461,7 @@
      ;; set default font
      (add-hook 'window-setup-hook
                (lambda ()
-                 (safe-set-frame-font "Iosevka Fixed Extended-14")))
+                 (safe-set-frame-font "Iosevka Fixed-14:width=regular:weight=regular")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -1965,9 +1972,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; ctl-x-map
-      (define-key ctl-x-map (kbd "C-c") 'execute-command-history)
-
-      ;; (define-key vlm-utils-map (kbd "e") 'execute-command-history)
+      (define-key ctl-x-map (kbd "C-c") 'eval-command-history)
 
       #+END_SRC
 
@@ -2048,6 +2053,13 @@
       ;; non-nil means to delete duplicates in history
       (customize-set-variable 'history-delete-duplicates t)
 
+      ;; special hook to find the completion table for the entity at point (default)
+      (customize-set-variable
+       'completion-at-point-functions
+       '(elisp-completion-at-point
+         lisp-completion-at-point
+         tags-completion-at-point-function t))
+
       #+END_SRC
 
 ***** Hooks
@@ -2083,9 +2095,13 @@
       (define-key goto-map (kbd "v") 'goto-minibuffer-window)
       (define-key goto-map (kbd "M-c") 'goto-completions-window)
       (define-key goto-map (kbd "M-v") 'goto-minibuffer-or-completions-window)
+      (define-key goto-map (kbd "M-m") 'goto-mark)
 
       ;; esc-map (force minibuffer to exit)
       (define-key esc-map (kbd "ESC") 'force-minibuffer-exit)
+
+      ;; vlm-completion-map: completion-at-point (experimental)
+      (define-key vlm-completion-map (kbd "a") 'completion-at-point)
 
       #+END_SRC
 
@@ -2307,7 +2323,7 @@
             ;; (define-key icomplete-minibuffer-map (kbd "RET") nil)
 
             ;; bind
-            (define-key icomplete-minibuffer-map (kbd "RET") 'minibuffer-complete-and-exit)
+            ;; (define-key icomplete-minibuffer-map (kbd "RET") 'minibuffer-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions)
@@ -2824,23 +2840,23 @@
 *** Network
 **** Net-utils
 
-   Wrap common network utility programs (ping, traceroute, netstat,
-   nslookup, arp, route). Note that these wrappers are of the diagnostic
-   functions of these programs only.
+     Wrap common network utility programs (ping, traceroute, netstat,
+     nslookup, arp, route). Note that these wrappers are of the diagnostic
+     functions of these programs only.
 
-   Implement some very basic protocols in Emacs Lisp (finger and whois)
+     Implement some very basic protocols in Emacs Lisp (finger and whois)
 
-   Support connections to HOST/PORT, generally for debugging and the like.
-   In other words, for doing much the same thing as "telnet HOST PORT", and
-   then typing commands.
+     Support connections to HOST/PORT, generally for debugging and the like.
+     In other words, for doing much the same thing as "telnet HOST PORT", and
+     then typing commands.
 
 ***** Require
 
-   #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-   ;; (require 'net-utils)
+      ;; (require 'net-utils)
 
-   #+END_SRC
+      #+END_SRC
 
 ***** Customize
 
@@ -6279,6 +6295,8 @@
 
       ;; utils map
       (define-key vlm-utils-map (kbd "c") 'compile-history)
+      (define-key vlm-utils-map (kbd "e") 'shell-command)
+      (define-key vlm-utils-map (kbd "C-e") 'shell-command-current-buffer)
 
       #+END_SRC
 
@@ -7672,7 +7690,7 @@
      (global-unset-key (kbd "C-\\"))
      (global-unset-key (kbd "C-_"))
      ;;(global-unset-key (kbd "M-l"))
-     (global-unset-key (kbd "M-h"))
+     ;; (global-unset-key (kbd "M-h"))
      ;; (global-unset-key (kbd "M-\\"))
      (global-unset-key (kbd "M-$"))
      (global-unset-key (kbd "M-("))

@@ -359,8 +359,10 @@ an operating system.
     Here is an example of how to set =EMACSLOADPATH= variable (from a
     'sh'-style shell).
 
-    #+BEGIN_SRC example
+    #+BEGIN_SRC sh
+
     export EMACSLOADPATH=$EMACSLOADPATH:~/.emacs.d/lisp:~/.emacs.d/site-lisp
+
     #+END_SRC
 
     See ~defaults/default.xinitrc~ file for a detailed example.
@@ -1461,7 +1463,7 @@ an operating system.
      ;; set default font
      (add-hook 'window-setup-hook
                (lambda ()
-                 (safe-set-frame-font "Iosevka Fixed-14:width=regular:weight=regular")))
+                 (safe-set-frame-font "Iosevka Fixed-16:width=regular:weight=regular")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -1785,163 +1787,6 @@ an operating system.
 
      #+END_SRC
 
-*** Help
-**** Help
-
-     GNU Emacs's built-in help system, the one invoked by
-     M-x help-for-help.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'help nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; always select the help window
-      (customize-set-variable 'help-window-select t)
-
-      ;; maximum height of a window displaying a temporary buffer.
-      (customize-set-variable 'temp-buffer-max-height
-                              (lambda (buffer)
-                                (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
-                                    (/ (x-display-pixel-height) (frame-char-height) 4)
-                                  (/ (- (frame-height) 4) 4))))
-
-      ;; reference
-      ;; (customize-set-variable 'temp-buffer-max-height 12)
-
-      #+END_SRC
-
-***** Display
-
-      #+BEGIN_SRC emacs-lisp
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (funcall 'temp-buffer-resize-mode 1)))
-
-      #+END_SRC
-
-**** Help-fns
-
-     This file contains those help commands which are complicated, and
-     which may not be used in every session. For example
-     `describe-function' will probably be heavily used when doing elisp
-     programming, but not if just editing C files.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'help-fns nil t)
-
-      #+END_SRC
-
-**** Help-mode
-
-     Help-mode, which is the mode used by *Help* buffers, and
-     associated support machinery, such as adding hyperlinks, etc...
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'help-mode nil t)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      (eval-after-load 'help-mode
-        (lambda ()
-          (when (boundp 'help-mode-map)
-            (define-key help-mode-map (kbd "C-j") 'push-button))))
-
-      #+END_SRC
-
-*** Docs
-**** Info
-
-     The GNU Project distributes most of its manuals in the Info format,
-     which you read using an Info reader.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'info nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; non-nil means don’t record intermediate Info nodes to the history
-      (customize-set-variable 'info-history-skip-intermediate-nodes nil)
-
-      ;; 0 -> means do not display breadcrumbs
-      ;; (customize-set-variable 'info-breadcrumbs-depth 0)
-
-      #+END_SRC
-
-**** Eldoc
-
-     As you type a function's symbol name as part of a sexp,
-     it will print the argument list for that function.
-     Behavior is not identical; for example, you need not actually
-     type the function name, you need only move point around in a sexp that
-     calls it.  Also, if point is over a documented variable, it will print
-     the one-line documentation for that variable instead, to remind you of
-     that variable's meaning.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'eldoc nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; number of seconds of idle time to wait before printing.
-      (customize-set-variable 'eldoc-idle-delay 0.1)
-
-      ;; if value is any non-nil value other than t, symbol name may be truncated
-      ;; if it will enable the function arglist or documentation string to fit on a
-      ;; single line without resizing window
-      (customize-set-variable 'eldoc-echo-area-use-multiline-p t)
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; enable eldoc globally
-      (add-hook 'window-setup-hook
-                (lambda()
-                  (funcall 'eldoc-mode 1)))
-
-      #+END_SRC
-
 *** Commands
 **** History
 
@@ -2029,13 +1874,13 @@ an operating system.
 
       ;; list of completion styles to use: see `completion-styles-alist variable
       (customize-set-variable 'completion-styles
-                              '(partial-completion substring flex initials))
+                              '(partial-completion flex substring initials basic))
 
       ;; list of category-specific user overrides for completion styles.
-      (customize-set-variable 'completion-category-overrides
-                              '((file (styles initials basic))
-                                (buffer (styles initials basic))
-                                (info-menu (styles basic))))
+      (customize-set-variable 'completion-category-overrides nil)
+      ;; '((file (styles initials basic))
+      ;;   (buffer (styles initials basic))
+      ;;   (info-menu (styles basic))))
 
       ;; define the appearance and sorting of completions
       (customize-set-variable 'completions-format 'vertical)
@@ -2327,8 +2172,8 @@ an operating system.
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions)
-            (define-key icomplete-minibuffer-map (kbd "M-k") 'icomplete-kill-candidate)
-            (define-key icomplete-minibuffer-map (kbd "M-i") 'icomplete-insert-candidate))))
+            (define-key icomplete-minibuffer-map (kbd "M-k") 'minibuffer-kill-top-candidate)
+            (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-top-candidate))))
 
       #+END_SRC
 
@@ -2888,7 +2733,193 @@ an operating system.
 
       #+END_SRC
 
-** Extension
+*** Search
+**** Find-lisp
+
+     This is a very generalized form of find; it basically implements a
+     recursive directory descent. The conditions which bound the search
+     are expressed as predicates, and I have not addressed the question
+     of how to wrap up the common chores that find does in a simpler
+     format than writing code for all the various predicates.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'find-lisp nil t)
+
+      #+END_SRC
+
+***** Aliases
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defalias 'find-subdirectories 'find-lisp-find-dired-subdirectories)
+
+      #+END_SRC
+
+**** Find-dired
+
+     Run a `find' command and Dired the output.
+
+*** Help
+**** Help
+
+     GNU Emacs's built-in help system, the one invoked by
+     M-x help-for-help.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'help nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; always select the help window
+      (customize-set-variable 'help-window-select t)
+
+      ;; maximum height of a window displaying a temporary buffer.
+      (customize-set-variable 'temp-buffer-max-height
+                              (lambda (buffer)
+                                (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
+                                    (/ (x-display-pixel-height) (frame-char-height) 4)
+                                  (/ (- (frame-height) 4) 4))))
+
+      ;; reference
+      ;; (customize-set-variable 'temp-buffer-max-height 12)
+
+      #+END_SRC
+
+***** Display
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'temp-buffer-resize-mode 1)))
+
+      #+END_SRC
+
+**** Help-fns
+
+     This file contains those help commands which are complicated, and
+     which may not be used in every session. For example
+     `describe-function' will probably be heavily used when doing elisp
+     programming, but not if just editing C files.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'help-fns nil t)
+
+      #+END_SRC
+
+**** Help-mode
+
+     Help-mode, which is the mode used by *Help* buffers, and
+     associated support machinery, such as adding hyperlinks, etc...
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'help-mode nil t)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (eval-after-load 'help-mode
+        (lambda ()
+          (when (boundp 'help-mode-map)
+            (define-key help-mode-map (kbd "C-j") 'push-button))))
+
+      #+END_SRC
+
+*** Docs
+**** Info
+
+     The GNU Project distributes most of its manuals in the Info format,
+     which you read using an Info reader.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'info nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; non-nil means don’t record intermediate Info nodes to the history
+      (customize-set-variable 'info-history-skip-intermediate-nodes nil)
+
+      ;; 0 -> means do not display breadcrumbs
+      ;; (customize-set-variable 'info-breadcrumbs-depth 0)
+
+      #+END_SRC
+
+**** Eldoc
+
+     As you type a function's symbol name as part of a sexp,
+     it will print the argument list for that function.
+     Behavior is not identical; for example, you need not actually
+     type the function name, you need only move point around in a sexp that
+     calls it.  Also, if point is over a documented variable, it will print
+     the one-line documentation for that variable instead, to remind you of
+     that variable's meaning.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'eldoc nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; number of seconds of idle time to wait before printing.
+      (customize-set-variable 'eldoc-idle-delay 0.1)
+
+      ;; if value is any non-nil value other than t, symbol name may be truncated
+      ;; if it will enable the function arglist or documentation string to fit on a
+      ;; single line without resizing window
+      (customize-set-variable 'eldoc-echo-area-use-multiline-p t)
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable eldoc globally
+      (add-hook 'window-setup-hook
+                (lambda()
+                  (funcall 'eldoc-mode 1)))
+
+      #+END_SRC
+
+** Extensions
 *** Loaddefs
 
     The local ~lisp-loaddefs.el~ was generated by
@@ -6353,6 +6384,14 @@ an operating system.
       #+BEGIN_SRC emacs-lisp
 
       ;; (require 'projectile nil t)
+
+      #+END_SRC
+
+***** Alias
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defalias 'compile-project 'projectile-compile-project)
 
       #+END_SRC
 

@@ -133,8 +133,8 @@
 
 ** Goal
 
-   Use =EMACS= as a =LISP MACHINE=, i.e, the main dynamic system interface
-   to perform data transformation of interest.
+   Use =EMACS= as a =LISP MACHINE=, i.e, the main dynamic interface
+   to perform data transformations.
 
    * The only bridge between human and machine.
 

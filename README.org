@@ -97,11 +97,11 @@
 
   To summarize everything in a single statement:
 
-  =Emacs= is a programmable platform with builtin libraries that
+  =Emacs= is a programmable platform with builtin =libraries= that
   provide editing and data visualization functionalities.
   Its core - the interpreter and basic features -
   is written using the =C= programming language,
-  and all the other packages that extend it use a =LISP= dialect
+  and all the other =libraries= that extend it use a =LISP= dialect
   called =Emacs Lisp=, usually abbreviated as
   =Elisp=. The =interpreter= is the main interface to
   interact with its components and =lists= are evaluated
@@ -122,21 +122,73 @@
   documentation.
 
   * Note: Throughout this document the word =application=
-    refers to any =elisp package= or =external program=.
+    refers to any =elisp library= or =external program=.
 
   It's important to understand that all applications with
   different purposes, made in =Elisp= or not, pass, in a
   way or another, through the interpreter.
 
-  So again, =application(s)= implies =Elisp packages=
+  So again, =application(s)= implies =elisp library=
   or =external programs=.
 
-** Objective
+** Goal
 
-   Use =EMACS= as a =LISP MACHINE=, i.e, the only dynamic interface
-   to perform data transformations: =INPUT-TRANSFORM-OUTPUT= cycles.
+   Use =EMACS= as a =LISP MACHINE=, i.e, the main dynamic system interface
+   to perform data transformation of interest.
 
    * The only bridge between human and machine.
+
+** Mantras
+
+   0. Data driven/oriented design: we only care about how to organize
+      our data to do less transformations as possible to solve a given
+      problem, this results in a great degree of optimization and
+      simplicity.
+
+   1. Avoid late time decisions.
+
+   2. Always go in the opposite direction: =SCALE DOWN=, i.e, use less
+      resource as possible!
+
+   3. Simple is better.
+   4. Less is more.
+
+   5. For the =LISP MACHINE= everything is a =library=, in the same way
+      the everything is a file on UNIX systems!
+
+   6. Lazy load (=autoloads=) everywhere.
+   7. Byte-compile warnings are equal to errors: not allowed!
+
+   8. Use as few =libraries= (sometimes called =packages= or =modules=)
+      as possible and always try to use =libraries= already installed
+      on Emacs to meet your needs. If you can withdraw a =library=, do
+      so! Most of the time it takes little or no effort, and the gain
+      is considerable. So, be alert to identify these situations!
+
+   9. Prioritize Emacs's native =libraries= (builtin) over third-party
+      ones. If any demand comes to light, try to solve it with these
+      =libraries= first, then third-party ones already
+      installed and finally (maybe, A HUGE ONE) the internet!
+      Sometimes a little extension on these blotted-code-base
+      is everything that's needed to bring a new feature to life or
+      solve an issue.
+
+   10. If something is bothering you, fix it, right now!
+
+   11. Few mapped keybinds as possible! Implies the constant
+       usage of the =minibuffer= to =eval= less often used commands,
+       but a huge pain relief, =diwm= style!
+
+   12. Use the same action flow logic, for the same class of commands.
+
+   13. Global behavior always available, do not change states (erase
+       this silly idea), we have just one state and its
+       very dynamic!
+
+   14. Successive refinements: in constant refactoring!
+       Always improve, never fear the winds of change!
+
+   15. I must not fear. Fear is the mind killer...
 
 ** Features:
 
@@ -178,9 +230,9 @@
 
    - Intern communication (=pipes, IPCs, data streams, sockets, you
      name it=) between peers are transparent, resulting in a very
-     practical, very convenient integration for all modules and
+     practical, very convenient integration for all librariess and
      resources available:
-     - Packages
+     - Libraries
      - Applications
      - Buffers/Windows/Frames
      - Processes
@@ -191,8 +243,8 @@
 * Dependencies
 
   1. Emacs >= 26.3
-  2. Elisp Packages
-     - TODO: List packages!
+  2. Elisp Libraries
+     - TODO: List Libraries!
   3. Elf Binaries
      - Ag, The Silver Searcher
      - Global
@@ -354,41 +406,9 @@
    | Global | M-p     | transpose-lines-down         |
    | ...    | ...     | ...                          |
 
-* Packages
+* Libraries
 
-  Packages listed on ~packages.org~ file. (TODO!)
-
-* Advices
-
-  0. Do one thing and do it well (Unix philosophy).
-  1. If something is bothering you, fix it!
-  2. Global behavior aways available and static.
-  3. Few keybinds sets.
-
-  4. Repeat keybinds postfix for mode-specific commands
-     according to their logical classification.
-
-  5. Use the same action flow logic, for the same
-     class of commands.
-
-  6. Use as few modules (packages) as possible and always try to use
-     modules already installed on Emacs to meet your needs.
-     If you can withdraw a module, do so! Most of the time it
-     takes little or no effort, and the gain is considerable.
-     So, be alert to identify these situations!
-
-  7. Prioritize Emacs's native packages (builtin) over third-party
-     ones. If any demand comes to light, try to solve it with these
-     packages first, then third-party packages already
-     installed and finally the internet. (A HUGE MAYBE)!
-     Sometimes a little extension on these blotted-packages sets
-     is everything that's needed to bring a new feature to life or
-     solve an issue.
-
-  8. Successive refinements: in constant refactoring!
-     Always improve, never fear the winds of change!
-
-  9. Have fun!
+  Libraries are listed on ~libraries.org~ file.
 
 * FAQ
 
@@ -399,7 +419,7 @@
   - A: It is not just a matter of taste, it is simply because
     they get in the way and disturb the desired transformation from
     properly occurring, and I prefer a more direct/effective approach.
-    Remember that's the way I think, you can add these modules
+    Remember that's the way I think, you can add these librariess
     on your own and make your life a little more miserable,
     be my guest!
 

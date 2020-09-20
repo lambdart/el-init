@@ -3479,27 +3479,6 @@ an operating system.
 
        #+END_SRC
 
-****** Functions
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; functions
-       (defun vlm-term-send-kill-line ()
-         "Kill line in multi-term mode with the possibility to paste it like in a normal shell."
-         (interactive)
-         (when (fboundp 'term-send-raw-string)
-           (kill-line)
-           (term-send-raw-string "\C-k")))
-
-       (defun vlm-term (name)
-         "Call `term' and asks for a buffer NAME."
-         (interactive
-          (list (read-string "Term name: " nil nil "Term")))
-         (funcall 'term (getenv "SHELL"))
-         (rename-buffer name t))
-
-       #+END_SRC
-
 ****** Hooks
 
        #+BEGIN_SRC emacs-lisp
@@ -3531,7 +3510,7 @@ an operating system.
        #+BEGIN_SRC emacs-lisp
 
        ;; clt-x-map (C-x) prefix
-       (define-key ctl-x-map (kbd "<C-return>") 'vlm-term)
+       (define-key ctl-x-map (kbd "<C-return>") 'open-terminal)
 
        #+END_SRC
 

@@ -1463,7 +1463,7 @@ an operating system.
      ;; set default font
      (add-hook 'window-setup-hook
                (lambda ()
-                 (safe-set-frame-font "Iosevka Fixed-16:width=regular:weight=regular")))
+                 (safe-set-frame-font "Iosevka Fixed-15:width=regular:weight=regular")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -2973,7 +2973,7 @@ an operating system.
 
       #+END_SRC
 
-*** CLI
+*** Command-Line-Interface
 
     Command line interface (CLI) is a text-based interface that is
     used to operate software and operating systems while allowing the
@@ -4267,9 +4267,9 @@ an operating system.
 
       ;; if emms is available, enable it
       (add-hook 'window-setup-hook
-                (lambda ()
-                  (funcall 'emms-all)
-                  (funcall 'emms-default-players)))
+                 (lambda ()
+                   (funcall 'emms-minimalistic)
+                   (funcall 'emms-default-players)))
 
       #+END_SRC
 
@@ -6449,6 +6449,33 @@ an operating system.
       #+END_SRC
 
 *** Containers
+*** Misc
+**** Speedbar
+
+     The =speedbar= library provides a frame in which files, and locations in
+     files are displayed. These items can be clicked on with mouse-2 in
+     to display that file location.
+
+***** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (require 'seedbar nil t)
+
+     #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; non-nil if speedbar should display icons
+      (customize-set-variable 'speedbar-use-images nil)
+
+      ;; non-nil means use imenu for file parsing, nil to use etags
+      (customize-set-variable 'speedbar-use-imenu-flag t)
+
+      #+END_SRC
+
 ** Development
 *** Generic
 

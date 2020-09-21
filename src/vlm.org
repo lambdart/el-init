@@ -2172,8 +2172,9 @@ an operating system.
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "M-n") 'icomplete-forward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-p") 'icomplete-backward-completions)
+            (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-top-candidate)
             (define-key icomplete-minibuffer-map (kbd "M-k") 'minibuffer-kill-top-candidate)
-            (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-top-candidate))))
+            (define-key icomplete-minibuffer-map (kbd "M-h") 'minibuffer-describe-top-candidate))))
 
       #+END_SRC
 
@@ -2873,6 +2874,17 @@ an operating system.
 
       ;; 0 -> means do not display breadcrumbs
       ;; (customize-set-variable 'info-breadcrumbs-depth 0)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (eval-after-load 'info
+        (lambda ()
+          (when (boundp 'Info-mode-map)
+            (define-key Info-mode-map (kbd "C-j") 'Info-follow-nearest-node))))
 
       #+END_SRC
 

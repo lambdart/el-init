@@ -6235,21 +6235,7 @@ an operating system.
 
      This package provides two minor modes which automatically
      recompile Emacs Lisp source files. Together these modes guarantee
-     that Emacs never loads outdated byte code files.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'auto-compile nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      #+END_SRC
+     that Emacs never loads outdated byte code files. (Research)
 
 **** Compile
 
@@ -6274,7 +6260,7 @@ an operating system.
         "Default compile command for VLM.")
 
       (defun vlm-compile ()
-        "Invoke `compile-at-dir' passing the right arguments."
+        "Invoke `compile' passing `vlm-compile-command'."
         (interactive)
         (compile vlm-compile-command))
 
@@ -6306,8 +6292,9 @@ an operating system.
                 (lambda ()
                   (when (and (eq major-mode 'compilation-mode)
                              (boundp 'compilation-filter-start))
-                    (safe-funcall 'ansi-color-apply-on-region
-                                  `(,compilation-filter-start ,(point-max))))))
+                    (funcall 'ansi-color-apply-on-region
+                             compilation-filter-start
+                             (point-max)))))
 
       #+END_SRC
 

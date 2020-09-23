@@ -39,9 +39,23 @@ to this definition.
 * GOAL
 
   Use =Emacs= as the only dynamic interface between
-  human and machine, i.e, as a LISP MACHINE.
+  human and machine, i.e, as a =VIRTUAL LISP MACHINE=.
 
-* LISP
+* INIT
+
+  When you start Emacs, it normally attempts to load
+  your =init.el file=, that will =load*= and =set= the proper
+  values to the customizable library's variables.
+
+  Finally, =Org-mode= is used to write and organize the configuration
+  ~src/vlm.org~ (this document) in a literate programming format,
+  meaning it contains =Elisp= source code blocks - that will be tangled
+  generating the ~src/init.el~ final script.
+
+  load* : Just load the definitions using the =autoloads= facility
+  (=loaddefs.el=), this speed up the process of initialization.
+  that's most of the =(require '<library>)= are commented.
+
 ** Bootstrap
 *** Header
 
@@ -1946,8 +1960,8 @@ to this definition.
       ;; (define-key goto-map (kbd "M-v") 'goto-minibuffer-or-completions-window)
       (define-key goto-map (kbd "M-m") 'goto-mark)
 
-      ;; esc-map (force minibuffer to exit)
-      (define-key esc-map (kbd "ESC") 'force-minibuffer-exit)
+      ;; clt-x-map quit minibuffer
+      (global-set-key (kbd "<C-delete>") 'quit-minibuffer)
 
       ;; vlm-completion-map: completion-at-point (experimental)
       (define-key vlm-completion-map (kbd "a") 'completion-at-point)

@@ -19,7 +19,11 @@ computer, but as that line starts to blur it seems like a useful
 epithet for =Emacs=, because these days it looks more and more like
 an operating system.
 
-* Introduction
+So, =VLM= stands for =Virtual Lisp Machine= and the prefix
+=vlm-= will appear often through this document in reference
+to this definition.
+
+* INTRO
 
   Literate programming is a programming paradigm introduced by Donald
   Knuth  in which a computer program is given an explanation of its
@@ -32,17 +36,12 @@ an operating system.
   Elisp source code blocks - that will be tangled generating the
   =init.el= final script - and the referent documentation.
 
-* Objective
+* GOAL
 
   Use =Emacs= as the only dynamic interface between
   human and machine, i.e, as a LISP MACHINE.
 
-* VLM
-
-  So, =VLM= stands for =Virtual Lisp Machine= and the prefix
-  =vlm-= will appear often through this document in reference
-  to this definition.
-
+* LISP
 ** Bootstrap
 *** Header
 
@@ -552,6 +551,9 @@ an operating system.
       (define-key vlm-utils-map (kbd "p") 'mark-paragraph)
       (define-key vlm-utils-map (kbd "w") 'mark-word)
 
+      ;; in buffer completion
+      ;; (global-set-key (kbd "C-M-i") 'complete-or-indent)
+
       #+END_SRC
 
 *** Network
@@ -1046,6 +1048,8 @@ an operating system.
 
    Major Structures of Emacs: Files, Buffer, Windows, Frames, Input,
    International, Commands, Completions, Editing ...
+
+   Basically the 'C' (core) system.
 
 *** Files
 
@@ -1937,9 +1941,9 @@ an operating system.
       (define-key minibuffer-local-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       ;; goto-map
-      (define-key goto-map (kbd "v") 'goto-minibuffer-window)
-      (define-key goto-map (kbd "M-c") 'goto-completions-window)
-      (define-key goto-map (kbd "M-v") 'goto-minibuffer-or-completions-window)
+      (define-key goto-map (kbd "M-SPC") 'goto-minibuffer-window)
+      (define-key goto-map (kbd "C-M-i") 'goto-completions-window)
+      ;; (define-key goto-map (kbd "M-v") 'goto-minibuffer-or-completions-window)
       (define-key goto-map (kbd "M-m") 'goto-mark)
 
       ;; esc-map (force minibuffer to exit)
@@ -1947,6 +1951,9 @@ an operating system.
 
       ;; vlm-completion-map: completion-at-point (experimental)
       (define-key vlm-completion-map (kbd "a") 'completion-at-point)
+
+      ;; global
+      (global-set-key (kbd "M-x") 'goto-minibuffer-or-call-it)
 
       #+END_SRC
 
@@ -4258,9 +4265,9 @@ an operating system.
 
       ;; if emms is available, enable it
       (add-hook 'window-setup-hook
-                 (lambda ()
-                   (funcall 'emms-minimalistic)
-                   (funcall 'emms-default-players)))
+                (lambda ()
+                  (funcall 'emms-minimalistic)
+                  (funcall 'emms-default-players)))
 
       #+END_SRC
 
@@ -5927,7 +5934,7 @@ an operating system.
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
-               (safe-funcall 'company-complete nil))
+               (safe-funcall 'company-complete-common))
               (t (indent-according-to-mode))))
 
       #+END_SRC
@@ -6436,11 +6443,11 @@ an operating system.
 
 ***** Require
 
-     #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-     ;; (require 'seedbar nil t)
+      ;; (require 'seedbar nil t)
 
-     #+END_SRC
+      #+END_SRC
 
 ***** Customize
 
@@ -6475,7 +6482,7 @@ an operating system.
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key prog-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
+      (define-key prog-mode-map (kbd "C-M-i") 'complete-at-point-or-indent)
 
       #+END_SRC
 
@@ -7849,6 +7856,6 @@ an operating system.
 
      #+END_SRC
 
-** EOF
+* EOF
 
-   See You Space Cowboy...
+  =See You Space Cowboy...=

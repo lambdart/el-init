@@ -53,8 +53,9 @@ to this definition.
   generating the ~src/init.el~ final script.
 
   load* : Just load the definitions using the =autoloads= facility
-  (=loaddefs.el=), this speed up the process of initialization.
-  that's most of the =(require '<library>)= are commented.
+  (=loaddefs.el=), speeding up the process of initialization,
+  that's why most of the =(require '<library>)= are commented
+  through this configuration.
 
 ** Bootstrap
 *** Header

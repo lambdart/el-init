@@ -47,8 +47,8 @@ to this definition.
   your =init.el file=, that will =load*= and =set= the proper
   values to the customizable library's variables.
 
-  Finally, =Org-mode= is used to write and organize the configuration
-  ~src/vlm.org~ (this document) in a literate programming format,
+  =Org-mode= is used to write and organize the configuration
+  ~src/vlm.org~ (this document) in a =literate programming format=,
   meaning it contains =Elisp= source code blocks - that will be tangled
   generating the ~src/init.el~ final script.
 
@@ -565,6 +565,9 @@ to this definition.
       (define-key vlm-utils-map (kbd "s") 'mark-sexp)
       (define-key vlm-utils-map (kbd "p") 'mark-paragraph)
       (define-key vlm-utils-map (kbd "w") 'mark-word)
+
+      ;; keyboard quit
+      (global-set-key (kbd "M-ESC") 'keyboard-escape-quit)
 
       ;; in buffer completion
       ;; (global-set-key (kbd "C-M-i") 'complete-or-indent)
@@ -2103,8 +2106,8 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; completion-list-mode-map
-      (define-key completion-list-mode-map (kbd "h") 'describe-symbol-at-point)
-      (define-key completion-list-mode-map (kbd "?") 'describe-symbol-at-point)
+      ;; (define-key completion-list-mode-map (kbd "h") 'describe-symbol-at-point)
+      ;; (define-key completion-list-mode-map (kbd "?") 'describe-symbol-at-point)
       (define-key completion-list-mode-map (kbd "q") 'delete-completion-window)
       (define-key completion-list-mode-map (kbd "d") 'delete-completion-line)
       (define-key completion-list-mode-map (kbd "w") 'kill-ring-save)
@@ -2112,7 +2115,7 @@ to this definition.
       (define-key completion-list-mode-map (kbd "TAB") 'next-completion)
       (define-key completion-list-mode-map (kbd "DEL") 'previous-completion)
       (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
-      (define-key completion-list-mode-map (kbd "C-g") 'force-minibuffer-exit)
+      (define-key completion-list-mode-map (kbd "C-g") 'quit-minibuffer)
       (define-key completion-list-mode-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       #+END_SRC
@@ -2993,6 +2996,12 @@ to this definition.
 
       ;; non-nil means show debug messages
       (customize-set-variable 'lazy-debug-messages-flag t)
+
+      ;; non-nil means run `lazy-update-autoloads' when emacs is idle
+      (customize-set-variable 'lazy-run-idle-flag t)
+
+      ;; idle timer value
+      (customize-set-variable 'lazy-idle-seconds 4)
 
       #+END_SRC
 
@@ -5830,6 +5839,18 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; (require 'yasnippet nil t)
+
+      #+END_SRC
+
+***** Aliases
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; yasnippet insert snippet alias
+      (defalias 'insert-snippet 'yas-insert-snippet)
+
+      ;; yasnippet find snippet alias
+      (defalias 'find-snippet 'yas-visit-snippet-file)
 
       #+END_SRC
 

@@ -3378,16 +3378,16 @@ to this definition.
        #+BEGIN_SRC emacs-lisp
 
        ;; default depth expanded by `dired-subtree-cycle'
-       (customize-set-variable 'dired-subtree-cycle-depth 2)
+       ;; (customize-set-variable 'dired-subtree-cycle-depth 2)
 
-       ;; a prefix put into each nested subtree
-       (customize-set-variable 'dired-subtree-line-prefix "  ")
+       ;; ;; a prefix put into each nested subtree
+       ;; (customize-set-variable 'dired-subtree-line-prefix "  ")
 
-       ;; specifies how the prefix is fontified, subtree
-       (customize-set-variable 'dired-subtree-line-prefix-face 'subtree)
+       ;; ;; specifies how the prefix is fontified, subtree
+       ;; (customize-set-variable 'dired-subtree-line-prefix-face 'subtree)
 
-       ;; when non-nil, add a background face to a subtree listing.
-       (customize-set-variable 'dired-subtree-use-backgrounds nil)
+       ;; ;; when non-nil, add a background face to a subtree listing.
+       ;; (customize-set-variable 'dired-subtree-use-backgrounds nil)
 
        #+END_SRC
 
@@ -3395,10 +3395,10 @@ to this definition.
 
        #+BEGIN_SRC emacs-lisp
 
-       (when (boundp 'dired-mode-map)
-         (progn
-           (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
-           (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))
+       ;; (when (boundp 'dired-mode-map)
+       ;;   (progn
+       ;;     (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
+       ;;     (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))
 
        #+END_SRC
 
@@ -3422,7 +3422,7 @@ to this definition.
        #+BEGIN_SRC emacs-lisp
 
        ;; the default options for the rsync command
-       (customize-set-variable 'dired-rsync-options "-a -z -v -r --info=progress2")
+       ;; (customize-set-variable 'dired-rsync-options "-a -z -v -r --info=progress2")
 
        #+END_SRC
 
@@ -3430,8 +3430,8 @@ to this definition.
 
        #+BEGIN_SRC emacs-lisp
 
-       (when (boundp 'dired-mode-map)
-         (define-key dired-mode-map (kbd "C-c C-r") 'dired-rsync))
+       ;; (when (boundp 'dired-mode-map)
+       ;;   (define-key dired-mode-map (kbd "C-c C-r") 'dired-rsync))
 
        #+END_SRC
 
@@ -4662,10 +4662,10 @@ to this definition.
 
       ;; flycheck mode after some programming mode
       ;; is activated (c-mode, elisp-mode, etc).
-      (add-hook 'prog-mode-hook
-                (lambda ()
-                  (interactive)
-                  (funcall 'flycheck-mode 1)))
+      ;; (add-hook 'prog-mode-hook
+      ;;           (lambda ()
+      ;;             (interactive)
+      ;;             (funcall 'flycheck-mode 1)))
 
       #+END_SRC
 
@@ -4674,14 +4674,47 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; binds
-      (define-key vlm-sc-map (kbd "C-g") 'keyboard-quit)
-      (define-key vlm-sc-map (kbd "e") 'flycheck-list-errors)
-      (define-key vlm-sc-map (kbd "b") 'flycheck-buffer)
-      (define-key vlm-sc-map (kbd "d") 'flycheck-disable-checker)
-      (define-key vlm-sc-map (kbd "m") 'flycheck-mode)
-      (define-key vlm-sc-map (kbd "s") 'flycheck-select-checker)
-      (define-key vlm-sc-map (kbd "?") 'flycheck-describe-checker)
-      (define-key vlm-sc-map (kbd "v") 'flycheck-verify-setup)
+      ;; (define-key vlm-sc-map (kbd "C-g") 'keyboard-quit)
+      ;; (define-key vlm-sc-map (kbd "e") 'flycheck-list-errors)
+      ;; (define-key vlm-sc-map (kbd "b") 'flycheck-buffer)
+      ;; (define-key vlm-sc-map (kbd "d") 'flycheck-disable-checker)
+      ;; (define-key vlm-sc-map (kbd "m") 'flycheck-mode)
+      ;; (define-key vlm-sc-map (kbd "s") 'flycheck-select-checker)
+      ;; (define-key vlm-sc-map (kbd "?") 'flycheck-describe-checker)
+      ;; (define-key vlm-sc-map (kbd "v") 'flycheck-verify-setup)
+
+      #+END_SRC
+
+**** Flymake
+
+
+     Flymake is a library to performing on-the-fly syntax checks.
+     Flymake collects diagnostic information for multiple sources,
+     called backends, and visually annotates the relevant portions in
+     the buffer.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'flymake nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable flymake-mode
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'flymake-mode 1)))
 
       #+END_SRC
 
@@ -5850,7 +5883,7 @@ to this definition.
       (defalias 'insert-snippet 'yas-insert-snippet)
 
       ;; yasnippet find snippet alias
-      (defalias 'find-snippet 'yas-visit-snippet-file)
+      (defalias 'find-snippet-file 'yas-visit-snippet-file)
 
       #+END_SRC
 
@@ -6294,21 +6327,6 @@ to this definition.
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defvar vlm-compile-command
-        "make -C ~/.emacs.d all"
-        "Default compile command for VLM.")
-
-      (defun vlm-compile ()
-        "Invoke `compile' passing `vlm-compile-command'."
-        (interactive)
-        (compile vlm-compile-command))
-
-      #+END_SRC
-
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
@@ -6413,6 +6431,10 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       (defalias 'compile-project 'projectile-compile-project)
+      (defalias 'find-project-file 'projectile-find-file)
+      (defalias 'switch-to-project 'projectile-switch-project)
+      ;; (defalias 'switch-to-project-buffer 'projectile-switch-to-buffer)
+      ;; (defalias 'switch-to-open-project 'projectile-switch-open-project)
 
       #+END_SRC
 
@@ -6793,7 +6815,7 @@ to this definition.
                   (vlm/elisp/set-company-backends)
 
                   ;; set flycheck checker
-                  (vlm-set-flycheck-checker 'emacs-lisp)
+                  ;; (vlm-set-flycheck-checker 'emacs-lisp)
 
                   ;; activate dash docset (emacs)
                   (vlm-set-dash-docset "Emacs Lisp")))
@@ -6880,7 +6902,7 @@ to this definition.
                   (vlm/haskell/set-company-backends)
 
                   ;; set flycheck checker
-                  (vlm-set-flycheck-checker 'haskell-ghc)
+                  ;; (vlm-set-flycheck-checker 'haskell-ghc)
 
                   ;; haskell indentation mode that deals with the layout rule.
                   ;; it rebinds RET, DEL and BACKSPACE, so that indentations can be
@@ -7134,10 +7156,10 @@ to this definition.
                   (vlm/cc/set-company-backends)
 
                   ;; set dash docset
-                  (vlm-set-dash-docset '"C")
+                  (vlm-set-dash-docset '"C")))
 
-                  ;; set flycheck checker
-                  (vlm-set-flycheck-checker 'c/c++-clang)))
+      ;; set flycheck checker
+      ;; (vlm-set-flycheck-checker 'c/c++-clang)))
 
       (add-hook 'c++-mode-hook
                 (lambda ()
@@ -7145,7 +7167,7 @@ to this definition.
                   (vlm/cc/set-company-backends)
 
                   ;; set flycheck checker
-                  (vlm-set-flycheck-checker 'c++-cppcheck)
+                  ;; (vlm-set-flycheck-checker 'c++-cppcheck)
 
                   ;; set dash docset
                   (vlm-set-dash-docset '"C++")))
@@ -7246,7 +7268,7 @@ to this definition.
                   (vlm/go/set-company-backends)
 
                   ;; set flycheck checker (go lint)
-                  (vlm-set-flycheck-checker 'go-golint)
+                  ;; (vlm-set-flycheck-checker 'go-golint)
 
                   ;; set dash docsets
                   (vlm-set-dash-docset '"Go")))
@@ -7308,10 +7330,10 @@ to this definition.
                                     company-yasnippet)
                      (company-dabbrev
                       company-dabbrev-code)
-                     (company-files)))
+                     (company-files)))))
 
-                  ;; set flycheck backends
-                  (vlm-set-flycheck-checker 'sh-shellcheck)))
+      ;; set flycheck backends
+      ;; (vlm-set-flycheck-checker 'sh-shellcheck)))
 
       #+END_SRC
 
@@ -7419,7 +7441,7 @@ to this definition.
                   (vlm/lua/set-company-backends)
 
                   ;; set flycheck checker
-                  (vlm-set-flycheck-checker 'lua)
+                  ;; (vlm-set-flycheck-checker 'lua)
 
                   ;; activate dash docset
                   (vlm-set-dash-docset "Lua")))
@@ -7530,7 +7552,7 @@ to this definition.
                   (vlm/python/set-company-backends)
 
                   ;; set flycheck checker
-                  (vlm-set-flycheck-checker 'python-pycompile)
+                  ;; (vlm-set-flycheck-checker 'python-pycompile)
 
                   ;; set dash docsets
                   (vlm-set-dash-docset '"Python 3")))
@@ -7620,7 +7642,7 @@ to this definition.
                      (company-files)))
 
                   ;; select flycheck checker (use gcc)
-                  (vlm-set-flycheck-checker 'c/c++-gcc)
+                  ;; (vlm-set-flycheck-checker 'c/c++-gcc)
 
                   ;; activate mql5 docset
                   (vlm-set-dash-docset '"mql5")))

@@ -283,7 +283,7 @@ to this definition.
      (define-key ctl-x-map (kbd "p") 'vlm-pm-map) ; project
      (define-key ctl-x-map (kbd "t") 'vlm-tags-map) ; tags
      (define-key ctl-x-map (kbd "c") 'vlm-utils-map) ; commands
-     (define-key ctl-x-map (kbd "e") 'vlm-sc-map) ; errors
+     ;; (define-key ctl-x-map (kbd "e") 'vlm-sc-map) ; errors
      (define-key ctl-x-map (kbd "l") 'vlm-docs-map) ; library
      (define-key ctl-x-map (kbd "v") 'vlm-media-map) ; media
      (define-key ctl-x-map (kbd "<tab>") 'vlm-completion-map) ; tab - complete
@@ -581,6 +581,10 @@ to this definition.
 
       ;; kill
       (define-key ctl-x-map (kbd "k") 'kill-buffer)
+
+      ;; shell command history
+      (define-key ctl-x-map (kbd "C-x") 'shell-command-history)
+      (define-key ctl-x-map (kbd "C-c") 'compile-command-history)
 
       ;; mark
       (define-key vlm-utils-map (kbd "h") 'mark-whole-buffer)
@@ -1853,7 +1857,7 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; ctl-x-map
-      (define-key ctl-x-map (kbd "C-c") 'eval-command-history)
+      ;; (define-key ctl-x-map (kbd "e") 'eval-command-history)
 
       #+END_SRC
 
@@ -1966,9 +1970,9 @@ to this definition.
 
       ;; minibuffer-local-map
       (define-key minibuffer-local-map (kbd "M-`") 'minibuffer-completion-help)
-      (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
       (define-key minibuffer-local-map (kbd "M-w") 'minibuffer-complete-word)
-      (define-key minibuffer-local-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
+      (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
+      ;; (define-key minibuffer-local-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       ;; goto-map
       (define-key goto-map (kbd "M-SPC") 'goto-minibuffer-window)
@@ -2126,7 +2130,7 @@ to this definition.
       (define-key completion-list-mode-map (kbd "DEL") 'previous-completion)
       (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
       (define-key completion-list-mode-map (kbd "C-g") 'quit-minibuffer)
-      (define-key completion-list-mode-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
+      ;; (define-key completion-list-mode-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       #+END_SRC
 
@@ -2203,8 +2207,8 @@ to this definition.
 
             ;; bind
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-            (define-key icomplete-minibuffer-map (kbd "M-SPC") 'icomplete-forward-completions)
-            (define-key icomplete-minibuffer-map (kbd "M-DEL") 'icomplete-backward-completions)
+            (define-key icomplete-minibuffer-map (kbd "M-<tab>") 'icomplete-forward-completions)
+            (define-key icomplete-minibuffer-map (kbd "M-SPC") 'icomplete-backward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-p") 'previous-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "M-n") 'next-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-top-candidate)
@@ -2867,6 +2871,12 @@ to this definition.
         (lambda ()
           (when (boundp 'help-mode-map)
             (define-key help-mode-map (kbd "C-j") 'push-button))))
+
+      ;; help prefix map (C-h)
+      (define-key help-map (kbd "C-f") 'describe-function)
+      (define-key help-map (kbd "C-v") 'describe-variable)
+      (define-key help-map (kbd "C-m") 'describe-mode)
+      (define-key help-map (kbd "C-e") 'view-echo-area-messages)
 
       #+END_SRC
 
@@ -3534,6 +3544,10 @@ to this definition.
                  (lambda ()
                    (when (and (boundp 'term-raw-map)
                               (boundp 'term-mode-map))
+
+                     ;;
+                     (define-key term-raw-map (kbd "M-x") 'execute-extended-command)
+
                      ;; term-raw-map
                      (define-key term-raw-map (kbd "s-q") 'term-line-mode)
 
@@ -3569,13 +3583,13 @@ to this definition.
        #+BEGIN_SRC emacs-lisp
 
        ;; if this is nil, setup to environment variable of `SHELL'"
-       (customize-set-variable 'multi-term-program nil)
+       ;; (customize-set-variable 'multi-term-program nil)
 
-       ;; focus terminal window after you open dedicated window
-       (customize-set-variable 'multi-term-dedicated-select-after-open-p t)
+       ;; ;; focus terminal window after you open dedicated window
+       ;; (customize-set-variable 'multi-term-dedicated-select-after-open-p t)
 
-       ;; the buffer name of term buffer.
-       (customize-set-variable 'multi-term-buffer-name "Term")
+       ;; ;; the buffer name of term buffer.
+       ;; (customize-set-variable 'multi-term-buffer-name "Term")
 
        #+END_SRC
 
@@ -3584,7 +3598,7 @@ to this definition.
        #+BEGIN_SRC emacs-lisp
 
        ;; clt-x-map (C-x) prefix
-       (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)
+       ;; (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)
 
        #+END_SRC
 
@@ -5921,7 +5935,7 @@ to this definition.
       (customize-set-variable 'company-tooltip-limit 6)
 
       ;; set minimum prefix length
-      (customize-set-variable 'company-minimum-length 2)
+      (customize-set-variable 'company-minimum-length 3)
 
       ;; if enabled, selecting item before first or after last wraps around
       (customize-set-variable 'company-selection-wrap-around t)
@@ -5936,7 +5950,7 @@ to this definition.
       ;; if enabled, disallow non-matching input
       (customize-set-variable 'company-require-match nil)
 
-      ;; When non-nil, align annotations to the right tooltip border
+      ;; when non-nil, align annotations to the right tooltip border
       (customize-set-variable 'company-tooltip-align-annotations nil)
 
       ;; show candidates number
@@ -7651,6 +7665,22 @@ to this definition.
 
       #+END_SRC
 
+** Unload
+
+   #+BEGIN_SRC emacs-lisp
+
+   (defvar vm-not-used-libraries
+     '(cedet semantic chinese)
+     "Libraries that are not used.")
+
+   (add-hook 'window-setup-hook
+             (lambda ()
+               (let (libraries vlm-not-used-libraries)
+                 (dolist (library libraries)
+                   (unload-feature library '(4))))))
+
+   #+END_SRC
+
 ** Cleanup
 
    A lot of commands are not used as often so they are cleanup
@@ -7731,7 +7761,7 @@ to this definition.
      ;; (define-key ctl-x-map (kbd "a") nil)
      ;; (define-key ctl-x-map (kbd "v") nil)
      (define-key ctl-x-map (kbd "h") nil)
-     (define-key ctl-x-map (kbd "d") nil)
+     ;; (define-key ctl-x-map (kbd "d") nil)
      (define-key ctl-x-map (kbd "x") nil)
      (define-key ctl-x-map (kbd "X") nil)
      ;; (define-key ctl-x-map (kbd "8") nil)

@@ -7,11 +7,9 @@
 
 * VLM
 
-  An =Emacs= configuration - written in org - well designed
-  and integrated that provides a generic computer environment
-  =VIRTUAL LISP MACHINE= for everyday use.
-
-  | Wait... What!? |
+  Just an =Emacs= configuration written in =org= that
+  has a simple goal: be just a configuration file, i.e,
+  set custom values and hooks for the libraries of interest.
 
   Some people (including me) have started to refer to
   =Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
@@ -42,13 +40,11 @@
   d(-_-)b, nice song!
 
   It's better to understand, once and for all, that as an =Emacs=
-  user you automatically become a developer of it, this is =the user
-  developer concept=, and there's no way around it. Unfortunately some
-  people find this overwhelming, but others find it formidable -
-  myself included!
+  user you automatically become a =elisp= developer (=the user
+  developer= concept), there's no way around it.
 
-  Knowing that, maybe you should consider =Emacs= isn't for you.
-  No problem, just move on :)
+  Unfortunately some people find this overwhelming,
+  but others find it formidable - myself included!
 
 ** Screenshot
 

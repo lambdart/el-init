@@ -7,7 +7,7 @@
 
 * VLM
 
-  Just an =Emacs= configuration written in =org= that
+  Just another =Emacs= configuration written in =org= that
   has a simple goal: be just a configuration file, i.e,
   set custom values and hooks for the libraries of interest.
 
@@ -186,7 +186,7 @@
 
    15. I must not fear. Fear is the mind killer...
 
-** Features:
+** Conclusions
 
    - Just one major language (=Elisp=) to conquer them all!
    - Information comes to you as required and not the other way around.
@@ -226,8 +226,8 @@
 
    - Intern communication (=pipes, IPCs, data streams, sockets, you
      name it=) between peers are transparent, resulting in a very
-     practical, very convenient integration for all librariess and
-     resources available:
+     practical, very convenient integration for all libraries and
+     the resources available:
      - Libraries
      - Applications
      - Buffers/Windows/Frames
@@ -404,7 +404,7 @@
 
 * Libraries
 
-  Libraries are listed on ~libraries.org~ file.
+  TODO: List the libraries in ~libraries.org~ file.
 
 * FAQ
 
@@ -413,9 +413,9 @@
 
   - Q: Why don't you use =evil/hydra/which-key/use-package/etc=?
   - A: It is not just a matter of taste, it is simply because
-    they get in the way and disturb the desired transformation from
-    properly occurring, and I prefer a more direct/effective approach.
-    Remember that's the way I think, you can add these librariess
+    they get in the way disturbing the desired transformation to
+    properly occur, and I prefer a more direct/effective approach.
+    Remember that's the way I think, you can add these libraries
     on your own and make your life a little more miserable,
     be my guest!
 

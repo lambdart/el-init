@@ -3020,7 +3020,40 @@ to this definition.
 
       #+END_SRC
 
-*** Command-Line-Interface
+*** Buffer
+**** So-long
+
+     When the lines in a file are so long that performance could suffer to an
+     unacceptable degree, we say "so long" to the slow modes and options enabled
+     in that buffer, and invoke something much more basic in their
+     place.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'global-so-long-mode nil t)
+
+      #+END_SRC
+
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'global-so-long-mode 1)))
+
+      #+END_SRC
+
+*** CLI
 
     Command line interface (CLI) is a text-based interface that is
     used to operate software and operating systems while allowing the
@@ -5990,7 +6023,7 @@ to this definition.
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
-               (funcall 'company-complete-common))
+               (safe-funcall 'company-complete-common))
               (t (indent-according-to-mode))))
 
       #+END_SRC
@@ -6340,9 +6373,9 @@ to this definition.
                 (lambda ()
                   (when (and (eq major-mode 'compilation-mode)
                              (boundp 'compilation-filter-start))
-                    (funcall 'ansi-color-apply-on-region
-                             compilation-filter-start
-                             (point-max)))))
+                    (safe-funcall 'ansi-color-apply-on-region
+                                  compilation-filter-start
+                                  (point-max)))))
 
       #+END_SRC
 
@@ -6882,11 +6915,11 @@ to this definition.
                   ;; haskell indentation mode that deals with the layout rule.
                   ;; it rebinds RET, DEL and BACKSPACE, so that indentations can be
                   ;; set and deleted as if they were real tabs.
-                  (funcall 'haskell-indentation-mode 1)
+                  (safe-funcall 'haskell-indentation-mode 1)
 
                   ;; minor mode for enabling haskell-process interaction
                   ;; non-nil if Interactive-Haskell mode is enabled.
-                  (funcall 'interactive-haskell-mode 1)))
+                  (safe-funcall 'interactive-haskell-mode 1)))
 
       ;; activate dash docset (emacs) (not working)
       ;; (vlm-set-dash-docset "Haskell")))

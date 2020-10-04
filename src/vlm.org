@@ -458,6 +458,15 @@ to this definition.
 
      #+END_SRC
 
+**** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; non-nil means print a message when garbage collecting
+     (customize-set-variable 'gcmh-verbose t)
+
+     #+END_SRC
+
 **** Hooks
 
      #+BEGIN_SRC emacs-lisp
@@ -1503,7 +1512,7 @@ to this definition.
      ;; set default font
      (add-hook 'window-setup-hook
                (lambda ()
-                 (safe-set-frame-font "Iosevka Fixed-14:width=regular:weight=regular")))
+                 (safe-set-frame-font "Iosevka Fixed-15:width=regular:weight=regular")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -2209,8 +2218,8 @@ to this definition.
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "M-<tab>") 'icomplete-forward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-SPC") 'icomplete-backward-completions)
-            (define-key icomplete-minibuffer-map (kbd "M-p") 'previous-line-or-history-element)
-            (define-key icomplete-minibuffer-map (kbd "M-n") 'next-line-or-history-element)
+            (define-key icomplete-minibuffer-map (kbd "C-p") 'previous-line-or-history-element)
+            (define-key icomplete-minibuffer-map (kbd "C-n") 'next-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-top-candidate)
             (define-key icomplete-minibuffer-map (kbd "M-k") 'minibuffer-kill-top-candidate)
             (define-key icomplete-minibuffer-map (kbd "M-h") 'minibuffer-describe-top-candidate))))
@@ -3002,10 +3011,20 @@ to this definition.
       (customize-set-variable 'lazy-debug-messages-flag t)
 
       ;; non-nil means run `lazy-update-autoloads' when emacs is idle
-      (customize-set-variable 'lazy-run-idle-flag nil)
+      (customize-set-variable 'lazy-run-idle-flag t)
 
       ;; idle timer value
-      (customize-set-variable 'lazy-idle-seconds 60) ; 1 minute
+      (customize-set-variable 'lazy-idle-seconds 30) ; half minute
+
+      ;; target files and directories
+      (customize-set-variable 'lazy-files-alist
+        (list
+         ;; lisp directory
+         (cons "lisp-loaddefs.el"
+               (expand-file-name "lisp/" user-emacs-directory))
+         ;; site-lisp directory
+         (cons "site-lisp-loaddefs.el"
+               (expand-file-name "site-lisp/" user-emacs-directory))))
 
       #+END_SRC
 
@@ -3036,7 +3055,6 @@ to this definition.
 
       #+END_SRC
 
-
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
@@ -3050,6 +3068,119 @@ to this definition.
       (add-hook 'window-setup-hook
                 (lambda ()
                   (funcall 'global-so-long-mode 1)))
+
+      #+END_SRC
+
+**** Iedit
+
+     This package includes Emacs minor modes (iedit-mode and
+     iedit-rectangle-mode) based on a API library (iedit-lib) and allows you to edit
+     one occurrence of some text in a buffer (possibly narrowed) or region, and
+     simultaneously have other occurrences edited in the same way, with visual
+     feedback as you type.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'iedit nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; if no-nil, the key is inserted into global-map,
+      ;; isearch-mode-map, esc-map and help-map.
+      ;; (customize-set-variable 'iedit-toggle-key-default (kbd "C-;"))
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; bind (iedit-mode-keymap)
+      (eval-after-load 'iedit
+        (lambda ()
+          (when (boundp 'iedit-mode-keymap)
+            (define-key iedit-mode-keymap (kbd "<tab>") 'vlm-complete-in-buffer-or-indent)
+            (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence))))
+
+      ;; bind (global)
+      (global-set-key (kbd "C-;") 'iedit-mode)
+
+      #+END_SRC
+
+**** Undo-tree
+
+     Emacs has a powerful undo system. Unlike the standard undo/redo system in
+     most software, it allows you to recover *any* past state of a buffer
+     (whereas the standard undo/redo system can lose past states as soon as you
+     redo). However, this power comes at a price: many people find Emacs' undo
+     system confusing and difficult to use, spawning a number of packages that
+     replace it with the less powerful but more intuitive undo/redo system.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'undo-tree nil t)
+
+      #+END_SRC
+
+***** Aliases
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; define alias for redo
+      (defalias 'redo 'undo-tree-redo)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key ctl-x-map (kbd "u") 'undo-tree-visualize)
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'global-undo-tree-mode 1)))
+
+      #+END_SRC
+
+**** Browse-kill-ring
+
+     This library provides a buffer kill-ring list for
+     searching/insertion and other operations.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'browse-kill-ring nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; non-nil means display duplicate items in `kill-ring' buffer
+      (customize-set-variable 'browse-kill-ring-display-duplicates nil)
+
+      ;; non-nil means browse-kill-ring will show a preview of what the
+      ;; buffer would look like if the item under point were inserted
+      (customize-set-variable 'browse-kill-ring-show-preview nil)
 
       #+END_SRC
 
@@ -3568,9 +3699,11 @@ to this definition.
                    ;; do not display continuation lines.
                    (setq truncate-lines nil)
 
+                   ;; setup keybinds
+                   (safe-funcall 'term-setup-keystroke)
+
                    ;; disable company mode
-                   (when (fboundp 'company-mode)
-                     (company-mode -1))))
+                   (safe-funcall 'company-mode -1)))
 
        ;; bind term-raw-map/term-mode-map with hook
        (add-hook 'term-mode-hook
@@ -3578,14 +3711,14 @@ to this definition.
                    (when (and (boundp 'term-raw-map)
                               (boundp 'term-mode-map))
 
-                     ;;
-                     (define-key term-raw-map (kbd "M-x") 'execute-extended-command)
-
                      ;; term-raw-map
                      (define-key term-raw-map (kbd "s-q") 'term-line-mode)
 
                      ;; term-mode-map
                      (define-key term-mode-map (kbd "s-q") 'term-char-mode))))
+
+       ;; hook run after the term buffer is killed.
+       (add-hook 'kill-buffer-hook 'term-kill-buffer-hook)
 
        #+END_SRC
 
@@ -3595,43 +3728,6 @@ to this definition.
 
        ;; clt-x-map (C-x) prefix
        (define-key ctl-x-map (kbd "<C-return>") 'open-terminal)
-
-       #+END_SRC
-
-***** Multi-term
-
-      This package is for creating and managing multiple
-      terminal buffers in Emacs.
-
-****** Require
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; (require 'multi-term nil t)
-
-       #+END_SRC
-
-****** Customize
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; if this is nil, setup to environment variable of `SHELL'"
-       ;; (customize-set-variable 'multi-term-program nil)
-
-       ;; ;; focus terminal window after you open dedicated window
-       ;; (customize-set-variable 'multi-term-dedicated-select-after-open-p t)
-
-       ;; ;; the buffer name of term buffer.
-       ;; (customize-set-variable 'multi-term-buffer-name "Term")
-
-       #+END_SRC
-
-****** Binds
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; clt-x-map (C-x) prefix
-       ;; (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)
 
        #+END_SRC
 
@@ -3928,115 +4024,6 @@ to this definition.
       #+END_SRC
 
 *** Editing
-**** Iedit
-
-     This package includes Emacs minor modes (iedit-mode and
-     iedit-rectangle-mode) based on a API library (iedit-lib) and allows you to edit
-     one occurrence of some text in a buffer (possibly narrowed) or region, and
-     simultaneously have other occurrences edited in the same way, with visual
-     feedback as you type.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'iedit nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; if no-nil, the key is inserted into global-map,
-      ;; isearch-mode-map, esc-map and help-map.
-      ;; (customize-set-variable 'iedit-toggle-key-default (kbd "C-;"))
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; bind (iedit-mode-keymap)
-      (eval-after-load 'iedit
-        (lambda ()
-          (when (boundp 'iedit-mode-keymap)
-            (define-key iedit-mode-keymap (kbd "<tab>") 'vlm-complete-in-buffer-or-indent)
-            (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence))))
-
-      ;; bind (global)
-      (global-set-key (kbd "C-;") 'iedit-mode)
-
-      #+END_SRC
-
-**** Undo-tree
-
-     Emacs has a powerful undo system. Unlike the standard undo/redo system in
-     most software, it allows you to recover *any* past state of a buffer
-     (whereas the standard undo/redo system can lose past states as soon as you
-     redo). However, this power comes at a price: many people find Emacs' undo
-     system confusing and difficult to use, spawning a number of packages that
-     replace it with the less powerful but more intuitive undo/redo system.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'undo-tree nil t)
-
-      #+END_SRC
-
-***** Aliases
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; define alias for redo
-      (defalias 'redo 'undo-tree-redo)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      (define-key ctl-x-map (kbd "u") 'undo-tree-visualize)
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; enable
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (funcall 'global-undo-tree-mode 1)))
-
-      #+END_SRC
-
-**** EditorConfig
-
-     EditorConfig helps developers define and maintain consistent
-     coding styles between different editors and IDEs.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'editorconfig nil t)
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (safe-funcall 'editorconfig-mode 1)
-
-      #+END_SRC
-
-**** Browse-kill-ring
 *** Graphics
 **** Artist
 
@@ -4369,7 +4356,7 @@ to this definition.
 
       ;; prompt string to use in IRC buffers
       ;; %n: nick, %s: server, %t target: channel or user
-      (customize-set-variable 'rcirc-prompt "%t ] ")
+      (customize-set-variable 'rcirc-prompt "%s%t ] ")
 
       ;; coding system used to decode incoming irc messages
       (customize-set-variable 'rcirc-decode-coding-system 'utf-8)
@@ -4384,6 +4371,10 @@ to this definition.
       (customize-set-variable 'rcirc-omit-responses
                               '("JOIN" "PART" "QUIT" "NICK"))
 
+      ;; the minimum interval in seconds between reconnect attempts
+      ;; when 0, do not auto-reconnect
+      (customize-set-variable 'rcirc-reconnect-delay 2)
+
       ;; an alist of IRC connections to establish when running `rcirc'
       (customize-set-variable 'rcirc-server-alist
                               '(("chat.freenode.net"
@@ -4391,7 +4382,7 @@ to this definition.
                                  :server-alias "freenode"
                                  :encryption tls
                                  :nick "esac"
-                                 :channels ("#emacs #emacs-br #lisp-br #freebsd"))))
+                                 :channels ("#emacs #emacs-br #freebsd"))))
 
       #+END_SRC
 
@@ -7682,19 +7673,19 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  ;; add files extensions to web-mode
-                  (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
-                  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-                  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-                  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-                  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-                  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-                  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-                  ;; resolve warning
-                  (when (boundp 'web-mode-engines-alist)
-                    (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'"))))))
+      ;; (add-hook 'window-setup-hook
+      ;;           (lambda ()
+      ;;             ;; add files extensions to web-mode
+      ;;             (add-to-list 'auto-mode-alist '("\\.php\\'" . web-mode))
+      ;;             (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+      ;;             (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+      ;;             (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+      ;;             (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+      ;;             (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+      ;;             (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+      ;;             ;; resolve warning
+      ;;             (when (boundp 'web-mode-engines-alist)
+      ;;               (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'"))))))
 
       #+END_SRC
 

@@ -463,7 +463,7 @@ to this definition.
      #+BEGIN_SRC emacs-lisp
 
      ;; non-nil means print a message when garbage collecting
-     (customize-set-variable 'gcmh-verbose t)
+     (customize-set-variable 'gcmh-verbose nil)
 
      #+END_SRC
 
@@ -593,7 +593,7 @@ to this definition.
 
       ;; shell command history
       (define-key ctl-x-map (kbd "C-x") 'shell-command-history)
-      (define-key ctl-x-map (kbd "C-c") 'compile-command-history)
+      (define-key ctl-x-map (kbd "C-c") 'eval-command-history)
 
       ;; mark
       (define-key vlm-utils-map (kbd "h") 'mark-whole-buffer)
@@ -1426,6 +1426,10 @@ to this definition.
             (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
             (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file))))
 
+      ;; ctl-x-map
+      (define-key ctl-x-map (kbd "C-d") 'dired-jump)
+      (define-key ctl-x-map (kbd "d") 'dired)
+
       #+END_SRC
 
 *** Frames
@@ -1512,7 +1516,7 @@ to this definition.
      ;; set default font
      (add-hook 'window-setup-hook
                (lambda ()
-                 (safe-set-frame-font "Iosevka Fixed-15:width=regular:weight=regular")))
+                 (safe-set-frame-font "Iosevka Fixed-16:width=regular:weight=regular")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -2190,7 +2194,7 @@ to this definition.
       (customize-set-variable 'icomplete-hide-common-prefix nil)
 
       ;; maximum number of lines to use in the minibuffer
-      (customize-set-variable 'icomplete-prospects-height 1)
+      (customize-set-variable 'icomplete-prospects-height 2)
 
       ;; string used by Icomplete to separate alternatives in the minibuffer
       (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
@@ -2387,6 +2391,13 @@ to this definition.
       #+END_SRC
 
 **** Mode-line
+
+     Each Emacs window (aside from minibuffer windows) typically has a mode
+     line at the bottom, which displays status information about the buffer
+     displayed in the window. The mode line contains information about the
+     buffer, such as its name, associated file, depth of recursive editing,
+     and major and minor modes.
+
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
@@ -2401,15 +2412,17 @@ to this definition.
                                 mode-line-mule-info
                                 mode-line-modified
                                 mode-line-remote
-                                " "
+                                "  "
+                                (:eval (format-time-string "%H:%M"))
+                                "  "
                                 "%l:%c"
-                                " • "
+                                " » "
                                 (:eval (propertized-buffer-identification "%b"))
-                                " • "
+                                " « "
                                 "("
                                 mode-name
                                 ")"
-                                (:eval (when vc-mode " »"))
+                                (:eval (when vc-mode (concat " » " (projectile-project-name) " ")))
                                 (vc-mode vc-mode)))
 
       #+END_SRC
@@ -2884,6 +2897,7 @@ to this definition.
       ;; help prefix map (C-h)
       (define-key help-map (kbd "C-f") 'describe-function)
       (define-key help-map (kbd "C-v") 'describe-variable)
+      (define-key help-map (kbd "C-k") 'describe-key)
       (define-key help-map (kbd "C-m") 'describe-mode)
       (define-key help-map (kbd "C-e") 'view-echo-area-messages)
 
@@ -2909,6 +2923,12 @@ to this definition.
 
       ;; non-nil means don’t record intermediate Info nodes to the history
       (customize-set-variable 'info-history-skip-intermediate-nodes nil)
+
+      ;; list of additional directories to search for
+      ;; Info documentation files
+      (customize-set-variable
+       'Info-additional-directory-list
+       (list (expand-file-name "info" user-emacs-directory)))
 
       ;; 0 -> means do not display breadcrumbs
       ;; (customize-set-variable 'info-breadcrumbs-depth 0)
@@ -3008,10 +3028,10 @@ to this definition.
       (customize-set-variable 'lazy-enable-filenotify-flag t)
 
       ;; non-nil means show debug messages
-      (customize-set-variable 'lazy-debug-messages-flag t)
+      (customize-set-variable 'lazy-debug-messages-flag nil)
 
       ;; non-nil means run `lazy-update-autoloads' when emacs is idle
-      (customize-set-variable 'lazy-run-idle-flag t)
+      (customize-set-variable 'lazy-run-idle-flag nil)
 
       ;; idle timer value
       (customize-set-variable 'lazy-idle-seconds 30) ; half minute
@@ -3834,13 +3854,13 @@ to this definition.
        #+BEGIN_SRC emacs-lisp
 
        ;; whether or not to include a foreground colour when formatting the icon
-       (customize-set-variable 'all-the-icons-color-icons t)
+       (customize-set-variable 'all-the-icons-color-icons nil)
 
        ;; the default adjustment to be made to the `raise' display property of an icon
-       (customize-set-variable 'all-the-icons-default-adjust -0.2)
+       (customize-set-variable 'all-the-icons-default-adjust -0.3)
 
        ;; the base Scale Factor for the `height' face property of an icon
-       (customize-set-variable 'all-the-icons-scale-factor 1.0)
+       (customize-set-variable 'all-the-icons-scale-factor 1.1)
 
        #+END_SRC
 
@@ -4019,7 +4039,7 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (define-key ctl-x-map (kbd "b") 'ibuffer)
+      (define-key ctl-x-map (kbd "b") 'ibuffer)
 
       #+END_SRC
 
@@ -4342,30 +4362,29 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; non-nil means log irc activity to disk
-      ;; logfiles are kept in `rcirc-log-directory
       (customize-set-variable 'rcirc-log-flag nil)
 
       ;; major-mode function to use in multiline edit buffers
       (customize-set-variable 'rcirc-multiline-major-mode 'text-mode)
 
       ;; format string to use in nick completions
-      (customize-set-variable 'rcirc-completion-fomart "%s:")
+      (customize-set-variable 'rcirc-nick-completion-format "%s: ")
 
       ;; list of authentication passwords (not your job)
       (customize-set-variable 'rcirc-authinfo nil)
 
       ;; prompt string to use in IRC buffers
       ;; %n: nick, %s: server, %t target: channel or user
-      (customize-set-variable 'rcirc-prompt "%s%t ] ")
+      (customize-set-variable 'rcirc-prompt "%t » ")
 
       ;; coding system used to decode incoming irc messages
       (customize-set-variable 'rcirc-decode-coding-system 'utf-8)
 
       ;; the default reason to send when quitting a server
-      (customize-set-variable 'rcirc-default-quit-reason "d(-_-)b")
+      (customize-set-variable 'rcirc-default-quit-reason "")
 
       ;; the default reason to send when parting from a channel
-      (customize-set-variable 'rcirc-default-part-reason "")
+      (customize-set-variable 'rcirc-default-part-reason "")
 
       ;; responses which will be hidden when `rcirc-omit-mode is enable
       (customize-set-variable 'rcirc-omit-responses
@@ -4377,12 +4396,12 @@ to this definition.
 
       ;; an alist of IRC connections to establish when running `rcirc'
       (customize-set-variable 'rcirc-server-alist
-                              '(("chat.freenode.net"
+                              '(("irc.freenode.net"
                                  :port 6697
                                  :server-alias "freenode"
                                  :encryption tls
                                  :nick "esac"
-                                 :channels ("#emacs #emacs-br #freebsd"))))
+                                 :channels ("#rcirc #emacs #lisp-br #emacs-br"))))
 
       #+END_SRC
 
@@ -4945,7 +4964,7 @@ to this definition.
       (customize-set-variable 'ielm-noisy nil)
 
       ;; prompt used in IELM
-      (customize-set-variable 'ielm-prompt "elisp » ")
+      (customize-set-variable 'ielm-prompt "» ")
 
       ;; if non-nil, the IELM prompt is read only
       (customize-set-variable 'ielm-prompt-read-only nil)
@@ -6014,7 +6033,7 @@ to this definition.
         "Company (complete anything (in-buffer)) or indent."
         (interactive)
         (cond ((looking-at "\\_>")
-               (safe-funcall 'company-complete-common))
+               (safe-funcall 'company-complete))
               (t (indent-according-to-mode))))
 
       #+END_SRC
@@ -6375,9 +6394,7 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; utils map
-      (define-key vlm-utils-map (kbd "c") 'compile-history)
-      (define-key vlm-utils-map (kbd "e") 'shell-command)
-      (define-key vlm-utils-map (kbd "C-e") 'shell-command-current-buffer)
+      (define-key vlm-utils-map (kbd "c") 'compile-command-history)
 
       #+END_SRC
 

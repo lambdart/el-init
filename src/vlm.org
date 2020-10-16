@@ -3031,10 +3031,13 @@ to this definition.
       (customize-set-variable 'lazy-debug-messages-flag nil)
 
       ;; non-nil means run `lazy-update-autoloads' when emacs is idle
-      (customize-set-variable 'lazy-run-idle-flag nil)
+      (customize-set-variable 'lazy-enable-run-idle-flag t)
 
       ;; idle timer value
-      (customize-set-variable 'lazy-idle-seconds 30) ; half minute
+      (customize-set-variable 'lazy-idle-seconds 15)
+
+      ;; interval in seconds, used to trigger the timer callback
+      (customize-set-variable 'lazy-timer-interval 8)
 
       ;; target files and directories
       (customize-set-variable 'lazy-files-alist

@@ -1,13 +1,13 @@
-;; we can't tangle without org
+;; tangle the source code blocks require org
 (require 'org)
 
-;; read eos org file
+;; read vlm.org file
 (find-file (expand-file-name "vlm.org" user-emacs-directory))
 
 ;; tangle it (only emacs-lisp source code)
 (org-babel-tangle nil nil 'emacs-lisp)
 
-;; rename: eos to init
+;; rename: vlm.el to init.el
 (rename-file
   (expand-file-name "vlm.el" user-emacs-directory)
   (expand-file-name "init.el" user-emacs-directory)

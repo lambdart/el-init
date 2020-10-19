@@ -601,6 +601,10 @@ to this definition.
       (define-key vlm-utils-map (kbd "p") 'mark-paragraph)
       (define-key vlm-utils-map (kbd "w") 'mark-word)
 
+      ;; goto
+      (define-key goto-map (kbd "m") 'goto-mark)
+      (define-key goto-map (kbd "M-m") 'goto-mark)
+
       ;; keyboard quit
       (global-set-key (kbd "M-ESC") 'keyboard-escape-quit)
 
@@ -1994,7 +1998,6 @@ to this definition.
       (define-key goto-map (kbd "M-SPC") 'goto-minibuffer-window)
       (define-key goto-map (kbd "C-M-i") 'goto-completions-window)
       ;; (define-key goto-map (kbd "M-v") 'goto-minibuffer-or-completions-window)
-      (define-key goto-map (kbd "M-m") 'goto-mark)
 
       ;; clt-x-map quit minibuffer
       (global-set-key (kbd "<C-delete>") 'quit-minibuffer)
@@ -2228,6 +2231,7 @@ to this definition.
             (define-key icomplete-minibuffer-map (kbd "C-p") 'previous-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "C-n") 'next-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-top-candidate)
+            (define-key icomplete-minibuffer-map (kbd "M-y") 'minibuffer-yank-top-candidate)
             (define-key icomplete-minibuffer-map (kbd "M-k") 'minibuffer-kill-top-candidate)
             (define-key icomplete-minibuffer-map (kbd "M-h") 'minibuffer-describe-top-candidate))))
 

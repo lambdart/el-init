@@ -1516,7 +1516,7 @@ to this definition.
      ;; set default font
      (add-hook 'window-setup-hook
                (lambda ()
-                 (safe-set-frame-font "Iosevka Fixed-16:width=regular:weight=regular")))
+                 (safe-set-frame-font "Iosevka Fixed-15:width=regular:weight=regular")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -1937,11 +1937,14 @@ to this definition.
       ;;   (info-menu (styles basic))))
 
       ;; define the appearance and sorting of completions
-      (customize-set-variable 'completions-format 'horizontal)
+      (customize-set-variable 'completions-format 'vertical)
 
       ;; how to resize mini-windows (the minibuffer and the echo area)
       ;; a value of t means resize them to fit the text displayed in them
       (customize-set-variable 'resize-mini-windows nil)
+
+      ;; format string used to output "default" values
+      (customize-set-variable 'minibuffer-default-prompt-format " [%s] ")
 
       ;; if non-nil, shorten "(default ...)" to "[...]" in minibuffer prompts
       (customize-set-variable 'minibuffer-eldef-shorten-default t)
@@ -2027,7 +2030,7 @@ to this definition.
       ;; the default when it's applicable
       (add-hook 'window-setup-hook
                 (lambda()
-                  (funcall 'minibuffer-electric-default-mode 0)))
+                  (funcall 'minibuffer-electric-default-mode 1)))
 
       #+END_SRC
 
@@ -2221,7 +2224,7 @@ to this definition.
             ;; bind
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
             (define-key icomplete-minibuffer-map (kbd "M-<tab>") 'icomplete-forward-completions)
-            (define-key icomplete-minibuffer-map (kbd "M-SPC") 'icomplete-backward-completions)
+            (define-key icomplete-minibuffer-map (kbd "M-DEL") 'icomplete-backward-completions)
             (define-key icomplete-minibuffer-map (kbd "C-p") 'previous-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "C-n") 'next-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-top-candidate)
@@ -3028,10 +3031,10 @@ to this definition.
       (customize-set-variable 'lazy-enable-filenotify-flag t)
 
       ;; non-nil means show debug messages
-      (customize-set-variable 'lazy-debug-messages-flag nil)
+      (customize-set-variable 'lazy-debug-messages-flag t)
 
       ;; non-nil means run `lazy-update-autoloads' when emacs is idle
-      (customize-set-variable 'lazy-enable-run-idle-flag t)
+      (customize-set-variable 'lazy-enable-run-idle-flag nil)
 
       ;; idle timer value
       (customize-set-variable 'lazy-idle-seconds 15)
@@ -3512,119 +3515,6 @@ to this definition.
 
      A file manager or file browser is a computer program that provides
      a user interface to manage files and folders.
-
-***** Dired-async
-
-      This package provides a redefinition of `dired-create-file' function,
-      performs copies, moves and all what is handled by `dired-create-file'
-      in the background using a slave Emacs process, by means of
-      the async.el module.
-
-****** Require
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; (require 'dired-async nil t)
-
-       #+END_SRC
-
-****** Binds
-
-       #+BEGIN_SRC emacs-lisp
-
-       (when (boundp 'dired-mode-map)
-         (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
-         (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file))
-
-       #+END_SRC
-
-****** Enable
-
-       #+BEGIN_SRC emacs-lisp
-
-       (add-hook 'window-setup-hook
-                 (lambda ()
-                   (funcall 'dired-async-mode 1)))
-
-       #+END_SRC
-
-***** Dired-subtree
-
-      This package defines function `dired-subtree-insert' which instead
-      inserts the subdirectory directly below its line in the original
-      listing, and indent the listing of subdirectory to resemble a
-      tree-like structure (somewhat similar to tree(1) except the pretty
-      graphics).
-
-****** Require
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; (require 'dired-subtree-autoloads nil t)
-
-       #+END_SRC
-
-****** Customize
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; default depth expanded by `dired-subtree-cycle'
-       ;; (customize-set-variable 'dired-subtree-cycle-depth 2)
-
-       ;; ;; a prefix put into each nested subtree
-       ;; (customize-set-variable 'dired-subtree-line-prefix "  ")
-
-       ;; ;; specifies how the prefix is fontified, subtree
-       ;; (customize-set-variable 'dired-subtree-line-prefix-face 'subtree)
-
-       ;; ;; when non-nil, add a background face to a subtree listing.
-       ;; (customize-set-variable 'dired-subtree-use-backgrounds nil)
-
-       #+END_SRC
-
-****** Binds
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; (when (boundp 'dired-mode-map)
-       ;;   (progn
-       ;;     (define-key dired-mode-map (kbd "TAB") 'dired-subtree-insert)
-       ;;     (define-key dired-mode-map (kbd "<M-tab>") 'dired-subtree-remove)))
-
-       #+END_SRC
-
-***** Dired-rsync
-
-      Dired-rsync is a command that can be run from a dired buffer to
-      copy files using rsync rather than tramps in-built mechanism.
-      This is especially useful for copying large files to/from remote
-      locations without locking up tramp.
-
-****** Require
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; (require 'dired-rsync nil t)
-
-       #+END_SRC
-
-****** Customize
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; the default options for the rsync command
-       ;; (customize-set-variable 'dired-rsync-options "-a -z -v -r --info=progress2")
-
-       #+END_SRC
-
-****** Binds
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; (when (boundp 'dired-mode-map)
-       ;;   (define-key dired-mode-map (kbd "C-c C-r") 'dired-rsync))
-
-       #+END_SRC
 
 **** Bookmark
 
@@ -5152,10 +5042,8 @@ to this definition.
       ;; set initial buffer choice (emacsclient fix)
       (customize-set-variable 'initial-buffer-choice
                               (lambda ()
-                                (let ((initial-buffer (get-buffer "*dashboard*")))
-                                  (unless initial-buffer
-                                    (setq initial-buffer (get-buffer "*scratch*")))
-                                  initial-buffer)))
+                                (or (get-buffer "*dashboard*")
+                                    (get-buffer "*scratch*"))))
 
       #+END_SRC
 

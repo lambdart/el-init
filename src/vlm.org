@@ -2423,9 +2423,9 @@ to this definition.
                                 (:eval (format-time-string "%H:%M"))
                                 "  "
                                 "%l:%c"
-                                " » "
+                                " · "
                                 (:eval (propertized-buffer-identification "%b"))
-                                " « "
+                                " · "
                                 "("
                                 mode-name
                                 ")"
@@ -2946,6 +2946,10 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; help-map
+      (define-key help-map (kbd "TAB") 'info-display-manual)
+
+      ;; info-mode-map
       (eval-after-load 'info
         (lambda ()
           (when (boundp 'Info-mode-map)
@@ -3674,15 +3678,6 @@ to this definition.
       ;; list of authentication sources
       (customize-set-variable
        'auth-sources '("~/.auth/auth.gpg" "~/.auth/netrc"))
-
-      #+END_SRC
-
-**** Password-store
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'password-store nil t)
 
       #+END_SRC
 
@@ -5433,7 +5428,7 @@ to this definition.
     Posts are typically displayed in reverse chronological order, so
     that the most recent post appears first, at the top of the web page.
 
-**** Org-static-blog
+**** Org-weblog
 
      Static blog generators are a dime a dozen.
      This is one more, which focuses on being simple.
@@ -5446,49 +5441,7 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'org-static-blog nil t)
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun org-static-blog--insert-html (html-file)
-        "Insert HTML-FILE when file exists."
-        (if (file-exists-p html-file)
-            (with-temp-buffer
-              (insert-file-contents (expand-file-name html-file))
-              (buffer-string))
-          ""))
-
-      (defun org-static-blog--update-html ()
-        "Update html content."
-
-        ;; html to put in the <head> of each page.
-        (customize-set-variable
-         'org-static-blog-page-header
-         (org-static-blog--insert-html "~/core/dev/hidden-ones/html/header.html"))
-
-        ;; html to put before the content of each page.
-        (customize-set-variable
-         'org-static-blog-page-preamble
-         (org-static-blog--insert-html "~/core/dev/hidden-ones/html/preamble.html"))
-
-        ;; html to put after the content of each page.
-        (customize-set-variable
-         'org-static-blog-page-postamble
-         (format
-          (org-static-blog--insert-html "~/core/dev/hidden-ones/html/postamble.html")
-          (org-version))))
-
-      (defun org-static-blog-update ()
-        "Update html content/layout and publish."
-        (interactive)
-        ;; setup html/layout pages
-        (org-static-blog--update-html)
-        ;; export the org files
-        (funcall 'org-static-blog-publish t))
+      ;; (require 'org-weblog nil t)
 
       #+END_SRC
 
@@ -5498,62 +5451,39 @@ to this definition.
 
       ;; title of the blog
       (customize-set-variable
-       'org-static-blog-publish-title "Hidden Ones")
+       'org-weblog-publish-title "Hidden Ones")
 
       ;; url of the blog.
       (customize-set-variable
-       'org-static-blog-publish-url "https://esac-io.github.io/")
+       'org-weblog-url "https://esac-io.github.io/")
 
       ;; directory where published HTML files are stored
       (customize-set-variable
-       'org-static-blog-publish-directory "~/core/dev/hidden-ones/site/preview/")
+       'org-weblog-publish-directory "~/core/dev/hidden-ones/site/preview/")
 
       ;; directory where published ORG files are stored
       (customize-set-variable
-       'org-static-blog-posts-directory "~/core/dev/hidden-ones/posts/")
+       'org-weblog-posts-directory "~/core/dev/hidden-ones/posts/")
 
       ;; directory where published ORG files are stored
       (customize-set-variable
-       'org-static-blog-pages-directory "~/core/dev/hidden-ones/pages/")
+       'org-weblog-pages-directory "~/core/dev/hidden-ones/pages/")
 
       ;; directory where unpublished ORG files are stored.
       (customize-set-variable
-       'org-static-blog-drafts-directory "~/core/dev/hidden-ones/drafts/")
+       'org-weblog-drafts-directory "~/core/dev/hidden-ones/drafts/")
 
-      ;; html to put in the <head> of each page.
-      (customize-set-variable
-       'org-static-blog-page-header
-       (org-static-blog--insert-html "~/core/dev/hidden-ones/html/header.html"))
+      ;; ;; use preview versions of posts on multipost pages
+      ;; (customize-set-variable 'org-weblog-use-preview-flag t)
 
-      ;; html to put before the content of each page.
-      (customize-set-variable
-       'org-static-blog-page-preamble
-       (org-static-blog--insert-html "~/core/dev/hidden-ones/html/preamble.html"))
+      ;; ;; show tags below posts, and generate tag pages
+      ;; (customize-set-variable 'org-weblog-enable-tags t)
 
-      ;; html to put after the content of each page.
-      (customize-set-variable
-       'org-static-blog-page-postamble
-       (format
-        (org-static-blog--insert-html "~/core/dev/hidden-ones/html/postamble.html")
-        (org-version)))
+      ;; ;; when preview is enabled, convert <h1> to <h2> for the previews
+      ;; (customize-set-variable 'org-weblog-preview-convert-titles nil)
 
-      ;; use preview versions of posts on multipost pages
-      (customize-set-variable 'org-static-blog-use-preview t)
-
-      ;; when preview is enabled, convert <h1> to <h2> for the previews
-      (customize-set-variable 'org-static-blog-preview-convert-titles nil)
-
-      ;; the HTML appended to the preview if some part of the post is hidden
-      (customize-set-variable 'org-static-blog-preview-ellipsis "(...)")
-
-      ;; show tags below posts, and generate tag pages
-      (customize-set-variable 'org-static-blog-enable-tags t)
-
-      ;; non-nil means create a table of contents in exported files
-      (customize-set-variable 'org-export-with-toc t)
-
-      ;; non-nil means add section numbers to headlines when exporting
-      (customize-set-variable 'org-export-with-section-numbers t)
+      ;; ;; the HTML appended to the preview if some part of the post is hidden
+      ;; (customize-set-variable 'org-weblog-preview-ellipsis "(...)")
 
       #+END_SRC
 
@@ -5864,16 +5794,16 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; set echo delay
-      (customize-set-variable 'company-echo-delay 0.1)
+      (customize-set-variable 'company-echo-delay .1)
 
       ;; idle delay in seconds until completion starts automatically
       (customize-set-variable 'company-idle-delay nil)
 
       ;; maximum number of candidates in the tooltip
-      (customize-set-variable 'company-tooltip-limit 6)
+      (customize-set-variable 'company-tooltip-limit 9)
 
       ;; set minimum prefix length
-      (customize-set-variable 'company-minimum-length 3)
+      (customize-set-variable 'company-minimum-length 4)
 
       ;; if enabled, selecting item before first or after last wraps around
       (customize-set-variable 'company-selection-wrap-around t)
@@ -5943,6 +5873,8 @@ to this definition.
           (when (boundp 'company-active-map)
             (define-key company-active-map (kbd "TAB") 'company-complete-common)
             (define-key company-active-map (kbd "C-j") 'company-complete-selection)
+            (define-key company-active-map (kbd "M-TAB") 'company-select-next)
+            (define-key company-active-map (kbd "M-DEL") 'company-select-previous)
             (define-key company-active-map (kbd "C-n") 'company-select-next)
             (define-key company-active-map (kbd "C-p") 'company-select-previous))))
 
@@ -5954,9 +5886,6 @@ to this definition.
 
       ;; redundancy
       (define-key vlm-completion-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
-
-      ;; global
-      (global-set-key (kbd "C-TAB") 'vlm-complete-in-buffer-or-indent)
 
       #+END_SRC
 
@@ -6000,7 +5929,7 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-hook 'company-mode-hook 'company-statistics-mode)
+      ;; (add-hook 'company-mode-hook 'company-statistics-mode)
 
       #+END_SRC
 
@@ -6757,10 +6686,32 @@ to this definition.
 
       #+END_SRC
 
+*** Slime
+
+    SLIME is the Superior Lisp Interaction Mode for Emacs.
+
+    SLIME extends Emacs with support for interactive programming in
+    Common Lisp. The features are centered around slime-mode, an Emacs
+    minor-mode that complements the standard lisp-mode.
+
+    While lisp-mode supports editing Lisp source files, slime-mode
+    adds support for interacting with a running Common Lisp process
+    for compilation, debugging, documentation lookup, and so on.
+
+**** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; program name for invoking an inferior Lisp with for
+     ;; inferior lisp mode
+     (customize-set-variable 'inferior-lisp-program "sbcl")
+
+     #+END_SRC
+
 *** Haskell
 **** Haskell
 
-     Haskell Mode is an Haskell development Environment for
+     Haskell mode is an Haskell development Environment for
      GNU Emacs version 24.3 or later. It provides syntax-based
      indentation, font locking, editing cabal files, and supports
      running an inferior Haskell interpreter (e.g. GHCi).

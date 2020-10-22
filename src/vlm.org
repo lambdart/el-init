@@ -6698,6 +6698,14 @@ to this definition.
     adds support for interacting with a running Common Lisp process
     for compilation, debugging, documentation lookup, and so on.
 
+**** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (require 'slime nil t)
+
+     #+END_SRC
+
 **** Customize
 
      #+BEGIN_SRC emacs-lisp

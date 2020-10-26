@@ -1520,7 +1520,7 @@ to this definition.
      ;; set default font
      (add-hook 'window-setup-hook
                (lambda ()
-                 (safe-set-frame-font "Iosevka Fixed-15:width=regular:weight=regular")))
+                 (safe-set-frame-font "Iosevka Fixed-16:width=regular:weight=regular")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -3052,13 +3052,13 @@ to this definition.
 
       ;; target files and directories
       (customize-set-variable 'lazy-files-alist
-        (list
-         ;; lisp directory
-         (cons "lisp-loaddefs.el"
-               (expand-file-name "lisp/" user-emacs-directory))
-         ;; site-lisp directory
-         (cons "site-lisp-loaddefs.el"
-               (expand-file-name "site-lisp/" user-emacs-directory))))
+                              (list
+                               ;; lisp directory
+                               (cons "lisp-loaddefs.el"
+                                     (expand-file-name "lisp/" user-emacs-directory))
+                               ;; site-lisp directory
+                               (cons "site-lisp-loaddefs.el"
+                                     (expand-file-name "site-lisp/" user-emacs-directory))))
 
       #+END_SRC
 
@@ -4293,7 +4293,7 @@ to this definition.
                                  :server-alias "freenode"
                                  :encryption tls
                                  :nick "esac"
-                                 :channels ("#rcirc #emacs #lisp-br #emacs-br"))))
+                                 :channels ("#rcirc #lisp-br #lispgames"))))
 
       #+END_SRC
 
@@ -5604,12 +5604,11 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; vlm-docs-map
-      (define-key vlm-docs-map (kbd "u") 'dash-docs-update-docset)
-      ;; (define-key vlm-docs-map (kbd "i") 'dash-docs-async-install-docset)
+      ;; (define-key vlm-docs-map (kbd "u") 'dash-docs-update-docset)
       (define-key vlm-docs-map (kbd "i") 'dash-docs-install-docset)
-      (define-key vlm-docs-map (kbd "l") 'dash-docs-search-docs)
       (define-key vlm-docs-map (kbd "a") 'dash-docs-activate-docset)
       (define-key vlm-docs-map (kbd "d") 'dash-docs-deactivate-docset)
+      (define-key vlm-docs-map (kbd "l") 'dash-docs-find-file)
 
       #+END_SRC
 
@@ -6713,6 +6712,26 @@ to this definition.
      ;; program name for invoking an inferior Lisp with for
      ;; inferior lisp mode
      (customize-set-variable 'inferior-lisp-program "sbcl")
+
+     #+END_SRC
+
+*** Glsl
+
+    Major mode for editing OpenGLSL grammar files, usually files
+    ending with .vert, .frag, .glsl, .geom. Is is based on
+    c-mode plus some features and pre-specified fonts and
+    faces properties.
+
+**** Enable
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;;;###autoload
+     (progn
+       (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+       (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+       (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode))
+       (add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode)))
 
      #+END_SRC
 

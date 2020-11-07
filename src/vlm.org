@@ -1,4 +1,4 @@
-#+TITLE: Virtual Lisp Machine
+#+xoTITLE: Virtual Lisp Machine
 #+AUTHOR: esac
 #+EMAIL: esac-io@tutanota.com
 #+DESCRIPTION: an org-mode based Emacs configuration
@@ -1474,6 +1474,13 @@ to this definition.
                                           (abbreviate-file-name (buffer-file-name))
                                         "%b"))))
 
+     ;; alist of parameters for the initial minibuffer frame.
+     (customize-set-variable 'minibuffer-frame-alist
+                             '((top . 2)
+                               (left . 2)
+                               (width . 80)
+                               (height . 2)))
+
      ;; alist of parameters for the initial X window frame
      (add-to-list 'initial-frame-alist '(fullscreen . fullheight))
 
@@ -1516,11 +1523,6 @@ to this definition.
 **** Enable
 
      #+BEGIN_SRC emacs-lisp
-
-     ;; set default font
-     (add-hook 'window-setup-hook
-               (lambda ()
-                 (safe-set-frame-font "Iosevka Fixed-16:width=regular:weight=regular")))
 
      ;; enable window divider
      (add-hook 'window-setup-hook
@@ -1700,9 +1702,9 @@ to this definition.
      ;; kill process not confirmation required
      ;; list of functions called with no args to query before killing a buffer.
      ;; The buffer being killed will be current while the functions are running.
-     (customize-set-variable
-      'kill-buffer-query-functions
-      (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
+     ;; (customize-set-variable
+     ;;  'kill-buffer-query-functions
+     ;;  (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
 
      ;; non-nil means load prefers the newest version of a file.
      (customize-set-variable 'load-prefer-newer t)
@@ -1866,15 +1868,6 @@ to this definition.
 
       ;;list history of commands that used the minibuffer
       (customize-set-variable 'list-command-history-max history-length)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; ctl-x-map
-      ;; (define-key ctl-x-map (kbd "e") 'eval-command-history)
 
       #+END_SRC
 
@@ -2436,18 +2429,18 @@ to this definition.
 
 **** Wallpaper
 
-     Set default wallpaper (uses vex-util package!).
+     Set default wallpaper.
 
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
       ;; set wallpaper
-      (add-hook 'window-setup-hook
-                (lambda()
-                  (set-wallpaper
-                   "~/media/images/wallpapers/studio-ghibli/ghibli-7.jpg"
-                   "-g -0-0")))
+      ;; (add-hook 'window-setup-hook
+      ;;           (lambda()
+      ;;             (set-wallpaper
+      ;;              "~/media/images/wallpapers/studio-ghibli/ghibli-7.jpg"
+      ;;              "-g -0-0")))
 
       #+END_SRC
 
@@ -3064,7 +3057,6 @@ to this definition.
 
 ***** Enable
 
-
       #+BEGIN_SRC emacs-lisp
 
       (add-hook 'window-setup-hook
@@ -3139,7 +3131,7 @@ to this definition.
       (eval-after-load 'iedit
         (lambda ()
           (when (boundp 'iedit-mode-keymap)
-            (define-key iedit-mode-keymap (kbd "<tab>") 'vlm-complete-in-buffer-or-indent)
+            (define-key iedit-mode-keymap (kbd "<tab>") 'complete-at-point-or-indent)
             (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence))))
 
       ;; bind (global)
@@ -3256,11 +3248,7 @@ to this definition.
        (add-hook 'shell-mode-hook
                  (lambda()
                    ;; do not display continuation lines.
-                   (setq truncate-lines nil)
-
-                   ;; when available remove company-mode
-                   (when (fboundp 'company-mode)
-                     (company-mode -1))))
+                   (setq truncate-lines nil)))
 
        #+END_SRC
 
@@ -3621,10 +3609,7 @@ to this definition.
                    (setq truncate-lines nil)
 
                    ;; setup keybinds
-                   (safe-funcall 'term-setup-keystroke)
-
-                   ;; disable company mode
-                   (safe-funcall 'company-mode -1)))
+                   (safe-funcall 'term-setup-keystroke)))
 
        ;; bind term-raw-map/term-mode-map with hook
        (add-hook 'term-mode-hook
@@ -3866,11 +3851,6 @@ to this definition.
                 ("Debug"  (or (mode . debugger-mode)
                               (name . "^\\*debug")))
 
-                ("Flycheck" (or
-                             (mode . flycheck-mode)
-                             (mode . flycheck-error-list-mode)
-                             (name . "^\\*Flycheck error messages\\*$")))
-
                 ("Grep" (or
                          (mode . ag-mode)
                          (mode . occur-mode)
@@ -4065,6 +4045,9 @@ to this definition.
        ;; if non-nil, require your confirmation when exiting gnus
        (customize-set-variable 'gnus-interactive-exit nil)
 
+       ;; if non-nil, use the entire Emacs screen
+       (customize-set-variable 'gnus-use-full-window nil)
+
        #+END_SRC
 
 ****** Groups
@@ -4126,12 +4109,14 @@ to this definition.
        (customize-set-variable 'gnus-treat-fill-long-lines nil)
        (customize-set-variable 'gnus-treat-fill-article nil)
 
-       ;; WHAT?
-       ;; (customize-set-variable 'gnus-article-auto-eval-lisp-snippets nil)
-
        #+END_SRC
 
 ****** Articles
+
+       #+BEGIN_SRC emacs-lisp
+
+       #+END_SRC
+
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -4145,6 +4130,16 @@ to this definition.
       #+END_SRC
 
 ***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (eval-after-load 'gnus-group
+        (lambda ()
+          (when (boundp 'gnus-group-mode-map)
+            (define-key gnus-group-mode-map (kbd "<tab>") 'gnus-group-select-group))))
+
+      #+END_SRC
+
 *** Media
 **** Emms
 
@@ -4552,70 +4547,6 @@ to this definition.
       ;; hooks
       (add-hook 'text-mode-hook #'flyspell-mode)
       (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-
-      #+END_SRC
-
-**** Flycheck
-
-     Flycheck is a modern on-the-fly syntax checking extension.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'flycheck nil t)
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm-set-flycheck-checker (checker)
-        "Set flycheck CHECKER variable."
-        (when (boundp 'flycheck-checker)
-          (setq flycheck-checker checker)))
-
-      #+END_SRC
-
-***** Display
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; dont display this buffer
-      (add-to-list 'display-buffer-alist
-                   '("\\*Flycheck error messages\\*"
-                     (display-buffer-no-window)
-                     (allow-no-window . t)))
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; flycheck mode after some programming mode
-      ;; is activated (c-mode, elisp-mode, etc).
-      ;; (add-hook 'prog-mode-hook
-      ;;           (lambda ()
-      ;;             (interactive)
-      ;;             (funcall 'flycheck-mode 1)))
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; binds
-      ;; (define-key vlm-sc-map (kbd "C-g") 'keyboard-quit)
-      ;; (define-key vlm-sc-map (kbd "e") 'flycheck-list-errors)
-      ;; (define-key vlm-sc-map (kbd "b") 'flycheck-buffer)
-      ;; (define-key vlm-sc-map (kbd "d") 'flycheck-disable-checker)
-      ;; (define-key vlm-sc-map (kbd "m") 'flycheck-mode)
-      ;; (define-key vlm-sc-map (kbd "s") 'flycheck-select-checker)
-      ;; (define-key vlm-sc-map (kbd "?") 'flycheck-describe-checker)
-      ;; (define-key vlm-sc-map (kbd "v") 'flycheck-verify-setup)
 
       #+END_SRC
 
@@ -5166,22 +5097,6 @@ to this definition.
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm/org/set-company-backends ()
-        "Set `org-mode' company backends."
-        (interactive)
-        (vlm-set-company-backends
-         '((company-dabbrev :with
-                            company-yasnippet
-                            company-dabbrev-code
-                            company-ispell)
-           (company-files))))
-
-      #+END_SRC
-
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -5190,9 +5105,6 @@ to this definition.
                 (lambda ()
                   ;; do not truncate lines
                   (setq truncate-lines nil)
-
-                  ;; set company backends
-                  (vlm/org/set-company-backends)
 
                   ;; languages which can be evaluated in Org buffers.
                   (org-babel-do-load-languages
@@ -5213,7 +5125,7 @@ to this definition.
       (eval-after-load 'org
         (lambda()
           (when (boundp 'org-mode-map)
-            (define-key org-mode-map (kbd "C-M-i") 'vlm-complete-in-buffer-or-indent))))
+            (define-key org-mode-map (kbd "C-M-i") 'complete-at-point-or-indent))))
 
       #+END_SRC
 
@@ -5301,7 +5213,7 @@ to this definition.
 
       (when (boundp 'markdown-mode-map)
         (progn
-          (define-key markdown-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)))
+          (define-key markdown-mode-map (kbd "TAB") 'complete-at-point-or-indent)))
 
       #+END_SRC
 
@@ -5581,10 +5493,10 @@ to this definition.
        (concat (expand-file-name user-emacs-directory) "docsets"))
 
       ;; minimum length to start searching in docsets
-      (customize-set-variable 'dash-docs-min-length 0)
+      ;; (customize-set-variable 'dash-docs-min-length 0)
 
       ;; format of the displayed candidates
-      (customize-set-variable 'dash-docs-candidate-format "%n")
+      (customize-set-variable 'dash-docs-candidate-format "%d %t %n")
 
       #+END_SRC
 
@@ -5611,6 +5523,18 @@ to this definition.
       (define-key vlm-docs-map (kbd "l") 'dash-docs-find-file)
 
       #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable dash-docs after emacs startup
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'turn-on-dash-docs-mode)))
+
+      #+END_SRC
+
 
 **** Rfc-docs
 
@@ -5771,164 +5695,6 @@ to this definition.
       (add-hook 'window-setup-hook
                 (lambda ()
                   (funcall 'yas-global-mode 1)))
-
-      #+END_SRC
-
-**** Company
-
-     Company is a modular completion framework.
-     Modules for retrieving completion candidates are called backends,
-     modules for displaying them are front-ends.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'company nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; set echo delay
-      (customize-set-variable 'company-echo-delay .1)
-
-      ;; idle delay in seconds until completion starts automatically
-      (customize-set-variable 'company-idle-delay nil)
-
-      ;; maximum number of candidates in the tooltip
-      (customize-set-variable 'company-tooltip-limit 9)
-
-      ;; set minimum prefix length
-      (customize-set-variable 'company-minimum-length 4)
-
-      ;; if enabled, selecting item before first or after last wraps around
-      (customize-set-variable 'company-selection-wrap-around t)
-
-      ;; sort by frequency
-      (customize-set-variable 'company-transformers
-                              '(company-sort-by-occurrence))
-
-      ;; whether to downcase the returned candidates.
-      (customize-set-variable 'company-dabbrev-downcase t)
-
-      ;; if enabled, disallow non-matching input
-      (customize-set-variable 'company-require-match nil)
-
-      ;; when non-nil, align annotations to the right tooltip border
-      (customize-set-variable 'company-tooltip-align-annotations nil)
-
-      ;; show candidates number
-      ;; to select completions use: M-1, M-2, etc..
-      (customize-set-variable 'company-show-numbers t)
-
-      ;; research
-      ;; (customize-set-variable 'company-tooltip-flip-when-above nil)
-
-      ;; the list of active backends (completion engines)
-      (customize-set-variable
-       'company-backends
-       '(company-capf company-files company-ispell
-                      (company-dabbrev-code company-keywords)
-                      company-dabbrev))
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm-set-company-backends (backends)
-        "Set company back ends with BACKENDS."
-        (make-local-variable 'company-backends)
-        (when (boundp 'company-backends)
-          (setq company-backends backends)))
-
-      (defun vlm-company-complete-or-indent ()
-        "Company (complete anything (in-buffer)) or indent."
-        (interactive)
-        (cond ((looking-at "\\_>")
-               (funcall 'company-complete))
-              (t (indent-according-to-mode))))
-
-      (defun vlm-complete-in-buffer-or-indent ()
-        "Company (complete anything (in-buffer)) or indent."
-        (interactive)
-        (cond ((looking-at "\\_>")
-               (safe-funcall 'company-complete))
-              (t (indent-according-to-mode))))
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; company-active-map
-      (eval-after-load 'company
-        (lambda ()
-          (when (boundp 'company-active-map)
-            (define-key company-active-map (kbd "TAB") 'company-complete-common)
-            (define-key company-active-map (kbd "C-j") 'company-complete-selection)
-            (define-key company-active-map (kbd "M-TAB") 'company-select-next)
-            (define-key company-active-map (kbd "M-DEL") 'company-select-previous)
-            (define-key company-active-map (kbd "C-n") 'company-select-next)
-            (define-key company-active-map (kbd "C-p") 'company-select-previous))))
-
-      ;; vlm-complete map
-      (define-key vlm-completion-map (kbd "`") 'company-ispell)
-      (define-key vlm-completion-map (kbd "f") 'company-files)
-      (define-key vlm-completion-map (kbd "e") 'company-etags)
-      (define-key vlm-completion-map (kbd "y") 'company-yasnippet)
-
-      ;; redundancy
-      (define-key vlm-completion-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; enable globally
-      (add-hook 'window-setup-hook
-                (lambda()
-                  (funcall 'global-company-mode 1)))
-
-      #+END_SRC
-
-**** Company-statistics
-
-     Every time a candidate is chosen using company-mode, we keep track of this
-     (for a limited amount of recent choices). When presenting completion
-     candidates next time, they are sorted according to the score thus acquired.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'company-statistics nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; set company-statistics cache location
-      (customize-set-variable
-       'company-statistics-file
-       (concat user-emacs-directory "cache/company-statistics-cache.el"))
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (add-hook 'company-mode-hook 'company-statistics-mode)
 
       #+END_SRC
 
@@ -6136,11 +5902,11 @@ to this definition.
 *** Building
 **** Cmake-ide
 
-     This package runs CMake and sets variables for IDE-like functionality
-     provided by other packages such as:
-     On the fly syntax checks with flycheck
-     auto-completion using auto-complete-clang or company-clang.
-     Jump to definition and refactoring with rtags.
+     This package runs CMake and sets variables for IDE-like
+     functionality provided by other packages such as: On the fly
+     syntax checks with flycheck auto-completion using
+     auto-complete-clang or company-clang. Jump to definition and
+     refactoring with rtags.
 
 ***** Require
 
@@ -6380,6 +6146,7 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       (define-key prog-mode-map (kbd "C-M-i") 'complete-at-point-or-indent)
+      ;; (define-key prog-mode-map (kbd "C-M-i") 'complete-at-point-or-indent)
 
       #+END_SRC
 
@@ -6454,20 +6221,6 @@ to this definition.
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm/text/set-company-backends ()
-        "Set `text-mode' company backends."
-        (interactive)
-        (vlm-set-company-backends
-         '((company-ispell :with
-                           company-dabbrev)
-           (company-files))))
-
-      #+END_SRC
-
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -6475,10 +6228,7 @@ to this definition.
       (add-hook 'text-mode-hook
                 (lambda ()
                   ;; turn on auto fill mode
-                  (turn-on-auto-fill)
-
-                  ;; set company backends
-                  (vlm/text/set-company-backends)))
+                  (turn-on-auto-fill)))
 
       #+END_SRC
 
@@ -6487,7 +6237,7 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-      (define-key text-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
+      (define-key text-mode-map (kbd "TAB") 'complete-at-point-or-indent)
 
       (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
       (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
@@ -6619,21 +6369,6 @@ to this definition.
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm/elisp/set-company-backends ()
-        "Set elisp company backends."
-        (interactive)
-        (vlm-set-company-backends
-         '((company-elisp :with company-capf company-dabbrev-code)
-           (company-dabbrev)
-           (company-files))))
-      ;; (company-yasnippet)
-
-      #+END_SRC
-
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -6647,17 +6382,7 @@ to this definition.
                 (lambda()
                   (funcall 'eldoc-mode 1)))
 
-      ;; set backends (company, flychecker, dash-docs)
-      (add-hook 'emacs-lisp-mode-hook
-                (lambda ()
-                  ;; set company backends
-                  (vlm/elisp/set-company-backends)
-
-                  ;; set flycheck checker
-                  ;; (vlm-set-flycheck-checker 'emacs-lisp)
-
-                  ;; activate dash docset (emacs)
-                  (vlm-set-dash-docset "Emacs Lisp")))
+      ;; (add-hook 'emacs-lisp-mode-hook (lambda ()))
 
       #+END_SRC
 
@@ -6681,7 +6406,7 @@ to this definition.
             (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
             (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
             (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile)
-            (define-key emacs-lisp-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent))))
+            (define-key emacs-lisp-mode-map (kbd "TAB") 'complete-at-point-or-indent))))
 
       #+END_SRC
 
@@ -6766,33 +6491,12 @@ to this definition.
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm/haskell/set-company-backends ()
-        "Set haskell company backends."
-        (interactive)
-        (vlm-set-company-backends
-         '((company-capf
-            company-yasnippet
-            company-dabbrev-code)
-           (company-files))))
-
-      #+END_SRC
-
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
       (add-hook 'haskell-mode-hook
                 (lambda ()
-                  ;; set company backends
-                  (vlm/haskell/set-company-backends)
-
-                  ;; set flycheck checker
-                  ;; (vlm-set-flycheck-checker 'haskell-ghc)
-
                   ;; haskell indentation mode that deals with the layout rule.
                   ;; it rebinds RET, DEL and BACKSPACE, so that indentations can be
                   ;; set and deleted as if they were real tabs.
@@ -6801,9 +6505,6 @@ to this definition.
                   ;; minor mode for enabling haskell-process interaction
                   ;; non-nil if Interactive-Haskell mode is enabled.
                   (safe-funcall 'interactive-haskell-mode 1)))
-
-      ;; activate dash docset (emacs) (not working)
-      ;; (vlm-set-dash-docset "Haskell")))
 
       #+END_SRC
 
@@ -6875,16 +6576,6 @@ to this definition.
 
       (add-hook 'elixir-mode-hook
                 (lambda ()
-                  ;; set company backends
-                  (vlm-set-company-backends
-                   '(company-yasnippet
-                     company-dabbrev
-                     company-dabbrev-code
-                     (company-files)))
-
-                  ;; set syntax checker
-                  ;; vlm/flycheck/set-cheker '<elixir-checker>)
-
                   ;; set dash docsets
                   (vlm-set-dash-docset '"Elixir")))
 
@@ -6981,15 +6672,6 @@ to this definition.
 
       #+END_SRC
 
-**** Company-rtags
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'company-rtags nil t)
-
-      #+END_SRC
-
 **** CC-mode
 
      This package provides GNU Emacs major modes for editing C, C++,
@@ -7003,26 +6685,6 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; (require 'cc-mode nil t)
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; c/c++ company backends
-      (defun vlm/cc/set-company-backends ()
-        "Set C/C++ common company backends."
-        (interactive)
-        (vlm-set-company-backends
-         '((company-c-headers)
-           (company-keywords :with
-                             ;; company-rtags
-                             company-yasnippet
-                             company-etags
-                             company-dabbrev-code
-                             company-dabbrev)
-           (company-files))))
 
       #+END_SRC
 
@@ -7041,23 +6703,11 @@ to this definition.
 
       (add-hook 'c-mode-hook
                 (lambda ()
-                  ;; set cc common company backends
-                  (vlm/cc/set-company-backends)
-
                   ;; set dash docset
                   (vlm-set-dash-docset '"C")))
 
-      ;; set flycheck checker
-      ;; (vlm-set-flycheck-checker 'c/c++-clang)))
-
       (add-hook 'c++-mode-hook
                 (lambda ()
-                  ;; set cc common backends (company and flycheck)
-                  (vlm/cc/set-company-backends)
-
-                  ;; set flycheck checker
-                  ;; (vlm-set-flycheck-checker 'c++-cppcheck)
-
                   ;; set dash docset
                   (vlm-set-dash-docset '"C++")))
 
@@ -7075,8 +6725,8 @@ to this definition.
             (define-key c++-mode-map (kbd "C-c r") 'vlm-rtags-map)
 
             ;; complete or indent
-            (define-key c-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
-            (define-key c++-mode-map (kbd "TAB") 'vlm-complete-in-buffer-or-indent)
+            (define-key c-mode-map (kbd "TAB") 'complete-at-point-or-indent)
+            (define-key c++-mode-map (kbd "TAB") 'complete-at-point-or-indent)
 
             ;; compilation keybind
             (define-key c-mode-map (kbd "C-c C-c")
@@ -7088,19 +6738,6 @@ to this definition.
               (lambda ()
                 (interactive)
                 (funcall 'compile compile-command))))))
-
-      #+END_SRC
-
-**** Company-c-headers
-
-     This library enables the completion of C/C++ header file names
-     using Company mode for Emacs.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'company-c-headers nil t)
 
       #+END_SRC
 
@@ -7132,33 +6769,12 @@ to this definition.
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm/go/set-company-backends ()
-        "Set go company backends."
-        (interactive)
-        (vlm-set-company-backends
-         '((company-yasnippet :with
-                              company-dabbrev
-                              company-dabbrev-code)
-           (company-files))))
-
-      #+END_SRC
-
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
       (add-hook 'go-mode-hook
                 (lambda ()
-                  ;; set company backends
-                  (vlm/go/set-company-backends)
-
-                  ;; set flycheck checker (go lint)
-                  ;; (vlm-set-flycheck-checker 'go-golint)
-
                   ;; set dash docsets
                   (vlm-set-dash-docset '"Go")))
 
@@ -7177,19 +6793,6 @@ to this definition.
       #+END_SRC
 
 *** Sh
-**** Company-shell
-
-     Backend for company mode to complete environment variables, binaries found
-     on your $PATH and fish shell functions.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'company-shell nil t)
-
-      #+END_SRC
-
 **** Sh-script
 
      Major mode for editing shell scripts. Bourne, C and rc shells as well
@@ -7210,19 +6813,7 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-hook 'sh-mode-hook
-                (lambda ()
-                  ;; set company backends
-                  (vlm-set-company-backends
-                   '((company-shell :with
-                                    company-shell-env
-                                    company-yasnippet)
-                     (company-dabbrev
-                      company-dabbrev-code)
-                     (company-files)))))
-
-      ;; set flycheck backends
-      ;; (vlm-set-flycheck-checker 'sh-shellcheck)))
+      ;; (add-hook 'sh-mode-hook (lambda ()))
 
       #+END_SRC
 
@@ -7238,30 +6829,11 @@ to this definition.
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm/fish/set-company-backends ()
-        "Set fish company backends."
-        (interactive)
-        (vlm-set-company-backends
-         '((company-fish-shell :with
-                               company-yasnippet)
-           (company-dabbrev
-            company-dabbrev-code)
-           (company-files))))
-
-      #+END_SRC
-
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-hook 'fish-mode-hook
-                (lambda ()
-                  ;; set company backends
-                  (vlm/fish/set-company-backends)))
+      ;; (add-hook 'fish-mode-hook (lambda ()))
 
       #+END_SRC
 
@@ -7305,33 +6877,12 @@ to this definition.
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm/lua/set-company-backends ()
-        "Set lua company backends."
-        (interactive)
-        (vlm-set-company-backends
-         '((company-yasnippet :with
-                              company-dabbrev
-                              company-dabbrev-code)
-           (company-files))))
-
-      #+END_SRC
-
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
 
       (add-hook 'lua-mode-hook
                 (lambda ()
-                  ;; set company backends
-                  (vlm/lua/set-company-backends)
-
-                  ;; set flycheck checker
-                  ;; (vlm-set-flycheck-checker 'lua)
-
                   ;; activate dash docset
                   (vlm-set-dash-docset "Lua")))
 
@@ -7407,23 +6958,6 @@ to this definition.
 
       #+END_SRC
 
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm/python/set-company-backends ()
-        "Set python company backends."
-        (interactive)
-        (vlm-set-company-backends
-         '((company-keywords :with
-                             company-yasnippet
-                             company-dabbrev-code
-                             company-dabbrev)
-           (company-dabbrev)
-           (company-files))))
-
-      #+END_SRC
-
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -7437,12 +6971,6 @@ to this definition.
       ;; set backends
       (add-hook 'python-mode-hook
                 (lambda ()
-                  ;; set company backends
-                  (vlm/python/set-company-backends)
-
-                  ;; set flycheck checker
-                  ;; (vlm-set-flycheck-checker 'python-pycompile)
-
                   ;; set dash docsets
                   (vlm-set-dash-docset '"Python 3")))
 
@@ -7522,17 +7050,6 @@ to this definition.
 
       (add-hook 'mql-mode-hook
                 (lambda ()
-                  ;; set company backends
-                  (vlm-set-company-backends
-                   '((company-etags
-                      company-yasnippet
-                      company-dabbrev
-                      company-dabbrev-code)
-                     (company-files)))
-
-                  ;; select flycheck checker (use gcc)
-                  ;; (vlm-set-flycheck-checker 'c/c++-gcc)
-
                   ;; activate mql5 docset
                   (vlm-set-dash-docset '"mql5")))
 

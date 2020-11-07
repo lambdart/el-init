@@ -11,12 +11,12 @@
   has a simple goal: be just a configuration file, i.e,
   set custom values and hooks for the libraries of interest.
 
-  Some people (including me) have started to refer to
-  =Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
+  Some people have started to refer to =Emacs= as a
+  =LISP MACHINE=. It is not strictly a lisp machine
   because, clearly, it is a software program and not a physical
   computer, but as that line starts to blur it seems like a useful
   epithet for =Emacs=, because these days it looks more and more like
-  an operating system.
+  an =OS=.
 
 * Disclaimer
 
@@ -129,19 +129,19 @@
 
 ** Goal
 
-   Use =EMACS= as a =LISP MACHINE=, i.e, the main dynamic interface
-   to perform data transformations.
-
-   * The only bridge between human and machine.
+   Use =EMACS= as a =VIRTUAL LISP MACHINE=, i.e, the main
+   dynamic interface to perform data transformations,
+   the only bridge between the human mind and the
+   machine resources.
 
 ** Mantras
 
-   0. Data driven/oriented design: we only care about how to organize
-      our data to do less transformations as possible to solve a given
-      problem, this results in a great degree of optimization and
+   0. Data driven/oriented design: is all about the data and how its
+      organized to do less transformations as possible when solving
+      a given problem, resulting in a great degree of optimization and
       simplicity.
 
-   1. Avoid late time decisions.
+   1. No late time decisions are allowed.
 
    2. Always go in the opposite direction: =SCALE DOWN=, i.e, use less
       resource as possible!
@@ -149,16 +149,16 @@
    3. Simple is better.
    4. Less is more.
 
-   5. For the =LISP MACHINE= everything is a =library=, in the same way
-      the everything is a file on UNIX systems!
+   5. For the =LISP MACHINE= everything is a just =data=
+      to be s-expressed and evaluated.
 
    6. Lazy load (=autoloads=) everywhere.
    7. Byte-compile warnings are equal to errors: not allowed!
 
-   8. Use as few =libraries= (sometimes called =packages= or =modules=)
-      as possible and always try to use =libraries= already installed
-      on Emacs to meet your needs. If you can withdraw a =library=, do
-      so! Most of the time it takes little or no effort, and the gain
+   8. Use as few =libraries= as possible and always try
+      to use =libraries= already installed on Emacs to meet your
+      needs.  If you can withdraw a =library=, do so!
+      Most of the time it takes little or no effort, and the gain
       is considerable. So, be alert to identify these situations!
 
    9. Prioritize Emacs's native =libraries= (builtin) over third-party
@@ -173,7 +173,7 @@
 
    11. Few mapped keybinds as possible! Implies the constant
        usage of the =minibuffer= to =eval= less often used commands,
-       but a huge pain relief, =diwm= style!
+       but a huge pain relief, =dwim= style!
 
    12. Use the same action flow logic, for the same class of commands.
 
@@ -415,7 +415,7 @@
   - A: It is not just a matter of taste, it is simply because
     they get in the way disturbing the desired transformation to
     properly occur, and I prefer a more direct/effective approach.
-    Remember that's the way I think, you can add these libraries
+    Remember that's the way I think, you can add these =libraries=
     on your own and make your life a little more miserable,
     be my guest!
 
@@ -426,7 +426,7 @@
     light!
 
   - Q: Do you think Emacs has a future?
-  - A: Maybe, the =concept= of the lisp machine as the main interface
+  - A: Maybe, the =concept= of the =LISP MACHINE= as the main interface
     to be used to do any task is great, however the =execution= side of
     it, is in a complete mess state, open the =info buffer= and you
     will see what I mean. This lack of organization makes everything

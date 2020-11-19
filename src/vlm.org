@@ -1,4 +1,4 @@
-#+xoTITLE: Virtual Lisp Machine
+#+TITLE: Virtual Lisp Machine
 #+AUTHOR: esac
 #+EMAIL: esac-io@tutanota.com
 #+DESCRIPTION: an org-mode based Emacs configuration
@@ -609,7 +609,7 @@ to this definition.
       (global-set-key (kbd "M-ESC") 'keyboard-escape-quit)
 
       ;; in buffer completion
-      ;; (global-set-key (kbd "C-M-i") 'complete-or-indent)
+      ;; (global-set-key (kbd "TAB") 'completion-at-point)
 
       #+END_SRC
 
@@ -1476,8 +1476,8 @@ to this definition.
 
      ;; alist of parameters for the initial minibuffer frame.
      (customize-set-variable 'minibuffer-frame-alist
-                             '((top . 2)
-                               (left . 2)
+                             '((top . 1)
+                               (left . 1)
                                (width . 80)
                                (height . 2)))
 
@@ -1608,8 +1608,14 @@ to this definition.
 
       ;; binds (vlm-window prefix map)
       (define-key vlm-window-map (kbd "1") 'maximize-window)
-      (define-key vlm-window-map (kbd "q") 'minimize-window)
-      (define-key vlm-window-map (kbd "w") 'balance-windows)
+      (define-key vlm-window-map (kbd "2") 'minimize-window)
+
+      (define-key vlm-window-map (kbd "q") 'balance-windows)
+      (define-key vlm-window-map (kbd "w") 'other-window-prefix)
+      (define-key vlm-window-map (kbd "r") 'windmove-right)
+      (define-key vlm-window-map (kbd "l") 'windmove-left)
+      (define-key vlm-window-map (kbd "d") 'windmove-down)
+      (define-key vlm-window-map (kbd "u") 'windmove-up)
 
       ;; binds ctl-x-map (C-x w)
       (define-key ctl-x-map (kbd "w") 'vlm-window-map)
@@ -1923,8 +1929,7 @@ to this definition.
       (customize-set-variable 'completion-auto-help 'lazy)
 
       ;; list of completion styles to use: see `completion-styles-alist variable
-      (customize-set-variable 'completion-styles
-                              '(basic partial-completion emacs22 flex))
+      (customize-set-variable 'completion-styles '(basic partial-completion flex))
       ;; '(basic partial-completion substring flex))
 
       ;; list of category-specific user overrides for completion styles.
@@ -2178,10 +2183,10 @@ to this definition.
 
       ;; custom
       ;; pending-completions number over which to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-delay-completions-threshold 128)
+      (customize-set-variable 'icomplete-delay-completions-threshold 64)
 
       ;; maximum number of initial chars to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-max-delay-chars 0.3)
+      (customize-set-variable 'icomplete-max-delay-chars 2)
 
       ;; completions-computation stall, used only with large-number completions
       (customize-set-variable 'icomplete-compute-delay 0.1)
@@ -2193,7 +2198,7 @@ to this definition.
       (customize-set-variable 'icomplete-hide-common-prefix nil)
 
       ;; maximum number of lines to use in the minibuffer
-      (customize-set-variable 'icomplete-prospects-height 2)
+      (customize-set-variable 'icomplete-prospects-height 1)
 
       ;; string used by Icomplete to separate alternatives in the minibuffer
       (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
@@ -2822,22 +2827,22 @@ to this definition.
 
       #+END_SRC
 
-***** Customize
+***** COMMENT Customize
 
       #+BEGIN_SRC emacs-lisp
 
       ;; always select the help window
-      (customize-set-variable 'help-window-select t)
+      (customize-set-variable 'help-window-select nil)
 
       ;; maximum height of a window displaying a temporary buffer.
       (customize-set-variable 'temp-buffer-max-height
                               (lambda (buffer)
                                 (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
-                                    (/ (x-display-pixel-height) (frame-char-height) 4)
-                                  (/ (- (frame-height) 4) 4))))
+                                    (/ (x-display-pixel-height) (frame-char-height) 2)
+                                  (/ (- (frame-height) 2) 2))))
 
-      ;; reference
-      ;; (customize-set-variable 'temp-buffer-max-height 12)
+      ;; the minimum total height, in lines, of any window
+      (customize-set-variable 'window-min-height 4)
 
       #+END_SRC
 
@@ -4012,14 +4017,14 @@ to this definition.
 
        ;; a list of secondary methods that will be used for reading news
        (customize-set-variable
-        'gnus-secondary-select-methods '((nntp "news.gwene.org")
-                                         (nnimap "gmail"
-                                                 (nnimap-address "imap.gmail.com")
-                                                 (nnimap-stream ssl)
-                                                 (nnimap-server-port "imaps")
-                                                 (nnimap-inbox "INBOX")
-                                                 (nnimap-fetch-partial-articles t)
-                                                 (nnimap-authinfo-file "~/.auth/auth.gpg"))))
+        'gnus-secondary-select-methods '((nntp "news.gwene.org")))
+       ;; (nnimap "gmail"
+       ;;         (nnimap-address "imap.gmail.com")
+       ;;         (nnimap-stream ssl)
+       ;;         (nnimap-server-port "imaps")
+       ;;         (nnimap-inbox "INBOX")
+       ;;         (nnimap-fetch-partial-articles t)
+       ;;         (nnimap-authinfo-file "~/.auth/auth.gpg"))))
 
        ;; if non-nil, automatically mark Gcc articles as read
        (customize-set-variable 'gnus-gcc-mark-as-read nil)
@@ -6405,8 +6410,7 @@ to this definition.
             (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
             (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
             (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
-            (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile)
-            (define-key emacs-lisp-mode-map (kbd "TAB") 'complete-at-point-or-indent))))
+            (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile))))
 
       #+END_SRC
 

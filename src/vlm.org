@@ -240,10 +240,6 @@ to this definition.
        (make-sparse-keymap)
        "Utils commands keymap.")
 
-     (defvar vlm-rtags-map
-       (make-sparse-keymap)
-       "Rtag commands keymap.")
-
      (defvar vlm-media-map
        (make-sparse-keymap)
        "Media commands keymap.")
@@ -264,8 +260,7 @@ to this definition.
                            vlm-utils-map
                            vlm-window-map
                            vlm-media-map
-                           vlm-completion-map
-                           vlm-rtags-map))
+                           vlm-completion-map))
        (define-prefix-command prefix-map))
 
      #+END_SRC
@@ -2183,19 +2178,19 @@ to this definition.
 
       ;; custom
       ;; pending-completions number over which to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-delay-completions-threshold 64)
+      (customize-set-variable 'icomplete-delay-completions-threshold 128)
 
       ;; maximum number of initial chars to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-max-delay-chars 2)
+      (customize-set-variable 'icomplete-max-delay-chars 4)
 
       ;; completions-computation stall, used only with large-number completions
-      (customize-set-variable 'icomplete-compute-delay 0.1)
+      (customize-set-variable 'icomplete-compute-delay 0)
 
       ;; when non-nil, show completions when first prompting for input
       (customize-set-variable 'icomplete-show-matches-on-no-input t)
 
       ;; when non-nil, hide common prefix from completion candidates
-      (customize-set-variable 'icomplete-hide-common-prefix nil)
+      (customize-set-variable 'icomplete-hide-common-prefix t)
 
       ;; maximum number of lines to use in the minibuffer
       (customize-set-variable 'icomplete-prospects-height 1)
@@ -2417,6 +2412,7 @@ to this definition.
                                 mode-line-mule-info
                                 mode-line-modified
                                 mode-line-remote
+                                (:eval (format "  %d/%d" exwm-workspace-current-index (exwm-workspace--count)))
                                 "  "
                                 (:eval (format-time-string "%H:%M"))
                                 "  "
@@ -5904,32 +5900,6 @@ to this definition.
 
 *** Testing
 **** Ert
-*** Building
-**** Cmake-ide
-
-     This package runs CMake and sets variables for IDE-like
-     functionality provided by other packages such as: On the fly
-     syntax checks with flycheck auto-completion using
-     auto-complete-clang or company-clang. Jump to definition and
-     refactoring with rtags.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'cmake-ide nil t)
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (add-hook 'c-mode-hook 'cmake-ide-setup)
-      ;; (add-hook 'c++-mode-hook 'cmake-ide-setup)
-
-      #+END_SRC
-
 *** Compilation
 **** Auto-compile
 
@@ -6625,57 +6595,6 @@ to this definition.
 
       #+END_SRC
 
-**** Rtags
-
-     RTags is a client/server application that indexes C/C++ code and keeps a
-     persistent file-based database of references, declarations, definitions,
-     symbolnames etc. There’s also limited support for ObjC/ObjC++.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'rtags nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; set rtags binary path
-      (customize-set-variable
-       'rtags-path
-       (expand-file-name "rtags/build/bin/" user-emacs-directory))
-
-      ;; method to use to display RTags results, like references
-      (customize-set-variable 'rtags-display-result-backend 'default)
-
-      ;; behavior for completing-read
-      (customize-set-variable 'rtags-completing-read-behavior 'insert-default-marked)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; vlm-rtags-map
-      (define-key vlm-rtags-map (kbd "l") 'rtags-taglist)
-      (define-key vlm-rtags-map (kbd "I") 'rtags-install)
-      (define-key vlm-rtags-map (kbd "y") 'rtags-symbol-type)
-      (define-key vlm-rtags-map (kbd "l") 'rtags-symbol-info)
-      (define-key vlm-rtags-map (kbd "n") 'rtags-rename-symbol)
-      (define-key vlm-rtags-map (kbd "m") 'rtags-asm-file)
-      (define-key vlm-rtags-map (kbd "h") 'rtags-find-file-history)
-      (define-key vlm-rtags-map (kbd "x") 'rtags-fixit)
-      (define-key vlm-rtags-map (kbd "d") 'rtags-diagnostics)
-      (define-key vlm-rtags-map (kbd "c") 'rtags-compile-file)
-      (define-key vlm-rtags-map (kbd "-") 'rtags-compilation-flags)
-      (define-key vlm-rtags-map (kbd ".") 'rtags-find-functions-called-by-this-function)
-
-      #+END_SRC
-
 **** CC-mode
 
      This package provides GNU Emacs major modes for editing C, C++,
@@ -6724,14 +6643,9 @@ to this definition.
       (eval-after-load 'cc-mode
         (lambda ()
           (when (and (boundp 'c-mode-map) (boundp 'c++-mode-map))
-            ;; set rtags prefix map in c-mode map (C-c r)
-            (define-key c-mode-map (kbd "C-c r") 'vlm-rtags-map)
-            (define-key c++-mode-map (kbd "C-c r") 'vlm-rtags-map)
-
             ;; complete or indent
             (define-key c-mode-map (kbd "TAB") 'complete-at-point-or-indent)
             (define-key c++-mode-map (kbd "TAB") 'complete-at-point-or-indent)
-
             ;; compilation keybind
             (define-key c-mode-map (kbd "C-c C-c")
               (lambda ()

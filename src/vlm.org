@@ -1,6 +1,6 @@
 #+TITLE: Virtual Lisp Machine
-#+AUTHOR: esac
-#+EMAIL: esac-io@tutanota.com
+#+AUTHOR: lambdart
+#+EMAIL: lambdart@protonmail.com
 #+DESCRIPTION: an org-mode based Emacs configuration
 #+KEYWORDS: emacs, org, liretate programming, config, init.el
 #+LANGUAGE: en
@@ -39,7 +39,8 @@ to this definition.
 * GOAL
 
   Use =Emacs= as the only dynamic interface between
-  human and machine, i.e, as a =VIRTUAL LISP MACHINE=.
+  human brain and machine resources, i.e,
+  as a =VIRTUAL LISP MACHINE=.
 
 * INIT
 
@@ -2408,15 +2409,16 @@ to this definition.
       ;; mode-line format
       (customize-set-variable 'mode-line-format
                               '("%e"
+                                (:eval (format "  %d/%d"
+                                               exwm-workspace-current-index
+                                               (exwm-workspace--count)))
+                                (:eval (format-time-string "  %H:%M"))
                                 mode-line-front-space
                                 mode-line-mule-info
                                 mode-line-modified
                                 mode-line-remote
-                                (:eval (format "  %d/%d" exwm-workspace-current-index (exwm-workspace--count)))
-                                "  "
-                                (:eval (format-time-string "%H:%M"))
-                                "  "
-                                "%l:%c"
+                                ;; 
+                                " (%l:%c)"
                                 " · "
                                 (:eval (propertized-buffer-identification "%b"))
                                 " · "
@@ -2429,22 +2431,6 @@ to this definition.
       #+END_SRC
 
 **** Wallpaper
-
-     Set default wallpaper.
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; set wallpaper
-      ;; (add-hook 'window-setup-hook
-      ;;           (lambda()
-      ;;             (set-wallpaper
-      ;;              "~/media/images/wallpapers/studio-ghibli/ghibli-7.jpg"
-      ;;              "-g -0-0")))
-
-      #+END_SRC
-
 *** Editing
 **** Indent
 
@@ -2923,16 +2909,15 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; non-nil means don’t record intermediate Info nodes to the history
-      (customize-set-variable 'info-history-skip-intermediate-nodes nil)
+      (customize-set-variable 'Info-history-skip-intermediate-nodes nil)
 
       ;; list of additional directories to search for
       ;; Info documentation files
-      (customize-set-variable
-       'Info-additional-directory-list
-       (list (expand-file-name "info" user-emacs-directory)))
+      (customize-set-variable 'Info-additional-directory-list
+                              (list (expand-file-name "info" user-emacs-directory)))
 
       ;; 0 -> means do not display breadcrumbs
-      ;; (customize-set-variable 'info-breadcrumbs-depth 0)
+      (customize-set-variable 'info-breadcrumbs-depth 0)
 
       #+END_SRC
 
@@ -4288,7 +4273,7 @@ to this definition.
                                  :port 6697
                                  :server-alias "freenode"
                                  :encryption tls
-                                 :nick "esac"
+                                 :nick "lambdart"
                                  :channels ("#rcirc #lisp-br #lispgames"))))
 
       #+END_SRC
@@ -5368,7 +5353,7 @@ to this definition.
 
       ;; url of the blog.
       (customize-set-variable
-       'org-weblog-url "https://esac-io.github.io/")
+       'org-weblog-url "https://lambdart.github.io/")
 
       ;; directory where published HTML files are stored
       (customize-set-variable

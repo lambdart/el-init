@@ -1,5 +1,5 @@
-#+AUTHOR: esac
-#+EMAIL: esac-io@tutanota.com
+#+AUTHOR: lambdart
+#+EMAIL: lambdart@protonmail.com
 #+KEYWORDS: virtual lisp machine, vlm, readme
 #+LANGUAGE: en
 #+STARTUP: overview
@@ -265,7 +265,7 @@
   example below uses curl.
 
   #+BEGIN_SRC
-     sh -c "$(curl -fsSL https://raw.githubusercontent.com/esac-io/vlm/master/scripts/install.sh)"
+     sh -c "$(curl -fsSL https://raw.githubusercontent.com/lambdart/vlm/master/scripts/install.sh)"
   #+END_SRC
 
   Steps performed by the script:

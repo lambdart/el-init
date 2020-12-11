@@ -326,6 +326,9 @@ to this definition.
      ;; non-nil inhibits the initial startup echo area message
      (customize-set-variable 'inhibit-startup-echo-area-message nil)
 
+     ;; email address of the current user
+     (customize-set-variable 'user-mail-address "lambdart@protonmail.com")
+
      #+END_SRC
 
 *** Warnings
@@ -1123,6 +1126,16 @@ to this definition.
 
       #+END_SRC
 
+***** Functions
+
+      #+BEGIN_SRC emacs-lisp
+
+      (defun vlm-kill-emacs-query-function ()
+        "Asks for Emacs kill confirmation."
+        (y-or-n-p "[kill-emacs]: Are you sure? "))
+
+      #+END_SRC
+
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
@@ -1152,7 +1165,13 @@ to this definition.
       ;; with a newline
       (customize-set-variable 'require-final-newline t)
 
-      ;; backup directory list
+      ;; non-nil if Emacs should confirm killing processes on exit
+      (customize-set-variable 'confirm-kill-processes nil)
+
+      ;; functions to call with no arguments to query about killing Emacs
+      (customize-set-variable 'kill-emacs-query-functions
+                              `(server-kill-emacs-query-function vlm-kill-emacs-query-function))
+
       ;; alist of filename patterns and backup directory names
       (customize-set-variable 'backup-directory-alist '(("" . "~/.emacs.d/backup")))
 
@@ -1164,8 +1183,8 @@ to this definition.
 
       ;; create cache directory, if necessary
       ;; (add-hook 'window-setup-hook
-      ;; (lambda ()
-      ;; (mkdir (concat user-emacs-directory "cache"))))
+      ;;           (lambda ()
+      ;;             (mkdir (concat user-emacs-directory "cache") t)))
 
       #+END_SRC
 
@@ -1423,12 +1442,16 @@ to this definition.
       (eval-after-load 'dired
         (lambda ()
           (when (boundp 'dired-mode-map)
+            (define-key dired-mode-map (kbd "c") 'dired-do-copy)
+            (define-key dired-mode-map (kbd "e") 'dired-create-empty-file)
+            (define-key dired-mode-map (kbd "C") 'dired-do-compress-to)
+            ;; redundancy
             (define-key dired-mode-map (kbd "RET") 'dired-find-alternate-file)
             (define-key dired-mode-map (kbd "C-j") 'dired-find-alternate-file))))
 
-      ;; ctl-x-map
-      (define-key ctl-x-map (kbd "C-d") 'dired-jump)
+      ;; ctl-x-map (redundancy)
       (define-key ctl-x-map (kbd "d") 'dired)
+      (define-key ctl-x-map (kbd "C-d") 'dired)
 
       #+END_SRC
 
@@ -1514,6 +1537,8 @@ to this definition.
        `(cond ((find-font (font-spec :name ,font))
                (set-frame-font ,font nil t))))
 
+     ;; (safe-set-frame-font "Iosevka Fixed:pixelsize=24:width=regular:weight=regular")
+
      #+END_SRC
 
 **** Enable
@@ -1584,7 +1609,7 @@ to this definition.
       (customize-set-variable 'window-sides-vertical nil)
 
       ;; non-nil value means always make a separate frame
-      ;; (customize-set-variable 'pop-up-frames nil)
+      (customize-set-variable 'pop-up-frames nil)
 
       #+END_SRC
 
@@ -1704,15 +1729,14 @@ to this definition.
      ;; kill process not confirmation required
      ;; list of functions called with no args to query before killing a buffer.
      ;; The buffer being killed will be current while the functions are running.
-     ;; (customize-set-variable
-     ;;  'kill-buffer-query-functions
-     ;;  (remq 'process-kill-buffer-query-function kill-buffer-query-functions))
+     (customize-set-variable 'kill-buffer-query-functions nil)
+     ;; (process-kill-buffer-query-function)
 
      ;; non-nil means load prefers the newest version of a file.
      (customize-set-variable 'load-prefer-newer t)
 
-     ;; enable: (erase-buffer)
-     ;; Delete the entire contents of the current buffer.
+     ;; delete the entire contents of the current buffer
+     ;; enable: M-x erase-buffer RET
      (add-hook 'window-setup-hook
                (lambda ()
                  (put 'erase-buffer 'disabled nil)))
@@ -1945,7 +1969,7 @@ to this definition.
       (customize-set-variable 'minibuffer-default-prompt-format " [%s] ")
 
       ;; if non-nil, shorten "(default ...)" to "[...]" in minibuffer prompts
-      (customize-set-variable 'minibuffer-eldef-shorten-default t)
+      (customize-set-variable 'minibuffer-eldef-shorten-default nil)
 
       ;; non-nil means to delete duplicates in history
       (customize-set-variable 'history-delete-duplicates t)
@@ -1989,17 +2013,19 @@ to this definition.
       ;; (define-key minibuffer-local-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       ;; goto-map
-      (define-key goto-map (kbd "M-SPC") 'goto-minibuffer-window)
-      (define-key goto-map (kbd "C-M-i") 'goto-completions-window)
+      ;; (define-key goto-map (kbd "M-SPC") 'goto-minibuffer-window)
+      ;; (define-key goto-map (kbd "C-M-i") 'goto-completions-window)
+      ;; (define-key goto-map (kbd "C-M-i") 'goto-completions-window)
       ;; (define-key goto-map (kbd "M-v") 'goto-minibuffer-or-completions-window)
 
-      ;; clt-x-map quit minibuffer
-      (global-set-key (kbd "<C-delete>") 'quit-minibuffer)
+      ;; ctl-x-map goes to completions window
+      (define-key ctl-x-map (kbd "C-o") 'goto-completions-window)
 
       ;; vlm-completion-map: completion-at-point (experimental)
-      (define-key vlm-completion-map (kbd "a") 'completion-at-point)
+      ;; (define-key vlm-completion-map (kbd "a") 'completion-at-point)
 
       ;; global
+      (global-set-key (kbd "<C-delete>") 'quit-minibuffer)
       (global-set-key (kbd "M-x") 'goto-minibuffer-or-call-it)
 
       #+END_SRC
@@ -2409,14 +2435,14 @@ to this definition.
       ;; mode-line format
       (customize-set-variable 'mode-line-format
                               '("%e"
-                                (:eval (format "  %d/%d"
-                                               exwm-workspace-current-index
-                                               (exwm-workspace--count)))
-                                (:eval (format-time-string "  %H:%M"))
                                 mode-line-front-space
                                 mode-line-mule-info
                                 mode-line-modified
                                 mode-line-remote
+                                (:eval (format "  %d/%d"
+                                               exwm-workspace-current-index
+                                               (exwm-workspace--count)))
+                                (:eval (format-time-string "  %H:%M"))
                                 ;; 
                                 " (%l:%c)"
                                 " · "
@@ -2534,7 +2560,7 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; global-map
-      (global-set-key (kbd "M-c") 'comment-or-uncomment-region)
+      (global-set-key (kbd "M-c") 'comment-line)
 
       #+END_SRC
 
@@ -2809,24 +2835,24 @@ to this definition.
 
       #+END_SRC
 
-***** COMMENT Customize
+**** Customize
 
-      #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp
 
-      ;; always select the help window
-      (customize-set-variable 'help-window-select nil)
+     ;; always select the help window
+     (customize-set-variable 'help-window-select nil)
 
-      ;; maximum height of a window displaying a temporary buffer.
-      (customize-set-variable 'temp-buffer-max-height
-                              (lambda (buffer)
-                                (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
-                                    (/ (x-display-pixel-height) (frame-char-height) 2)
-                                  (/ (- (frame-height) 2) 2))))
+     ;; maximum height of a window displaying a temporary buffer.
+     (customize-set-variable 'temp-buffer-max-height
+                             (lambda (buffer)
+                               (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
+                                   (/ (x-display-pixel-height) (frame-char-height) 2)
+                                 (/ (- (frame-height) 2) 2))))
 
-      ;; the minimum total height, in lines, of any window
-      (customize-set-variable 'window-min-height 4)
+     ;; the minimum total height, in lines, of any window
+     (customize-set-variable 'window-min-height 4)
 
-      #+END_SRC
+     #+END_SRC
 
 ***** Display
 
@@ -2911,10 +2937,15 @@ to this definition.
       ;; non-nil means don’t record intermediate Info nodes to the history
       (customize-set-variable 'Info-history-skip-intermediate-nodes nil)
 
-      ;; list of additional directories to search for
-      ;; Info documentation files
-      (customize-set-variable 'Info-additional-directory-list
-                              (list (expand-file-name "info" user-emacs-directory)))
+      ;; list of additional directories to search for (not working)
+      ;; (customize-set-variable 'Info-additional-directory-list
+      ;;                         `(,(expand-file-name "info/" user-emacs-directory)))
+
+      ;; list of directories to search for Info documentation files (works!)
+      (customize-set-variable 'Info-directory-list
+                              `("/usr/local/share/emacs/info/"
+                                "/usr/local/share/info/"
+                                ,(expand-file-name "info/" user-emacs-directory)))
 
       ;; 0 -> means do not display breadcrumbs
       (customize-set-variable 'info-breadcrumbs-depth 0)
@@ -3593,7 +3624,6 @@ to this definition.
                  (lambda()
                    ;; do not display continuation lines.
                    (setq truncate-lines nil)
-
                    ;; setup keybinds
                    (safe-funcall 'term-setup-keystroke)))
 
@@ -3602,14 +3632,12 @@ to this definition.
                  (lambda ()
                    (when (and (boundp 'term-raw-map)
                               (boundp 'term-mode-map))
-
                      ;; term-raw-map
                      (define-key term-raw-map (kbd "s-q") 'term-line-mode)
-
                      ;; term-mode-map
                      (define-key term-mode-map (kbd "s-q") 'term-char-mode))))
 
-       ;; hook run after the term buffer is killed.
+       ;; hook run after the term buffer is killed (not working)
        (add-hook 'kill-buffer-hook 'term-kill-buffer-hook)
 
        #+END_SRC
@@ -5916,6 +5944,13 @@ to this definition.
       ;; if t, always kill a running compilation process before starting a new one
       (customize-set-variable 'compilation-always-kill t)
 
+      ;; non-nil means M-x compile asks which buffers to save before compiling
+      ;; otherwise, it saves all modified buffers without asking
+      (customize-set-variable 'compilation-ask-about-save nil)
+
+      ;; if non-nil, automatically jump to the first error during compilation
+      ;; (customize-set-variable 'compilation-auto-jump-to-first-error nil)
+
       #+END_SRC
 
 ***** Hooks
@@ -6083,7 +6118,6 @@ to this definition.
       (customize-set-variable 'speedbar-use-imenu-flag t)
 
       #+END_SRC
-
 ** Development
 *** Generic
 
@@ -6396,6 +6430,21 @@ to this definition.
      ;; program name for invoking an inferior Lisp with for
      ;; inferior lisp mode
      (customize-set-variable 'inferior-lisp-program "sbcl")
+
+     #+END_SRC
+
+*** Geiser
+**** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (require 'geiser nil t)
+
+     #+END_SRC
+
+**** Customize
+
+     #+BEGIN_SRC emacs-lisp
 
      #+END_SRC
 

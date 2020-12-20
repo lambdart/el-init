@@ -6,163 +6,32 @@ _GREEN=""
 _RESET=""
 _YELLOW=""
 
-# repositories
-_CASK_REPO="https://github.com/cask/cask"
-_EOS_REPO="https://github.com/esac-io/eos"
+_VLM_URL="https://github.com/lambdart/vlm"
 
-# default directories
-_EOS_DIR="$HOME/.eos"
-_CASK_DIR="$HOME/.cask"
+# primary directories
+_VLM_DEST="$HOME/.vlm"
 _EMACS_DIR="$HOME/.emacs.d"
+
+# default directory
+_VLM_DEFAULT_DIR=${_VLM_DEST}/default/
+
+# lisp directories
+_VLM_SITE_DIR=${_VLM_DEST}/src/site-lisp
 
 # emacs backup
 _EMACS_BACKUP=
 
 # flags
-# _FLAG_BACKUP=1
-_FLAG_SYMLINK=1
-
-# defaults
-_DEFAULT_DIR=
-_DEFAULT_FILES="adapt.el Cask"
-_DEFAULT_PREFIX="default."
-
-# banner
-banner() {
-    # print help message
-    cat <<-'EOF'
-       __________________
-      / ____// __ \/ ___/
-     / __/  / / / /\__ \
-    / /___ / /_/ /___/ /
-   /_____/ \____//____/
-                 ... installation script
-EOF
-}
-
-# show help message
-usage() {
-    # print help message
-    printf $_GREEN
-    cat <<-'EOF'
-
-  sh install.sh [-hlx] [-m PATH] [-c PATH]
-
-  -h    show help message and exit
-  -x    enable debugging
-  -v    enable verbose
-  -l    disables symlink (.emacs.d -> eos/src)
-
-  -m PATH
-      defines eos default directory
-
-  -c PATH
-        defines cask default directory
-
-  Examples:
-
-  [1] : ./install.sh
-  [2] : ./install.sh -h
-  [3] : ./install.sh -m .
-  [3] : cd eos/scripts; ./install.sh -m ..
-  [4] : ./install.sh -c ~/.local/share/cask -x
-
-EOF
-    printf $_RESET
-}
-
-# die message stdout
-die() {
-    printf "$_RED [-] Error: $@" >&2; exit 1
-}
-
-# verify if a command exists
-command_exists() {
-    command -v "$@" >/dev/null 2>&1
-}
-
-# check dependencies
-check_deps() {
-    command_exists git || die 'git not found';
-    command_exists emacs || die "emacs not found";
-    command_exists python || die "python not found";
-}
-
-# git clone
-git_clone() {
-    # params
-    local _url=$1
-    local _folder=$2
-
-    # if folder do not exists, git clone
-    test ! -d $_folder && \
-        git clone $_url $_folder > /dev/null 2>&1
-
-    # cloned?
-    test ! -d $_folder && \
-        die "was not possible to clone eos repo"
-
-    # ok: cloned!
-    return 0
-}
-
-# generate random string
-get_rand_str() {
-    # generate
-    cat /dev/urandom | \
-        env LC_CTYPE=C tr -dc a-z0-9 | \
-        head -c 8; \
-        echo
-}
-
-# backup ~/.emacs.d dir
-backup_emacs() {
-    # already a symlink?
-    test -h ${_EMACS_DIR} && {
-        unlink ${_EMACS_DIR}
-        return 0
-    }
-
-    # backup
-    test -d ${_EMACS_DIR} && \
-        mv ${_EMACS_DIR} $_EMACS_BACKUP
-}
-
-# handle eos/src symlink
-handle_symlink() {
-    # make symlink
-    ln -s ${_EOS_DIR}/src ${_EMACS_DIR};
-}
-
-# handle eos/src copy
-copy_eos() {
-    # if .emacs.d do not exists, copy
-    test ! -d ${_EMACS_DIR} && \
-        cp -rp ${_EOS_DIR}/src ${_EMACS_DIR}
-}
-
-# this function will copy the default files
-# to the right location: ~/.emacs.d
-copy_defaults() {
-    # copy default files
-    for _f in $_DEFAULT_FILES; do
-        # default file
-        _file=${_DEFAULT_DIR}/${_DEFAULT_PREFIX}${_f}
-
-        # destination
-        _dest=${_EMACS_DIR}/${_f}
-
-        # if exist, continue
-        test -f $_dest && \
-            continue;
-
-        # else copy
-        cp -p $_file $_dest
-    done
-}
+# create .emacs.d backup?
+# create .emacs.d symlink?
+# 0 means no
+# 1 means yes
+_BACKUP_FLAG=1
+_SYMLINK_FLAG=1
 
 # set colors if file descriptor is associated with a terminal
-setup_colors() {
+setup_colors()
+{
     # True if the file whose file descriptor number is
     # file_descriptor is open and is associated with a terminal.
     # test(1)
@@ -174,43 +43,165 @@ setup_colors() {
     }
 }
 
-# handle cask
-setup_cask() {
-    # clone cask repository (if necessary)
-    test ! -d $_CASK_DIR && {
-        git_clone $_CASK_REPO $_CASK_DIR
+# print banner
+banner()
+{
+    cat <<-'EOF'
+      (`-.             _   .-')
+    _(OO  )_          ( '.( OO )_
+,--(_/   ,. \ ,--.     ,--.   ,--.)
+\   \   /(__/ |  |.-') |   `.'   |
+ \   \ /   /  |  | OO )|         |
+  \   '   /,  |  |`-' ||  |'.'|  |
+   \     /__)(|  '---.'|  |   |  |
+    \   /     |      | |  |   |  |
+     `-'      `------' `--'   `--'
+                 ... installation script
+EOF
+}
 
-        # if directory was clonned,
+# show help message
+usage()
+{
+    printf $_GREEN
+    cat <<-'EOF'
+
+  sh install.sh [-hlx] dest
+
+  -h    show help message and exit
+  -x    enable debugging
+  -v    enable verbose
+  -l    disables symlink (.emacs.d -> vlm/src)
+
+  dest  vlm default destination path
+
+  Examples:
+
+  [1] : ./install.sh
+  [2] : ./install.sh -h
+  [3] : ./install.sh .
+  [3] : cd vlm/scripts; ./install.sh ..
+
+EOF
+    printf $_RESET
+}
+
+# die message stdout
+die()
+{
+    printf "$_RED [-] Error: $@" >&2; exit 1
+}
+
+# verify if a command exists
+command_exists()
+{
+    command -v "$@" >/dev/null 2>&1
+}
+
+# check dependencies
+check_deps()
+{
+    command_exists git || die 'git not found';
+    command_exists emacs || die "emacs not found";
+}
+
+# git clone
+git_clone()
+{
+    # params
+    local _url=$1
+    local _folder=$2
+
+    # if folder do not exists, git clone
+    test ! -d $_folder && \
+        git clone -q $_url $_folder
+
+    # cloned?
+    test ! -d $_folder && \
+        die "was not possible to clone EOS"
+}
+
+# generate random string
+gen_rand_str()
+{
+    # generate
+    cat /dev/urandom | \
+        env LC_CTYPE=C tr -dc a-z0-9 | \
+        head -c 8; \
+        echo
+}
+
+# backup emacs default folder
+# usually (~/.emacs.d)
+backup_emacs()
+{
+    # already a symlink, if so, just unlink it
+    test -h ${_EMACS_DIR} && {
+        unlink ${_EMACS_DIR}
+        return 0
+    }
+
+    # otherwise rename .emacs.d folder
+    test -d ${_EMACS_DIR} && \
+        mv ${_EMACS_DIR} $_EMACS_BACKUP
+}
+
+# create symlink
+create_symlink()
+{
+    ln -s ${_VLM_DEST}/src ${_EMACS_DIR};
+}
+
+# copy vlm/src directory
+copy_vlm()
+{
+    # if .emacs.d do not exists, copy vlm source
+    test ! -d ${_EMACS_DIR} && \
+        cp -rp ${_VLM_DEST}/src ${_EMACS_DIR}
+}
+
+# this function will copy the default files
+# to the right location: ~/.emacs.d
+copy_subdir()
+{
+    # create directories if they do not exists (site-lisp, lisp)
+    mkdir ${_VLM_SITE_DIR}
+
+    # copy subdirs to lisp and site-lisp directories
+    cp -p ${_VLM_DEFAULT_DIR}/default.subdirs.el ${_VLM_SITE_DIR}/subdirs.el
+}
+
+# download vlm
+clone_vlm()
+{
+    # clone vlm repository (if necessary)
+    test ! -d $_VLM_DEST && {
+        # dump vlm
+        git_clone $_VLM_URL $_VLM_DEST
+
         test ! $? -eq 0 && \
-            die "was not possible to dump cask repository."
+            die "was not possible to clone EOS"
     }
 }
 
-# download eos
-setup_eos() {
-    # clone eos repository (if necessary)
-    test ! -d $_EOS_DIR && {
-        # dump eos
-        git_clone $_EOS_REPO $_EOS_DIR
+# git clone list of packages
+# clone_packages ()
+# {
+#     # add packages (libraries) list
+#     # the list of git repositories
+#     . packages.sh
 
-        test ! $? -eq 0 && \
-            die "was not possible to clone eos repository."
-    }
-}
+#     for package in $@; do
+#         git_clone package;
+#     done;
+# }
 
-# install emacs packages listed on Cask file
-# OBS: uses cask binary
-install_packages () {
-    (cd ${_EMACS_DIR}; ${_CASK_DIR}/bin/cask install)
-}
-
-# build: org tangle and compile
-build_eos() {
-    # load build.sh
-    . ${_EOS_DIR}/scripts/build.sh
-
-    # calls cask build
-    (cd ${_EMACS_DIR}; ${_CASK_DIR}/bin/cask build)
+# build vlm, i.e, tangle the source code blocks
+# from the org file and byte-compile the generated
+# init.el final script
+make_vlm()
+{
+    make -C core/dev/vlm/src all
 }
 
 # todo: define options
@@ -224,17 +215,9 @@ parse_opts() {
             # enable verbose
             -v) shift 1; set -v ;;
 
-            # set cask target directory
-            -c)
-                shift 1; _CASK_DIR=`readlink -f "${1}"`; shift 1 ;;
-
-            # set eos target directory
-            -m)
-                shift 1; _EOS_DIR=`readlink -f "${1}"`; shift 1 ;;
-
             # disable symlink? yes!
             -l)
-                shift 1; _FLAG_SYMLINK=0 ;;
+                shift 1; _SYMLINK_FLAG=0 ;;
 
             # help message and exit
             --help|-h)
@@ -242,25 +225,27 @@ parse_opts() {
         esac
     done
 
-    # update params
-    _DEFAULT_DIR=${_EOS_DIR}/default
+    # set vlm target directory
+    _VLM_DEST=`readlink -f "${1}"`;;
 
-    # the get_rand_str contat is used to avoid conflicts
+    # update vlm default directory
+    _VLM_DEFAULT_DIR=${_VLM_DEST}/default
+
+    # the gen_rand_str contat is used to avoid conflicts
     # set emacs backup directory
-    _EMACS_BACKUP=${_EMACS_DIR}.old.`get_rand_str`
+    _EMACS_BACKUP=${_EMACS_DIR}.old.`gen_rand_str`
 }
 
-show_opt_values() {
-    # todo: replace this for a better syntax
-    # todo: research sh(1) Parameter Expansion
-    local _a="yes"
+show_opts()
+{
+    local _flag="no"
 
     # show banner
     banner
 
     # verify flags
-    test $_FLAG_SYMLINK -eq 0 && \
-        _a="no";
+    test $_SYMLINK_FLAG -gt 0 && \
+        _flag="yes";
 
     test -h ${_EMACS_DIR} && \
         _EMACS_BACKUP="unlink"
@@ -269,17 +254,17 @@ show_opt_values() {
     printf $_GREEN
     printf \
         "[*] Options values:
-  EOS dir  : $_EOS_DIR
-  Cask dir : $_CASK_DIR
-  Backup   : $_EMACS_BACKUP
-  Symlink  : $_a
+  EOS_DIR : $_VLM_DEST
+  BACKUP  : $_EMACS_BACKUP
+  SYMLINK : $_flag
   \n"
     printf $_RESET
 }
 
 # show values and operations that will be executed to the user
-# if we receive user's confirmation, then install eos
-should_install() {
+# if we receive user's confirmation, then install vlm
+confirm()
+{
     local _answer=
 
     # question
@@ -307,38 +292,43 @@ should_install() {
     done
 }
 
-# install main
-main() {
-    # check dependencies (emacs, git and python)
-    check_deps
-
-    # parse options
-    parse_opts $@
-
-    # show options
-    show_opt_values
-
-    # install?
-    should_install || exit 1;
-
-    # setup eos and cask (package manager)
-    setup_eos; setup_cask
-
-    # backup ~/.emacs.d folder
-    backup_emacs
+install_vlm()
+{
+    # clone vlm repository
+    clone_vlm;
 
     # handle symlink or copy?
-    test $_FLAG_SYMLINK -eq 1 && \
-        handle_symlink || copy_eos
+    test $_SYMLINK_FLAG -eq 1 && \
+        create_symlink || copy_vlm
 
     # copy default files
     copy_defaults
 
-    # setup cask (package manager) and install emacs packages
-    install_packages
+    # clone packages
+    clone_packages
 
-    # build eos: tangle and compile
-    build_eos
+    # build vlm: call make to tangle and compile
+    make_vlm
+}
+
+# main: handle logic
+main()
+{
+    # parse options
+    parse_opts $@
+
+    # show options
+    show_opts
+
+    # should install?
+    confirm || exit 1;
+
+    # handle emacs backup
+    backup_emacs
+
+    # install vlm, i.e, download the repositories
+    # and copy files to the right location
+    install_vlm
 
     # final message
     printf $_GREEN
@@ -347,6 +337,9 @@ main() {
      [+] Run emacs and enjoy! :)
 EOF
 }
+
+# check dependencies (emacs and git)
+check_deps
 
 # setup colors
 setup_colors

@@ -1132,6 +1132,7 @@ to this definition.
 
       (defun vlm-kill-emacs-query-function ()
         "Asks for Emacs kill confirmation."
+        (interactive)
         (y-or-n-p "[kill-emacs]: Are you sure? "))
 
       #+END_SRC
@@ -1537,7 +1538,7 @@ to this definition.
        `(cond ((find-font (font-spec :name ,font))
                (set-frame-font ,font nil t))))
 
-     ;; (safe-set-frame-font "Iosevka Fixed:pixelsize=24:width=regular:weight=regular")
+     ;; (safe-set-frame-font "Iosevka Fixed:pixelsize=22:width=regular:weight=regular")
 
      #+END_SRC
 
@@ -2441,7 +2442,7 @@ to this definition.
                                 mode-line-remote
                                 (:eval (format "  %d/%d"
                                                exwm-workspace-current-index
-                                               (exwm-workspace--count)))
+                                               (- (exwm-workspace--count) 1)))
                                 (:eval (format-time-string "  %H:%M"))
                                 ;; 
                                 " (%l:%c)"
@@ -3029,7 +3030,7 @@ to this definition.
 
     #+END_SRC
 
-**** Lazy
+**** Lazy-Load
 
      Automatic generate `autoload' definitions.
 
@@ -3037,7 +3038,7 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'lazy)
+      ;; (require 'lazy-load nil t)
 
       #+END_SRC
 
@@ -3046,22 +3047,22 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; non-nil means starts to monitor the directories
-      (customize-set-variable 'lazy-enable-filenotify-flag t)
+      (customize-set-variable 'lazy-load-enable-filenotify-flag t)
 
       ;; non-nil means show debug messages
-      (customize-set-variable 'lazy-debug-messages-flag t)
+      (customize-set-variable 'lazy-load-debug-messages-flag t)
 
-      ;; non-nil means run `lazy-update-autoloads' when emacs is idle
-      (customize-set-variable 'lazy-enable-run-idle-flag nil)
+      ;; non-nil means run `lazy-load-update-autoloads' when emacs is idle
+      (customize-set-variable 'lazy-load-enable-run-idle-flag nil)
 
       ;; idle timer value
-      (customize-set-variable 'lazy-idle-seconds 15)
+      (customize-set-variable 'lazy-load-idle-seconds 15)
 
       ;; interval in seconds, used to trigger the timer callback
-      (customize-set-variable 'lazy-timer-interval 8)
+      (customize-set-variable 'lazy-load-timer-interval 8)
 
       ;; target files and directories
-      (customize-set-variable 'lazy-files-alist
+      (customize-set-variable 'lazy-load-files-alist
                               (list
                                ;; lisp directory
                                (cons "lisp-loaddefs.el"
@@ -3078,7 +3079,7 @@ to this definition.
 
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (funcall 'turn-on-lazy-mode)))
+                  (funcall 'turn-on-lazy-load-mode)))
 
       #+END_SRC
 
@@ -4147,10 +4148,10 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      (eval-after-load 'gnus-group
+      (eval-after-load 'gnus-group-mode
         (lambda ()
           (when (boundp 'gnus-group-mode-map)
-            (define-key gnus-group-mode-map (kbd "<tab>") 'gnus-group-select-group))))
+            (define-key gnus-group-mode-map (kbd "TAB") 'gnus-group-select-group))))
 
       #+END_SRC
 
@@ -5493,7 +5494,7 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'dash-docs nil t)
+      ;; (require 'ddoc nil t)
 
       #+END_SRC
 
@@ -5503,14 +5504,14 @@ to this definition.
 
       ;; default path for docsets
       (customize-set-variable
-       'dash-docs-docsets-path
+       'ddoc-docsets-path
        (concat (expand-file-name user-emacs-directory) "docsets"))
 
       ;; minimum length to start searching in docsets
-      ;; (customize-set-variable 'dash-docs-min-length 0)
+      ;; (customize-set-variable 'ddoc-min-length 0)
 
       ;; format of the displayed candidates
-      (customize-set-variable 'dash-docs-candidate-format "%d %t %n")
+      (customize-set-variable 'ddoc-candidate-format "%d %t %n")
 
       #+END_SRC
 
@@ -5518,10 +5519,10 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      (defun vlm-set-dash-docset (docset)
+      (defun vlm-activate-docset (docset)
         "Activate a DOCSET, if available."
-        (when (fboundp 'dash-docs-activate-docset)
-          (funcall 'dash-docs-activate-docset docset)))
+        (when (fboundp 'ddoc-activate-docset)
+          (funcall 'ddoc-activate-docset docset)))
 
       #+END_SRC
 
@@ -5530,11 +5531,11 @@ to this definition.
       #+BEGIN_SRC emacs-lisp
 
       ;; vlm-docs-map
-      ;; (define-key vlm-docs-map (kbd "u") 'dash-docs-update-docset)
-      (define-key vlm-docs-map (kbd "i") 'dash-docs-install-docset)
-      (define-key vlm-docs-map (kbd "a") 'dash-docs-activate-docset)
-      (define-key vlm-docs-map (kbd "d") 'dash-docs-deactivate-docset)
-      (define-key vlm-docs-map (kbd "l") 'dash-docs-find-file)
+      ;; (define-key vlm-docs-map (kbd "u") 'ddoc-update-docset)
+      (define-key vlm-docs-map (kbd "i") 'ddoc-install-docset)
+      (define-key vlm-docs-map (kbd "a") 'ddoc-activate-docset)
+      (define-key vlm-docs-map (kbd "d") 'ddoc-deactivate-docset)
+      (define-key vlm-docs-map (kbd "l") 'ddoc-find-file)
 
       #+END_SRC
 
@@ -5542,10 +5543,10 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; enable dash-docs after emacs startup
+      ;; enable ddoc after emacs startup
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (funcall 'turn-on-dash-docs-mode)))
+                  (funcall 'turn-on-ddoc-mode)))
 
       #+END_SRC
 
@@ -6585,7 +6586,7 @@ to this definition.
       (add-hook 'elixir-mode-hook
                 (lambda ()
                   ;; set dash docsets
-                  (vlm-set-dash-docset '"Elixir")))
+                  (vlm-activate-docset '"Elixir")))
 
       #+END_SRC
 
@@ -6661,12 +6662,12 @@ to this definition.
       (add-hook 'c-mode-hook
                 (lambda ()
                   ;; set dash docset
-                  (vlm-set-dash-docset '"C")))
+                  (vlm-activate-docset '"C")))
 
       (add-hook 'c++-mode-hook
                 (lambda ()
                   ;; set dash docset
-                  (vlm-set-dash-docset '"C++")))
+                  (vlm-activate-docset '"C++")))
 
       #+END_SRC
 
@@ -6728,7 +6729,7 @@ to this definition.
       (add-hook 'go-mode-hook
                 (lambda ()
                   ;; set dash docsets
-                  (vlm-set-dash-docset '"Go")))
+                  (vlm-activate-docset '"Go")))
 
       #+END_SRC
 
@@ -6836,7 +6837,7 @@ to this definition.
       (add-hook 'lua-mode-hook
                 (lambda ()
                   ;; activate dash docset
-                  (vlm-set-dash-docset "Lua")))
+                  (vlm-activate-docset "Lua")))
 
       #+END_SRC
 
@@ -6924,7 +6925,7 @@ to this definition.
       (add-hook 'python-mode-hook
                 (lambda ()
                   ;; set dash docsets
-                  (vlm-set-dash-docset '"Python 3")))
+                  (vlm-activate-docset '"Python 3")))
 
       #+END_SRC
 
@@ -7003,7 +7004,7 @@ to this definition.
       (add-hook 'mql-mode-hook
                 (lambda ()
                   ;; activate mql5 docset
-                  (vlm-set-dash-docset '"mql5")))
+                  (vlm-activate-docset '"mql5")))
 
       #+END_SRC
 

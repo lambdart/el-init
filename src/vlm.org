@@ -20,8 +20,7 @@ epithet for =Emacs=, because these days it looks more and more like
 an operating system.
 
 So, =VLM= stands for =Virtual Lisp Machine= and the prefix
-=vlm-= will appear often through this document in reference
-to this definition.
+=vlm-= will appear often through this document.
 
 * INTRO
 
@@ -35,12 +34,6 @@ to this definition.
   in a literate programming format, meaning it contains
   Elisp source code blocks - that will be tangled generating the
   =init.el= final script - and the referent documentation.
-
-* GOAL
-
-  Use =Emacs= as the only dynamic interface between
-  human brain and machine resources, i.e,
-  as a =VIRTUAL LISP MACHINE=.
 
 * INIT
 
@@ -145,14 +138,7 @@ to this definition.
      #+BEGIN_SRC emacs-lisp
 
      ;; threshold inital value
-     ;; gc-cons-percentage 0.5)
      (setq gc-cons-threshold most-positive-fixnum) ; 2^61 bytes
-
-     #+END_SRC
-
-**** Hooks
-
-     #+BEGIN_SRC emacs-lisp
 
      #+END_SRC
 
@@ -409,12 +395,6 @@ to this definition.
 
     #+BEGIN_SRC emacs-lisp
 
-    ;; set term to eterm-color
-    ;; (setenv "TERM" "eterm-color")
-
-    ;; the full name of the user logged in
-    ;; (customize-set-variable 'user-login-name (getenv "USER"))
-
     ;; the email address of the current user
     ;; (customize-set-variable 'user-mail-address nil)
 
@@ -636,7 +616,7 @@ to this definition.
       (customize-set-variable 'tramp-default-method "ssh")
 
       ;; if non-nil, chunksize for sending input to local process.
-      ;; (customize-set-variable 'tramp-chunksize 512)
+      ;; (customize-set-variable 'tramp-chunksize 64)
 
       ;; a value of t would require an immediate reread during filename completion,
       ;; nil means to use always cached values for the directory contents.
@@ -1103,9 +1083,25 @@ to this definition.
 ** Vanilla
 
    Major Structures of Emacs: Files, Buffer, Windows, Frames, Input,
-   International, Commands, Completions, Editing ...
+   International, Commands, Completions, Editing...
 
-   Basically the 'C' (core) system.
+   Basically the 'C' (core) system and fundamental ELISP libraries.
+
+*** X
+
+    #+BEGIN_SRC emacs-lisp
+
+    ;; non-nil means normalize frame before maximizing (not working)
+    ;; (customize-set-variable 'x-frame-normalize-before-maximize nil)
+
+    ;; if non-nil with a Gtk+ built Emacs, the Gtk+ tooltip is used
+    (customize-set-variable 'x-gtk-use-system-tooltips t)
+
+    ;; if this equals the symbol ’hide’, Emacs temporarily hides the child
+    ;; frame during resizing (testing)
+    (customize-set-variable 'x-gtk-resize-child-frames 'resize-mode)
+
+    #+END_SRC
 
 *** Files
 
@@ -1516,7 +1512,7 @@ to this definition.
      ;; set transparency after a frame is created
      (add-hook 'after-make-frame-functions
                (lambda (frame)
-                 (set-frame-transparency .8)))
+                 (set-transparency .8)))
 
      #+END_SRC
 
@@ -2013,12 +2009,6 @@ to this definition.
       (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
       ;; (define-key minibuffer-local-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
-      ;; goto-map
-      ;; (define-key goto-map (kbd "M-SPC") 'goto-minibuffer-window)
-      ;; (define-key goto-map (kbd "C-M-i") 'goto-completions-window)
-      ;; (define-key goto-map (kbd "C-M-i") 'goto-completions-window)
-      ;; (define-key goto-map (kbd "M-v") 'goto-minibuffer-or-completions-window)
-
       ;; ctl-x-map goes to completions window
       (define-key ctl-x-map (kbd "C-o") 'goto-completions-window)
 
@@ -2122,13 +2112,20 @@ to this definition.
       (customize-set-variable 'completion-search-distance 12000)
 
       ;; if non-nil, the next completion prompt does a cdabbrev search
-      (customize-set-variable 'completion-cdabbrev-prompt-flag t)
+      ;; (customize-set-variable 'completion-cdabbrev-prompt-flag nil)
 
       ;; non-nil means show help message in *Completions* buffer
       (customize-set-variable 'completion-show-help nil)
 
+      ;; minimum output speed at which to display next potential completion
+      (customize-set-variable 'completion-prompt-speed-threshold 2400)
+
+      ;; how far to search in the buffer when looking for completions
+      ;; if nil, search the whole buffer
+      (customize-set-variable 'completion-search-distance nil)
+
       ;; non-nil means separator characters mark previous word as used
-      (customize-set-variable 'completion-on-separator-characthfer t)
+      (customize-set-variable 'completion-on-separator-character t)
 
       ;; the filename to save completions to.
       (customize-set-variable
@@ -2150,10 +2147,10 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      (add-to-list 'display-buffer-alist
-                   '("\\*Completions\\*"
-                     (display-buffer-below-selected display-buffer-at-bottom)
-                     (window-height . fit-window-to-buffer)))
+      ;; (add-to-list 'display-buffer-alist
+      ;;              '("\\*Completions\\*"
+      ;;                (display-buffer-below-selected display-buffer-at-bottom)
+      ;;                (window-height . fit-window-to-buffer)))
 
       #+END_SRC
 
@@ -2324,8 +2321,6 @@ to this definition.
       ;; seconds to wait before displaying a tooltip the first time.
       (customize-set-variable 'tooltip-delay 0.2)
 
-      (customize-set-variable 'x-gtk-use-system-tooltips nil)
-
       ;; frame parameters used for tooltips
       ;; if ‘left’ or ‘top’ parameters are included, they specify the absolute
       (customize-set-variable 'tooltip-frame-parameters
@@ -2362,6 +2357,15 @@ to this definition.
 
       #+END_SRC
 
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key vlm-utils-map (kbd "o") 'menu-bar-open)
+
+      #+END_SRC
+
+
 ***** Disable
 
       #+BEGIN_SRC emacs-lisp
@@ -2369,6 +2373,9 @@ to this definition.
       ;; (safe-funcall 'menu-bar-mode 0)
 
       #+END_SRC
+
+
+
 
 **** Scroll-bar
 
@@ -2847,11 +2854,11 @@ to this definition.
      (customize-set-variable 'temp-buffer-max-height
                              (lambda (buffer)
                                (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
-                                   (/ (x-display-pixel-height) (frame-char-height) 2)
-                                 (/ (- (frame-height) 2) 2))))
+                                   (/ (x-display-pixel-height) (frame-char-height) 4)
+                                 (/ (frame-height) 4))))
 
      ;; the minimum total height, in lines, of any window
-     (customize-set-variable 'window-min-height 4)
+     (customize-set-variable 'window-min-height 8)
 
      #+END_SRC
 
@@ -4555,11 +4562,10 @@ to this definition.
 
       #+END_SRC
 
-***** Hooks
+***** Enable
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; hooks
       (add-hook 'text-mode-hook #'flyspell-mode)
       (add-hook 'prog-mode-hook #'flyspell-prog-mode)
 
@@ -4591,10 +4597,10 @@ to this definition.
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; enable flymake-mode
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (funcall 'flymake-mode 1)))
+      ;; (add-hook 'window-setup-hook
+      ;;           (lambda ()
+      ;;             (funcall 'flymake-mode 1)))
+      (add-hook 'prog-mode-hook #'flymake-mode)
 
       #+END_SRC
 
@@ -6119,6 +6125,7 @@ to this definition.
       (customize-set-variable 'speedbar-use-imenu-flag t)
 
       #+END_SRC
+
 ** Development
 *** Generic
 

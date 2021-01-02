@@ -6,23 +6,23 @@
 #+LANGUAGE: en
 #+BABEL: :cache yes
 #+PROPERTY: header-args :tangle yes
-#+STARTUP: overview
+#+STARTUP: showall
 
-A =Lisp Machine= is a generic term. A Lisp Machine is a
-computer whose operating system and applications are
-written in Lisp.
+* VLM
 
-Some people (including me) have started to refer to
-=Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
-because, clearly, it is a software program and not a physical
-computer, but as that line starts to blur it seems like a useful
-epithet for =Emacs=, because these days it looks more and more like
-an operating system.
+  Some people (including me) have started to refer to
+  =Emacs= as a =LISP MACHINE=. It is not strictly a lisp machine
+  because, clearly, it is a software program and not a physical
+  computer, but as that line starts to blur it seems like a useful
+  epithet for =Emacs=, because these days it looks more and more like
+  an operating system.
 
-So, =VLM= stands for =Virtual Lisp Machine= and the prefix
-=vlm-= will appear often through this document.
+  A =Lisp Machine= is a generic term. A Lisp Machine is a
+  computer whose operating system and applications are
+  written in Lisp.
 
-* INTRO
+  So, =VLM= stands for =Virtual Lisp Machine= and the prefix
+  =vlm-= will appear often through this document.
 
   Literate programming is a programming paradigm introduced by Donald
   Knuth  in which a computer program is given an explanation of its
@@ -35,21 +35,9 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
   Elisp source code blocks - that will be tangled generating the
   =init.el= final script - and the referent documentation.
 
-* INIT
-
   When you start Emacs, it normally attempts to load
-  your =init.el file=, that will =load*= and =set= the proper
-  values to the customizable library's variables.
-
-  =Org-mode= is used to write and organize the configuration
-  ~src/vlm.org~ (this document) in a =literate programming format=,
-  meaning it contains =Elisp= source code blocks - that will be tangled
-  generating the ~src/init.el~ final script.
-
-  load* : Just load the definitions using the =autoloads= facility
-  (=loaddefs.el=), speeding up the process of initialization,
-  that's why most of the =(require '<library>)= are commented
-  through this configuration.
+  your =init.el file=, that will =load*= and =set= the
+  proper values to the customizable library's variables.
 
 ** Bootstrap
 *** Header
@@ -101,11 +89,16 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
 
     Loaddefs.el, automatically extracted autoloads!
 
+    Just load the definitions using the =autoloads= facility
+    (=loaddefs.el=), speeding up the process of initialization,
+    that's why most of the =(require '<library>)= are commented
+    through this configuration.
+
     The =autoload= facility lets you register the existence of a function or
     macro, but put off loading the file that defines it. The first call to
     the function automatically loads the proper library, in order to install
     the real definition and other associated code, then runs the real
-    definition as if it had been loaded all along (lazy load).
+    definition as if it had been loaded all along (lazy-load).
 
     Instead of installing a function by loading the file that contains it,
     or by evaluating the function definition, you can make the function
@@ -195,6 +188,10 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
        (make-sparse-keymap)
        "Tags (navigation) commands keymap.")
 
+     (defvar vlm-tabs-map
+       (make-sparse-keymap)
+       "Tabs (navigation) commands keymap.")
+
      (defvar vlm-pm-map
        (make-sparse-keymap)
        "Project management commands keymap.")
@@ -239,6 +236,7 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
      #+BEGIN_SRC emacs-lisp
 
      (dolist (prefix-map '(vlm-tags-map
+                           vlm-tabs-map
                            vlm-pm-map
                            vlm-sc-map
                            vlm-docs-map
@@ -265,7 +263,7 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
      (define-key ctl-x-map (kbd "p") 'vlm-pm-map) ; project
      (define-key ctl-x-map (kbd "t") 'vlm-tags-map) ; tags
      (define-key ctl-x-map (kbd "c") 'vlm-utils-map) ; commands
-     ;; (define-key ctl-x-map (kbd "e") 'vlm-sc-map) ; errors
+     (define-key ctl-x-map (kbd "e") 'vlm-sc-map) ; errors
      (define-key ctl-x-map (kbd "l") 'vlm-docs-map) ; library
      (define-key ctl-x-map (kbd "v") 'vlm-media-map) ; media
      (define-key ctl-x-map (kbd "<tab>") 'vlm-completion-map) ; tab - complete
@@ -1534,7 +1532,7 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
        `(cond ((find-font (font-spec :name ,font))
                (set-frame-font ,font nil t))))
 
-     ;; (safe-set-frame-font "Iosevka Fixed:pixelsize=22:width=regular:weight=regular")
+     ;; (safe-set-frame-font "Iosevka Fixed:pixelsize=24:width=regular:weight=regular")
 
      #+END_SRC
 
@@ -1625,15 +1623,10 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       (define-key ctl-x-map (kbd "C-.") 'next-buffer)
 
       ;; binds (vlm-window prefix map)
-      (define-key vlm-window-map (kbd "1") 'maximize-window)
-      (define-key vlm-window-map (kbd "2") 'minimize-window)
-
-      (define-key vlm-window-map (kbd "q") 'balance-windows)
+      (define-key vlm-window-map (kbd "+") 'maximize-window)
+      (define-key vlm-window-map (kbd "-") 'minimize-window)
+      (define-key vlm-window-map (kbd "b") 'balance-windows)
       (define-key vlm-window-map (kbd "w") 'other-window-prefix)
-      (define-key vlm-window-map (kbd "r") 'windmove-right)
-      (define-key vlm-window-map (kbd "l") 'windmove-left)
-      (define-key vlm-window-map (kbd "d") 'windmove-down)
-      (define-key vlm-window-map (kbd "u") 'windmove-up)
 
       ;; binds ctl-x-map (C-x w)
       (define-key ctl-x-map (kbd "w") 'vlm-window-map)
@@ -1937,13 +1930,13 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       (customize-set-variable 'completion-pcm-complete-word-inserts-delimiters t)
 
       ;; a string of characters treated as word delimiters for completion
-      ;; (customize-set-variable 'completion-pcm-word-delimiters "-_./:| ")
+      (customize-set-variable 'completion-pcm-word-delimiters "-_./:| ")
 
-      ;; non-nil means show help message in *Completions* buffer
-      (customize-set-variable 'completion-show-help nil)
+      ;; if non-nil, print helpful inline messages during completion
+      (customize-set-variable 'completion-show-inline-help nil)
 
       ;; non-nil means automatically provide help for invalid completion input
-      (customize-set-variable 'completion-auto-help 'lazy)
+      (customize-set-variable 'completion-auto-help nil)
 
       ;; list of completion styles to use: see `completion-styles-alist variable
       (customize-set-variable 'completion-styles '(basic partial-completion flex))
@@ -1963,10 +1956,10 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       (customize-set-variable 'resize-mini-windows nil)
 
       ;; format string used to output "default" values
-      (customize-set-variable 'minibuffer-default-prompt-format " [%s] ")
+      (customize-set-variable 'minibuffer-default-prompt-format " (default %s)")
 
       ;; if non-nil, shorten "(default ...)" to "[...]" in minibuffer prompts
-      (customize-set-variable 'minibuffer-eldef-shorten-default nil)
+      (customize-set-variable 'minibuffer-eldef-shorten-default t)
 
       ;; non-nil means to delete duplicates in history
       (customize-set-variable 'history-delete-duplicates t)
@@ -1975,7 +1968,6 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       (customize-set-variable
        'completion-at-point-functions
        '(elisp-completion-at-point
-         lisp-completion-at-point
          tags-completion-at-point-function t))
 
       #+END_SRC
@@ -2031,14 +2023,14 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       ;; be used to make the ignored text invisible, dim, etc.
       (add-hook 'window-setup-hook
                 (lambda()
-                  (funcall 'file-name-shadow-mode 1)))
+                  (funcall 'file-name-shadow-mode 0)))
 
       ;; when active, any recursive use of the minibuffer will show
       ;; the recursion depth in the minibuffer prompt, this is only
       ;; useful if `enable-recursive-minibuffers' is non-nil
       (add-hook 'window-setup-hook
                 (lambda()
-                  (funcall 'minibuffer-depth-indicate-mode -1)))
+                  (funcall 'minibuffer-depth-indicate-mode 0)))
 
       ;; when active, minibuffer prompts that show a default value only show
       ;; the default when it's applicable
@@ -2112,7 +2104,7 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       (customize-set-variable 'completion-search-distance 12000)
 
       ;; if non-nil, the next completion prompt does a cdabbrev search
-      ;; (customize-set-variable 'completion-cdabbrev-prompt-flag nil)
+      (customize-set-variable 'completion-cdabbrev-prompt-flag nil)
 
       ;; non-nil means show help message in *Completions* buffer
       (customize-set-variable 'completion-show-help nil)
@@ -2167,7 +2159,6 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       (define-key completion-list-mode-map (kbd "DEL") 'previous-completion)
       (define-key completion-list-mode-map (kbd "C-j") 'choose-completion)
       (define-key completion-list-mode-map (kbd "C-g") 'quit-minibuffer)
-      ;; (define-key completion-list-mode-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
 
       #+END_SRC
 
@@ -2203,10 +2194,10 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
 
       ;; custom
       ;; pending-completions number over which to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-delay-completions-threshold 128)
+      (customize-set-variable 'icomplete-delay-completions-threshold 512)
 
       ;; maximum number of initial chars to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-max-delay-chars 4)
+      (customize-set-variable 'icomplete-max-delay-chars 2)
 
       ;; completions-computation stall, used only with large-number completions
       (customize-set-variable 'icomplete-compute-delay 0)
@@ -2214,14 +2205,18 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       ;; when non-nil, show completions when first prompting for input
       (customize-set-variable 'icomplete-show-matches-on-no-input t)
 
+      ;; if non-nil, automatically delete superfluous parts of file names
+      (customize-set-variable 'icomplete-tidy-shadowed-file-names t)
+
       ;; when non-nil, hide common prefix from completion candidates
-      (customize-set-variable 'icomplete-hide-common-prefix t)
+      (customize-set-variable 'icomplete-hide-common-prefix nil)
 
       ;; maximum number of lines to use in the minibuffer
       (customize-set-variable 'icomplete-prospects-height 1)
 
       ;; string used by Icomplete to separate alternatives in the minibuffer
-      (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
+      ;; (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
+      (customize-set-variable 'icomplete-separator " · ")
 
       ;; specialized completion tables with which `icomplete should operate,
       ;; if this is t, `icomplete operates on all tables
@@ -2241,11 +2236,13 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
           (when (boundp 'icomplete-minibuffer-map)
             ;; unbind
             (define-key icomplete-minibuffer-map (kbd "SPC") nil)
-
             ;; bind
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
+            (define-key icomplete-minibuffer-map (kbd "RET") 'icomplete-ret)
+            (define-key icomplete-minibuffer-map (kbd "<tab>") 'minibuffer-complete)
             (define-key icomplete-minibuffer-map (kbd "M-<tab>") 'icomplete-forward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-DEL") 'icomplete-backward-completions)
+            (define-key icomplete-minibuffer-map (kbd "DEL") 'icomplete-fido-backward-updir)
             (define-key icomplete-minibuffer-map (kbd "C-p") 'previous-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "C-n") 'next-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-top-candidate)
@@ -2275,6 +2272,37 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
     very similarly on both kinds of frames. It normally starts out with
     just one frame, but you can create additional frames if you wish.
 
+**** Tab-bar
+
+     Provides `tab-bar-mode' to control display of the tab bar and
+     bindings for the global tab bar.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'tab-bar nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; defines where to show the close tab button
+      (customize-set-variable 'tab-bar-close-button-show nil)
+
+      ;; if non-nil, show the "New tab" button in the tab bar
+      (customize-set-variable 'tab-bar-new-button-show nil)
+
+      ;; string that delimits tabs
+      (customize-set-variable 'tab-bar-separator " · ")
+
+      ;; if the value is ‘1’, then hide the tab bar when it has only one tab
+      (customize-set-variable 'tab-bar-show '1)
+
+      #+END_SRC
+
 **** Tool-bar
 
      Provides `tool-bar-mode' to control display of the tool-bar and
@@ -2291,12 +2319,20 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
 
       #+END_SRC
 
-***** Disable
+***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; disable
-      ;; (safe-funcall 'tool-bar-mode '0)
+      (define-key vlm-tags-map (kbd "t") 'tab-switcher)
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable
+      ;; (safe-funcall 'tool-bar-mode 1)
 
       #+END_SRC
 
@@ -2325,7 +2361,7 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       ;; if ‘left’ or ‘top’ parameters are included, they specify the absolute
       (customize-set-variable 'tooltip-frame-parameters
                               '((name . "tooltip")
-                                (internal-border-width . 0)
+                                (internal-border-width . 2)
                                 (border-width . 0)
                                 (no-special-glyphs . t)))
 
@@ -2365,7 +2401,6 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
 
       #+END_SRC
 
-
 ***** Disable
 
       #+BEGIN_SRC emacs-lisp
@@ -2373,9 +2408,6 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       ;; (safe-funcall 'menu-bar-mode 0)
 
       #+END_SRC
-
-
-
 
 **** Scroll-bar
 
@@ -3356,12 +3388,7 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
 
        ;; exwn global keybindings
        (customize-set-variable 'exwm-input-global-keys
-                               `(([?\s-r] . exwm-reset)
-                                 ([?\s-q] . exwm-input-toggle-keyboard)
-                                 ;; ([?\s-w] . exwm-workspace-switch)
-                                 ;; ([?\s-k] . exwm-workspace-delete)
-                                 ;; ([?\s-a] . exwm-workspace-swap)
-
+                               `((,(kbd "s-q") . exwm-input-toggle-keyboard)
                                  ;; create and switch to workspaces
                                  ,@(mapcar (lambda (i)
                                              `(,(kbd (format "s-%d" i)) .
@@ -4303,15 +4330,6 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       ;; when 0, do not auto-reconnect
       (customize-set-variable 'rcirc-reconnect-delay 2)
 
-      ;; an alist of IRC connections to establish when running `rcirc'
-      (customize-set-variable 'rcirc-server-alist
-                              '(("irc.freenode.net"
-                                 :port 6697
-                                 :server-alias "freenode"
-                                 :encryption tls
-                                 :nick "lambdart"
-                                 :channels ("#rcirc #lisp-br #lispgames"))))
-
       #+END_SRC
 
 ***** Hooks
@@ -4593,13 +4611,18 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
 
       #+END_SRC
 
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key vlm-sc-map (kbd "e") 'flymake-show-diagnostics-buffer)
+
+      #+END_SRC
+
 ***** Enable
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (add-hook 'window-setup-hook
-      ;;           (lambda ()
-      ;;             (funcall 'flymake-mode 1)))
       (add-hook 'prog-mode-hook #'flymake-mode)
 
       #+END_SRC
@@ -5743,13 +5766,28 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       ;; use a popup menu rather than a minibuffer prompt (no)
       (customize-set-variable 'imenu-use-popup-menu nil)
 
+      ;; if non-nil, eagerly popup the completion buffer.
+      (customize-set-variable 'imenu-eager-completion-buffer t)
+
+      ;; non-nil means Imenu should always rescan the buffers
+      (customize-set-variable 'imenu-auto-rescan t)
+
+      ;; when non-nil, ignore text inside comments and strings
+      (customize-set-variable 'imenu-generic-skip-comments-and-strings t)
+
+      ;; maximum number of elements in a mouse menu for Imenu
+      (customize-set-variable 'imenu-max-items 128)
+
+      ;; if a number, truncate Imenu entries to that length
+      (customize-set-variable 'imenu-max-item-length 256)
+
       #+END_SRC
 
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key vlm-tags-map (kbd "t") 'imenu)
+      (global-set-key (kbd "M-`") 'imenu)
 
       #+END_SRC
 
@@ -5826,11 +5864,11 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
       ;; when t, always prompt for the identifier name
       ;; when nil, prompt only when there’s no value at point we can use,
       ;; or when the command has been called with the prefix argument.
+      (customize-set-variable 'xref-prompt-for-identifier t)
 
       ;; (not xref-find-definitions
       ;;      xref-find-definitions-other-window
       ;;      xref-find-definitions-other-frame)
-      (customize-set-variable 'xref-prompt-for-identifier t)
 
       #+END_SRC
 
@@ -7298,6 +7336,6 @@ So, =VLM= stands for =Virtual Lisp Machine= and the prefix
 
      #+END_SRC
 
-* EOF
+** EOF
 
-  =See You Space Cowboy...=
+  *See You Space Cowboy...*

@@ -1489,11 +1489,11 @@
                                         "%b"))))
 
      ;; alist of parameters for the initial minibuffer frame.
-     (customize-set-variable 'minibuffer-frame-alist
-                             '((top . 1)
-                               (left . 1)
-                               (width . 80)
-                               (height . 2)))
+     ;; (customize-set-variable 'minibuffer-frame-alist
+     ;;                         '((top . 1)
+     ;;                           (left . 1)
+     ;;                           (width . 80)
+     ;;                           (height . 2)))
 
      ;; alist of parameters for the initial X window frame
      (add-to-list 'initial-frame-alist '(fullscreen . fullheight))
@@ -1532,7 +1532,7 @@
        `(cond ((find-font (font-spec :name ,font))
                (set-frame-font ,font nil t))))
 
-     ;; (safe-set-frame-font "Iosevka Fixed:pixelsize=24:width=regular:weight=regular")
+     ;; (safe-set-frame-font "Iosevka Fixed:pixelsize=22:width=regular:weight=regular")
 
      #+END_SRC
 
@@ -1635,7 +1635,7 @@
       (define-key ctl-x-map (kbd "C-b") 'switch-to-buffer)
 
       ;; kill buffer and window
-      (define-key ctl-x-map (kbd "C-k") 'kill-buffer-and-window)
+      (define-key ctl-x-map (kbd "C-k") 'kill-buffer)
 
       ;; switch to the last buffer in the buffer list
       (define-key ctl-x-map (kbd "C-u") 'unbury-buffer)
@@ -1734,6 +1734,11 @@
      #+END_SRC
 
 **** Display
+
+     #+BEGIN_SRC emacs-lisp
+
+     #+END_SRC
+
 ***** Hl-line
 
       Provides a local minor mode (toggled by M-x hl-line-mode) and
@@ -1775,10 +1780,19 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       ;; format used to display line numbers.
+       ;; format used to display line numbers
        (customize-set-variable 'linum-format " %2d ")
 
        #+END_SRC
+
+****** Hook
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; (add-hook 'prog-mode-hook 'linum-mode)
+
+       #+END_SRC
+
 
 ***** Display-linum
 
@@ -1790,6 +1804,27 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; (require 'display-line-numbers nil t)
+
+       #+END_SRC
+
+****** Customize
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; the default type of line numbers to use in `display-line-numbers-mode'
+       (customize-set-variable 'display-line-numbers-type t)
+
+       ;; if non-nil, do not shrink line number width
+       (customize-set-variable 'display-line-numbers-grow-only t)
+
+       ;; if non-nil, count number of lines to use for line number width
+       (customize-set-variable 'display-line-numbers-width-start t)
+
+       ;; if an integer N > 0, highlight line number of every Nth line
+       (customize-set-variable 'display-line-numbers-major-tick 0)
+
+       ;; if an integer N > 0, highlight line number of every Nth line
+       (customize-set-variable 'display-line-numbers-minor-tick 0)
 
        #+END_SRC
 
@@ -1918,10 +1953,10 @@
       (customize-set-variable 'read-answer-short t)
 
       ;; non-nil means completion ignores case when reading a buffer name
-      (customize-set-variable 'read-buffer-completion-ignore-case t)
+      (customize-set-variable 'read-buffer-completion-ignore-case nil)
 
       ;; non-nil means when reading a file name completion ignores case
-      (customize-set-variable 'read-file-name-completion-ignore-case t)
+      (customize-set-variable 'read-file-name-completion-ignore-case nil)
 
       ;; number of completion candidates below which cycling is used
       (customize-set-variable 'completion-cycle-threshold nil)
@@ -1943,10 +1978,10 @@
       ;; '(basic partial-completion substring flex))
 
       ;; list of category-specific user overrides for completion styles.
-      (customize-set-variable 'completion-category-overrides nil)
-      ;; '((file (styles initials basic))
-      ;;   (buffer (styles initials basic))
-      ;;   (info-menu (styles basic))))
+      ;; (customize-set-variable 'completion-category-overrides
+      ;;                         '((file (styles initials basic))
+      ;;                           (buffer (styles initials basic))
+      ;;                           (info-menu (styles basic))))
 
       ;; define the appearance and sorting of completions
       (customize-set-variable 'completions-format 'vertical)
@@ -1965,10 +2000,8 @@
       (customize-set-variable 'history-delete-duplicates t)
 
       ;; special hook to find the completion table for the entity at point (default)
-      (customize-set-variable
-       'completion-at-point-functions
-       '(elisp-completion-at-point
-         tags-completion-at-point-function t))
+      ;; (customize-set-variable 'completion-at-point-functions `(elisp-completion-at-point
+      ;;                                                          tags-completion-at-point-function t))
 
       #+END_SRC
 
@@ -2112,10 +2145,6 @@
       ;; minimum output speed at which to display next potential completion
       (customize-set-variable 'completion-prompt-speed-threshold 2400)
 
-      ;; how far to search in the buffer when looking for completions
-      ;; if nil, search the whole buffer
-      (customize-set-variable 'completion-search-distance nil)
-
       ;; non-nil means separator characters mark previous word as used
       (customize-set-variable 'completion-on-separator-character t)
 
@@ -2215,8 +2244,7 @@
       (customize-set-variable 'icomplete-prospects-height 1)
 
       ;; string used by Icomplete to separate alternatives in the minibuffer
-      ;; (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
-      (customize-set-variable 'icomplete-separator " · ")
+      (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
 
       ;; specialized completion tables with which `icomplete should operate,
       ;; if this is t, `icomplete operates on all tables
@@ -2238,7 +2266,7 @@
             (define-key icomplete-minibuffer-map (kbd "SPC") nil)
             ;; bind
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-            (define-key icomplete-minibuffer-map (kbd "RET") 'icomplete-ret)
+            (define-key icomplete-minibuffer-map (kbd "RET") 'exit-minibuffer)
             (define-key icomplete-minibuffer-map (kbd "<tab>") 'minibuffer-complete)
             (define-key icomplete-minibuffer-map (kbd "M-<tab>") 'icomplete-forward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-DEL") 'icomplete-backward-completions)
@@ -2296,12 +2324,19 @@
       (customize-set-variable 'tab-bar-new-button-show nil)
 
       ;; string that delimits tabs
-      (customize-set-variable 'tab-bar-separator " · ")
+      (customize-set-variable 'tab-bar-separator " ")
 
       ;; if the value is ‘1’, then hide the tab bar when it has only one tab
-      (customize-set-variable 'tab-bar-show '1)
+      (customize-set-variable 'tab-bar-show nil)
 
       #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
 
 **** Tool-bar
 
@@ -2476,23 +2511,18 @@
       (customize-set-variable 'mode-line-format
                               '("%e"
                                 mode-line-front-space
-                                mode-line-mule-info
+                                "("
+                                (:eval (format-time-string "%H:%M"))
+                                " "
                                 mode-line-modified
                                 mode-line-remote
-                                (:eval (format "  %d/%d"
-                                               exwm-workspace-current-index
-                                               (- (exwm-workspace--count) 1)))
-                                (:eval (format-time-string "  %H:%M"))
-                                ;; 
-                                " (%l:%c)"
-                                " · "
+                                " "
+                                "%l:%c"
+                                " "
                                 (:eval (propertized-buffer-identification "%b"))
-                                " · "
-                                "("
+                                " "
                                 mode-name
-                                ")"
-                                (:eval (when vc-mode (concat " » " (projectile-project-name) " ")))
-                                (vc-mode vc-mode)))
+                                ")"))
 
       #+END_SRC
 
@@ -3355,7 +3385,7 @@
      a desktop environment.
 
      Finally an Emacs window means X11/Xorg WINDOW as well :D!
-     Thanks to EXWM! (great package/library).
+     Thanks to EXWM! (great library!).
 
 ***** Exwm
 
@@ -3375,7 +3405,7 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; set exwm workspaces number
-       (customize-set-variable 'exwm-workspace-number 0)
+       (customize-set-variable 'exwm-workspace-number 1)
 
        ;; show workspaces in all buffers
        (customize-set-variable 'exwm-workspace-show-all-buffers t)
@@ -3389,13 +3419,13 @@
        ;; exwn global keybindings
        (customize-set-variable 'exwm-input-global-keys
                                `((,(kbd "s-q") . exwm-input-toggle-keyboard)
-                                 ;; create and switch to workspaces
+                                 ;; switch to tabs
                                  ,@(mapcar (lambda (i)
                                              `(,(kbd (format "s-%d" i)) .
                                                (lambda ()
                                                  (interactive)
-                                                 (exwm-workspace-switch-create ,i))))
-                                           (number-sequence 0 3))))
+                                                 (safe-funcall 'switch-to-tab-by-index ,i))))
+                                           (number-sequence 1 (safe-funcall 'tab-bar-number)))))
 
        ;; The following example demonstrates how to use simulation keys to mimic
        ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
@@ -3405,20 +3435,20 @@
        (customize-set-variable 'exwm-input-simulation-keys
                                '(
                                  ;; movement
-                                 ([?\C-b] . [left])
-                                 ([?\M-b] . [C-left])
-                                 ([?\C-f] . [right])
-                                 ([?\M-f] . [C-right])
                                  ([?\C-p] . [up])
+                                 ([?\C-b] . [left])
+                                 ([?\C-f] . [right])
                                  ([?\C-n] . [down])
-                                 ([?\C-a] . [home])
+                                 ([?\M-b] . [C-left])
+                                 ([?\M-f] . [C-right])
                                  ([?\C-e] . [end])
-                                 ([?\M-v] . [prior])
                                  ([?\C-v] . [next])
+                                 ([?\C-a] . [home])
+                                 ([?\M-v] . [prior])
                                  ([?\C-d] . [delete])
                                  ([?\C-k] . [S-end delete])
 
-                                 ;; firefox temporary
+                                 ;; browser temporary
                                  ([?\C-o] . [C-prior]) ; change tab mapping
                                  ([?\C-k] . [C-w]) ; close tab mapping
                                  ([?\C-j] . [return]) ; close tab mapping
@@ -3717,6 +3747,85 @@
 
 *** Session
 **** Desktop
+
+     This library provides ways to save the state of Emacs from one session to
+     another. Once you save the Emacs “desktop”—the buffers, their file
+     names, major modes, buffer positions, and so on—then subsequent Emacs
+     sessions reload the saved desktop.
+
+     By default, the desktop also tries to save the frame and window configuration.
+     When the desktop restores the frame and window configuration, it uses
+     the recorded values of frame parameters, disregarding any settings for
+     those parameters you have in your ~init~ file.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'desktop nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; list of directories to search for the desktop file
+      (customize-set-variable 'desktop-path
+                              (list (expand-file-name "cache" user-emacs-directory)))
+
+      ;; specifies whether the desktop should be saved when it is killed
+      (customize-set-variable 'desktop-save 'ask)
+
+      ;; if t, restoring frames reuses existing frames
+      (customize-set-variable 'desktop-restore-frames t)
+
+      ;; if t: restoring frames reuses existing frames,
+      ;; if nil: deletes existing frames,
+      ;; if keep: keeps existing frames and does not reuse them
+      (customize-set-variable 'desktop-restore-reuses-frames t)
+
+      ;; if all, also restores frames that are partially offscreen onscreen
+      (customize-set-variable 'desktop-restore-forces-onscreen 'all)
+
+      ;; if nil, restores frames into their original displays (if possible)
+      (customize-set-variable 'desktop-restore-in-current-display nil)
+
+      ;; Idle delay before starting to create buffers
+      (customize-set-variable 'desktop-lazy-idle-delay 4)
+
+      ;; number of buffers to restore immediately (max),
+      ;; remaining buffers are restored lazily
+      (customize-set-variable 'desktop-restore-eager 16)
+
+      ;; when non-nil, save buffer status in desktop file
+      (customize-set-variable 'desktop-save-buffer t)
+
+      ;; number of seconds of idle time before auto-saving the desktop
+      (customize-set-variable 'desktop-auto-save-time 16)
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'desktop-after-read-hook
+                (lambda ()
+                  (safe-funcall 'tab-bar-update-switch-binds)))
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'desktop-save-mode 1)))
+
+      #+END_SRC
+
 *** Clocks
 **** Time
 
@@ -3964,6 +4073,128 @@
 
       #+END_SRC
 
+*** Completions
+**** Dabbrev
+
+     The purpose with this package is to let you write just a few
+     characters of words you've written earlier to be able to expand
+     them.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'dabbrev nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; non-nil means case sensitive search.
+      (customize-set-variable 'dabbrev-upcase-means-case-search t)
+
+      ;; whether dabbrev treats expansions as the same if they differ in case
+      ;; a value of nil means treat them as different.
+      (customize-set-variable 'dabbrev-case-distinction t)
+
+      #+END_SRC
+
+**** Hippie-exp
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'hippie-exp nil t)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (global-set-key (kbd "M-]") 'hippie-expand)
+
+      #+END_SRC
+
+**** Yasnippet
+
+     YASnippet is a template system for Emacs. It allows you to type an
+     abbreviation and automatically expand it into
+     function templates. Bundled language templates include:
+     C, C++, C#, Perl, Python, Ruby, SQL, LaTeX, HTML, CSS and more.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'yasnippet nil t)
+
+      #+END_SRC
+
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; binds vlm-completion-map
+      (define-key vlm-completion-map (kbd "e") 'yas-expand)
+      (define-key vlm-completion-map (kbd "i") 'yas-insert-snippet)
+      (define-key vlm-completion-map (kbd "v") 'yas-visit-snippet-file)
+
+      ;; binds yas-keymap
+      (eval-after-load 'yasnippet
+        (lambda ()
+          (when (boundp 'yas-keymap)
+            (define-key yas-keymap (kbd "TAB") nil)
+            (define-key yas-keymap (kbd "<tab>") nil)
+            (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))
+
+          ;; unbind: clean minor mode map alist
+          (setq minor-mode-map-alist nil)))
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable yasnippet after emacs startup
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'yas-global-mode 1)))
+
+      #+END_SRC
+
+**** Ace
+
+     Auto-complete and expand (Package under construction).
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'ace nil t)
+
+      #+END_SRC
+
+***** Customize
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      (define-key vlm-completion-map (kbd "<tab>") 'ace-complete)
+      (define-key vlm-completion-map (kbd "`") 'ace-complete-word)
+      (define-key vlm-completion-map (kbd "f") 'ace-complete-file-name)
+
+      ;; TODO
+      ;; (define-key vlm-completion-map (kbd "/" 'ace-complete-dabbrev)
+      ;; (define-key vlm-completion-map (kbd "]") 'ace-complete-dabbrev-code)
+
+      #+END_SRC
+
+**** Srecode
+**** Autotype
 *** Editing
 *** Graphics
 **** Artist
@@ -4251,10 +4482,12 @@
       (define-key vlm-media-map (kbd "a") 'emms-add-file)
       (define-key vlm-media-map (kbd "s") 'emms-start)
       (define-key vlm-media-map (kbd "q") 'emms-stop)
-      (define-key vlm-media-map (kbd "v") 'emms-pause)
-      (define-key vlm-media-map (kbd "p") 'emms-previous)
-      (define-key vlm-media-map (kbd "n") 'emms-next)
-      (define-key vlm-media-map (kbd "r") 'emms-random)
+
+      ;; my-emms.el
+      (define-key vlm-media-map (kbd "v") 'pause-track)
+      (define-key vlm-media-map (kbd "p") 'previous-track)
+      (define-key vlm-media-map (kbd "n") 'next-track)
+      (define-key vlm-media-map (kbd "r") 'random-track)
 
       #+END_SRC
 
@@ -5149,7 +5382,6 @@
                 (lambda ()
                   ;; do not truncate lines
                   (setq truncate-lines nil)
-
                   ;; languages which can be evaluated in Org buffers.
                   (org-babel-do-load-languages
                    'org-babel-load-languages
@@ -5579,7 +5811,6 @@
 
       #+END_SRC
 
-
 **** Rfc-docs
 
      Browser/search/read local RFC files.
@@ -5649,101 +5880,6 @@
 
       #+END_SRC
 
-*** Completions
-**** Dabbrev
-
-     The purpose with this package is to let you write just a few
-     characters of words you've written earlier to be able to expand
-     them.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'dabbrev nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; non-nil means case sensitive search.
-      (customize-set-variable 'dabbrev-upcase-means-case-search t)
-
-      ;; whether dabbrev treats expansions as the same if they differ in case
-      ;; a value of nil means treat them as different.
-      (customize-set-variable 'dabbrev-case-distinction t)
-
-      #+END_SRC
-
-**** Hippie-exp
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'hippie-exp nil t)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      (global-set-key (kbd "M-\\") 'hippie-expand)
-
-      #+END_SRC
-
-**** Yasnippet
-
-     YASnippet is a template system for Emacs. It allows you to type an
-     abbreviation and automatically expand it into
-     function templates. Bundled language templates include:
-     C, C++, C#, Perl, Python, Ruby, SQL, LaTeX, HTML, CSS and more.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'yasnippet nil t)
-
-      #+END_SRC
-
-***** Binds
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; binds vlm-completion-map
-      (define-key vlm-completion-map (kbd "e") 'yas-expand)
-      (define-key vlm-completion-map (kbd "i") 'yas-insert-snippet)
-      (define-key vlm-completion-map (kbd "v") 'yas-visit-snippet-file)
-
-      ;; binds yas-keymap
-      (eval-after-load 'yasnippet
-        (lambda ()
-          (when (boundp 'yas-keymap)
-            (define-key yas-keymap (kbd "TAB") nil)
-            (define-key yas-keymap (kbd "<tab>") nil)
-            (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))
-
-          ;; unbind: clean minor mode map alist
-          (setq minor-mode-map-alist nil)))
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; enable yasnippet after emacs startup
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (funcall 'yas-global-mode 1)))
-
-      #+END_SRC
-
-**** Srecode
-**** Autotype
 *** Navigation
 **** Imenu
 
@@ -6185,8 +6321,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key prog-mode-map (kbd "C-M-i") 'complete-at-point-or-indent)
-      ;; (define-key prog-mode-map (kbd "C-M-i") 'complete-at-point-or-indent)
+      (define-key prog-mode-map (kbd "<tab>") 'complete-at-point-or-indent)
 
       #+END_SRC
 
@@ -7102,11 +7237,11 @@
      '(cedet semantic chinese)
      "Libraries that are not used.")
 
-   (add-hook 'window-setup-hook
-             (lambda ()
-               (let (libraries vlm-not-used-libraries)
-                 (dolist (library libraries)
-                   (unload-feature library '(4))))))
+   ;; (add-hook 'window-setup-hook
+   ;;           (lambda ()
+   ;;             (let (libraries vlm-not-used-libraries)
+   ;;               (dolist (library libraries)
+   ;;                 (unload-feature library '(4))))))
 
    #+END_SRC
 
@@ -7338,4 +7473,4 @@
 
 ** EOF
 
-  *See You Space Cowboy...*
+   *...See You Space Cowboy...*

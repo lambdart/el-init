@@ -699,27 +699,6 @@
 
       #+END_SRC
 
-**** Nnimap
-
-     Nnimap library provides interfaces Gnus with IMAP servers.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'nnimap nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; limit the number of articles to look for after moving an article
-      (customize-set-variable 'nnimap-request-articles-find-limit nil)
-
-      #+END_SRC
-
 **** Sendmail
 
      This mode provides mail-sending facilities from within Emacs.
@@ -1953,7 +1932,7 @@
       (customize-set-variable 'read-answer-short t)
 
       ;; non-nil means completion ignores case when reading a buffer name
-      (customize-set-variable 'read-buffer-completion-ignore-case nil)
+      (customize-set-variable 'read-buffer-completion-ignore-case t)
 
       ;; non-nil means when reading a file name completion ignores case
       (customize-set-variable 'read-file-name-completion-ignore-case nil)
@@ -1973,15 +1952,17 @@
       ;; non-nil means automatically provide help for invalid completion input
       (customize-set-variable 'completion-auto-help nil)
 
+      ;; non-nil means don’t consider case significant in completion
+      (customize-set-variable 'completion-ignore-case nil)
+
       ;; list of completion styles to use: see `completion-styles-alist variable
       (customize-set-variable 'completion-styles '(basic partial-completion flex))
-      ;; '(basic partial-completion substring flex))
 
-      ;; list of category-specific user overrides for completion styles.
-      ;; (customize-set-variable 'completion-category-overrides
-      ;;                         '((file (styles initials basic))
-      ;;                           (buffer (styles initials basic))
-      ;;                           (info-menu (styles basic))))
+      ;; list of category-specific user overrides for completion styles. (TODO: research)
+      ;; (customize-set-variable 'completion-category-overrides nil)
+      ;; '((file (styles initials basic))
+      ;;   (buffer (styles initials basic))
+      ;;   (info-menu (styles basic))))
 
       ;; define the appearance and sorting of completions
       (customize-set-variable 'completions-format 'vertical)
@@ -2000,8 +1981,9 @@
       (customize-set-variable 'history-delete-duplicates t)
 
       ;; special hook to find the completion table for the entity at point (default)
-      ;; (customize-set-variable 'completion-at-point-functions `(elisp-completion-at-point
-      ;;                                                          tags-completion-at-point-function t))
+      (customize-set-variable 'completion-at-point-functions
+                              `(elisp-completion-at-point
+                                tags-completion-at-point-function t))
 
       #+END_SRC
 
@@ -2223,10 +2205,10 @@
 
       ;; custom
       ;; pending-completions number over which to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-delay-completions-threshold 512)
+      (customize-set-variable 'icomplete-delay-completions-threshold 1024)
 
       ;; maximum number of initial chars to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-max-delay-chars 2)
+      (customize-set-variable 'icomplete-max-delay-chars 4)
 
       ;; completions-computation stall, used only with large-number completions
       (customize-set-variable 'icomplete-compute-delay 0)
@@ -2244,7 +2226,9 @@
       (customize-set-variable 'icomplete-prospects-height 1)
 
       ;; string used by Icomplete to separate alternatives in the minibuffer
-      (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
+      ;; (customize-set-variable 'icomplete-separator (propertize " • " 'face 'shadow))
+      ;; (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
+      (customize-set-variable 'icomplete-separator (propertize " | " 'face 'shadow))
 
       ;; specialized completion tables with which `icomplete should operate,
       ;; if this is t, `icomplete operates on all tables
@@ -2335,8 +2319,17 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      #+END_SRC
+      ;; (add-hook 'tab-bar-mode-hook
+      ;;           (lambda ()
+      ;;             (when (boundp 'exwm-input-global-keys)
+      ;;               (dolist (i (number-sequence 1 (safe-funcall 'tabs-number)))
+      ;;                 (push `(,(kbd (format "s-%d" i)) .
+      ;;                          (lambda ()
+      ;;                            (interactive)
+      ;;                            (safe-funcall 'tabs-switch-tab-by-index ,i)))
+      ;;                       exwm-input-global-keys)))))
 
+      #+END_SRC
 
 **** Tool-bar
 
@@ -2507,21 +2500,24 @@
       ;; remove underline
       (customize-set-variable 'x-underline-at-descent-line t)
 
+      ;; (:eval (format-time-string "%H:%M"))
       ;; mode-line format
       (customize-set-variable 'mode-line-format
                               '("%e"
                                 mode-line-front-space
-                                "("
-                                (:eval (format-time-string "%H:%M"))
-                                " "
                                 mode-line-modified
                                 mode-line-remote
                                 " "
                                 "%l:%c"
                                 " "
                                 (:eval (propertized-buffer-identification "%b"))
-                                " "
-                                mode-name
+                                " ("
+                                (:eval (downcase
+                                  (if (eq major-mode 'exwm-mode)
+                                      mode-name
+                                    (if (not (listp mode-name))
+                                        mode-name
+                                      (car mode-name)))))
                                 ")"))
 
       #+END_SRC
@@ -2977,11 +2973,12 @@
           (when (boundp 'help-mode-map)
             (define-key help-mode-map (kbd "C-j") 'push-button))))
 
-      ;; help prefix map (C-h)
+      ;; help prefix map (C-h) (redundancy)
       (define-key help-map (kbd "C-f") 'describe-function)
       (define-key help-map (kbd "C-v") 'describe-variable)
       (define-key help-map (kbd "C-k") 'describe-key)
       (define-key help-map (kbd "C-m") 'describe-mode)
+      (define-key help-map (kbd "C-o") 'describe-symbol)
       (define-key help-map (kbd "C-e") 'view-echo-area-messages)
 
       #+END_SRC
@@ -3419,13 +3416,13 @@
        ;; exwn global keybindings
        (customize-set-variable 'exwm-input-global-keys
                                `((,(kbd "s-q") . exwm-input-toggle-keyboard)
-                                 ;; switch to tabs
+                                 ;; switch to tabs (TODO: moves to tabs-bar)
                                  ,@(mapcar (lambda (i)
                                              `(,(kbd (format "s-%d" i)) .
                                                (lambda ()
                                                  (interactive)
-                                                 (safe-funcall 'switch-to-tab-by-index ,i))))
-                                           (number-sequence 1 (safe-funcall 'tab-bar-number)))))
+                                                 (safe-funcall 'tabs-switch-tab-by-index ,i))))
+                                           (number-sequence 1 (safe-funcall 'tabs-number)))))
 
        ;; The following example demonstrates how to use simulation keys to mimic
        ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
@@ -4183,9 +4180,13 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key vlm-completion-map (kbd "<tab>") 'ace-complete)
+      ;; vlm-completion-map
       (define-key vlm-completion-map (kbd "`") 'ace-complete-word)
       (define-key vlm-completion-map (kbd "f") 'ace-complete-file-name)
+      (define-key vlm-completion-map (kbd "<tab>") 'ace-complete-at-point-or-indent)
+
+      ;; global map
+      (global-set-key (kbd "M-<tab>") 'ace-complete-at-point-or-indent)
 
       ;; TODO
       ;; (define-key vlm-completion-map (kbd "/" 'ace-complete-dabbrev)
@@ -4242,13 +4243,55 @@
 
       ;; directory where elfeed will store its database.
       (customize-set-variable 'elfeed-db-directory
-                              (concat (expand-file-name user-emacs-directory) "elfeed"))
+                              (expand-file-name "elfeed" user-emacs-directory))
 
       ;; default directory for saving enclosures. Hide
       (customize-set-variable 'elfeed-enclosure-default-dir
-                              (concat (expand-file-name user-emacs-directory) "cache/elfeed"))
+                              (expand-file-name "cache/elfeed" user-emacs-directory))
 
       #+END_SRC
+
+**** Nnimap
+
+       Nnimap library provides interfaces Gnus with IMAP servers.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'nnimap nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; limit the number of articles to look for after moving an article
+      (customize-set-variable 'nnimap-request-articles-find-limit nil)
+
+      #+END_SRC
+
+**** Mail-source
+
+     The mail-fetching library.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'mail-source nil t)
+
+      #+END_SRC
+
+***** Customize
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; directory where incoming mail source files (if any) will be stored
+       (customize-set-variable 'mail-source-directory (expand-file-name "~/mail/"))
+
+       #+END_SRC
 
 **** Gnus
 
@@ -4284,6 +4327,9 @@
 
        #+BEGIN_SRC emacs-lisp
 
+       ;; directory variable from which all other Gnus file variables are derived
+       (customize-set-variable 'gnus-directory (expand-file-name "~/news/"))
+
        ;; default method for selecting a newsgroup
        ;; nnnil is a Gnus backend that provides no groups or articles.  It's useful
        ;; as a primary select method when you want all your real select methods to
@@ -4293,13 +4339,6 @@
        ;; a list of secondary methods that will be used for reading news
        (customize-set-variable
         'gnus-secondary-select-methods '((nntp "news.gwene.org")))
-       ;; (nnimap "gmail"
-       ;;         (nnimap-address "imap.gmail.com")
-       ;;         (nnimap-stream ssl)
-       ;;         (nnimap-server-port "imaps")
-       ;;         (nnimap-inbox "INBOX")
-       ;;         (nnimap-fetch-partial-articles t)
-       ;;         (nnimap-authinfo-file "~/.auth/auth.gpg"))))
 
        ;; if non-nil, automatically mark Gcc articles as read
        (customize-set-variable 'gnus-gcc-mark-as-read nil)
@@ -6321,7 +6360,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key prog-mode-map (kbd "<tab>") 'complete-at-point-or-indent)
+      (define-key prog-mode-map (kbd "<tab>") 'ace-complete-at-point-or-indent)
 
       #+END_SRC
 

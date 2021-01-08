@@ -5,7 +5,7 @@
 (find-file (expand-file-name "vlm.org" user-emacs-directory))
 
 ;; tangle it (only emacs-lisp source code)
-(org-babel-tangle nil nil 'emacs-lisp)
+(org-babel-tangle nil nil "emacs-lisp")
 
 ;; rename: vlm.el to init.el
 (rename-file

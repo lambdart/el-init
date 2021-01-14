@@ -1519,12 +1519,12 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; enable window divider
+     ;; window divider
      (add-hook 'window-setup-hook
                (lambda ()
-                 (funcall 'window-divider-mode)))
+                 (funcall 'window-divider-mode 1)))
 
-     ;; disable blink cursor
+     ;; blink cursor
      (add-hook 'window-setup-hook
                (lambda ()
                  (funcall 'blink-cursor-mode 1)))
@@ -1553,12 +1553,11 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; scroll options
       ;; number of lines of margin at the top and bottom of a window
       (customize-set-variable 'scroll-margin 0)
 
       ;; scroll up to this many lines, to bring point back on screen
-      (customize-set-variable 'scroll-conservatively 100)
+      (customize-set-variable 'scroll-conservatively 1)
 
       ;; t means point keeps its screen position
       (customize-set-variable 'scroll-preserve-screen-position t)
@@ -1566,7 +1565,6 @@
       ;; non-nil means mouse commands use dialog boxes to ask questions
       (customize-set-variable 'use-dialog-box nil)
 
-      ;; set window margins
       ;; width in columns of left marginal area for display of a buffer
       (customize-set-variable 'left-margin-width 1)
 
@@ -1819,7 +1817,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       ;; (safe-funcall 'global-display-line-numbers-mode 1)))
+       ;; (safe-funcall 'global-display-line-numbers-mode 1)
 
        #+END_SRC
 
@@ -2344,12 +2342,13 @@
 
       #+END_SRC
 
-***** Enable
+***** Disable
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; enable
-      ;; (safe-funcall 'tool-bar-mode 1)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (safe-funcall 'tool-bar-mode 0)))
 
       #+END_SRC
 
@@ -2379,16 +2378,6 @@
 
       #+END_SRC
 
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (funcall 'tooltip-mode 1)))
-
-      #+END_SRC
-
 **** Menu-bar
 
      Each Emacs frame normally has a "menu bar" at the top which you can use
@@ -2405,6 +2394,12 @@
 
       #+END_SRC
 
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp :tangle yes
+
+      #+END_SRC
+
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
@@ -2417,7 +2412,9 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (safe-funcall 'menu-bar-mode 0)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (safe-funcall 'menu-bar-mode 0)))
 
       #+END_SRC
 
@@ -2434,12 +2431,14 @@
 
       #+END_SRC
 
-***** Binds
+***** Disable
 
       #+BEGIN_SRC emacs-lisp
 
       ;; disable scroll bar
-      ;; (safe-funcall 'scroll-bar-mode 0)
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (safe-funcall 'scroll-bar-mode 0)))
 
       #+END_SRC
 
@@ -2713,7 +2712,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; TODO: find-out prefix map
+      ;; global map
       (global-set-key (kbd "C-x r %") 'replace-rectangle)
 
       #+END_SRC
@@ -2799,10 +2798,9 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; enable emacs server after startup (not used anymore)
      ;; (add-hook 'after-init-hook
      ;;           (lambda ()
-     ;;             (funcall 'server-start)))
+     ;;             (safe-funcall 'server-start)))
 
      #+END_SRC
 
@@ -3492,7 +3490,6 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       ;; enable exwm if graphic display is non-nil
        ;; (add-hook 'after-init-hook
        ;;                 (lambda ()
        ;;                   (when (display-graphic-p)
@@ -3835,8 +3832,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; enable display time
-      ;; (safe-funcall 'display-time-mode 1)
+      ;; (safe-funcall 'display-time-mode 0)
 
       #+END_SRC
 

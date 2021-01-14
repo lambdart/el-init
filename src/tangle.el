@@ -1,15 +1,25 @@
 ;; tangle the source code blocks require org
 (require 'org)
 
-;; read vlm.org file
-(find-file (expand-file-name "vlm.org" user-emacs-directory))
+(defvar vlm-org-file
+  (expand-file-name "vlm.org" user-emacs-directory)
+  "The vlm.org file - full path.")
 
-;; tangle it (only emacs-lisp source code)
-(org-babel-tangle nil nil "emacs-lisp")
-
-;; rename: vlm.el to init.el
-(rename-file
+(defvar vlm-tmp-init
   (expand-file-name "vlm.el" user-emacs-directory)
+  "Temporary file.")
+
+(defvar vlm-new-init
   (expand-file-name "init.el" user-emacs-directory)
-  ;; OK-IF-ALREADY-EXISTS
-  t)
+  "Init file.")
+
+(defun vlm-tangle-and-rename ()
+  "Tangle and rename `vlm-org-file' file."
+  ;; extract elisp source code blocks from vlm.org
+  (org-babel-tangle-file vlm-org-file nil "emacs-lisp")
+  ;; rename files if temporary file exists
+  (when (file-exists-p vlm-tmp-init)
+    (rename-file vlm-tmp-init vlm-new-init t)))
+
+;; invoke vlm-tangle-and-rename function
+(funcall 'vlm-tangle-and-rename)

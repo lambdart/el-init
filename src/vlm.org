@@ -1955,8 +1955,11 @@
       ;; non-nil means don’t consider case significant in completion
       (customize-set-variable 'completion-ignore-case nil)
 
+      ;; non-nil if flex completion rejects spaces in search pattern.
+      (customize-set-variable 'completion-flex-nospace nil)
+
       ;; list of completion styles to use: see `completion-styles-alist variable
-      (customize-set-variable 'completion-styles '(basic partial-completion flex))
+      (customize-set-variable 'completion-styles '(emacs22 basic partial-completion flex))
 
       ;; list of category-specific user overrides for completion styles. (TODO: research)
       ;; (customize-set-variable 'completion-category-overrides nil)
@@ -1976,6 +1979,9 @@
 
       ;; if non-nil, shorten "(default ...)" to "[...]" in minibuffer prompts
       (customize-set-variable 'minibuffer-eldef-shorten-default t)
+
+      ;; non-nil means entering the minibuffer raises the minibuffer's frame
+      (customize-set-variable 'minibuffer-auto-raise t)
 
       ;; non-nil means to delete duplicates in history
       (customize-set-variable 'history-delete-duplicates t)
@@ -2014,13 +2020,6 @@
       (define-key minibuffer-local-map (kbd "M-`") 'minibuffer-completion-help)
       (define-key minibuffer-local-map (kbd "M-w") 'minibuffer-complete-word)
       (define-key minibuffer-local-map (kbd "<tab>") 'minibuffer-complete)
-      ;; (define-key minibuffer-local-map (kbd "M-<tab>") 'goto-minibuffer-or-completions-window)
-
-      ;; ctl-x-map goes to completions window
-      (define-key ctl-x-map (kbd "C-o") 'goto-completions-window)
-
-      ;; vlm-completion-map: completion-at-point (experimental)
-      ;; (define-key vlm-completion-map (kbd "a") 'completion-at-point)
 
       ;; global
       (global-set-key (kbd "<C-delete>") 'quit-minibuffer)
@@ -2205,10 +2204,10 @@
 
       ;; custom
       ;; pending-completions number over which to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-delay-completions-threshold 1024)
+      (customize-set-variable 'icomplete-delay-completions-threshold 512)
 
       ;; maximum number of initial chars to apply `icomplete-compute-delay
-      (customize-set-variable 'icomplete-max-delay-chars 4)
+      (customize-set-variable 'icomplete-max-delay-chars 2)
 
       ;; completions-computation stall, used only with large-number completions
       (customize-set-variable 'icomplete-compute-delay 0)
@@ -2230,7 +2229,7 @@
       ;; (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
       (customize-set-variable 'icomplete-separator (propertize " | " 'face 'shadow))
 
-      ;; specialized completion tables with which `icomplete should operate,
+      ;; specialized completion tables with which `icomplete' should operate,
       ;; if this is t, `icomplete operates on all tables
       (customize-set-variable 'icomplete-with-completion-tables t)
 
@@ -2257,10 +2256,10 @@
             (define-key icomplete-minibuffer-map (kbd "DEL") 'icomplete-fido-backward-updir)
             (define-key icomplete-minibuffer-map (kbd "C-p") 'previous-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "C-n") 'next-line-or-history-element)
-            (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-top-candidate)
-            (define-key icomplete-minibuffer-map (kbd "M-y") 'minibuffer-yank-top-candidate)
-            (define-key icomplete-minibuffer-map (kbd "M-k") 'minibuffer-kill-top-candidate)
-            (define-key icomplete-minibuffer-map (kbd "M-h") 'minibuffer-describe-top-candidate))))
+            (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-completion-in-buffer)
+            (define-key icomplete-minibuffer-map (kbd "M-y") 'minibuffer-insert-completion-at-point)
+            (define-key icomplete-minibuffer-map (kbd "M-k") 'minibuffer-kill-current-completion)
+            (define-key icomplete-minibuffer-map (kbd "M-h") 'minibuffer-describe-current-completion))))
 
       #+END_SRC
 
@@ -2319,16 +2318,6 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (add-hook 'tab-bar-mode-hook
-      ;;           (lambda ()
-      ;;             (when (boundp 'exwm-input-global-keys)
-      ;;               (dolist (i (number-sequence 1 (safe-funcall 'tabs-number)))
-      ;;                 (push `(,(kbd (format "s-%d" i)) .
-      ;;                          (lambda ()
-      ;;                            (interactive)
-      ;;                            (safe-funcall 'tabs-switch-tab-by-index ,i)))
-      ;;                       exwm-input-global-keys)))))
-
       #+END_SRC
 
 **** Tool-bar
@@ -2385,13 +2374,8 @@
       ;; seconds to wait before displaying a tooltip the first time.
       (customize-set-variable 'tooltip-delay 0.2)
 
-      ;; frame parameters used for tooltips
-      ;; if ‘left’ or ‘top’ parameters are included, they specify the absolute
-      (customize-set-variable 'tooltip-frame-parameters
-                              '((name . "tooltip")
-                                (internal-border-width . 2)
-                                (border-width . 0)
-                                (no-special-glyphs . t)))
+      ;; use the echo area instead of tooltip frames for help and GUD tooltips
+      (customize-set-variable 'tooltip-use-echo-area t)
 
       #+END_SRC
 
@@ -2512,12 +2496,11 @@
                                 " "
                                 (:eval (propertized-buffer-identification "%b"))
                                 " ("
-                                (:eval (downcase
-                                  (if (eq major-mode 'exwm-mode)
-                                      mode-name
-                                    (if (not (listp mode-name))
-                                        mode-name
-                                      (car mode-name)))))
+                                (:eval (if (eq major-mode 'exwm-mode)
+                                           mode-name
+                                         (downcase (if (not (listp mode-name))
+                                                       mode-name
+                                                     (car mode-name)))))
                                 ")"))
 
       #+END_SRC
@@ -3415,14 +3398,7 @@
 
        ;; exwn global keybindings
        (customize-set-variable 'exwm-input-global-keys
-                               `((,(kbd "s-q") . exwm-input-toggle-keyboard)
-                                 ;; switch to tabs (TODO: moves to tabs-bar)
-                                 ,@(mapcar (lambda (i)
-                                             `(,(kbd (format "s-%d" i)) .
-                                               (lambda ()
-                                                 (interactive)
-                                                 (safe-funcall 'tabs-switch-tab-by-index ,i))))
-                                           (number-sequence 1 (safe-funcall 'tabs-number)))))
+                               `((,(kbd "s-q") . exwm-input-toggle-keyboard)))
 
        ;; The following example demonstrates how to use simulation keys to mimic
        ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
@@ -4253,7 +4229,7 @@
 
 **** Nnimap
 
-       Nnimap library provides interfaces Gnus with IMAP servers.
+     Nnimap library provides interfaces Gnus with IMAP servers.
 
 ***** Require
 
@@ -4286,12 +4262,12 @@
 
 ***** Customize
 
-       #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC emacs-lisp
 
-       ;; directory where incoming mail source files (if any) will be stored
-       (customize-set-variable 'mail-source-directory (expand-file-name "~/mail/"))
+      ;; directory where incoming mail source files (if any) will be stored
+      (customize-set-variable 'mail-source-directory (expand-file-name "~/mail/"))
 
-       #+END_SRC
+      #+END_SRC
 
 **** Gnus
 
@@ -6649,7 +6625,7 @@
 
      ;; program name for invoking an inferior Lisp with for
      ;; inferior lisp mode
-     (customize-set-variable 'inferior-lisp-program "sbcl")
+     (customize-set-variable 'inferior-lisp-program "ccl")
 
      #+END_SRC
 

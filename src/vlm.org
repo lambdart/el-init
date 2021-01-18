@@ -310,6 +310,9 @@
      ;; non-nil inhibits the initial startup echo area message
      (customize-set-variable 'inhibit-startup-echo-area-message nil)
 
+     ;; the full name of the user logged in
+     (customize-set-variable 'user-full-name (getenv "USER"))
+
      ;; email address of the current user
      (customize-set-variable 'user-mail-address "lambdart@protonmail.com")
 
@@ -384,20 +387,6 @@
     #+BEGIN_SRC emacs-lisp
 
     (setq load-prefer-newer noninteractive)
-
-    #+END_SRC
-
-*** Environment
-
-    User environment.
-
-    #+BEGIN_SRC emacs-lisp
-
-    ;; the email address of the current user
-    ;; (customize-set-variable 'user-mail-address nil)
-
-    ;; the full name of the user logged in.
-    (customize-set-variable 'user-full-name (getenv "USER"))
 
     #+END_SRC
 
@@ -503,7 +492,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; don't omit information when lists nest too deep
-      (customize-set-variable 'eval-expression-print-level nil)
+      (customize-set-variable 'eval-expression-print-level 4)
 
       ;; your preference for a mail composition package
       (customize-set-variable 'mail-user-agent 'message-user-agent)
@@ -1243,6 +1232,16 @@
       ;; vlm-files-map
       (define-key vlm-files-map (kbd "r") 'recentf-open-files)
       (define-key vlm-files-map (kbd "t") 'recentf-find-file)
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (safe-funcall 'recentf-mode 1)))
 
       #+END_SRC
 
@@ -2307,8 +2306,22 @@
       ;; string that delimits tabs
       (customize-set-variable 'tab-bar-separator " ")
 
-      ;; if the value is ‘1’, then hide the tab bar when it has only one tab
-      (customize-set-variable 'tab-bar-show nil)
+      ;; if the value is ‘1’, then hide the tab bar when it has only one tab-bar-show
+      ;; if t, enable `tab-bar-mode' automatically on using the commands that
+      ;; create new window configurations
+      (customize-set-variable 'tab-bar-show t)
+
+      ;; if 'rightmost', create as the last tab
+      (customize-set-variable 'tab-bar-new-tab-to "rightmost")
+
+      ;; if 'recent', select the most recently visited tab
+      (customize-set-variable 'tab-bar-close-tab-select "recent")
+
+      ;; list of modifier keys for selecting a tab by its index digit (testing)
+      ;; (customize-set-variable 'tab-bar-select-tab-modifiers '("super"))
+
+      ;; show absolute numbers on tabs in the tab bar before the tab name
+      ;; (customize-set-variable 'tab-bar-tab-hints nil)
 
       #+END_SRC
 
@@ -3948,55 +3961,44 @@
                           (name . "^\\*Completions\\*$")
                           (name . "^\\*Completions\\*$")
                           (name . "^\\*Messages\\*$")))
-
                 ("Comint" (or
                            (mode . comint-mode)
                            (name . "^\\*Async Shell Command\\*$")
                            (name . "^\\*dashboard\\*$")
                            (name . "^\\*tramp")
                            (name . "^\\*make\\*$")))
-
                 ("Custom" (mode . Custom-mode))
                 ("IRC" (mode . rcirc-mode))
-
                 ("Info"  (or
                           (mode . Info-mode)
                           (mode . dictionary-mode)
                           (mode . help-mode)
                           (mode . apropos-mode)
                           (mode . Man-mode)))
-
                 ("Tags" (or
                          (mode . tags-table-mode)
                          (mode . xref--xref-buffer-mode)))
-
                 ("Compilation" (or
                                 (mode . compilation-mode)
                                 (mode . emacs-lisp-compilation-mode)
                                 (name . "^\\*compilation\\*$")))
-
                 ("Debug"  (or (mode . debugger-mode)
                               (name . "^\\*debug")))
-
+                ("Flymake" (name . "^\\*Flymake"))
                 ("Grep" (or
                          (mode . ag-mode)
                          (mode . occur-mode)
                          (mode . locate-mode)))
-
                 ("Term" (mode . term-mode))
                 ("Shell" (or
                           (mode . shell-mode)
                           (mode . eshell-mode)))
-
                 ("Exwm" (mode . exwm-mode))
-
                 ("Emms" (or
                          (mode . emms-playlist-mode)
                          (name . "^\\*EMMS-LOG\\*$")))
-
                 ("Eww" (mode . eww-mode))
                 ("Dired" (mode . dired-mode))
-
                 ("Gnus" (or
                          (mode . message-mode)
                          (mode . bbdb-mode)
@@ -4008,16 +4010,16 @@
                          (mode . gnus-browse-mode)
                          (name . "^\\.bbdb$")
                          (name . "^\\.newsrc-dribble")))
-
                 ("Magit" (or
                           (mode . magit-mode)
                           (mode . magit-status-mode)
                           (mode . magit-diff-mode)
                           (mode . magit-process-mode)))
-
                 ("Planner" (or
                             (name . "^\\*Calendar\\*$")
-                            (name . "^diary$")
+                            (name . "^diary*")
+                            (name . "^TODO*")
+                            (name . "^agenda*")
                             (mode . muse-mode)))))))
 
       #+END_SRC
@@ -4459,7 +4461,7 @@
       (customize-set-variable 'emms-player-list '(emms-player-mpv))
 
       ;; default list of players for emms-setup
-      ;; (customize-set-variable 'emms-setup-default-player-list '(emms-player-mpv))
+      (customize-set-variable 'emms-setup-default-player-list '(emms-player-mpv))
 
       ;;  the default name of the EMMS playlist buffer
       (customize-set-variable 'emms-playlist-buffer-name "*playlist*")
@@ -4494,11 +4496,12 @@
       (define-key vlm-media-map (kbd "s") 'emms-start)
       (define-key vlm-media-map (kbd "q") 'emms-stop)
 
-      ;; my-emms.el
-      (define-key vlm-media-map (kbd "v") 'pause-track)
-      (define-key vlm-media-map (kbd "p") 'previous-track)
-      (define-key vlm-media-map (kbd "n") 'next-track)
-      (define-key vlm-media-map (kbd "r") 'random-track)
+      ;; binds from my-emms.el
+      (when (require 'my-emms nil t)
+        (define-key vlm-media-map (kbd "v") 'pause-track)
+        (define-key vlm-media-map (kbd "p") 'previous-track)
+        (define-key vlm-media-map (kbd "n") 'next-track)
+        (define-key vlm-media-map (kbd "r") 'random-track))
 
       #+END_SRC
 
@@ -4509,7 +4512,12 @@
       ;; if emms is available, enable it
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (funcall 'emms-minimalistic)
+                  ;; load required libraries (only mpv)
+                  (dolist (feature '(emms-source-file
+                                     emms-source-playlist
+                                     emms-player-mpv))
+                    (require feature nil t))
+                  ;; set default player
                   (funcall 'emms-default-players)))
 
       #+END_SRC
@@ -5189,124 +5197,10 @@
 
     A dashboard is a type of graphical user interface which often
     provides at-a-glance views of key performance indicators relevant
-    to a particular objective or business process. In other usage,
-    "dashboard" is another name for "progress report" or "report."
+    to a particular objective or business process.
 
-**** Dashboard
-
-     An extensible Emacs dashboard, with sections for
-     bookmarks, projectile projects, org-agenda and more.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'dashboard nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; association list of items to show in the startup buffer.
-      (customize-set-variable 'dashboard-items
-                              '((recents . 4)
-                                (projects . 4)
-                                (agenda . 4)
-                                (bookmarks . 4)))
-
-      ;; banners directory
-      ;; (customize-set-variable 'dashboard-banners-directory
-      ;;                         (expand-file-name "banner"  user-emacs-directory))
-
-      ;; specify the startup banner
-      (customize-set-variable 'dashboard-startup-banner 1)
-
-      ;; separator to use between the different pages.
-      (customize-set-variable 'dashboard-page-separator "
-
-      ")
-
-      ;; footer icon
-      (customize-set-variable 'dashboard-footer-icon
-                              #(" " 0 1 (face dashboard-footer)))
-
-      ;; when non nil, a footer will be displayed at the bottom.
-      (customize-set-variable 'dashboard-set-footer nil)
-
-
-      (customize-set-variable
-       'dashboard-footer "Litany Against Fear
-
-      I must not fear.
-      Fear is the mind-killer.
-      Fear is the little-death that brings total obliteration.
-      I will face my fear.
-      I will permit it to pass over me and through me.
-      And when it has gone past I will turn the inner eye to see its path.
-      Where the fear has gone there will be nothing.
-      Only I will remain.")
-
-      ;; a list of messages, one of which dashboard chooses to display
-      (customize-set-variable 'dashboard-footer-messages nil)
-
-      ;; when non nil, file lists will have icons
-      (customize-set-variable 'dashboard-set-file-icons nil)
-
-      ;; when non nil, heading sections will have icons
-      (customize-set-variable 'dashboard-set-heading-icons nil)
-
-      ;; set initial buffer choice (emacsclient fix)
-      (customize-set-variable 'initial-buffer-choice
-                              (lambda ()
-                                (or (get-buffer "*dashboard*")
-                                    (get-buffer "*scratch*"))))
-
-      #+END_SRC
-
-***** Functions
-
-      #+BEGIN_SRC emacs-lisp
-
-      (defun vlm-initialize-dashboard ()
-        "Opens or switch to *dashboard* buffer."
-        (interactive)
-        (let ((buffer (get-buffer "*dashboard*")))
-          (unless buffer
-            (setq buffer (generate-new-buffer "*dashboard*")))
-          (funcall 'dashboard-insert-startupify-lists)
-          (funcall 'dashboard-refresh-buffer)))
-
-      (defun vlm-dashboard-insert-footer ()
-        "Insert dashboard-footer message."
-        (read-only-mode 0)
-        (when (boundp 'dashboard-footer)
-          (insert (propertize dashboard-footer 'face 'dashboard-footer)))
-        (insert "\n")
-        (read-only-mode 1))
-
-      #+END_SRC
-
-***** Hooks
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; insert footer
-      (add-hook 'dashboard-mode-hook
-                (lambda ()
-                  (interactive)
-                  (vlm-dashboard-insert-footer)))
-
-      #+END_SRC
-
-***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'after-init-hook 'vlm-initialize-dashboard)
-
-      #+END_SRC
+    In other usage, "dashboard" is another name for
+    "progress report" or "report."
 
 *** Office
 **** Outline

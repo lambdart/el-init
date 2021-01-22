@@ -1900,9 +1900,9 @@
 
 **** Minibuffer
 
-     The “minibuffer” is where Emacs commands read complicated arguments,
+     The minibuffer is where Emacs commands read complicated arguments,
      such as file names, buffer names, Emacs command names, or Lisp
-     expressions. We call it the `minibuffer' because it’s a special-purpose
+     expressions. We call it the `minibuffer' because it's a special-purpose
      buffer with a small amount of screen space. You can use the usual Emacs
      editing commands in the minibuffer to edit the argument text.
 
@@ -2246,7 +2246,7 @@
             (define-key icomplete-minibuffer-map (kbd "SPC") nil)
             ;; bind
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-            (define-key icomplete-minibuffer-map (kbd "RET") 'exit-minibuffer)
+            (define-key icomplete-minibuffer-map (kbd "RET") 'icomplete-ret)
             (define-key icomplete-minibuffer-map (kbd "<tab>") 'minibuffer-complete)
             (define-key icomplete-minibuffer-map (kbd "M-<tab>") 'icomplete-forward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-DEL") 'icomplete-backward-completions)
@@ -2328,6 +2328,10 @@
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'tab-bar-mode 1)))
 
       #+END_SRC
 
@@ -3409,7 +3413,10 @@
 
        ;; exwn global keybindings
        (customize-set-variable 'exwm-input-global-keys
-                               `((,(kbd "s-q") . exwm-input-toggle-keyboard)))
+                               `((,(kbd "s-q") . exwm-input-toggle-keyboard)
+                                 (,(kbd "s-<f6>") . mute-audio)
+                                 (,(kbd "s-<f7>") . lower-volume)
+                                 (,(kbd "s-<f8>") . increase-volume)))
 
        ;; The following example demonstrates how to use simulation keys to mimic
        ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
@@ -3695,7 +3702,7 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; clt-x-map (C-x) prefix
-       (define-key ctl-x-map (kbd "<C-return>") 'open-terminal)
+       (define-key ctl-x-map (kbd "<C-return>") 'term-make)
 
        #+END_SRC
 

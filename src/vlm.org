@@ -304,11 +304,13 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; non-nil inhibits the startup screen
-     ;; this variable is an alias for `inhibit-startup-screen'
-     (customize-set-variable 'inhibit-startup-message t)
+     (customize-set-variable 'inhibit-startup-message nil)
 
      ;; non-nil inhibits the initial startup echo area message
      (customize-set-variable 'inhibit-startup-echo-area-message nil)
+
+     ;; major mode command symbol to use for the initial *scratch* buffer
+     (customize-set-variable 'initial-major-mode 'emacs-lisp-mode)
 
      ;; the full name of the user logged in
      (customize-set-variable 'user-full-name (getenv "USER"))
@@ -1613,6 +1615,9 @@
       ;; kill buffer and window
       (define-key ctl-x-map (kbd "C-k") 'kill-buffer)
 
+      ;; other window (redundancy)
+      (define-key ctl-x-map (kbd "C-o") 'other-window)
+
       ;; switch to the last buffer in the buffer list
       (define-key ctl-x-map (kbd "C-u") 'unbury-buffer)
 
@@ -1968,7 +1973,6 @@
       (customize-set-variable 'completions-format 'vertical)
 
       ;; how to resize mini-windows (the minibuffer and the echo area)
-      ;; a value of t means resize them to fit the text displayed in them
       (customize-set-variable 'resize-mini-windows nil)
 
       ;; format string used to output "default" values
@@ -1982,6 +1986,10 @@
 
       ;; non-nil means to delete duplicates in history
       (customize-set-variable 'history-delete-duplicates t)
+
+      ;; any other value means the minibuffer will move onto another frame, but
+      ;; only when the user starts using a minibuffer there
+      (customize-set-variable 'minibuffer-follows-selected-frame 1)
 
       ;; special hook to find the completion table for the entity at point (default)
       (customize-set-variable 'completion-at-point-functions
@@ -2219,7 +2227,7 @@
       (customize-set-variable 'icomplete-hide-common-prefix nil)
 
       ;; maximum number of lines to use in the minibuffer
-      (customize-set-variable 'icomplete-prospects-height 1)
+      (customize-set-variable 'icomplete-prospects-height 4)
 
       ;; string used by Icomplete to separate alternatives in the minibuffer
       ;; (customize-set-variable 'icomplete-separator (propertize " • " 'face 'shadow))
@@ -2246,13 +2254,13 @@
             (define-key icomplete-minibuffer-map (kbd "SPC") nil)
             ;; bind
             (define-key icomplete-minibuffer-map (kbd "C-j") 'icomplete-force-complete-and-exit)
-            (define-key icomplete-minibuffer-map (kbd "RET") 'icomplete-ret)
-            (define-key icomplete-minibuffer-map (kbd "<tab>") 'minibuffer-complete)
             (define-key icomplete-minibuffer-map (kbd "M-<tab>") 'icomplete-forward-completions)
             (define-key icomplete-minibuffer-map (kbd "M-DEL") 'icomplete-backward-completions)
             (define-key icomplete-minibuffer-map (kbd "DEL") 'icomplete-fido-backward-updir)
-            (define-key icomplete-minibuffer-map (kbd "C-p") 'previous-line-or-history-element)
             (define-key icomplete-minibuffer-map (kbd "C-n") 'next-line-or-history-element)
+            (define-key icomplete-minibuffer-map (kbd "C-p") 'previous-line-or-history-element)
+            (define-key icomplete-minibuffer-map (kbd "RET") 'exit-minibuffer)
+            (define-key icomplete-minibuffer-map (kbd "<tab>") 'minibuffer-complete)
             (define-key icomplete-minibuffer-map (kbd "M-i") 'minibuffer-insert-completion-in-buffer)
             (define-key icomplete-minibuffer-map (kbd "M-y") 'minibuffer-insert-completion-at-point)
             (define-key icomplete-minibuffer-map (kbd "M-k") 'minibuffer-kill-current-completion)
@@ -2509,14 +2517,15 @@
                                 mode-line-remote
                                 " "
                                 "%l:%c"
-                                " "
+                                " [ "
                                 (:eval (propertized-buffer-identification "%b"))
-                                " ("
+                                " ] "
+                                "("
                                 (:eval (if (eq major-mode 'exwm-mode)
                                            mode-name
-                                         (downcase (if (not (listp mode-name))
-                                                       mode-name
-                                                     (car mode-name)))))
+                                         (upcase (if (not (listp mode-name))
+                                                     mode-name
+                                                   (car mode-name)))))
                                 ")"))
 
       #+END_SRC
@@ -2762,7 +2771,6 @@
          newline-mark missing-newline-at-eof))
 
       #+END_SRC
-
 
 ***** Hooks
 
@@ -4025,6 +4033,7 @@
                 ("Planner" (or
                             (name . "^\\*Calendar\\*$")
                             (name . "^diary*")
+                            (name . "^\\bookmark*")
                             (name . "^TODO*")
                             (name . "^agenda*")
                             (mode . muse-mode)))))))
@@ -4168,6 +4177,7 @@
 
       ;; global map
       (global-set-key (kbd "M-<tab>") 'ace-complete-at-point-or-indent)
+      (global-set-key (kbd "TAB") 'ace-complete-at-point-or-indent)
 
       ;; TODO
       ;; (define-key vlm-completion-map (kbd "/" 'ace-complete-dabbrev)
@@ -6742,8 +6752,28 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; TODO research
-      ;; (customize-set-variable 'c-default-style nil)
+      ;; style which gets installed by default when a file is visited
+      ;; (customize-set-variable 'c-default-style '(custom))
+
+      ;; whether to fontify certain ambiguous constructs by white space asymmetry
+      (customize-set-variable 'c-asymmetry-fontification-flag nil)
+
+      ;; align automatically inserted line continuation backslashes
+      (customize-set-variable 'c-auto-align-backslashes t)
+
+      ;; whether the indentation should be controlled by the syntactic context
+      ;; if nil, every line is just indented to the same level as the previous one
+      (customize-set-variable 'c-syntactic-indentation t)
+
+      ;; amount of basic offset used by + and - symbols in `c-offsets-alist'
+      ;; also used as the indentation step when `c-syntactic-indentation' is nil
+      (customize-set-variable 'c-basic-offset nil) ; 'set-from-style
+
+      ;; if non-nil, syntactic info is echoed when the line is indented
+      (customize-set-variable 'c-echo-syntactic-information-p t)
+
+      ;; specifies documentation comment style(s) to recognize
+      (customize-set-variable 'c-doc-comment-style 'doxygen) ; 'set-from-style
 
       #+END_SRC
 
@@ -6771,8 +6801,8 @@
         (lambda ()
           (when (and (boundp 'c-mode-map) (boundp 'c++-mode-map))
             ;; complete or indent
-            (define-key c-mode-map (kbd "TAB") 'complete-at-point-or-indent)
-            (define-key c++-mode-map (kbd "TAB") 'complete-at-point-or-indent)
+            (define-key c-mode-map (kbd "TAB") 'ace-complete-at-point-or-indent)
+            (define-key c++-mode-map (kbd "TAB") 'ace-complete-at-point-or-indent)
             ;; compilation keybind
             (define-key c-mode-map (kbd "C-c C-c")
               (lambda ()

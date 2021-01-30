@@ -392,6 +392,17 @@
 
     #+END_SRC
 
+*** Sound
+**** Beeping
+***** Disable
+
+    #+BEGIN_SRC emacs-lisp :tangle yes
+
+    ;; do nothing (NOP)
+    (customize-set-variable 'ring-bell-function (lambda () nil))
+
+    #+END_SRC
+
 ** Libraries
 *** Loaddefs
 
@@ -1512,7 +1523,7 @@
        `(cond ((find-font (font-spec :name ,font))
                (set-frame-font ,font nil t))))
 
-     ;; (safe-set-frame-font "Iosevka Fixed:pixelsize=22:width=regular:weight=regular")
+     ;; (safe-set-frame-font "Iosevka:pixelsize=20:width=regular:weight=regular")
 
      #+END_SRC
 
@@ -2333,7 +2344,7 @@
 
       #+END_SRC
 
-***** Hooks
+***** Enable
 
       #+BEGIN_SRC emacs-lisp
 
@@ -3902,16 +3913,26 @@
       Add theme directory to load-path and load the
       default theme.
 
+****** Add
+
       #+BEGIN_SRC emacs-lisp
 
       ;; add vlm-theme-dir to theme load path
       (add-to-list 'custom-theme-load-path
                    (concat user-emacs-directory "themes"))
 
-      ;; load theme
-      (load-theme 'moebius-sun t)
-
       #+END_SRC
+
+****** Enable
+
+       #+BEGIN_SRC emacs-lisp :tangle yes
+
+       ;; load theme
+       (add-hook 'window-setup-hook
+                 (lambda ()
+                   (funcall 'load-theme 'moebius-glass t)))
+
+       #+END_SRC
 
 *** Buffers
 **** Buffer-move
@@ -4940,6 +4961,17 @@
 
       #+END_SRC
 
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp :tangle yes
+
+      ;; turn on cannon-mode
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'turn-on-cannon-mode)))
+
+      #+END_SRC
+
 *** Clients
 
     Network Client is a software that runs on a client computer
@@ -5158,7 +5190,11 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; ctl-x map
       (define-key ctl-x-map (kbd "<end>") 'lock-screen)
+
+      ;; notebook
+      (global-set-key (kbd "<XF86ScreenSaver>") 'lock-screen)
 
       #+END_SRC
 
@@ -5180,7 +5216,12 @@
       ;; global-map
       (global-set-key (kbd "s-<f6>") 'mute-audio)
       (global-set-key (kbd "s-<f7>") 'lower-volume)
-      (global-set-key (kbd "s-<f8>") 'increase-volume)
+      (global-set-key (kbd "s-<f8>") 'raise-volume)
+
+      ;; notebook
+      (global-set-key (kbd "<XF86AudioMute>") 'mute-audio)
+      (global-set-key (kbd "<XF86AudioLowerVolume>") 'lower-volume)
+      (global-set-key (kbd "<XF86AudioRaiseVolume>") 'raise-volume)
 
       #+END_SRC
 

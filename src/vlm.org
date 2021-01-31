@@ -3139,10 +3139,10 @@
       (customize-set-variable 'lazy-load-enable-run-idle-flag nil)
 
       ;; idle timer value
-      (customize-set-variable 'lazy-load-idle-seconds 15)
+      (customize-set-variable 'lazy-load-idle-seconds 30)
 
       ;; interval in seconds, used to trigger the timer callback
-      (customize-set-variable 'lazy-load-timer-interval 8)
+      (customize-set-variable 'lazy-load-timer-interval 15)
 
       ;; target files and directories
       (customize-set-variable 'lazy-load-files-alist
@@ -4524,22 +4524,26 @@
       (eval-after-load 'emms-playlist-mode
         (lambda ()
           ;; avoid warnings
-          (when (boundp 'emms-playlist-mode-map)
+          (and (boundp 'emms-playlist-mode-map)
             ;; add files inside playlist mode buffer
             (define-key emms-playlist-mode-map (kbd "A") 'emms-add-file))))
 
-      ;; binds vlm-media-map
+      ;; vlm-media-map default
       (define-key vlm-media-map (kbd "P") 'play-playlist)
       (define-key vlm-media-map (kbd "a") 'emms-add-file)
-      (define-key vlm-media-map (kbd "s") 'emms-start)
+      (define-key vlm-media-map (kbd "s") 'emms-shuffle)
       (define-key vlm-media-map (kbd "q") 'emms-stop)
 
-      ;; binds from my-emms.el
-      (when (require 'my-emms nil t)
-        (define-key vlm-media-map (kbd "v") 'pause-track)
-        (define-key vlm-media-map (kbd "p") 'previous-track)
-        (define-key vlm-media-map (kbd "n") 'next-track)
-        (define-key vlm-media-map (kbd "r") 'random-track))
+      ;; vlm-media-map track related binds
+      (define-key vlm-media-map (kbd "v") 'pause-track)
+      (define-key vlm-media-map (kbd "p") 'previous-track)
+      (define-key vlm-media-map (kbd "n") 'next-track)
+      (define-key vlm-media-map (kbd "r") 'random-track)
+
+      ;; notebook related
+      (global-set-key (kbd "<XF86AudioPlay>") 'pause-track)
+      (global-set-key (kbd "<XF86AudioNext>") 'next-track)
+      (global-set-key (kbd "<XF86AudioPrev>") 'previous-track)
 
       #+END_SRC
 
@@ -5219,9 +5223,9 @@
       (global-set-key (kbd "s-<f8>") 'raise-volume)
 
       ;; notebook
-      (global-set-key (kbd "<XF86AudioMute>") 'mute-audio)
-      (global-set-key (kbd "<XF86AudioLowerVolume>") 'lower-volume)
-      (global-set-key (kbd "<XF86AudioRaiseVolume>") 'raise-volume)
+      (global-set-key (kbd "<XF86AudioMute>") 'm-mixer-toggle-audio)
+      (global-set-key (kbd "<XF86AudioLowerVolume>") 'm-mixer-lower-volume)
+      (global-set-key (kbd "<XF86AudioRaiseVolume>") 'm-mixer-raise-volume)
 
       #+END_SRC
 

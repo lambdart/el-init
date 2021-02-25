@@ -184,6 +184,10 @@
        (make-sparse-keymap)
        "Window commands keymap.")
 
+     (defvar vlm-rb-map
+       (make-sparse-keymap)
+       "Register/Bookmarks commands keymap.")
+
      (defvar vlm-tags-map
        (make-sparse-keymap)
        "Tags (navigation) commands keymap.")
@@ -237,6 +241,7 @@
 
      (dolist (prefix-map '(vlm-tags-map
                            vlm-tabs-map
+                           vlm-rb-map
                            vlm-pm-map
                            vlm-sc-map
                            vlm-docs-map
@@ -258,15 +263,15 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; vlm prefix maps
-     (define-key ctl-x-map (kbd "f") 'vlm-files-map) ;; files
-     ;; (define-key ctl-x-map (kbd "") 'vlm-filter-map)
-     (define-key ctl-x-map (kbd "p") 'vlm-pm-map) ; project
-     (define-key ctl-x-map (kbd "t") 'vlm-tags-map) ; tags
-     (define-key ctl-x-map (kbd "c") 'vlm-utils-map) ; commands
+     (define-key ctl-x-map (kbd "f") 'vlm-files-map)
+     ;; (define-key ctl-x-map (kbd "r") 'vlm-rb-map) ; register
+     (define-key ctl-x-map (kbd "p") 'vlm-pm-map)
+     (define-key ctl-x-map (kbd "t") 'vlm-tags-map)
+     (define-key ctl-x-map (kbd "c") 'vlm-utils-map)
      (define-key ctl-x-map (kbd "e") 'vlm-sc-map) ; errors
      (define-key ctl-x-map (kbd "l") 'vlm-docs-map) ; library
-     (define-key ctl-x-map (kbd "v") 'vlm-media-map) ; media
-     (define-key ctl-x-map (kbd "<tab>") 'vlm-completion-map) ; tab - complete
+     (define-key ctl-x-map (kbd "v") 'vlm-media-map) ; video/media
+     (define-key ctl-x-map (kbd "<tab>") 'vlm-completion-map) ; tab (complete)
 
      #+END_SRC
 
@@ -396,12 +401,12 @@
 **** Beeping
 ***** Disable
 
-    #+BEGIN_SRC emacs-lisp :tangle yes
+      #+BEGIN_SRC emacs-lisp :tangle yes
 
-    ;; do nothing (NOP)
-    (customize-set-variable 'ring-bell-function (lambda () nil))
+      ;; do nothing (NOP)
+      (customize-set-variable 'ring-bell-function (lambda () nil))
 
-    #+END_SRC
+      #+END_SRC
 
 ** Libraries
 *** Loaddefs
@@ -571,7 +576,7 @@
       (define-key ctl-x-map (kbd "k") 'kill-buffer)
 
       ;; shell command history
-      (define-key ctl-x-map (kbd "C-x") 'shell-command-history)
+      (define-key ctl-x-map (kbd "x") 'shell-command-history)
       (define-key ctl-x-map (kbd "C-c") 'eval-command-history)
 
       ;; mark
@@ -1014,16 +1019,16 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; frame width to use for rendering
-      (customize-set-variable 'shr-width 120)
+      (customize-set-variable 'shr-width 80)
 
       ;; if non-nil, use proportional fonts for text
       (customize-set-variable 'shr-use-fonts nil)
 
       ;; if non-nil, respect color specifications in the HTML
-      (customize-set-variable 'shr-use-colors nil)
+      (customize-set-variable 'shr-use-colors t)
 
       ;; if non-nil, inhibit loading images
-      (customize-set-variable 'shr-inhibit-images nil)
+      (customize-set-variable 'shr-inhibit-images t)
 
       ;; images that have URLs matching this regexp will be blocked (regexp)
       (customize-set-variable 'shr-blocked-images nil)
@@ -1966,7 +1971,7 @@
       (customize-set-variable 'completion-auto-help nil)
 
       ;; non-nil means don’t consider case significant in completion
-      (customize-set-variable 'completion-ignore-case nil)
+      (customize-set-variable 'completion-ignore-case t)
 
       ;; non-nil if flex completion rejects spaces in search pattern.
       (customize-set-variable 'completion-flex-nospace nil)
@@ -1974,10 +1979,10 @@
       ;; list of completion styles to use: see `completion-styles-alist variable
       (customize-set-variable 'completion-styles '(emacs22 basic partial-completion flex))
 
-      ;; list of category-specific user overrides for completion styles. (TODO: research)
-      ;; (customize-set-variable 'completion-category-overrides nil)
-      ;; '((file (styles initials basic))
-      ;;   (buffer (styles initials basic))
+      ;; list of category-specific user overrides for completion styles
+      (customize-set-variable 'completion-category-overrides nil)
+      ;; '((file (styles initials basic flex))
+      ;;   (buffer (styles initials basic flex))
       ;;   (info-menu (styles basic))))
 
       ;; define the appearance and sorting of completions
@@ -2238,12 +2243,12 @@
       (customize-set-variable 'icomplete-hide-common-prefix nil)
 
       ;; maximum number of lines to use in the minibuffer
-      (customize-set-variable 'icomplete-prospects-height 4)
+      (customize-set-variable 'icomplete-prospects-height 1)
 
       ;; string used by Icomplete to separate alternatives in the minibuffer
       ;; (customize-set-variable 'icomplete-separator (propertize " • " 'face 'shadow))
       ;; (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
-      (customize-set-variable 'icomplete-separator (propertize " | " 'face 'shadow))
+     (customize-set-variable 'icomplete-separator (propertize " | " 'face 'shadow))
 
       ;; specialized completion tables with which `icomplete' should operate,
       ;; if this is t, `icomplete operates on all tables
@@ -2519,18 +2524,21 @@
       ;; remove underline
       (customize-set-variable 'x-underline-at-descent-line t)
 
-      ;; (:eval (format-time-string "%H:%M"))
+      ;;
       ;; mode-line format
       (customize-set-variable 'mode-line-format
-                              '("%e"
+                              '(" λ · ["
+                                (:eval (format-time-string "%H:%M"))
+                                "]"
+                                "%e"
                                 mode-line-front-space
                                 mode-line-modified
                                 mode-line-remote
                                 " "
                                 "%l:%c"
-                                " [ "
+                                " · "
                                 (:eval (propertized-buffer-identification "%b"))
-                                " ] "
+                                " · "
                                 "("
                                 (:eval (if (eq major-mode 'exwm-mode)
                                            mode-name
@@ -2933,7 +2941,7 @@
                                  (/ (frame-height) 4))))
 
      ;; the minimum total height, in lines, of any window
-     (customize-set-variable 'window-min-height 8)
+     (customize-set-variable 'window-min-height 4)
 
      #+END_SRC
 
@@ -3094,6 +3102,54 @@
 
       #+END_SRC
 
+*** Utils
+**** Bookmark
+
+     Bookmarks are somewhat like registers in that they record positions
+     you can jump to. Unlike registers, they have long names, and they
+     persist automatically from one Emacs session to the next.
+     The prototypical use of bookmarks is to record where you were
+     reading in various files.
+
+     The bookmark list is sorted lexically by default, but you can turn
+     this off by setting bookmark-sort-flag to nil. If it is nil, then
+     the list will be presented in the order it is recorded
+     (chronologically), which is actually fairly useful as well.
+
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; (require 'bookmark nil t)
+
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; custom
+      ;; file in which to save bookmarks by default.
+      (customize-set-variable
+       'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))
+
+      #+END_SRC
+
+**** Registers
+
+     This library provides functions that emulates and somewhat extends the venerable
+     TECO's `register' feature, which permits you to save various useful
+     pieces of buffer state to named variables. The entry points are
+     documented in the Emacs user's manual.
+
+     #+BEGIN_SRC emacs-lisp
+     (info "(emacs) Registers")
+     #+END_SRC
+
+***** Require
+***** Customize
+***** Binds
+
 ** Extensions
 *** Loaddefs
 
@@ -3148,8 +3204,7 @@
       (customize-set-variable 'lazy-load-files-alist
                               (list
                                ;; lisp directory
-                               (cons "lisp-loaddefs.el"
-                                     (expand-file-name "lisp/" user-emacs-directory))
+                               (cons "lisp-loaddefs.el" (expand-file-name "lisp/" user-emacs-directory))
                                ;; site-lisp directory
                                (cons "site-lisp-loaddefs.el"
                                      (expand-file-name "site-lisp/" user-emacs-directory))))
@@ -3232,10 +3287,10 @@
       (eval-after-load 'iedit
         (lambda ()
           (when (boundp 'iedit-mode-keymap)
-            (define-key iedit-mode-keymap (kbd "<tab>") 'complete-at-point-or-indent)
             (define-key iedit-mode-keymap (kbd "M-n") 'iedit-next-occurrence))))
 
       ;; bind (global)
+
       (global-set-key (kbd "C-;") 'iedit-mode)
 
       #+END_SRC
@@ -3435,7 +3490,7 @@
                                `((,(kbd "s-q") . exwm-input-toggle-keyboard)
                                  (,(kbd "s-<f6>") . mute-audio)
                                  (,(kbd "s-<f7>") . lower-volume)
-                                 (,(kbd "s-<f8>") . increase-volume)))
+                                 (,(kbd "s-<f8>") . raise-volume)))
 
        ;; The following example demonstrates how to use simulation keys to mimic
        ;; the behavior of Emacs.  The value of `exwm-input-simulation-keys` is a
@@ -3603,38 +3658,6 @@
      A file manager or file browser is a computer program that provides
      a user interface to manage files and folders.
 
-**** Bookmark
-
-     Bookmarks are somewhat like registers in that they record positions
-     you can jump to. Unlike registers, they have long names, and they
-     persist automatically from one Emacs session to the next.
-     The prototypical use of bookmarks is to record where you were
-     reading in various files.
-
-     The bookmark list is sorted lexically by default, but you can turn
-     this off by setting bookmark-sort-flag to nil. If it is nil, then
-     the list will be presented in the order it is recorded
-     (chronologically), which is actually fairly useful as well.
-
-***** Require
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; (require 'bookmark nil t)
-
-      #+END_SRC
-
-***** Customize
-
-      #+BEGIN_SRC emacs-lisp
-
-      ;; custom
-      ;; file in which to save bookmarks by default.
-      (customize-set-variable
-       'bookmark-default-file (concat user-emacs-directory "cache/bookmarks"))
-
-      #+END_SRC
-
 *** Emulators
 
     An emulator is hardware or software that enables one
@@ -3679,7 +3702,6 @@
        (customize-set-variable 'term-completion-addsuffix t)
 
        ;; regexp to recognize prompts in the inferior process
-       ;; (customize-set-variable 'term-prompt-regexp "^\\(>\\|\\(->\\)+\\) *")
        (customize-set-variable 'term-prompt-regexp "^[^#$%>\n]*[#$%>] *")
 
        ;; if non-nil, automatically list possibilities on partial completion.
@@ -3722,6 +3744,24 @@
 
        ;; clt-x-map (C-x) prefix
        (define-key ctl-x-map (kbd "<C-return>") 'term-make)
+
+       #+END_SRC
+
+***** Multi-Term
+****** Require
+****** Customize
+
+       #+BEGIN_SRC emacs-lisp
+
+       (customize-set-variable 'multi-term-dedicated-select-after-open-p t)
+
+       #+END_SRC
+
+****** Binds
+
+       #+BEGIN_SRC emacs-lisp
+
+       (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)
 
        #+END_SRC
 
@@ -3915,13 +3955,13 @@
 
 ****** Add
 
-      #+BEGIN_SRC emacs-lisp
+       #+BEGIN_SRC emacs-lisp
 
-      ;; add vlm-theme-dir to theme load path
-      (add-to-list 'custom-theme-load-path
-                   (concat user-emacs-directory "themes"))
+       ;; add vlm-theme-dir to theme load path
+       (add-to-list 'custom-theme-load-path
+                    (concat user-emacs-directory "themes"))
 
-      #+END_SRC
+       #+END_SRC
 
 ****** Enable
 
@@ -3930,7 +3970,7 @@
        ;; load theme
        (add-hook 'window-setup-hook
                  (lambda ()
-                   (funcall 'load-theme 'moebius-glass t)))
+                   (funcall 'load-theme 'moebius-sun t)))
 
        #+END_SRC
 
@@ -4003,6 +4043,7 @@
                            (name . "^\\*dashboard\\*$")
                            (name . "^\\*tramp")
                            (name . "^\\*make\\*$")))
+                ("Misc"    (mode . fundamental-mode))
                 ("Custom" (mode . Custom-mode))
                 ("IRC" (mode . rcirc-mode))
                 ("Info"  (or
@@ -4025,6 +4066,7 @@
                          (mode . ag-mode)
                          (mode . occur-mode)
                          (mode . locate-mode)))
+                ("Kill Ring" (mode . browse-kill-ring-mode))
                 ("Term" (mode . term-mode))
                 ("Shell" (or
                           (mode . shell-mode)
@@ -4194,15 +4236,26 @@
       ;; vlm-completion-map
       (define-key vlm-completion-map (kbd "`") 'ace-complete-word)
       (define-key vlm-completion-map (kbd "f") 'ace-complete-file-name)
-      (define-key vlm-completion-map (kbd "<tab>") 'ace-complete-at-point-or-indent)
+      (define-key vlm-completion-map (kbd "<tab>") 'ace-completion-at-point)
 
       ;; global map
-      (global-set-key (kbd "M-<tab>") 'ace-complete-at-point-or-indent)
-      (global-set-key (kbd "TAB") 'ace-complete-at-point-or-indent)
+      (global-set-key (kbd "M-<tab>") 'ace-completion-at-point-or-indent)
+      (global-set-key (kbd "TAB") 'ace-completion-at-point-or-indent)
 
       ;; TODO
       ;; (define-key vlm-completion-map (kbd "/" 'ace-complete-dabbrev)
       ;; (define-key vlm-completion-map (kbd "]") 'ace-complete-dabbrev-code)
+
+      #+END_SRC
+
+***** Enable
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; enable ace-mode
+      (add-hook 'window-setup-hook
+                (lambda ()
+                  (funcall 'turn-on-ace-mode)))
 
       #+END_SRC
 
@@ -4525,8 +4578,8 @@
         (lambda ()
           ;; avoid warnings
           (and (boundp 'emms-playlist-mode-map)
-            ;; add files inside playlist mode buffer
-            (define-key emms-playlist-mode-map (kbd "A") 'emms-add-file))))
+               ;; add files inside playlist mode buffer
+               (define-key emms-playlist-mode-map (kbd "A") 'emms-add-file))))
 
       ;; vlm-media-map default
       (define-key vlm-media-map (kbd "P") 'play-playlist)
@@ -4950,9 +5003,9 @@
 
       ;; file in which the launcher state is
       ;; saved between Emacs sessions
-      (customize-set-variable
-       'cannon-cache-file
-       (expand-file-name "cache/cannon" user-emacs-directory))
+      (customize-set-variable 'cannon-cache-file
+                              (expand-file-name "cache/cannon-cache"
+                                                user-emacs-directory))
 
       #+END_SRC
 
@@ -5058,6 +5111,28 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; (require 'verb nil t)
+
+      #+END_SRC
+
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; value nil means never show the headers buffer
+      ;; value ‘when-empty’ means automatically show the headers buffer only
+      ;; when the response’s body size is 0
+      ;; any other value means always show the headers buffer
+      (customize-set-variable 'verb-auto-show-headers-buffer t)
+
+      ;;  timeout (s) for HTTP requests made from a Babel source blocks
+      (customize-set-variable 'verb-babel-timeout 16)
+
+      ;; when set to a non-nil value, enable Lisp completion in code tags
+      (customize-set-variable 'verb-enable-elisp-completion nil)
+
+      ;; when non-nil, log different events in the *Verb Log* buffer
+      (customize-set-variable 'verb-enable-log t)
 
       #+END_SRC
 
@@ -5365,11 +5440,6 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eval-after-load 'org
-        (lambda()
-          (when (boundp 'org-mode-map)
-            (define-key org-mode-map (kbd "C-M-i") 'complete-at-point-or-indent))))
-
       #+END_SRC
 
 **** Org-Agenda
@@ -5453,10 +5523,6 @@
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
-
-      (when (boundp 'markdown-mode-map)
-        (progn
-          (define-key markdown-mode-map (kbd "TAB") 'complete-at-point-or-indent)))
 
       #+END_SRC
 
@@ -6288,7 +6354,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key prog-mode-map (kbd "<tab>") 'ace-complete-at-point-or-indent)
+      (define-key prog-mode-map (kbd "<tab>") 'ace-completion-at-point-or-indent)
 
       #+END_SRC
 
@@ -6379,8 +6445,6 @@
       #+BEGIN_SRC emacs-lisp
 
       (define-key text-mode-map (kbd "C-c C-g") 'keyboard-quit)
-      (define-key text-mode-map (kbd "TAB") 'complete-at-point-or-indent)
-
       (define-key text-mode-map (kbd "C-c C-k") 'with-editor-cancel)
       (define-key text-mode-map (kbd "C-c C-c") 'with-editor-finish)
 
@@ -7164,6 +7228,14 @@
 
       #+END_SRC
 
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+
+      #+END_SRC
+
 ***** Hooks
 
       #+BEGIN_SRC emacs-lisp
@@ -7313,7 +7385,7 @@
      ;; (define-key ctl-x-map (kbd "v") nil)
      (define-key ctl-x-map (kbd "h") nil)
      ;; (define-key ctl-x-map (kbd "d") nil)
-     (define-key ctl-x-map (kbd "x") nil)
+     ;; (define-key ctl-x-map (kbd "x") nil)
      (define-key ctl-x-map (kbd "X") nil)
      ;; (define-key ctl-x-map (kbd "8") nil)
 

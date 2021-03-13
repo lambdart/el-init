@@ -1706,24 +1706,22 @@
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; non-nil means do not display continuation lines.
+     ;; non-nil means do not display continuation lines
      (customize-set-variable 'truncate-lines nil)
 
-     ;; sentences should be separated by a single space,
-     ;; so treat two sentences as two when filling
+     ;; column beyond which automatic line-wrapping should happen
+     (customize-set-variable 'fill-column 80)
+
+     ;; sentences should be separated by a single space
      (customize-set-variable 'sentence-end-double-space nil)
 
-     ;; kill process not confirmation required
-     ;; list of functions called with no args to query before killing a buffer.
-     ;; The buffer being killed will be current while the functions are running.
+     ;; list of functions called with no args to query before killing a buffer
      (customize-set-variable 'kill-buffer-query-functions nil)
-     ;; (process-kill-buffer-query-function)
 
-     ;; non-nil means load prefers the newest version of a file.
+     ;; non-nil means load prefers the newest version of a file
      (customize-set-variable 'load-prefer-newer t)
 
-     ;; delete the entire contents of the current buffer
-     ;; enable: M-x erase-buffer RET
+     ;; enable erase-buffer
      (add-hook 'window-setup-hook
                (lambda ()
                  (put 'erase-buffer 'disabled nil)))
@@ -1790,7 +1788,6 @@
 
        #+END_SRC
 
-
 ***** Display-linum
 
       Display line numbers in the buffer.
@@ -1807,9 +1804,6 @@
 ****** Customize
 
        #+BEGIN_SRC emacs-lisp
-
-       ;; the default type of line numbers to use in `display-line-numbers-mode'
-       (customize-set-variable 'display-line-numbers-type t)
 
        ;; if non-nil, do not shrink line number width
        (customize-set-variable 'display-line-numbers-grow-only t)
@@ -1841,6 +1835,14 @@
 
        #+END_SRC
 
+***** Display-column-indicator
+
+     This library provides the display of the column indicator.
+
+****** Require
+****** Customize
+****** Hooks
+****** Binds
 ***** Cursor
 
       On a text terminal, the cursor's appearance is controlled by the
@@ -1968,7 +1970,7 @@
       (customize-set-variable 'completion-show-inline-help nil)
 
       ;; non-nil means automatically provide help for invalid completion input
-      (customize-set-variable 'completion-auto-help nil)
+      (customize-set-variable 'completion-auto-help t)
 
       ;; non-nil means don’t consider case significant in completion
       (customize-set-variable 'completion-ignore-case t)
@@ -2248,7 +2250,7 @@
       ;; string used by Icomplete to separate alternatives in the minibuffer
       ;; (customize-set-variable 'icomplete-separator (propertize " • " 'face 'shadow))
       ;; (customize-set-variable 'icomplete-separator (propertize " · " 'face 'shadow))
-     (customize-set-variable 'icomplete-separator (propertize " | " 'face 'shadow))
+      (customize-set-variable 'icomplete-separator (propertize " | " 'face 'shadow))
 
       ;; specialized completion tables with which `icomplete' should operate,
       ;; if this is t, `icomplete operates on all tables
@@ -3143,7 +3145,7 @@
      documented in the Emacs user's manual.
 
      #+BEGIN_SRC emacs-lisp
-     (info "(emacs) Registers")
+                                             ; (info "(emacs) Registers")
      #+END_SRC
 
 ***** Require
@@ -3474,13 +3476,13 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; set exwm workspaces number
-       (customize-set-variable 'exwm-workspace-number 1)
+       (customize-set-variable 'exwm-workspace-number 0)
 
        ;; show workspaces in all buffers
-       (customize-set-variable 'exwm-workspace-show-all-buffers t)
+       (customize-set-variable 'exwm-workspace-show-all-buffers nil)
 
        ;; non-nil to allow switching to buffers on other workspaces
-       (customize-set-variable 'exwm-layout-show-all-buffers t)
+       (customize-set-variable 'exwm-layout-show-all-buffers nil)
 
        ;; non-nil to force managing all X windows in tiling layout.
        (customize-set-variable 'exwm-manage-force-tiling t)
@@ -4109,9 +4111,9 @@
 
       ;; hook run upon entry into `ibuffer-mode'
       (add-hook 'ibuffer-mode-hook
-                '(lambda ()
-                   (ibuffer-auto-mode 1)
-                   (ibuffer-switch-to-saved-filter-groups "default")))
+                (lambda ()
+                  (safe-funcall 'ibuffer-auto-mode 1)
+                  (safe-funcall 'ibuffer-switch-to-saved-filter-groups "default")))
 
       #+END_SRC
 
@@ -4306,11 +4308,11 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; directory where elfeed will store its database.
+      ;; directory where elfeed will store its database
       (customize-set-variable 'elfeed-db-directory
                               (expand-file-name "elfeed" user-emacs-directory))
 
-      ;; default directory for saving enclosures. Hide
+      ;; default directory for saving enclosures
       (customize-set-variable 'elfeed-enclosure-default-dir
                               (expand-file-name "cache/elfeed" user-emacs-directory))
 
@@ -4647,6 +4649,9 @@
       ;; non-nil means log irc activity to disk
       (customize-set-variable 'rcirc-log-flag nil)
 
+      ;; non-nil means messages without a channel target will go to the server buffer
+      (customize-set-variable 'rcirc-always-use-server-buffer-flag t)
+
       ;; major-mode function to use in multiline edit buffers
       (customize-set-variable 'rcirc-multiline-major-mode 'text-mode)
 
@@ -4658,7 +4663,7 @@
 
       ;; prompt string to use in IRC buffers
       ;; %n: nick, %s: server, %t target: channel or user
-      (customize-set-variable 'rcirc-prompt "%t » ")
+      (customize-set-variable 'rcirc-prompt "%t] ")
 
       ;; coding system used to decode incoming irc messages
       (customize-set-variable 'rcirc-decode-coding-system 'utf-8)
@@ -6658,6 +6663,17 @@
 
      #+BEGIN_SRC emacs-lisp
 
+     ;; whether ‘geiser-mode’ should be active by default in all scheme buffers
+     ;; (customize-set-variable 'geiser-mode-auto-p nil)
+
+     #+END_SRC
+
+**** Hooks
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (remove-hook 'scheme-mode-hook 'geiser-mode--maybe-activate)
+
      #+END_SRC
 
 *** Glsl
@@ -7347,7 +7363,7 @@
      (define-key ctl-x-map (kbd "<left>") nil)
 
      ;; (define-key ctl-x-map (kbd "C-d") nil)
-     (define-key ctl-x-map (kbd "C-o") nil)
+     ;; (define-key ctl-x-map (kbd "C-o") nil)
      ;; (define-key ctl-x-map (kbd "C-c") nil)
      (define-key ctl-x-map (kbd "C-j") nil)
      (define-key ctl-x-map (kbd "C-+") nil)

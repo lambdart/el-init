@@ -27,7 +27,7 @@
   Literate programming is a programming paradigm introduced by Donald
   Knuth  in which a computer program is given an explanation of its
   logic in a natural language, such as English, interspersed with
-  snippets  of macros and traditional source code, from which
+  snippets of macros and traditional source code, from which
   compilable source code can be generated.
 
   =Org-mode= is used to write and organize the configuration
@@ -461,6 +461,60 @@
 
      #+END_SRC
 
+*** Comp
+
+    In addition to the byte-compilation, described in *note the previous
+    chapter: Byte Compilation, Emacs can also optionally compile Lisp
+    function definitions into a true compiled code, known as 'native code'.
+    This feature uses the =libgccjit= library, which is part of the GCC
+    distribution, and requires that Emacs be built with support for using
+    that library. It also requires to have GCC and Binutils (the assembler
+    and linker) available on your system for you to be able to
+    native-compile Lisp code.
+
+    Unlike byte-compiled code, natively-compiled Lisp code is executed
+    directly by the machine's hardware, and therefore runs at full speed
+    that the host CPU can provide. The resulting speedup generally depends
+    on what the Lisp code does, but is usually 2.5 to 5 times faster than
+    the corresponding byte-compiled code.
+
+    Since native code is generally incompatible between different
+    systems, the natively-compiled code is *not* transportable from one
+    machine to another, it can only be used on the same machine where it was
+    produced or on very similar ones (having the same CPU and run-time
+    libraries). The transportability of natively-compiled code is the same
+    as that of shared libraries (=.so= files).
+
+**** Require
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (require 'comp nil t)
+
+     #+END_SRC
+
+**** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; non-nil means unconditionally (re-)compile all files
+     (customize-set-variable 'native-comp-always-compile t)
+
+     ;; default number of subprocesses used for async native compilation
+     ;; value of zero means to use half the number of the CPU's execution units
+     (customize-set-variable 'native-comp-async-jobs-number 0)
+
+     ;; emit a warning if a byte-code file being loaded has no corresponding source
+     (customize-set-variable 'native-comp-warning-on-missing-source t)
+
+     #+END_SRC
+
+**** Hooks
+
+     #+BEGIN_SRC emacs-lisp
+
+     #+END_SRC
+
 *** Fundamental
 **** Macros
 
@@ -576,7 +630,7 @@
       (define-key ctl-x-map (kbd "k") 'kill-buffer)
 
       ;; shell command history
-      (define-key ctl-x-map (kbd "x") 'shell-command-history)
+      (define-key ctl-x-map (kbd "C-x") 'shell-command-history)
       (define-key ctl-x-map (kbd "C-c") 'eval-command-history)
 
       ;; mark
@@ -1390,7 +1444,7 @@
 
 ***** Customize
 
-      #+BEGIN_SRC emacs-lisp
+      #+BEGIN_SRC
 
       ;; TODO
 
@@ -1837,11 +1891,20 @@
 
 ***** Display-column-indicator
 
-     This library provides the display of the column indicator.
+      This library provides the display of the column indicator.
 
 ****** Require
 ****** Customize
 ****** Hooks
+
+       #+BEGIN_SRC emacs-lisp
+
+       (add-hook 'prog-mode-hook
+                 (lambda ()
+                   (display-fill-column-indicator-mode 1)))
+
+       #+END_SRC
+
 ****** Binds
 ***** Cursor
 
@@ -1975,17 +2038,20 @@
       ;; non-nil means don’t consider case significant in completion
       (customize-set-variable 'completion-ignore-case t)
 
-      ;; non-nil if flex completion rejects spaces in search pattern.
-      (customize-set-variable 'completion-flex-nospace nil)
+      ;; non-nil means flex completion rejects spaces in search pattern
+      (customize-set-variable 'completion-flex-nospace t)
 
       ;; list of completion styles to use: see `completion-styles-alist variable
-      (customize-set-variable 'completion-styles '(emacs22 basic partial-completion flex))
+      (customize-set-variable 'completion-styles '(basic
+                                                   initials
+                                                   partial-completion
+                                                   flex))
 
       ;; list of category-specific user overrides for completion styles
-      (customize-set-variable 'completion-category-overrides nil)
-      ;; '((file (styles initials basic flex))
-      ;;   (buffer (styles initials basic flex))
-      ;;   (info-menu (styles basic))))
+      (customize-set-variable 'completion-category-overrides
+                              '((file (flex basic initials))
+                                (buffer (flex basic initials))))
+      ;; (info-menu (styles basic))))
 
       ;; define the appearance and sorting of completions
       (customize-set-variable 'completions-format 'vertical)
@@ -1994,7 +2060,8 @@
       (customize-set-variable 'resize-mini-windows nil)
 
       ;; format string used to output "default" values
-      (customize-set-variable 'minibuffer-default-prompt-format " (default %s)")
+      ;; (customize-set-variable 'minibuffer-default-prompt-format " (default %s)")
+      (customize-set-variable 'minibuffer-default-prompt-format "[%s]")
 
       ;; if non-nil, shorten "(default ...)" to "[...]" in minibuffer prompts
       (customize-set-variable 'minibuffer-eldef-shorten-default t)
@@ -2526,27 +2593,35 @@
       ;; remove underline
       (customize-set-variable 'x-underline-at-descent-line t)
 
-      ;;
       ;; mode-line format
       (customize-set-variable 'mode-line-format
-                              '(" λ · ["
+                              '(;; "%e"
+                                " "
+                                "λ"
+                                " "
+                                "»"
+                                " "
                                 (:eval (format-time-string "%H:%M"))
-                                "]"
-                                "%e"
-                                mode-line-front-space
+                                " "
+                                "¦"
+                                ;; "
+                                ;; mode-line-front-space
+                                " "
                                 mode-line-modified
                                 mode-line-remote
                                 " "
-                                "%l:%c"
-                                " · "
-                                (:eval (propertized-buffer-identification "%b"))
-                                " · "
+                                "¦"
+                                " "
+                                "%l'%c"
+                                " "
+                                "·"
+                                " "
+                                (:eval (propertized-buffer-identification "(%b)"))
+                                " "
+                                "·"
+                                " "
                                 "("
-                                (:eval (if (eq major-mode 'exwm-mode)
-                                           mode-name
-                                         (upcase (if (not (listp mode-name))
-                                                     mode-name
-                                                   (car mode-name)))))
+                                (:eval (upcase (replace-regexp-in-string "-mode" "" (symbol-name major-mode))))
                                 ")"))
 
       #+END_SRC
@@ -3763,7 +3838,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (define-key ctl-x-map (kbd "C-x") 'multi-term-dedicated-toggle)
+       (define-key ctl-x-map (kbd "x") 'multi-term-dedicated-toggle)
 
        #+END_SRC
 
@@ -4098,10 +4173,11 @@
                 ("Planner" (or
                             (name . "^\\*Calendar\\*$")
                             (name . "^diary*")
-                            (name . "^\\bookmark*")
+                            (name . "^bookmark.org$")
                             (name . "^TODO*")
                             (name . "^agenda*")
-                            (mode . muse-mode)))))))
+                            (mode . muse-mode)))
+                ("VLM"  (name . "^vlm.org$"))))))
 
       #+END_SRC
 
@@ -4591,8 +4667,8 @@
 
       ;; vlm-media-map track related binds
       (define-key vlm-media-map (kbd "v") 'pause-track)
-      (define-key vlm-media-map (kbd "p") 'previous-track)
       (define-key vlm-media-map (kbd "n") 'next-track)
+      (define-key vlm-media-map (kbd "p") 'previous-track)
       (define-key vlm-media-map (kbd "r") 'random-track)
 
       ;; notebook related
@@ -5488,6 +5564,34 @@
 
       #+END_SRC
 
+**** Org-present
+
+***** Require
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'org-present-mode-hook
+                (lambda ()
+                  (let ((functions '(org-present-big
+                                     org-display-inline-images
+                                     org-present-hide-cursor
+                                     org-present-read-only)))
+                    (mapc (lambda (f) (safe-funcall f)) functions))))
+
+      (add-hook 'org-present-mode-quit-hook
+                (lambda ()
+                  (let ((functions '(org-present-small
+                                     org-remove-inline-images
+                                     org-present-show-cursor
+                                     org-present-read-write)))
+                    (mapc (lambda (f) (safe-funcall f)) functions))))
+
+      #+END_SRC
+
+***** Hooks
+***** Binds
+
 **** Tex
 
      Major mode for editing files of input for TeX, LaTeX, or SliTeX.
@@ -5992,7 +6096,7 @@
 
       ;; control whether to add a new tags table to the current list
       ;; t means do; nil means don’t (always start a new list)
-      (customize-set-variable 'tags-add-tables nil)
+      (customize-set-variable 'tags-add-tables t)
 
       ;; if non-nil, print the name of the tags file in the *Tags List* buffer.
       (customize-set-variable 'tags-apropos-verbose t)
@@ -6339,9 +6443,9 @@
       #+END_SRC
 
 ** Development
-*** Generic
+*** Common
 
-    Generic programming modes (minor/major).
+    Common programming modes (minor/major).
 
 **** Prog-mode
 
@@ -6650,6 +6754,19 @@
 
      #+END_SRC
 
+*** Clojure
+***** Clojure-mode
+****** Require
+****** Customize
+****** Hooks
+
+       #+BEGIN_SRC emacs-lisp
+
+       (add-hook 'clojure-mode-hook #'iclj-mode)
+
+       #+END_SRC
+
+***** ICLJ
 *** Geiser
 **** Require
 
@@ -7549,3 +7666,4 @@
 ** EOF
 
    *...See You Space Cowboy...*
+

@@ -9,7 +9,8 @@ RM = rm -f
 
 # Define Compile Command (CC)
 # Call batch-byte-compile function: -f
-CC := -f batch-byte-compile
+# CC := -f batch-byte-compile
+CC := -f batch-native-compile
 
 # Define eval and script commands
 EC := --eval

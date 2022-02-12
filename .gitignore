@@ -130,6 +130,10 @@ lisp
 backup
 blog
 nsm
+abbrev_defs
+eln-cache
+newsticker
+projects
 
 # Emacs private/custom elisp files
 cannon

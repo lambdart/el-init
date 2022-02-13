@@ -18,27 +18,31 @@
   epithet for =Emacs=, because these days it looks more and more like
   an =OS=.
 
+  Lisp Machines users are Lisp developers, this is so intrinsically
+  true as human knowledge is forgotten in time, time to be free
+  on the wind friend, time to be free...
+
   | Present Day, heh... Present Time |
 
 * Goal
 
-  Use =EMACS= as a =LISP MACHINE= the main
-  dynamic interface to perform data transformations,
-  a bridge between the human mind and the machine resources.
+  Use =EMACS= as a =LISP MACHINE=: a unify interface to
+  perform DATA transformations, a bridge between the human mind
+  and logical electric gates.
 
 * Mantras
 
   0. Data driven/oriented design: is all about the data and how its
      organized to do less transformations as possible when solving
-     a given problem, resulting in a great degree of optimization and
-     simplicity.
+     a given problem, resulting in a great degree of optimization,
+     clearness and simplicity.
   1. Avoid late time decisions.
   2. Always go in the opposite direction: =SCALE DOWN=, i.e, use less
-     resource as possible (reduce, re)
+     resource as possible (reduce, reuse, recycle)!
   3. Simple is better.
   4. Less is more.
   5. For the =LISP MACHINE= everything is a just =data=
-     to be s-expressed and evaluated.
+     to be s-expressed and/or evaluated.
   6. Lazy load (=autoloads=) everywhere.
   7. Byte-compile warnings not allowed!
   8. Use as few =libraries= as possible and always try
@@ -55,12 +59,12 @@
      solve an issue.
   10. If something is bothering you, fix it, right now!
   11. Few mapped keybinds as possible! Implies the constant
-      usage of the =minibuffer= to =eval= less often used commands,
-      but a huge pain relief, =dwim= style!
+      usage of the =minibuffer= (or any other dynamic front-end menu)
+      to =eval= less often used commands, but a huge pain relief,
+      =dwim= style!
   12. Use the same action flow logic, for the same class of commands.
   13. Global behavior always available, do not change states (erase
-      this silly idea), we have just one state and its
-      very dynamic!
+      this silly idea), we have just one state and its VERY DYNAMIC!
   14. Successive refinements: in constant refactoring!
       Always improve, never fear the winds of change!
   15. I must not fear. Fear is the mind killer...

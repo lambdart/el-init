@@ -9,7 +9,8 @@
 
   Just another =Emacs= configuration written in =org= that
   has a simple goal: be just a configuration file, i.e,
-  set custom values and hooks for the libraries of interest.
+  set custom values and hooks for the libraries/modes
+  of interest.
 
   Some people have started to refer to =Emacs= as a
   =LISP MACHINE=. It is not strictly a lisp machine
@@ -18,9 +19,10 @@
   epithet for =Emacs=, because these days it looks more and more like
   an =OS=.
 
-  Lisp Machines users are Lisp developers, this is so intrinsically
-  true as human knowledge is forgotten in time, time to be free
-  on the wind friend, time to be free...
+  A little tip for newcomers, Lisp Machines users are Lisp Developers there's
+  no way around it. This is so intrinsically true as all the human knowledge
+  that was already forgotten. Maybe you think this to be overwhelming, but
+  we understand that's in fact formidable!
 
   | Present Day, heh... Present Time |
 

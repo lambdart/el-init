@@ -20,9 +20,8 @@
   an =OS=.
 
   A little tip for newcomers, Lisp Machines users are Lisp Developers there's
-  no way around it. This is so intrinsically true as all the human knowledge
-  that was already forgotten. Maybe you think this to be overwhelming, but
-  we understand that's in fact formidable!
+  no way around it. A hard truth that can be overwhelming, although it's in fact
+  formidable!
 
   | Present Day, heh... Present Time |
 

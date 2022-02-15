@@ -14,10 +14,11 @@
 
   Some people have started to refer to =Emacs= as a
   =LISP MACHINE=. It is not strictly a lisp machine
-  because, clearly, it is a software program and not a physical
-  computer, but as that line starts to blur it seems like a useful
-  epithet for =Emacs=, because these days it looks more and more like
-  an =OS=.
+  because, clearly, it is a software program and not
+  a physical computer, but as that line starts to blur
+  it seems like a useful epithet for =Emacs=, because
+  these days it looks more and more like an
+  =VIRTUAL LISP MACHINE=.
 
   A little tip for newcomers, Lisp Machines users are Lisp Developers there's
   no way around it. A hard truth that can be overwhelming, although it's in fact

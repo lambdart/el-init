@@ -237,7 +237,7 @@
      Define maps as prefix commands, this prepares
      =keymaps= for use as a prefix key's binding.
 
-     #+BEGIN_SRC emacs-lisp
+  macs-lisp
 
      (dolist (prefix-map '(vlm-tags-map
                            vlm-tabs-map
@@ -408,7 +408,7 @@
 
       #+END_SRC
 
-** System
+** Basic
 *** Definitions
 **** Loaddefs
 
@@ -2088,7 +2088,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; non-nil means to allow minibuffer commands while in the minibuffer
-      (customize-set-variable 'enable-recursive-minibuffers t)
+      (customize-set-variable 'enable-recursive-minibuffers nil)
 
       ;; if non-nil, `read-answer' accepts single-character answers
       (customize-set-variable 'read-answer-short t)
@@ -2113,6 +2113,9 @@
 
       ;; non-nil means automatically provide help for invalid completion input
       (customize-set-variable 'completion-auto-help nil)
+
+      ;; the value can be nil to disable sorting
+      (customize-set-variable 'completions-sort nil)
 
       ;; non-nil means don't consider case significant in completion
       (customize-set-variable 'completion-ignore-case t)
@@ -4625,17 +4628,13 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; vlm-completion-map
-      (define-key vlm-completion-map (kbd "`") 'ace-complete-word)
-      (define-key vlm-completion-map (kbd "f") 'ace-complete-file-name)
+      ;; (define-key vlm-completion-map (kbd "`") 'ace-completion-word-at-point)
+      ;; (define-key vlm-completion-map (kbd "f") 'ace-completion-file-name-at-point)
       (define-key vlm-completion-map (kbd "<tab>") 'ace-completion-at-point)
 
       ;; global map
       (global-set-key (kbd "M-<tab>") 'ace-completion-at-point-or-indent)
       (global-set-key (kbd "TAB") 'ace-completion-at-point-or-indent)
-
-      ;; TODO
-      ;; (define-key vlm-completion-map (kbd "/" 'ace-complete-dabbrev)
-      ;; (define-key vlm-completion-map (kbd "]") 'ace-complete-dabbrev-code)
 
       #+END_SRC
 
@@ -6764,7 +6763,15 @@
 
       #+END_SRC
 
-** Development Environments
+** Interop
+
+   Interoperability is a characteristic of a product or system to work with
+   other products or systems. While the term was initially defined for
+   information technology or systems engineering services to allow for
+   information exchange, a broader definition takes into account social,
+   political, and organizational factors that impact system-to-system
+   performance.
+
 *** Common
 
     Common programming modes (minor/major).
@@ -7100,6 +7107,26 @@
        #+END_SRC
 
 ***** ICLJ
+****** Require
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; (require 'iclj nil t)
+
+       #+END_SRC
+
+****** Customize
+****** Hooks
+
+       #+BEGIN_SRC emacs-lisp
+
+       (add-hook 'iclj-mode-hook
+                 (lambda ()
+                   (setq-local ace-collection-functions '(iclj-completion-at-point))))
+
+       #+END_SRC
+
+
 *** Geiser
 **** Require
 
@@ -7995,15 +8022,6 @@
      (global-unset-key (kbd "<S-down-mouse-1>"))
 
      #+END_SRC
-
-** Aliases
-
-   It is sometimes useful to make two variables synonyms, so that both
-   variables always have the same value, and changing either one also
-   changes the other.  Whenever you change the name of a variable - either
-   because you realize its old name was not well chosen, or because its
-   meaning has partly changed - it can be useful to keep the old name as an
-   alias of the new one for compatibility.
 
 ** EOF
 

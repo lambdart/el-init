@@ -20,9 +20,8 @@
   these days it looks more and more like a
   =VIRTUAL LISP MACHINE=.
 
-  A little tip for newcomers, Lisp Machines users are Lisp Developers there's
-  no way around it. A hard truth that can be overwhelming, although it's in fact
-  formidable!
+  A little tip for newcomers, Lisp Machines users are Lisp Developers, a hard
+  truth that can be overwhelming for some and formidable by others.
 
   | Present Day, heh... Present Time |
 
@@ -78,9 +77,6 @@
   2. https://www.gnu.org/software/emacs/manual/html_node/emacs/Keymaps.html
   3. https://en.wikipedia.org/wiki/Lisp_machine
   4. https://www.emacswiki.org/emacs/LispMachine
-  5. http://www.gigamonkeys.com/book
-  6. https://github.com/larstvei/dot-emacs/blob/master/init.org
-  7. https://protesilaos.com/dotemacs/
 
 * LICENSE
 

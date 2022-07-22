@@ -28,7 +28,7 @@
   Knuth  in which a computer program is given an explanation of its
   logic in a natural language, such as English, interspersed with
   snippets of macros and traditional source code, from which
-  compilable source code can be generated.
+  compatible source code can be generated.
 
   =Org-mode= is used to write and organize the configuration
   in a literate programming format, meaning it contains
@@ -237,7 +237,7 @@
      Define maps as prefix commands, this prepares
      =keymaps= for use as a prefix key's binding.
 
-  macs-lisp
+     #+BEGIN_SRC emacs-lisp
 
      (dolist (prefix-map '(vlm-tags-map
                            vlm-tabs-map
@@ -635,8 +635,8 @@
       (define-key ctl-x-map (kbd "k") 'kill-buffer)
 
       ;; shell command history
-      (define-key ctl-x-map (kbd "C-x") 'shell-command-history)
-      (define-key ctl-x-map (kbd "C-c") 'eval-command-history)
+      (define-key ctl-x-map (kbd "C-c")  'eval-command-history)
+      (define-key ctl-x-map (kbd "C-<f4>") 'shell-command-history)
 
       ;; mark
       (define-key vlm-utils-map (kbd "h") 'mark-whole-buffer)
@@ -683,8 +683,8 @@
       ;; (customize-set-variable 'tramp-chunksize 64)
 
       ;; a value of t would require an immediate reread during filename completion,
-      ;; nil means to use always cached values for the directory contents.
-      (customize-set-variable 'tramp-completion-reread-directory-timeout nil)
+      ;; nil means to use always cached values for the directory contents
+      (customize-set-variable 'tramp-completion-reread-directory-timeout 15)
 
       ;; set tramp verbose level
       (customize-set-variable 'tramp-verbose 4)
@@ -694,12 +694,19 @@
        'tramp-persistency-file-name
        (concat (expand-file-name user-emacs-directory) "cache/tramp"))
 
+      ;; regexp to match prompts from remote shell
+      ;; (customize-set-variable 'tramp-shell-prompt-pattern
+      ;;                         (ignore-errors
+      ;;                           (symbol-value 'shell-prompt-pattern)))
+
       ;; when invoking a shell, override the HISTFILE with this value
-      (customize-set-variable
-       'tramp-histfile-override "~/.tramp_history")
+      (customize-set-variable 'tramp-histfile-override nil)
+
+      ;; default method to use for specific host/user pairs
+      ;; (customize-set-variable 'tramp-default-method-alist nil)
 
       ;; connection timeout in seconds
-      (customize-set-variable 'tramp-connection-timeout 60)
+      (customize-set-variable 'tramp-connection-timeout 15)
 
       #+END_SRC
 
@@ -1159,7 +1166,7 @@
 
       #+END_SRC
 
-      ~** Vanilla
+** Vanilla
 
       Major Structures of Emacs: Files, Buffer, Windows, Frames, Input,
       International, Commands, Completions, Editing...
@@ -1579,6 +1586,15 @@
      ;; alist of default values for frame creation
      (add-to-list 'default-frame-alist '(internal-border-width . 2))
 
+     ;; adjust bottom dividers for frames individually
+     (add-to-list 'default-frame-alist '(bottom-divider-width . 4))
+
+     ;; default width of dividers on the right of windows.
+     (customize-set-variable 'window-divider-default-right-width 4)
+
+     ;; default width of dividers on bottom of windows
+     (customize-set-variable 'window-divider-default-bottom-width 4)
+
      #+END_SRC
 
 **** Hooks
@@ -1628,8 +1644,8 @@
 
      ;; set frame font
      (add-hook 'after-make-frame-functions
-               (lambda (_frame)
-                 (safe-set-frame-font "Iosevka:pixelsize=18:width=regular:weight=regular")))
+               (lambda (frame)
+                 (safe-set-frame-font "Iosevka:pixelsize=20:width=regular:weight=regular")))
 
      #+END_SRC
 
@@ -2124,8 +2140,11 @@
       (customize-set-variable 'completion-flex-nospace nil)
 
       ;; list of completion styles to use: see `completion-styles-alist variable
+      ;; (customize-set-variable 'completion-styles
+      ;;                         '(basic emacs22 partial-completion initials flex))
+
       (customize-set-variable 'completion-styles
-                              '(basic emacs22 partial-completion initials flex))
+                              '(basic orderless partial-completion initials))
 
       ;; list of category-specific user overrides for completion styles
       (customize-set-variable 'completion-category-overrides
@@ -2142,7 +2161,7 @@
       (customize-set-variable 'resize-mini-windows nil)
 
       ;; maximum height for resizing mini-windows (the minibuffer and the echo area)
-      (customize-set-variable 'max-mini-window-height 0.5)
+      (customize-set-variable 'max-mini-window-height 1)
 
       ;; format string used to output "default" values
       (customize-set-variable 'minibuffer-default-prompt-format "[%s]")
@@ -2710,10 +2729,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; custom
-      ;; 0 -> ("no-fringes" . 0), remove ugly icons to represet new lines
+      ;; ("no-fringes" . 0), remove ugly icons to represet new lines
       ;; ascii is more than enough to represent this information
-      ;; default appearance of fringes on all frame
       (customize-set-variable 'fringe-mode 0)
 
       #+END_SRC
@@ -2735,31 +2752,33 @@
 
       ;; mode-line format
       (customize-set-variable 'mode-line-format
-                              '(;; "%e"
+                              '(
                                 " "
                                 "λ"
                                 " "
                                 "»"
                                 " "
+                                "("
                                 (:eval (format-time-string "%H:%M"))
-                                " "
-                                "¦"
+                                ")"
+                                ;;"¦"
                                 ;; "
                                 ;; mode-line-front-space
                                 " "
+                                "("
                                 mode-line-modified
                                 mode-line-remote
+                                ")"
                                 " "
-                                "¦"
-                                " "
+                                ;; "¦"
+                                "("
                                 "%l'%c"
-                                " "
-                                "·"
+                                ")"
                                 " "
                                 (:eval (propertized-buffer-identification "(%b)"))
                                 " "
-                                "·"
-                                " "
+                                ;; "·"
+                                ;; " "
                                 "("
                                 (:eval (upcase (replace-regexp-in-string "-mode" "" (symbol-name major-mode))))
                                 ")"))
@@ -3200,7 +3219,7 @@
                                   (/ (frame-height) 3))))
 
       ;; the minimum total height, in lines, of any window
-      (customize-set-variable 'window-min-height 8)
+      (customize-set-variable 'window-min-height 4)
 
       #+END_SRC
 
@@ -3472,6 +3491,8 @@
 
       #+END_SRC
 
+*** Common
+**** Font-lock
 ** Extensions
 *** Loaddefs
 
@@ -3539,7 +3560,7 @@
 
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (funcall 'turn-on-lazy-load-mode)))
+                  (funcall 'lazy-load-mode 1)))
 
       #+END_SRC
 
@@ -3722,13 +3743,16 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; regexp to match prompts in the inferior shell
-      ;; (customize-set-variable 'shell-prompt-pattern "^[^#$%>\n]*[#$%>] *")
+      (customize-set-variable 'shell-prompt-pattern "^[^#$%>\n]*[#$%>] *")
+      ;; (customize-set-variable
+      ;;  'shell-prompt-pattern
+      ;;  "\\(?:^\\|\\)[^]#$%>\n]*#?[]#$%>] *\\(\\[[[:digit:];]*[[:alpha:]] *\\)*")
 
       ;; if non-nil, the file name to use for explicitly requested inferior shells.
       ;; When nil, such interactive shell sessions fall back to using the
       ;; shell specified in either the environment variable "ESHELL" or
       ;; ‘shell-file-name’
-      (customize-set-variable 'explicit-shell-file-name "/bin/sh")
+      (customize-set-variable 'explicit-shell-file-name "/usr/bin/fish")
 
       #+END_SRC
 
@@ -4484,6 +4508,8 @@
                             (name . "^TODO*")
                             (name . "^agenda*")
                             (mode . muse-mode)))
+                ("Ibuffer" (mode . ibuffer-mode))
+                ("Imenu" (name . "^\*Ilist\*"))
                 ("VLM"  (name . "^vlm.org$"))))))
 
       #+END_SRC
@@ -4651,7 +4677,6 @@
 
 **** Srecode
 **** Autotype
-*** Editing
 *** Graphics
 **** Artist
 
@@ -5265,6 +5290,9 @@
       ;; program invoked by M-x ispell-word and M-x ispell-region commands.
       (customize-set-variable 'ispell-program-name "aspell")
 
+      ;; english dictionary
+      ;; (customize-set-variable 'ispell-alternate-dictionary "/usr/lib/aspell-0.60/en-common.rws")
+
       #+END_SRC
 
 ***** Display
@@ -5635,7 +5663,7 @@
 
       #+END_SRC
 
-*** Compositor
+*** Graphics
 **** Compton
 
      Compton is a compositor based on Dana Jansens' version of xcompmgr
@@ -5736,6 +5764,14 @@
     "progress report" or "report."
 
 *** Office
+**** Allout
+
+     Allout outline minor mode provides extensive outline
+     formatting and and manipulation beyond standard emacs
+     outline mode.
+
+***** Require
+***** Customize
 **** Outline
 
      This package is a major mode for editing outline-format documents.
@@ -5750,14 +5786,6 @@
 
       #+END_SRC
 
-**** Allout
-
-     Allout outline minor mode provides extensive outline
-     formatting and and manipulation beyond standard emacs
-     outline mode.
-
-***** Require
-***** Customize
 **** Org
 
      Org is a mode for keeping notes, maintaining ToDo lists, and doing
@@ -5790,7 +5818,7 @@
 ***** Customize
 
       #+BEGIN_SRC emacs-lisp
-      ;; custom
+
       ;; when non-nil, fontify code in code blocks
       (customize-set-variable 'org-src-fontify-natively t)
 
@@ -5803,6 +5831,9 @@
 
       ;; confirm before evaluation
       (customize-set-variable 'org-confirm-babel-evaluate t)
+
+      ;; the maximum level for Imenu access to Org headlines
+      (customize-set-variable 'org-imenu-depth 8)
 
       ;; when set to t, Org assumes that you write outlines by indenting
       ;; text in each node to align with the headline, after the stars
@@ -6763,7 +6794,7 @@
 
       #+END_SRC
 
-** Interop
+** Development
 
    Interoperability is a characteristic of a product or system to work with
    other products or systems. While the term was initially defined for
@@ -7122,10 +7153,10 @@
 
        (add-hook 'iclj-mode-hook
                  (lambda ()
-                   (setq-local ace-collection-functions '(iclj-completion-at-point))))
+                   (setq-local ace-collection-functions
+                               '(iclj-completion-completions))))
 
        #+END_SRC
-
 
 *** Geiser
 **** Require
@@ -8026,4 +8057,5 @@
 ** EOF
 
    *...See You Space Cowboy...*
+
 

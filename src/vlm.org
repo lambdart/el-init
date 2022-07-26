@@ -1168,10 +1168,10 @@
 
 ** Vanilla
 
-      Major Structures of Emacs: Files, Buffer, Windows, Frames, Input,
-      International, Commands, Completions, Editing...
+   Major Structures of Emacs: Files, Buffer, Windows, Frames, Input,
+   International, Commands, Completions, Editing...
 
-      Basically the 'C' (core) system and fundamental ELISP libraries.
+   Basically the 'C' (core) system and fundamental ELISP libraries.
 
 *** Files
 
@@ -3493,6 +3493,23 @@
 
 *** Common
 **** Font-lock
+*** Menu
+**** Tmm
+***** Require
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; help text to insert on the top of the completion buffer
+      (customize-set-variable 'tmm-completion-prompt "")
+
+      ;; what letters to use as menu shortcuts.
+      (customize-set-variable 'tmm-shortcut-style 'upcase)
+
+      #+END_SRC
+
+***** Hooks
+*** Mail
 ** Extensions
 *** Loaddefs
 

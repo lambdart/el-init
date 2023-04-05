@@ -5,7 +5,8 @@
 # Don't load an init file: -q
 # Avoid processing X resources: -Q
 # Send messages to stderr: --batch
-EMACS = emacs -Q -q --batch -L ./lisp -L ./site-lisp
+# EMACS = emacs -Q -q --batch -L ./lisp -L ./site-lisp
+EMACS = emacs -Q -q --batch -L ~/core/devel/site-lisp/dists -L ~/core/devel/site-lisp/local
 
 # Remove command
 RM = rm -f
@@ -19,7 +20,7 @@ CC := -f batch-byte-compile
 TANGLE_SCRIPT = tangle.el
 
 # default target
-all: tangle compile
+all: tangle compile autoloads
 
 # run tangle script (org related)
 # the script will tangle the source code blocks from vlm.org
@@ -31,6 +32,10 @@ tangle:
 # Compile init.el and early-init.el
 compile:
 	 ${EMACS} ${CC} init.el early-init.el
+
+autoloads:
+	 # ${EMACS} -L ./site-lisp -L ./lisp -l ./lisp/lazy-load/lazy-load.el -f lazy-load-update-autoloads
+	 ${EMACS} -L ~/core/devel/site-lisp/dists -L ~/core/devel/site-lisp/local -l ~/core/devel/site-lisp/local/lazy-load/lazy-load.el -f lazy-load-update-autoloads
 
 # Remove all byte compiled files
 clean:

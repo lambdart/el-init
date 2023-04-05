@@ -114,6 +114,8 @@
       #+BEGIN_SRC emacs-lisp
 
       (require 'loaddefs)
+      (require 'dists-loaddefs)
+      (require 'local-loaddefs)
 
       #+END_SRC
 
@@ -368,7 +370,7 @@
 
     #+BEGIN_SRC sh
 
-    export EMACSLOADPATH=$EMACSLOADPATH:~/.emacs.d/lisp:~/.emacs.d/site-lisp
+        export EMACSLOADPATH=$EMACSLOADPATH:~/.emacs.d/lisp:~/.emacs.d/site-lisp
 
     #+END_SRC
 
@@ -513,7 +515,10 @@
        (customize-set-variable 'native-comp-warning-on-missing-source t)
 
        ;; if non-nil compile loaded .elc files asynchronously
-       (customize-set-variable 'native-comp-deferred-compilation t)
+       (customize-set-variable 'native-comp-deferred-compilation nil)
+
+       ;; if non-nil, enable primitive trampoline synthesis
+       (customize-set-variable 'comp-enable-subr-trampolines nil)
 
        #+END_SRC
 
@@ -579,6 +584,17 @@
 
       #+END_SRC
 
+***** Binds
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; shell command
+      (global-set-key (kbd "M-<f5>") 'shell-command)
+      (global-set-key (kbd "M-<f6>") 'async-shell-command)
+
+      #+END_SRC
+
+
 ***** Enable
 
       #+BEGIN_SRC emacs-lisp
@@ -635,8 +651,8 @@
       (define-key ctl-x-map (kbd "k") 'kill-buffer)
 
       ;; shell command history
-      (define-key ctl-x-map (kbd "C-c")  'eval-command-history)
-      (define-key ctl-x-map (kbd "C-<f4>") 'shell-command-history)
+      (define-key ctl-x-map (kbd "C-c") 'eval-command-history)
+      (define-key ctl-x-map (kbd "C-<f6>") 'shell-command-history)
 
       ;; mark
       (define-key vlm-utils-map (kbd "h") 'mark-whole-buffer)
@@ -680,11 +696,11 @@
       (customize-set-variable 'tramp-default-method "ssh")
 
       ;; if non-nil, chunksize for sending input to local process.
-      ;; (customize-set-variable 'tramp-chunksize 64)
+      (customize-set-variable 'tramp-chunksize 64)
 
       ;; a value of t would require an immediate reread during filename completion,
       ;; nil means to use always cached values for the directory contents
-      (customize-set-variable 'tramp-completion-reread-directory-timeout 15)
+      (customize-set-variable 'tramp-completion-reread-directory-timeout 60)
 
       ;; set tramp verbose level
       (customize-set-variable 'tramp-verbose 4)
@@ -695,15 +711,14 @@
        (concat (expand-file-name user-emacs-directory) "cache/tramp"))
 
       ;; regexp to match prompts from remote shell
-      ;; (customize-set-variable 'tramp-shell-prompt-pattern
-      ;;                         (ignore-errors
-      ;;                           (symbol-value 'shell-prompt-pattern)))
+      (customize-set-variable 'tramp-shell-prompt-pattern
+                              "\\(?:^\\|\\)[^]#$%>»\n]*#?[]#$%>»] *\\(\\[[[:digit:];]*[[:alpha:]] *\\)*")
 
       ;; when invoking a shell, override the HISTFILE with this value
       (customize-set-variable 'tramp-histfile-override nil)
 
       ;; default method to use for specific host/user pairs
-      ;; (customize-set-variable 'tramp-default-method-alist nil)
+      (customize-set-variable 'tramp-default-method-alist nil)
 
       ;; connection timeout in seconds
       (customize-set-variable 'tramp-connection-timeout 15)
@@ -1590,7 +1605,7 @@
      (add-to-list 'default-frame-alist '(bottom-divider-width . 4))
 
      ;; default width of dividers on the right of windows.
-     (customize-set-variable 'window-divider-default-right-width 4)
+     (customize-set-variable 'window-divider-default-right-width 5)
 
      ;; default width of dividers on bottom of windows
      (customize-set-variable 'window-divider-default-bottom-width 4)
@@ -1813,6 +1828,10 @@
      ;; column beyond which automatic line-wrapping should happen
      (customize-set-variable 'fill-column 80)
 
+     ;; character to draw the indicator when `display-fill-column-indicator'
+     ;;  is non-nil
+     (customize-set-variable 'display-fill-column-indicator-character 124)
+
      ;; sentences should be separated by a single space
      (customize-set-variable 'sentence-end-double-space nil)
 
@@ -1843,6 +1862,14 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; (require 'hl-line nil t)
+
+       #+END_SRC
+
+****** Customize
+
+       #+BEGIN_SRC emacs-lisp
+
+       (make-variable-buffer-local 'global-hl-line-mode)
 
        #+END_SRC
 
@@ -1968,6 +1995,12 @@
        ;; non-nil means to make the cursor very visible
        (customize-set-variable 'visible-cursor t)
 
+       ;; display a horizontal bar cursor with height HEIGHT
+       (customize-set-variable 'cursor-type '(hbar . 2))
+
+       ;; non-nil means show a cursor in non-selected windows
+       (customize-set-variable 'cursor-in-non-selected-windows t)
+
        #+END_SRC
 
 *** Conding-System
@@ -2072,12 +2105,22 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; maximum length of history lists before truncation takes place
-      (customize-set-variable 'history-length 1024)
+      (customize-set-variable 'history-length 2048)
 
-      ;;list history of commands that used the minibuffer
+      ;; list history of commands that used the minibuffer
       (customize-set-variable 'list-command-history-max history-length)
 
       #+END_SRC
+
+***** Bind
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; bind list-command-history command
+      (define-key vlm-utils-map (kbd "c") 'list-command-history)
+
+      #+END_SRC
+
 
 **** Minibuffer
 
@@ -2144,7 +2187,7 @@
       ;;                         '(basic emacs22 partial-completion initials flex))
 
       (customize-set-variable 'completion-styles
-                              '(basic orderless partial-completion initials))
+                              '(basic emacs22 partial-completion initials orderless))
 
       ;; list of category-specific user overrides for completion styles
       (customize-set-variable 'completion-category-overrides
@@ -2170,7 +2213,7 @@
       (customize-set-variable 'minibuffer-eldef-shorten-default t)
 
       ;; non-nil means entering the minibuffer raises the minibuffer's frame
-      (customize-set-variable 'minibuffer-auto-raise nil)
+      (customize-set-variable 'minibuffer-auto-raise t)
 
       ;; non-nil means to delete duplicates in history
       (customize-set-variable 'history-delete-duplicates t)
@@ -2404,13 +2447,12 @@
 
       #+END_SRC
 
-**** Selector
-
+**** Edm
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'mod-selector nil t)
+      ;; (require 'edm nil t)
 
       #+END_SRC
 
@@ -2418,11 +2460,19 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (eval-after-load 'mod-selector
+      (eval-after-load 'edm
         (lambda ()
-          (global-set-key (kbd "M-x") 'mod-selector-execute-extended-command)))
+          ;; global
+          (global-set-key (kbd "M-x") 'execute-extended-command)
+          (global-set-key (kbd "C-M-x") 'edm-execute-extended-command)
+          ;; minibuffer
+          (define-key minibuffer-local-map
+                      (kbd "M-`") 'edm-display-menu-buffer)
+          ;; ctl-x-map
+          (define-key ctl-x-map (kbd "x") 'edm-execute-keymap-command)
+          (define-key ctl-x-map (kbd "C-x") 'edm-execute-local-keymap-command)))
 
-      ;; reference:
+      ;; reference (backup)
       ;; (global-set-key (kbd "M-x") 'execute-extended-command)
 
       #+END_SRC
@@ -2434,7 +2484,7 @@
       ;; enable globally
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (funcall 'mod-selector-mode 1)))
+                  (funcall 'edm-mode 1)))
 
       #+END_SRC
 
@@ -2569,11 +2619,15 @@
       ;; if 'recent', select the most recently visited tab
       (customize-set-variable 'tab-bar-close-tab-select "recent")
 
+      ;; when this variable is nil, the width of each tab is determined by the
+      ;; length of the tab’s name.
+      (customize-set-variable 'tab-bar-auto-width nil)
+
       ;; list of modifier keys for selecting a tab by its index digit (testing)
       ;; (customize-set-variable 'tab-bar-select-tab-modifiers '("super"))
 
       ;; show absolute numbers on tabs in the tab bar before the tab name
-      ;; (customize-set-variable 'tab-bar-tab-hints nil)
+      (customize-set-variable 'tab-bar-tab-hints nil)
 
       #+END_SRC
 
@@ -2768,12 +2822,13 @@
                                 "("
                                 mode-line-modified
                                 mode-line-remote
+                                "%n"
                                 ")"
                                 " "
+                                "(%p)"
+                                " "
                                 ;; "¦"
-                                "("
-                                "%l'%c"
-                                ")"
+                                "(%l'%c)"
                                 " "
                                 (:eval (propertized-buffer-identification "(%b)"))
                                 " "
@@ -2781,7 +2836,10 @@
                                 ;; " "
                                 "("
                                 (:eval (upcase (replace-regexp-in-string "-mode" "" (symbol-name major-mode))))
-                                ")"))
+                                ")"
+                                ;; " "
+                                ;; mode-line-process
+                                ))
 
       #+END_SRC
 
@@ -2796,6 +2854,14 @@
        #+END_SRC
 
 ****** Customize
+
+       #+BEGIN_SRC emacs-lisp
+
+       (customize-set-variable 'wall-root-dir
+                               "/storage/media/images/wallpapers")
+
+       #+END_SRC
+
 ****** Enable
 
        #+BEGIN_SRC emacs-lisp
@@ -3327,7 +3393,8 @@
       (customize-set-variable 'Info-directory-list
                               `("/usr/local/share/emacs/info/"
                                 "/usr/local/share/info/"
-                                ,(expand-file-name "info/" user-emacs-directory)))
+                                ,(expand-file-name "info/" user-emacs-directory)
+                                ,(expand-file-name "info/gdb" user-emacs-directory)))
 
       ;; 0 -> means do not display breadcrumbs
       (customize-set-variable 'info-breadcrumbs-depth 0)
@@ -3561,13 +3628,13 @@
       (customize-set-variable 'lazy-load-timer-interval 15)
 
       ;; target files and directories
-      (customize-set-variable 'lazy-load-files-alist
-                              (list
-                               ;; lisp directory
-                               (cons "lisp-loaddefs.el" (expand-file-name "lisp/" user-emacs-directory))
-                               ;; site-lisp directory
-                               (cons "site-lisp-loaddefs.el"
-                                     (expand-file-name "site-lisp/" user-emacs-directory))))
+      ;; (customize-set-variable 'lazy-load-files-alist
+      ;;                         (list
+      ;;                          ;; lisp directory
+      ;;                          (cons "lisp-loaddefs.el" (expand-file-name "lisp/" user-emacs-directory))
+      ;;                          ;; site-lisp directory
+      ;;                          (cons "site-lisp-loaddefs.el"
+      ;;                                (expand-file-name "site-lisp/" user-emacs-directory))))
 
       #+END_SRC
 
@@ -3769,7 +3836,7 @@
       ;; When nil, such interactive shell sessions fall back to using the
       ;; shell specified in either the environment variable "ESHELL" or
       ;; ‘shell-file-name’
-      (customize-set-variable 'explicit-shell-file-name "/usr/bin/fish")
+      (customize-set-variable 'explicit-shell-file-name "/bin/csh")
 
       #+END_SRC
 
@@ -4140,8 +4207,15 @@
                  (lambda()
                    ;; do not display continuation lines.
                    (setq truncate-lines t)
+                   ;; make global line disappear
+                   (setq-local global-hl-line-mode nil)
                    ;; setup keybinds
                    (safe-funcall 'term-setup-keystroke)))
+
+       ;; temporary
+       ;; (add-hook 'term-mode-hook
+       ;;           (lambda ()
+       ;;             (setq-local global-hl-line-mode nil)))
 
        ;; bind term-raw-map/term-mode-map with hook
        (add-hook 'term-mode-hook
@@ -4154,7 +4228,7 @@
                      (define-key term-mode-map (kbd "s-q") 'term-char-mode))))
 
        ;; hook run after the term buffer is killed (not working)
-       (add-hook 'kill-buffer-hook 'term-kill-buffer-hook)
+       ;; (add-hook 'kill-buffer-hook 'term-kill-buffer-hook)
 
        #+END_SRC
 
@@ -4387,8 +4461,12 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; add vlm-theme-dir to theme load path
+       (add-to-list 'custom-theme-load-path (concat user-emacs-directory "themes"))
+
+       ;; add borland-blue-theme path
        (add-to-list 'custom-theme-load-path
-                    (concat user-emacs-directory "themes"))
+                    (expand-file-name "themes/borland-blue-theme"
+                                      user-emacs-directory))
 
        #+END_SRC
 
@@ -4399,7 +4477,7 @@
        ;; load theme
        (add-hook 'window-setup-hook
                  (lambda ()
-                   (funcall 'load-theme 'moebius-sun t)))
+                   (funcall 'load-theme 'borland-blue t)))
 
        #+END_SRC
 
@@ -4451,6 +4529,9 @@
 
       ;; if non-nil, display the current Ibuffer buffer itself
       (customize-set-variable 'ibuffer-view-ibuffer nil)
+
+      ;; if non-nil, always display the previous buffer
+      (customize-set-variable 'ibuffer-always-show-last-buffer t)
 
       ;; if non-nil, then show the names of filter groups which are empty
       (customize-set-variable 'ibuffer-show-empty-filter-groups nil)
@@ -4518,14 +4599,18 @@
                          (mode . gnus-browse-mode)
                          (name . "^\\.bbdb$")
                          (name . "^\\.newsrc-dribble")))
-                ("Planner" (or
-                            (name . "^\\*Calendar\\*$")
-                            (name . "^diary*")
-                            (name . "^bookmark.org$")
-                            (name . "^TODO*")
-                            (name . "^agenda*")
-                            (mode . muse-mode)))
+                ("Org" (or
+                        (mode . org-agenda-mode)
+                        (name . "^\\*Calendar\\*$")
+                        (name . "^diary*")
+                        (name . "^bookmark.org$")
+                        (name . "^TODO*")
+                        (name . "^agenda*")
+                        (mode . muse-mode)))
                 ("Ibuffer" (mode . ibuffer-mode))
+                ("Command History" (mode . command-history-mode))
+                ("Tex" (or (mode . tex-shell)
+                           (mode . latex-mode)))
                 ("Imenu" (name . "^\*Ilist\*"))
                 ("VLM"  (name . "^vlm.org$"))))))
 
@@ -4597,11 +4682,31 @@
 
       #+END_SRC
 
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; the list of expansion functions tried in order by `hippie-expand'
+      ;; try-expand-all-abbrevs: todo research
+      (customize-set-variable 'hippie-expand-try-functions-list
+                              '(try-expand-list
+                                try-expand-dabbrev
+                                try-expand-dabbrev-all-buffers
+                                try-expand-dabbrev-from-kill
+                                try-expand-line
+                                try-complete-lisp-symbol-partially
+                                try-complete-lisp-symbol
+                                try-complete-file-name-partially
+                                try-complete-file-name))
+
+      #+END_SRC
+
+
 ***** Binds
 
       #+BEGIN_SRC emacs-lisp
 
-      (global-set-key (kbd "M-]") 'hippie-expand)
+      (global-set-key (kbd "M-[") 'hippie-expand)
 
       #+END_SRC
 
@@ -4674,6 +4779,7 @@
       ;; (define-key vlm-completion-map (kbd "`") 'ace-completion-word-at-point)
       ;; (define-key vlm-completion-map (kbd "f") 'ace-completion-file-name-at-point)
       (define-key vlm-completion-map (kbd "<tab>") 'ace-completion-at-point)
+      (define-key vlm-completion-map (kbd "a")     'completion-at-point)
 
       ;; global map
       (global-set-key (kbd "M-<tab>") 'ace-completion-at-point-or-indent)
@@ -4722,6 +4828,74 @@
       #+END_SRC
 
 *** Readers
+**** Email
+***** Messages
+
+      This mode provides mail-sending facilities from within Emacs.  It
+      consists mainly of large chunks of code from the sendmail.el,
+      gnus-msg.el and rnewspost.el files.
+
+****** Require
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; (require 'message nil t)
+
+       #+END_SRC
+
+****** Customize
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; your preference for a mail composition package
+       (customize-set-variable 'mail-user-agent 'message-user-agent)
+       ;; (customize-set-variable 'mail-user-agent 'gnus-user-agent)
+
+       ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
+       (customize-set-variable 'compose-mail-user-agent-warnings nil)
+
+       ;; if it is nil, use Gnus; else use `mail-user-agent'
+       (customize-set-variable 'message-mail-user-agent t)
+
+       ;; string to be inserted at the end of the message buffer
+       (customize-set-variable 'message-signature "")
+
+       ;; format of the "whomever writes:" line
+       (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
+
+       ;; function called to insert the "whomever writes:" line
+       (customize-set-variable 'message-citation-line-function
+                               'message-insert-formatted-citation-line)
+       ;; function that inserts a formatted citation line
+
+       ;; when non-nil, ask for confirmation when sending a message
+       (customize-set-variable 'message-confirm-send t)
+
+       ;; non-nil means that the message buffer will be killed after sending a message
+       (customize-set-variable 'message-kill-buffer-on-exit t)
+
+       ;; whether to confirm a wide reply to multiple email recipients
+       (customize-set-variable 'message-wide-reply-confirm-recipients t)
+
+       ;; this variable is obsolete since 26.1;
+       ;; the default charset comes from the language environment
+       ;; default charset used in non-MULE Emacsen
+       (customize-set-variable 'message-default-charset 'utf-8)
+
+       ;; directory from which all other mail file variables are derived
+       (customize-set-variable 'message-directory "~/mail")
+
+       #+END_SRC
+
+****** Hooks
+
+       #+BEGIN_SRC emacs-lisp
+
+       ;; normal hook, run each time a new outgoing message is initialized
+       (add-hook 'message-setup-hook 'message-sort-headers)
+
+       #+END_SRC
+
 **** Elfeed
 
      Elfeed is a web feed client for Emacs, inspired by notmuch.
@@ -4785,10 +4959,36 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; directory where incoming mail source files (if any) will be stored
-      (customize-set-variable 'mail-source-directory (expand-file-name "~/mail/"))
+      ;; where the mail backends will look for incoming mail
+      (customize-set-variable 'mail-sources
+                              '((maildir :path "~/.nmaildir" :subdirs ("cur" "new"))))
+
+      ;; file where mail will be stored while processing it
+      ;; (customize-set-variable 'mail-source-crash-box
+      ;;                         (expand-file-name
+      ;;                          ".emacs-mail-crash-box"
+      ;;                          (symbol-value 'mail-source-directory)))
+
+      ;; if non-nil, delete incoming files after handling.
+      ;; if t, delete immediately, if nil, never delete.  If a positive number, delete
+      ;; files older than number of days.
+      (customize-set-variable 'mail-source-delete-incoming nil)
 
       #+END_SRC
+
+**** Nnmail
+
+     These variables are (for the most part) pertinent to all the various
+     mail back ends.
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; the file name of the nnmail Message-ID cache
+     (customize-set-variable 'nnmail-message-id-cache-file
+                             (expand-file-name "cache/.nnmail-cache"
+                                               user-emacs-directory))
+
+     #+END_SRC
 
 **** Gnus
 
@@ -4834,11 +5034,20 @@
        (customize-set-variable 'gnus-select-method '(nnnil))
 
        ;; a list of secondary methods that will be used for reading news
-       (customize-set-variable
-        'gnus-secondary-select-methods '((nntp "news.gwene.org")))
+       ;; '((nnml "")))
+       (customize-set-variable 'gnus-secondary-select-methods
+                               '(
+                                 ;; (nntp "news.gwene.org")
+                                 ;; (nntp "news.grc.com")
+                                 ;; (nntp "news.tilde.club")
+                                 ;; (nntp "retrobsd.ddns.net")
+                                 (nnmaildir "" (directory "~/.nnmaildir"))))
 
        ;; if non-nil, automatically mark Gcc articles as read
        (customize-set-variable 'gnus-gcc-mark-as-read nil)
+
+       ;; if non-nil, the startup message will not be displayed
+       (customize-set-variable 'gnus-inhibit-startup-message nil)
 
        ;; whether we want to use the Gnus agent or not
        (customize-set-variable 'gnus-agent nil)
@@ -4848,6 +5057,9 @@
 
        ;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
        (customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
+
+       ;; unconditionally read the dribble file
+       (customize-set-variable 'gnus-always-read-dribble-file t)
 
        ;; non-nil means that Gnus will read the entire active file at startup
        (customize-set-variable 'gnus-read-active-file 'some)
@@ -4871,13 +5083,17 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; format of group lines
-       (customize-set-variable 'gnus-group-line-format "%M%S%p%P%-12,12y: %B%(%G%)%l\n")
+       ;; (customize-set-variable 'gnus-group-line-format "%M%S%p%P%-12,12y: %B%(%G%)%l\n")
+       (customize-set-variable 'gnus-group-line-format "%M%S%p%P%5y:%B%(%g%)\n")
 
        ;; non-nil means that Gnus will check and remove bogus newsgroup at startup
        (customize-set-variable 'gnus-check-bogus-newsgroups t)
 
        ;; non-nil means that Gnus will run `gnus-find-new-newsgroups' at startup
        (customize-set-variable 'gnus-check-new-newsgroups 'ask-server)
+
+       ;; revise this
+       ;; (setq gnus-message-archive-group '((format-time-string "sent.%Y-%m")))
 
        #+END_SRC
 
@@ -4886,14 +5102,14 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; if non-nil, display an arrow highlighting the current article
-       (customize-set-variable 'gnus-summary-display-arrow nil)
+       (customize-set-variable 'gnus-summary-display-arrow t)
 
        ;; if non-nil, ignore articles with identical Message-ID headers
        (customize-set-variable 'gnus-summary-ignore-duplicates t)
 
        ;; the format specification of the lines in the summary buffer.
-       (customize-set-variable
-        'gnus-summary-line-format " %U %R %d %-5,5L %-12,12n %B%-80,80S\n")
+       (customize-set-variable 'gnus-summary-line-format
+                               " %U %R %d %-5,5L %-12,12n %B%-80,80S\n")
 
        ;; specifies date format depending on age of article
        (customize-set-variable
@@ -4930,6 +5146,24 @@
 ****** Articles
 
        #+BEGIN_SRC emacs-lisp
+
+       ;; non-nil means inhibit displaying of images inline in the article body
+       (customize-set-variable 'gnus-inhibit-images t)
+
+       ;; value of ‘truncate-lines’ in Gnus Article buffer
+       (customize-set-variable 'gnus-article-truncate-lines t)
+
+       ;; if non-nil, allow scrolling the article buffer even when there no more text
+       (customize-set-variable 'gnus-article-show-cursor t)
+
+       ;; if non-nil, display all articles in the same buffer.
+       (customize-set-variable 'gnus-single-article-buffer t)
+
+       ;; if nil, don’t delete temporary files
+       ;; if it is t, delete them on exit from the summary buffer
+       ;; if it is the symbol ‘file’, query on each file, if it is ‘ask’ ask once when
+       ;; exiting from the summary buffer.
+       (customize-set-variable 'gnus-article-browse-delete-temp t)
 
        #+END_SRC
 
@@ -5477,71 +5711,6 @@
     and allows it to establish connectivity with services
     running on server computers.
 
-**** Email
-***** Messages
-
-      This mode provides mail-sending facilities from within Emacs.  It
-      consists mainly of large chunks of code from the sendmail.el,
-      gnus-msg.el and rnewspost.el files.
-
-****** Require
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; (require 'message nil t)
-
-       #+END_SRC
-
-****** Customize
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; your preference for a mail composition package
-       (customize-set-variable 'mail-user-agent 'message-user-agent)
-       ;; (customize-set-variable 'mail-user-agent 'gnus-user-agent)
-
-       ;; if non-nil, `compose-mail' warns about changes in `mail-user-agent'
-       (customize-set-variable 'compose-mail-user-agent-warnings nil)
-
-       ;; if it is nil, use Gnus; else use `mail-user-agent'
-       (customize-set-variable 'message-mail-user-agent t)
-
-       ;; string to be inserted at the end of the message buffer
-       (customize-set-variable 'message-signature "")
-
-       ;; format of the "whomever writes:" line
-       (customize-set-variable 'message-citation-line-format "%f [%Y-%m-%d, %R %z]:\n")
-
-       ;; function called to insert the "whomever writes:" line
-       (customize-set-variable 'message-citation-line-function
-                               'message-insert-formatted-citation-line)
-       ;; function that inserts a formatted citation line
-
-       ;; when non-nil, ask for confirmation when sending a message
-       (customize-set-variable 'message-confirm-send t)
-
-       ;; non-nil means that the message buffer will be killed after sending a message
-       (customize-set-variable 'message-kill-buffer-on-exit t)
-
-       ;; whether to confirm a wide reply to multiple email recipients
-       (customize-set-variable 'message-wide-reply-confirm-recipients t)
-
-       ;; this variable is obsolete since 26.1;
-       ;; the default charset comes from the language environment
-       ;; default charset used in non-MULE Emacsen
-       (customize-set-variable 'message-default-charset 'utf-8)
-
-       #+END_SRC
-
-****** Hooks
-
-       #+BEGIN_SRC emacs-lisp
-
-       ;; normal hook, run each time a new outgoing message is initialized
-       (add-hook 'message-setup-hook 'message-sort-headers)
-
-       #+END_SRC
-
 **** Verb
 
      Verb is a package that allows you to organize and send HTTP
@@ -5862,6 +6031,10 @@
       ;; non-nil means C-a and C-e behave specially in headlines and items
       (customize-set-variable 'org-special-ctrl-a/e t)
 
+      ;; check if in invisible region before inserting or deleting a character
+      ;; Valid values are:
+      (customize-set-variable 'org-fold-catch-invisible-edits 'show-and-error)
+
       #+END_SRC
 
 ***** Hooks
@@ -5889,6 +6062,12 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      (eval-after-load 'org-mode
+        (progn
+          (when (boundp 'org-mode-map)
+            (define-key org-mode-map (kbd "C-c C-<up>") 'org-timestamp-up)
+            (define-key org-mode-map (kbd "C-c C-<down>") 'org-timestamp-down))))
+
       #+END_SRC
 
 **** Org-Agenda
@@ -5904,7 +6083,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; the files to be used for agenda display, should be a list of them.
-      (customize-set-variable 'org-agenda-files '("~/org/agenda.org"))
+      (customize-set-variable 'org-agenda-files '("~/org/agenda"))
 
       ;; the separator between blocks in the agenda
       (customize-set-variable 'org-agenda-block-separator "=")
@@ -5913,7 +6092,7 @@
       (customize-set-variable 'org-agenda-buld-mark-char ">")
 
       ;; non-nil means make the block agenda more compact
-      (customize-set-variable 'org-agenda-compact-blocks t)
+      (customize-set-variable 'org-agenda-compact-blocks nil)
 
       ;; when t, a confirmation is always needed.
       ;; when a number N, confirmation is only needed when the text
@@ -5922,13 +6101,24 @@
 
       ;; if non-nil, include in the agenda entries from
       ;; the Emacs Calendar’s diary
-      (customize-set-variable 'org-agenda-include-diary t)
+      (customize-set-variable 'org-agenda-include-diary nil)
 
       ;; inhibit startup when preparing agenda buffers
       ;; when this variable is t, the initialization of the Org agenda
       ;; buffers is inhibited: e.g. the visibility state is not set, the
       ;; tables are not re-aligned, etc.
       (customize-set-variable 'org-agenda-inhibit-startup t)
+
+      ;; non-nil means start the overview always on the specified weekday.
+      ;; 0 denotes Sunday, 1 denotes Monday, etc.
+      ;; When nil, always start on the current day.
+      ;; Custom commands can set this variable in the options section.
+      (customize-set-variable 'org-agenda-start-on-weekday 1)
+
+      ;; Number of days to include in overview display.
+      ;; Can be day, week, month, year, or any number of days.
+      ;; Custom commands can set this variable in the options section.
+      (customize-set-variable 'org-agenda-span 'week)
 
       #+END_SRC
 
@@ -5993,7 +6183,7 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (customize-set-variable 'markdown-command "multimarkdown")
+      (customize-set-variable 'markdown-command "markdown")
 
       #+END_SRC
 
@@ -6065,14 +6255,11 @@
         (interactive)
         (let ((word (or (thing-at-point 'word)
                         (read-string "Word: "))))
-          ;; switch/case
           (cond
-           ;; word?
-           ((eq word "") (message "Missing word")) ; no word submited
-           ;; default, search in dictionary
-           (t
-            (when (fboundp 'dictionary-search)
-              (dictionary-search word))))))
+           ((string-equal word "")
+            (message "Missing %s word" word))
+           (t (when (fboundp 'dictionary-search)
+                (dictionary-search word))))))
 
       #+END_SRC
 
@@ -6117,6 +6304,20 @@
 
       #+END_SRC
 
+**** Markdown
+***** Require
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; command to run markdown
+      (customize-set-variable 'markdown-command "markdown")
+
+      #+END_SRC
+
+***** Hooks
+***** Binds
+***** Enable
 *** Blogs
 
     A blog (a truncation of 'weblog') is a discussion or informational
@@ -6306,7 +6507,7 @@
       (define-key vlm-docs-map (kbd "i") 'ddoc-install-docset)
       (define-key vlm-docs-map (kbd "a") 'ddoc-activate-docset)
       (define-key vlm-docs-map (kbd "d") 'ddoc-deactivate-docset)
-      (define-key vlm-docs-map (kbd "l") 'ddoc-find-file)
+      (define-key vlm-docs-map (kbd "l") 'ddoc-find-file-at-point)
 
       #+END_SRC
 
@@ -6669,7 +6870,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; utils map
-      (define-key vlm-utils-map (kbd "c") 'compile-command-history)
+      ;; (define-key vlm-utils-map (kbd "c") 'compile-command-history)
 
       #+END_SRC
 
@@ -6699,6 +6900,16 @@
 
       #+END_SRC
 
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      (add-hook 'magit-status-mode-hook
+                (lambda()
+                  (setq truncate-lines nil)))
+
+      #+END_SRC
+
 *** Projects
 **** Ede
 
@@ -6713,19 +6924,17 @@
 
       #+END_SRC
 
-**** Projectile
+**** Project
 
-     This package provides easy project management and navigation.
-     The concept of a project is pretty basic - just a folder containing
-     special file. Currently git, mercurial and bazaar repos are
-     considered projects by default. If you want to mark a folder
-     manually as a project just create an empty .projectile file in it.
+     This file contains generic infrastructure for dealing with
+     projects, some utility functions, and commands using that
+     infrastructure.
 
 ***** Require
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (require 'projectile nil t)
+      ;; (require 'project nil t)
 
       #+END_SRC
 
@@ -6733,17 +6942,14 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; enable cache and choose indexing method
-      (customize-set-variable 'projectile-enable-caching t)
-      (customize-set-variable 'projectile-indexing-method 'hybrid)
-      (customize-set-variable 'projectile-completion-system 'default)
+      ;; non-nil to display list of buffers to kill before killing project buffers
+      ;; hide  used by ‘project-kill-buffers’
+      (customize-set-variable 'project-kill-buffers-display-buffer-list t)
 
-      ;; set bookmarks file localtion (cache)
-      (customize-set-variable 'projectile-known-projects-file
-                              (concat user-emacs-directory "cache/projectile-bookmarks.eld"))
-
-      (customize-set-variable 'projectile-cache-file
-                              (concat user-emacs-directory "cache/projectile.cache"))
+      ;; file in which to save the list of known projects
+      (customize-set-variable 'project-list-file
+                              (expand-file-name "cache/projects"
+                                                user-emacs-directory))
 
       #+END_SRC
 
@@ -6751,38 +6957,24 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      (define-key vlm-pm-map (kbd "g") 'projectile-grep)
-      (define-key vlm-pm-map (kbd "p") 'projectile-ag)
-      (define-key vlm-pm-map (kbd "t") 'projectile-find-tag)
-      (define-key vlm-pm-map (kbd "f") 'projectile-find-file)
-      (define-key vlm-pm-map (kbd "<f5>") 'projectile-compile-project)
-      (define-key vlm-pm-map (kbd "&") 'projectile-run-eshell)
-      (define-key vlm-pm-map (kbd "o") 'projectile-switch-project)
-      (define-key vlm-pm-map (kbd "r") 'projectile-replace-regexp)
-      (define-key vlm-pm-map (kbd "d") 'projectile-dired)
-      (define-key vlm-pm-map (kbd "R") 'projectile-replace)
-      (define-key vlm-pm-map (kbd "s") 'projectile-save-project-buffers)
-      (define-key vlm-pm-map (kbd "d") 'projectile-discover-projects-in-directory)
-      (define-key vlm-pm-map (kbd "c") 'projectile-cleanup-known-projects)
-      (define-key vlm-pm-map (kbd "C") 'projectile-invalidate-cache)
-      (define-key vlm-pm-map (kbd "U") 'projectile-purge-dir-from-cache)
-      (define-key vlm-pm-map (kbd "u") 'projectile-purge-file-from-cache)
-      (define-key vlm-pm-map (kbd ".") 'projectile-edit-dir-locals)
-      (define-key vlm-pm-map (kbd "k") 'projectile-kill-buffers)
-      (define-key vlm-pm-map (kbd "D") 'projectile-remove-known-project)
+      ;; (define-key vlm-pm-map (kbd "p") 'ag-project-files)
+      (define-key vlm-pm-map (kbd "p") 'ag-project-at-point)
+      (define-key vlm-pm-map (kbd "o") 'project-switch-project)
+      (define-key vlm-pm-map (kbd "d") 'project-dired)
+      (define-key vlm-pm-map (kbd "s") 'project-search)
+      (define-key vlm-pm-map (kbd "g") 'project-find-regexp)
+      (define-key vlm-pm-map (kbd "f") 'project-find-file)
+      (define-key vlm-pm-map (kbd "k") 'project-kill-buffers)
+      (define-key vlm-pm-map (kbd "r") 'project-query-replace-regexp)
+      (define-key vlm-pm-map (kbd "j") 'magit-project-status)
+      (define-key vlm-pm-map (kbd "<f5>") 'project-compile)
+      (define-key vlm-pm-map (kbd "&") 'project-eshell)
+      (define-key vlm-pm-map (kbd "x") 'project-execute-extended-command)
 
       #+END_SRC
 
+***** Hooks
 ***** Enable
-
-      #+BEGIN_SRC emacs-lisp
-
-      (add-hook 'window-setup-hook
-                (lambda ()
-                  (funcall 'projectile-mode 1)))
-
-      #+END_SRC
-
 *** Containers
 *** Misc
 **** Speedbar
@@ -6824,7 +7016,7 @@
 
     Common programming modes (minor/major).
 
-**** Prog-mode
+**** Prog
 
      Generic programming mode, from which others derive.
 
@@ -7025,7 +7217,7 @@
       #+END_SRC
 
 *** Lisp
-**** Lisp-mode
+**** Lisp
 
      The base major mode for editing Lisp code (used also for Emacs Lisp).
      This mode is documented in the Emacs manual.
@@ -7048,7 +7240,7 @@
       #+END_SRC
 
 *** Elisp
-**** Elisp-mode
+**** Elisp
 
      The major mode for editing Emacs Lisp code.
      Tis mode is documented in the Emacs manual.
@@ -7097,11 +7289,13 @@
             (define-key emacs-lisp-mode-map (kbd "C-c C-f") 'eval-defun)
             (define-key emacs-lisp-mode-map (kbd "C-c C-r") 'eval-region)
             (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer)
-            (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile))))
+            (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'emacs-lisp-byte-compile)
+            (define-key emacs-lisp-mode-map (kbd "C-c C-n") 'emacs-lisp-native-compile-and-load))))
 
       #+END_SRC
 
-*** Slime
+*** Common-lisp
+**** Slime
 
     SLIME is the Superior Lisp Interaction Mode for Emacs.
 
@@ -7113,37 +7307,117 @@
     adds support for interacting with a running Common Lisp process
     for compilation, debugging, documentation lookup, and so on.
 
-**** Require
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
      ;; (require 'slime nil t)
+     (require 'slime-autoloads)
 
      #+END_SRC
 
-**** Customize
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
+     ;; "/usr/local/bin/ccl"
      ;; program name for invoking an inferior Lisp in Inferior Lisp mode
-     (customize-set-variable 'inferior-lisp-program "/usr/local/bin/ccl")
+     (customize-set-variable 'inferior-lisp-program "/usr/local/bin/sbcl")
+
+     ;; never doesn’t load the fasl
+     (customize-set-variable 'slime-load-failed-fasl 'never)
+
+     ;; if non-nil, kill slime processes without query
+     (customize-set-variable 'slime-kill-without-query-p t)
+
+     ;; set truncate-lines in popup buffers
+     (customize-set-variable 'slime-truncate-lines t)
 
      #+END_SRC
 
-**** Hooks
+***** Hooks
 
      #+BEGIN_SRC emacs-lisp
 
-     ;; hooks example
+     (add-hook 'slime-mode-hook
+               (lambda ()
+                 ;; a list of contrib packages to load with SLIME
+                 (when (boundp 'slime-contribs)
+                   (setq slime-contribs
+                         '(slime-fancy slime-asdf slime-quicklisp)))
+                 (setq-local ace-collection-functions
+                             '(slime-simple-completions))))
+
+     (add-hook 'slime-repl-mode-hook
+               (lambda ()
+                 (setq-local ace-collection-functions
+                             '(slime-simple-completions))))
+
      (add-hook 'slime-load-hook
                (lambda ()
                  (and (boundp 'slime-prefix-map)
-                      (define-key slime-prefix-map (kbd "M-h") 'slime-documentation-lookup))))
+                      (define-key slime-prefix-map
+                                  (kbd "M-h")
+                                  'slime-documentation-lookup))))
 
      #+END_SRC
 
+***** Binds
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; slime-repl-mode
+     (eval-after-load 'slime-repl
+       (lambda ()
+         (when (boundp 'slime-repl-mode-map)
+           (progn
+             (define-key slime-repl-mode-map (kbd "C-c C-p") 'slime-repl-set-package)
+             (define-key slime-repl-mode-map (kbd "C-c C-l") 'slime-quicklisp-load-system)))))
+
+     ;; slime-mode
+     (eval-after-load 'slime
+       (lambda ()
+         (when (boundp 'slime-mode-map)
+           (progn
+             ;; unbind
+             (define-key slime-mode-map (kbd "M-n") 'nil)
+             (define-key slime-mode-map (kbd "M-p") 'nil)
+             (define-key slime-mode-map (kbd "C-c C-y") 'nil)
+             (define-key slime-mode-map (kbd "C-c ~") 'nil)
+             (define-key slime-mode-map (kbd "C-c M-k") 'nil)
+             (define-key slime-mode-map (kbd "C-c C-s") 'nil)
+             ;; bind
+             (define-key slime-mode-map (kbd "M-h f")   'slime-describe-function)
+             (define-key slime-mode-map (kbd "M-h M-f") 'slime-describe-function)
+             (define-key slime-mode-map (kbd "M-h d")   'slime-describe-symbol)
+             (define-key slime-mode-map (kbd "M-h M-d") 'slime-describe-symbol)
+             (define-key slime-mode-map (kbd "C-c C-a") 'slime-apropos)
+             (define-key slime-mode-map (kbd "C-c C-i") 'slime-inspect)
+             (define-key slime-mode-map (kbd "C-c C-z") 'slime-interrupt)
+             (define-key slime-mode-map (kbd "C-c C-b") 'slime-eval-buffer)
+             (define-key slime-mode-map (kbd "C-c C-r") 'slime-eval-region)
+             (define-key slime-mode-map (kbd "C-c C-j") 'slime-eval-last-expression-in-repl)
+             (define-key slime-mode-map (kbd "C-c C-e") 'slime-interactive-eval)
+             (define-key slime-mode-map (kbd "C-c C-k") 'slime-call-defun)
+             (define-key slime-mode-map (kbd "C-c x")   'slime-compile-defun)
+             (define-key slime-mode-map (kbd "C-c C-e") 'slime-interactive-eval)
+             (define-key slime-mode-map (kbd "C-c C-m") 'slime-macroexpand-1)
+             (define-key slime-mode-map (kbd "C-c M-m") 'slime-macroexpand-all)
+             (define-key slime-mode-map (kbd "C-c C-x") 'slime-compile-defun)
+             (define-key slime-mode-map (kbd "C-c C-/") 'slime-disassemble-symbol)
+             (define-key slime-mode-map (kbd "C-c C-.") 'slime-export-symbol-at-point)
+             (define-key slime-mode-map (kbd "C-c C-c") 'slime-compile-and-load-file)
+             (define-key slime-mode-map (kbd "C-c C-f") 'slime-load-file)
+             (define-key slime-mode-map (kbd "C-c C-q") 'slime-unintern-symbol)
+             (define-key slime-mode-map (kbd "C-c C-l") 'slime-quicklisp-load-system)
+             (define-key slime-mode-map (kbd "C-c C-p") 'slime-repl-set-package)
+             (define-key slime-mode-map (kbd "C-c C-o") 'slime-switch-to-output-buffer)))))
+
+     #+END_SRC
+
+***** Enable
 *** Clojure
-***** Clojure-mode
+***** Clojure
 ****** Require
 ****** Customize
 ****** Hooks
@@ -7171,12 +7445,37 @@
        (add-hook 'iclj-mode-hook
                  (lambda ()
                    (setq-local ace-collection-functions
-                               '(iclj-completion-completions))))
+                               '(ace-collection-dabbrev-code
+                                 ace-collection-imenu
+                                 ace-collection-filenames
+                                 ace-collection-clojure-dictionary
+                                 iclj-completion-completions))))
 
        #+END_SRC
 
-*** Geiser
-**** Require
+*** Scheme
+**** Scheme
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      ;; program invoked by the `run-scheme' command
+      (customize-set-variable 'scheme-program-name "csi")
+
+      #+END_SRC
+
+**** Chicken
+***** Hooks
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; (remove-hook 'scheme-mode-hook 'chicken-mode)
+     (add-hook 'scheme-mode-hook 'chicken-mode)
+
+     #+END_SRC
+
+**** Geiser
+***** Require
 
      #+BEGIN_SRC emacs-lisp
 
@@ -7184,7 +7483,7 @@
 
      #+END_SRC
 
-**** Customize
+***** Customize
 
      #+BEGIN_SRC emacs-lisp
 
@@ -7193,7 +7492,7 @@
 
      #+END_SRC
 
-**** Hooks
+***** Hooks
 
      #+BEGIN_SRC emacs-lisp
 
@@ -7201,14 +7500,15 @@
 
      #+END_SRC
 
-*** Glsl
+*** GLSL
+**** GLSL
 
-    Major mode for editing OpenGLSL grammar files, usually files
+     Major mode for editing OpenGLSL grammar files, usually files
     ending with .vert, .frag, .glsl, .geom. Is is based on
     c-mode plus some features and pre-specified fonts and
     faces properties.
 
-**** Enable
+***** Enable
 
      #+BEGIN_SRC emacs-lisp
 
@@ -7403,7 +7703,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; style which gets installed by default when a file is visited
-      ;; (customize-set-variable 'c-default-style '(custom))
+      (customize-set-variable 'c-default-style '(custom))
 
       ;; whether to fontify certain ambiguous constructs by white space asymmetry
       (customize-set-variable 'c-asymmetry-fontification-flag nil)
@@ -7417,7 +7717,7 @@
 
       ;; amount of basic offset used by + and - symbols in `c-offsets-alist'
       ;; also used as the indentation step when `c-syntactic-indentation' is nil
-      (customize-set-variable 'c-basic-offset nil) ; 'set-from-style
+      (customize-set-variable 'c-basic-offset 4) ; 'set-from-style
 
       ;; if non-nil, syntactic info is echoed when the line is indented
       (customize-set-variable 'c-echo-syntactic-information-p t)

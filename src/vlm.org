@@ -1660,7 +1660,9 @@
      ;; set frame font
      (add-hook 'after-make-frame-functions
                (lambda (frame)
-                 (safe-set-frame-font "Iosevka:pixelsize=20:width=regular:weight=regular")))
+                 (safe-set-frame-font "Iosevka:pixelsize=22:width=regular:weight=regular")))
+
+     ;; -PfEd-unscii-thin-normal-normal-*-*-*-*-*-m-0-iso10646-1
 
      #+END_SRC
 
@@ -2858,7 +2860,7 @@
        #+BEGIN_SRC emacs-lisp
 
        (customize-set-variable 'wall-root-dir
-                               "/storage/media/images/wallpapers")
+                               "/storage/media/images/wallpapers/")
 
        #+END_SRC
 
@@ -3394,7 +3396,8 @@
                               `("/usr/local/share/emacs/info/"
                                 "/usr/local/share/info/"
                                 ,(expand-file-name "info/" user-emacs-directory)
-                                ,(expand-file-name "info/gdb" user-emacs-directory)))
+                                ,(expand-file-name "info/gdb" user-emacs-directory)
+                                ,(expand-file-name "info/gcl" user-emacs-directory)))
 
       ;; 0 -> means do not display breadcrumbs
       (customize-set-variable 'info-breadcrumbs-depth 0)
@@ -4241,6 +4244,36 @@
 
        #+END_SRC
 
+***** Vterm
+****** Require
+****** Customize
+****** Binds
+
+       #+BEGIN_SRC emacs-lisp
+
+       (eval-after-load 'vterm
+         (lambda ()
+           (when (and (boundp 'vterm-mode-map)
+                      (boundp 'vterm-copy-mode-map))
+             (define-key vterm-mode-map (kbd "s-q") 'vterm-copy-mode)
+             (define-key vterm-copy-mode-map (kbd "s-q") 'vterm-copy-mode-done))))
+
+       ;; clt-x-map (C-x) prefix
+       ;; (define-key ctl-x-map (kbd "<C-return>") 'vterm)
+
+       #+END_SRC
+
+****** Hooks
+
+       #+BEGIN_SRC emacs-lisp
+
+       (add-hook 'vterm-mode-hook
+                 (lambda ()
+                   (setq-local global-hl-line-mode nil)))
+
+       #+END_SRC
+
+****** Enable
 ***** Multi-Term
 ****** Require
 ****** Customize
@@ -4461,7 +4494,8 @@
        #+BEGIN_SRC emacs-lisp
 
        ;; add vlm-theme-dir to theme load path
-       (add-to-list 'custom-theme-load-path (concat user-emacs-directory "themes"))
+       (add-to-list 'custom-theme-load-path
+                    (concat user-emacs-directory "themes"))
 
        ;; add borland-blue-theme path
        (add-to-list 'custom-theme-load-path
@@ -4478,6 +4512,10 @@
        (add-hook 'window-setup-hook
                  (lambda ()
                    (funcall 'load-theme 'borland-blue t)))
+
+       ;; list of enabled custom themes, highest precedence first
+       ;; (customize-set-variable 'custom-enabled-themes
+       ;;                         '(borland-blue))
 
        #+END_SRC
 
@@ -4602,6 +4640,7 @@
                 ("Org" (or
                         (mode . org-agenda-mode)
                         (name . "^\\*Calendar\\*$")
+                        (name . "^\\*Org Src.+\\*$")
                         (name . "^diary*")
                         (name . "^bookmark.org$")
                         (name . "^TODO*")
@@ -4609,6 +4648,8 @@
                         (mode . muse-mode)))
                 ("Ibuffer" (mode . ibuffer-mode))
                 ("Command History" (mode . command-history-mode))
+                ("Minibuffer" (or (mode . minibuffer-inactive-mode)
+                                  (mode . minibuffer-mode)))
                 ("Tex" (or (mode . tex-shell)
                            (mode . latex-mode)))
                 ("Imenu" (name . "^\*Ilist\*"))
@@ -4733,6 +4774,7 @@
       (define-key vlm-completion-map (kbd "e") 'yas-expand)
       (define-key vlm-completion-map (kbd "i") 'yas-insert-snippet)
       (define-key vlm-completion-map (kbd "v") 'yas-visit-snippet-file)
+      (define-key global-map (kbd "C-M-I") 'yas-insert-snippet)
 
       ;; binds yas-keymap
       (eval-after-load 'yasnippet
@@ -5227,8 +5269,8 @@
       (customize-set-variable ' emms-source-playlist-ask-before-overwrite nil)
 
       ;; the default directory to look for media files.
-      (customize-set-variable
-       'emms-source-file-default-directory (expand-file-name "~/media/music/"))
+      (customize-set-variable 'emms-source-file-default-directory
+                              (expand-file-name "~/media/music"))
 
       #+END_SRC
 
@@ -7371,6 +7413,8 @@
        (lambda ()
          (when (boundp 'slime-repl-mode-map)
            (progn
+             (define-key slime-repl-mode-map (kbd "C-c a")   'slime-apropos)
+             (define-key slime-repl-mode-map (kbd "C-c C-a") 'slime-apropos-package)
              (define-key slime-repl-mode-map (kbd "C-c C-p") 'slime-repl-set-package)
              (define-key slime-repl-mode-map (kbd "C-c C-l") 'slime-quicklisp-load-system)))))
 
@@ -7391,7 +7435,8 @@
              (define-key slime-mode-map (kbd "M-h M-f") 'slime-describe-function)
              (define-key slime-mode-map (kbd "M-h d")   'slime-describe-symbol)
              (define-key slime-mode-map (kbd "M-h M-d") 'slime-describe-symbol)
-             (define-key slime-mode-map (kbd "C-c C-a") 'slime-apropos)
+             (define-key slime-mode-map (kbd "C-c a")   'slime-apropos)
+             (define-key slime-mode-map (kbd "C-c C-a") 'slime-apropos-package)
              (define-key slime-mode-map (kbd "C-c C-i") 'slime-inspect)
              (define-key slime-mode-map (kbd "C-c C-z") 'slime-interrupt)
              (define-key slime-mode-map (kbd "C-c C-b") 'slime-eval-buffer)
@@ -8128,6 +8173,17 @@
       ;;               (add-to-list 'web-mode-engines-alist '(("php" . "\\.phtml\\'"))))))
 
       #+END_SRC
+
+*** Rebuilder
+**** Customize
+
+     #+BEGIN_SRC emacs-lisp
+
+     ;; positive integer limiting the matches for re builder auto updates
+     ;; set it to nil if you don’t want limits here
+     (customize-set-variable 'reb-auto-match-limit 1024)
+
+     #+END_SRC
 
 ** Unload
 

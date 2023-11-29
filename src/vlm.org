@@ -48,7 +48,7 @@
 
     #+BEGIN_SRC emacs-lisp
 
-    ;;; init.el --- Virtual Lisp Machine Configuration (init.el)
+    ;;; init.el --- Emacs Init File -*- lexical-binding: t -*-
 
     ;;; Commentary:
 
@@ -311,13 +311,20 @@
      #+BEGIN_SRC emacs-lisp
 
      ;; non-nil inhibits the startup screen
-     (customize-set-variable 'inhibit-startup-message nil)
+     (customize-set-variable 'inhibit-startup-message t)
 
      ;; non-nil inhibits the initial startup echo area message
-     (customize-set-variable 'inhibit-startup-echo-area-message nil)
+     (customize-set-variable 'inhibit-startup-echo-area-message "lambdart")
 
      ;; major mode command symbol to use for the initial *scratch* buffer
      (customize-set-variable 'initial-major-mode 'emacs-lisp-mode)
+
+     ;; buffer to show after starting emacs
+     (customize-set-variable 'initial-buffer-choice nil)
+
+     ;; initial documentation displayed in *scratch* buffer at startup
+     (customize-set-variable 'initial-scratch-message
+                             ";; The dream to awaken our world...\n;;\n")
 
      ;; the full name of the user logged in
      (customize-set-variable 'user-full-name (getenv "USER"))
@@ -1642,7 +1649,7 @@
 
      ;; set transparency after a frame is created
      (add-hook 'after-make-frame-functions
-               (lambda (frame)
+               (lambda (_frame)
                  (set-transparency .8)))
 
      #+END_SRC
@@ -1684,8 +1691,8 @@
      ;; set frame font
      ;; (safe-set-frame-font "Hermit:pixelsize=20:slant=normal:width=normal:weight=light")))
      (add-hook 'after-make-frame-functions
-               (lambda (frame)
-                 (safe-set-frame-font "Iosevka Term:pixelsize=20:slant=normal:width=regular:weight=normal")))
+               (lambda (_frame)
+                 (safe-set-frame-font "Iosevka:pixelsize=21:slant=normal:width=regular:weight=normal")))
 
      #+END_SRC
 
@@ -2202,7 +2209,7 @@
       (customize-set-variable 'completion-auto-help nil)
 
       ;; the value can be nil to disable sorting
-      (customize-set-variable 'completions-sort nil)
+      (customize-set-variable 'completions-sort 'alphabetical)
 
       ;; non-nil means don't consider case significant in completion
       (customize-set-variable 'completion-ignore-case t)
@@ -2490,7 +2497,7 @@
       (eval-after-load 'edm
         (lambda ()
           ;; global
-          (global-set-key (kbd "M-x") 'execute-extended-command)
+          (global-set-key (kbd "M-x") 'edm-execute-extended-command)
           (global-set-key (kbd "C-M-x") 'edm-execute-extended-command)
           ;; minibuffer
           (define-key minibuffer-local-map
@@ -2664,7 +2671,7 @@
 
       (add-hook 'window-setup-hook
                 (lambda ()
-                  (funcall 'tab-bar-mode 1)))
+                  (funcall 'tab-bar-mode 0)))
 
       #+END_SRC
 
@@ -2688,7 +2695,8 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; (define-key vlm-tags-map (kbd "t") 'tab-switcher)
+
+      (define-key vlm-tags-map (kbd "t") 'tab-switcher)
       (define-key global-map (kbd "s-<tab>") 'tab-switcher)
 
       #+END_SRC
@@ -3203,7 +3211,7 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; clean whitespace and newlines before buffer save
-      ;; (add-hook 'before-save-hook #'whitespace-cleanup)
+      (add-hook 'before-save-hook #'whitespace-cleanup)
 
       #+END_SRC
 
@@ -3315,7 +3323,7 @@
 
       ;; maximum height of a window displaying a temporary buffer.
       (customize-set-variable 'temp-buffer-max-height
-                              (lambda (buffer)
+                              (lambda (_buffer)
                                 (if (and (display-graphic-p) (eq (selected-window) (frame-root-window)))
                                     (/ (x-display-pixel-height) (frame-char-height) 3)
                                   (/ (frame-height) 3))))
@@ -3433,7 +3441,7 @@
                                        "/usr/local/share/info")
                                      `(,(vlm-info-additional-directory-list))))
 
-      ;; list of additional directories to search for info files 
+      ;; list of additional directories to search for info files
       (customize-set-variable 'Info-additional-directory-list
                               (vlm-info-additional-directory-list))
 
@@ -3954,7 +3962,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'exwm nil t)
+       ;; (require 'exwm nil t)
 
        #+END_SRC
 
@@ -4058,7 +4066,6 @@
 
        ;; workspace binds
        (define-key vlm-window-map (kbd "o") 'vlm-exwm-other-workspace)
-
        #+END_SRC
 
 ****** Hooks
@@ -4102,7 +4109,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (require 'exwm-randr nil t)
+       ;; (require 'exwm-randr nil t)
 
        #+END_SRC
 
@@ -4152,7 +4159,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (add-hook 'exwm-randr-screen-change-hook 'vlm-xrandr-screen-layout)
+       ;; (add-hook 'exwm-randr-screen-change-hook 'vlm-xrandr-screen-layout)
 
        #+END_SRC
 
@@ -4160,7 +4167,7 @@
 
        #+BEGIN_SRC emacs-lisp
 
-       (exwm-randr-enable)
+       ;; (exwm-randr-enable)
        (exwm-enable)
 
        #+END_SRC
@@ -4790,6 +4797,10 @@
 
       #+BEGIN_SRC emacs-lisp
 
+      ;; completion map
+      (define-key vlm-completion-map (kbd "e") 'hippie-expand)
+
+      ;; global
       (global-set-key (kbd "M-[") 'hippie-expand)
 
       #+END_SRC
@@ -4814,10 +4825,10 @@
       #+BEGIN_SRC emacs-lisp
 
       ;; binds vlm-completion-map
-      (define-key vlm-completion-map (kbd "e") 'yas-expand)
-      (define-key vlm-completion-map (kbd "i") 'yas-insert-snippet)
-      (define-key vlm-completion-map (kbd "v") 'yas-visit-snippet-file)
-      (define-key global-map (kbd "C-M-I") 'yas-insert-snippet)
+      ;; (define-key vlm-completion-map (kbd "e") 'yas-expand)
+      ;; (define-key vlm-completion-map (kbd "i") 'yas-insert-snippet)
+      ;; (define-key vlm-completion-map (kbd "v") 'yas-visit-snippet-file)
+      ;; (define-key global-map (kbd "C-M-I") 'yas-insert-snippet)
 
       ;; binds yas-keymap
       (eval-after-load 'yasnippet
@@ -4825,7 +4836,7 @@
           (when (boundp 'yas-keymap)
             (define-key yas-keymap (kbd "TAB") nil)
             (define-key yas-keymap (kbd "<tab>") nil)
-            (define-key yas-keymap (kbd "M-TAB") 'yas-next-field))
+            (define-key yas-keymap (kbd "M-<tab>") 'yas-next-field))
 
           ;; unbind: clean minor mode map alist
           (setq minor-mode-map-alist nil)))
@@ -7533,6 +7544,17 @@
 
        (add-hook 'clojure-mode-hook #'iclj-mode)
 
+       (add-hook 'clojure-mode-hook
+                 (lambda ()
+                   (mapc (lambda (completion-function)
+                           (and (boundp 'ace-collection-functions)
+                                (push completion-function ace-collection-functions)))
+                         '(ace-collection-dabbrev-code
+                           ace-collection-yas
+                           ace-collection-filenames
+                           ace-collection-imenu
+                           ace-collection-clojure-dictionary))))
+
        #+END_SRC
 
 ***** ICLJ
@@ -7551,12 +7573,9 @@
 
        (add-hook 'iclj-mode-hook
                  (lambda ()
-                   (setq-local ace-collection-functions
-                               '(ace-collection-dabbrev-code
-                                 ace-collection-imenu
-                                 ace-collection-filenames
-                                 ace-collection-clojure-dictionary
-                                 iclj-completion-completions))))
+                   (and (boundp 'ace-collection-functions)
+                        (push 'iclj-completion-completions
+                              ace-collection-functions))))
 
        #+END_SRC
 
@@ -8095,11 +8114,14 @@
 
       #+BEGIN_SRC emacs-lisp
 
-      ;; default Python interpreter for shell
+      ;; default python noninteractive interpreter
+      (customize-set-variable 'python-interpreter "python")
+      ;; default Python interpreter interactive interpreter
       (customize-set-variable 'python-shell-interpreter "python")
-
       ;; non-nil means template skeletons will be automagically inserted
       (customize-set-variable 'python-skeleton-autoinsert t)
+      ;; path to virtualenv root
+      (customize-set-variable 'python-shell-virtualenv-root "/home/lambdart/core/work/funape/spectroman/venv")
 
       #+END_SRC
 
@@ -8119,8 +8141,50 @@
                   ;; set dash docsets
                   (vlm-activate-docset '"Python 3")))
 
+      ;; add ipy mode
+      (add-hook 'python-mode-hook #'ipy-mode)
+
+      ;; set completions
+      (add-hook 'python-mode-hook
+                (lambda ()
+                  (and (fboundp 'ace-config-python-mode)
+                       (ace-config-python-mode))))
+
       #+END_SRC
 
+**** Ipy
+***** Require
+
+      #+BEGIN_SRC emacs-lisp
+      ;; (require 'ipy nil t)
+      #+END_SRC
+
+***** Customize
+
+      #+BEGIN_SRC emacs-lisp
+
+      (customize-set-variable
+       'ipy-proc-virtualenv-root
+       (symbol-value 'python-shell-virtualenv-root))
+
+      ;; python process environment
+      (customize-set-variable
+       'ipy-proc-env
+       (funcall
+        (lambda ()
+          `(,(format "VIRTUAL_ENV=%s"
+                     (directory-file-name (symbol-value 'ipy-proc-virtualenv-root)))))))
+
+      #+END_SRC
+
+***** Hooks
+
+      #+BEGIN_SRC emacs-lisp
+
+      #+END_SRC
+
+***** Binds
+***** Enable
 *** Julia
 **** Julia-mode
 

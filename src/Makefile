@@ -1,5 +1,5 @@
 # Defines phony targets all and clean
-.PHONY = all compile clean
+.PHONY = all compile clean autoloads tangle
 
 # Emacs invocation
 # Don't load an init file: -q
@@ -34,8 +34,8 @@ compile:
 	 ${EMACS} ${CC} init.el early-init.el
 
 autoloads:
-	 # ${EMACS} -L ./site-lisp -L ./lisp -l ./lisp/lazy-load/lazy-load.el -f lazy-load-update-autoloads
-	 ${EMACS} -L ~/core/devel/site-lisp/dists -L ~/core/devel/site-lisp/local -l ~/core/devel/site-lisp/local/lazy-load/lazy-load.el -f lazy-load-update-autoloads
+	 ${EMACS} -L ./site-lisp -L ./lisp -l ./lisp/lazy-load/lazy-load.el -f lazy-load-update-autoloads
+	 # ${EMACS} -L ~/core/devel/site-lisp/dists -L ~/core/devel/site-lisp/local -l ~/core/devel/site-lisp/local/lazy-load/lazy-load.el -f lazy-load-update-autoloads
 
 # Remove all byte compiled files
 clean:
